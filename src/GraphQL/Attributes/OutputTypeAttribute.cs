@@ -9,12 +9,13 @@ namespace GraphQL;
 public class OutputTypeAttribute : GraphQLAttribute
 {
     /// <inheritdoc cref="OutputTypeAttribute"/>
-    public OutputTypeAttribute(Type graphType)
+    public OutputTypeAttribute([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type graphType)
     {
         OutputType = graphType;
     }
 
     /// <inheritdoc cref="OutputTypeAttribute"/>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
     public Type OutputType
     {
         get;
@@ -41,7 +42,7 @@ public class OutputTypeAttribute : GraphQLAttribute
 }
 
 /// <inheritdoc cref="OutputTypeAttribute"/>
-public class OutputTypeAttribute<TGraphType> : OutputTypeAttribute
+public class OutputTypeAttribute<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType> : OutputTypeAttribute
     where TGraphType : IGraphType
 {
     /// <inheritdoc cref="OutputTypeAttribute"/>

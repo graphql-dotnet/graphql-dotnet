@@ -616,12 +616,13 @@ namespace GraphQL
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter)]
     public class InputTypeAttribute : GraphQL.GraphQLAttribute
     {
-        public InputTypeAttribute(System.Type graphType) { }
+        public InputTypeAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type graphType) { }
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
         public System.Type InputType { get; set; }
         public override void Modify(GraphQL.Types.QueryArgument queryArgument) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
-    public class InputTypeAttribute<TGraphType> : GraphQL.InputTypeAttribute
+    public class InputTypeAttribute<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType> : GraphQL.InputTypeAttribute
         where TGraphType : GraphQL.Types.IGraphType
     {
         public InputTypeAttribute() { }
@@ -722,11 +723,12 @@ namespace GraphQL
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface)]
     public class OutputTypeAttribute : GraphQL.GraphQLAttribute
     {
-        public OutputTypeAttribute(System.Type graphType) { }
+        public OutputTypeAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type graphType) { }
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
         public System.Type OutputType { get; set; }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
-    public class OutputTypeAttribute<TGraphType> : GraphQL.OutputTypeAttribute
+    public class OutputTypeAttribute<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType> : GraphQL.OutputTypeAttribute
         where TGraphType : GraphQL.Types.IGraphType
     {
         public OutputTypeAttribute() { }
@@ -903,7 +905,6 @@ namespace GraphQL
         [System.Obsolete("Use TypeExtensions.GetGraphTypeFromType(Type, bool, bool) overload instead. This " +
             "method will be removed in v10.")]
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable, GraphQL.TypeMappingMode mode) { }
-        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", @"IL2073: 'target method' method return value does not satisfy 'DynamicallyAccessedMembersAttribute' requirements. The return value of method 'source method' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to", Justification="The return type is a marker type and will never have constructors.")]
         [return: System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable, bool isInputType) { }
         public static string GraphQLName(this System.Type type) { }

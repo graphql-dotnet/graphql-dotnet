@@ -283,8 +283,6 @@ public static class TypeExtensions
     /// <returns>A Type object representing a GraphType that matches the indicated type.</returns>
     /// <remarks>This can handle arrays, lists and other collections implementing IEnumerable.</remarks>
     [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-    [UnconditionalSuppressMessage("Trimming", "IL2073: 'target method' method return value does not satisfy 'DynamicallyAccessedMembersAttribute' requirements. The return value of method 'source method' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to",
-        Justification = "The return type is a marker type and will never have constructors.")]
     public static Type GetGraphTypeFromType(this Type type, bool isNullable, bool isInputType)
     {
         if (typeof(IGraphType).IsAssignableFrom(type))
