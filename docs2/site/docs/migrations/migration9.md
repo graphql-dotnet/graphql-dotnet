@@ -281,7 +281,7 @@ Typically no changes are required to user code unless you have a custom implemen
 
 ### 14. `GetGraphTypeFromType` method signature changed
 
-The `TypeExtensions.GetGraphTypeFromType()` method has a new overload that replaces the `TypeMappingMode` enum parameter with a boolean `isInputType` parameter to improve AOT compilation support. The old signature with `TypeMappingMode` is now obsolete and will be removed in v10. No changes are typically needed as this is primarily an internally used method.
+The `TypeExtensions.GetGraphTypeFromType()` method has a new overload that replaces the `TypeMappingMode` enum parameter with a boolean `isInputType` parameter to improve AOT compilation support. The old signature with `TypeMappingMode` is now obsolete and will be removed in v10. As a result of this change, the `TypeMappingMode.UseBuiltInScalarMappings` mode is now obsolete; the new method always uses CLR type references for types without built-in scalar mappings. Note that `SchemaTypes` continues to resolve CLR type references to built-in scalar types during schema initialization, so this change does not affect the final schema structure. No changes are typically needed as this is primarily an internally used method.
 
 If you call this method directly in your code, update calls as shown in this example:
 
