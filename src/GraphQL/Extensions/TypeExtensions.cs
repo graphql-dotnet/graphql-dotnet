@@ -177,13 +177,21 @@ public static class TypeExtensions
     }
 
     /// <summary>
-    /// Gets the graph type for the indicated type.
+    /// Converts a CLR type to its corresponding GraphQL type representation.
     /// </summary>
-    /// <param name="type">The type for which a graph type is desired.</param>
-    /// <param name="isNullable">if set to <see langword="false"/> if the type explicitly non-nullable.</param>
-    /// <param name="mode">Mode to use when mapping CLR type to GraphType.</param>
-    /// <returns>A Type object representing a GraphType that matches the indicated type.</returns>
-    /// <remarks>This can handle arrays, lists and other collections implementing IEnumerable.</remarks>
+    /// <param name="type">The CLR type to convert (e.g., <see cref="int"/>, <see cref="string"/>, custom classes, enums, or collections).</param>
+    /// <param name="isNullable">
+    /// <see langword="true"/> if the type is nullable; <see langword="false"/> to wrap it in <see cref="NonNullGraphType{T}"/>.
+    /// </param>
+    /// <param name="mode">The mapping mode: <see cref="TypeMappingMode.InputType"/>, <see cref="TypeMappingMode.OutputType"/>, or <see cref="TypeMappingMode.UseBuiltInScalarMappings"/> (legacy).</param>
+    /// <returns>
+    /// A GraphQL type such as <see cref="EnumerationGraphType{T}"/>, <see cref="ListGraphType{T}"/>, or <see cref="NonNullGraphType{T}"/>.
+    /// </returns>
+    /// <remarks>
+    /// Handles arrays, collections, nullable value types, and <see cref="IDataLoaderResult{T}"/>.
+    /// Respects <see cref="InputTypeAttribute"/> and <see cref="OutputTypeAttribute"/> for custom type mappings.
+    /// Throws <see cref="ArgumentOutOfRangeException"/> if <paramref name="type"/> is already a GraphQL type, a <see cref="Task"/>, or cannot be mapped.
+    /// </remarks>
     [Obsolete("Use TypeExtensions.GetGraphTypeFromType(Type, bool, bool) overload instead. This method will be removed in v10.")]
     [RequiresDynamicCode("This method uses reflection to create types at runtime which is not compatible with trimming and AOT.")]
     public static Type GetGraphTypeFromType(this Type type, bool isNullable, TypeMappingMode mode)
@@ -275,13 +283,24 @@ public static class TypeExtensions
     }
 
     /// <summary>
-    /// Gets the graph type for the indicated type.
+    /// Converts a CLR type to its corresponding GraphQL type representation.
     /// </summary>
-    /// <param name="type">The type for which a graph type is desired.</param>
-    /// <param name="isNullable">if set to <see langword="false"/> if the type explicitly non-nullable.</param>
-    /// <param name="isInputType">Indicates if the type is an input type</param>
-    /// <returns>A Type object representing a GraphType that matches the indicated type.</returns>
-    /// <remarks>This can handle arrays, lists and other collections implementing IEnumerable.</remarks>
+    /// <param name="type">The CLR type to convert (e.g., <see cref="int"/>, <see cref="string"/>, custom classes, enums, or collections).</param>
+    /// <param name="isNullable">
+    /// <see langword="true"/> if the type is nullable; <see langword="false"/> to wrap it in <see cref="NonNullGraphType{T}"/>.
+    /// </param>
+    /// <param name="isInputType">
+    /// <see langword="true"/> for input types (arguments, input objects); <see langword="false"/> for output types (fields, query results).
+    /// </param>
+    /// <returns>
+    /// A GraphQL type such as <see cref="GraphQLClrOutputTypeReference{T}"/>, <see cref="GraphQLClrInputTypeReference{T}"/>,
+    /// <see cref="ListGraphType{T}"/>, or <see cref="NonNullGraphType{T}"/>.
+    /// </returns>
+    /// <remarks>
+    /// Handles arrays, collections, nullable value types, and <see cref="IDataLoaderResult{T}"/>.
+    /// Respects <see cref="InputTypeAttribute"/> and <see cref="OutputTypeAttribute"/> for custom type mappings.
+    /// Throws <see cref="ArgumentOutOfRangeException"/> if <paramref name="type"/> is already a GraphQL type or a <see cref="Task"/>.
+    /// </remarks>
     [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
     public static Type GetGraphTypeFromType(this Type type, bool isNullable, bool isInputType)
     {
