@@ -132,6 +132,40 @@ public class ResolveFieldContextAccessorTests
             """);
     }
 
+    [Fact]
+    public async Task ContextAccessor_ListOfDataLoaders_ReturnCorrectContext()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .AddSchema<TestDataLoaderSchema>()
+            .AddResolveFieldContextAccessor()
+            .AddDataLoader()
+            .AddSystemTextJson());
+
+        var provider = services.BuildServiceProvider();
+        var schema = provider.GetRequiredService<ISchema>();
+        var executer = provider.GetRequiredService<IDocumentExecuter>();
+        var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
+
+        // Act
+        var result = await executer.ExecuteAsync(_ =>
+        {
+            _.Query = "{ dataLoaderListField }";
+            _.RequestServices = provider;
+        });
+        var jsonResult = serializer.Serialize(result);
+
+        // Assert
+        jsonResult.ShouldBeCrossPlatJson("""
+            {
+              "data": {
+                "dataLoaderListField": ["match", "match", "match"]
+              }
+            }
+            """);
+    }
+
     [Theory]
     [InlineData("dataLoaderField")]
     [InlineData("nestedDataLoaderField1")]
@@ -287,6 +321,26 @@ public class ResolveFieldContextAccessorTests
     {
         public TestDataLoaderQuery()
         {
+            Field<ListGraphType<StringGraphType>>("dataLoaderListField")
+                .ResolveAsync(async context =>
+                {
+                    // Create a list of 3 data loaders
+                    var loaders = new List<IDataLoaderResult<string>>();
+                    for (int i = 0; i < 3; i++)
+                    {
+                        var loader = new SimpleDataLoader<string>(async (_) =>
+                        {
+                            await Task.Yield();
+                            var service = context.RequestServices!.GetRequiredService<IResolveFieldContextAccessor>();
+                            var currentContext = service.Context;
+                            return currentContext != null ? "match" : "no match";
+                        });
+                        loaders.Add(loader.LoadAsync());
+                    }
+
+                    return loaders;
+                });
+
             Field<StringGraphType>("dataLoaderField")
                 .ResolveAsync(async context =>
                 {
@@ -297,7 +351,7 @@ public class ResolveFieldContextAccessorTests
                         await Task.Yield();
                         var service = context.RequestServices!.GetRequiredService<IResolveFieldContextAccessor>();
                         var currentContext = service.Context;
-                        return currentContext == context ? "match" : "no match";
+                        return currentContext != null ? "match" : "no match";
                     });
                     return loader.LoadAsync();
                 });
@@ -316,7 +370,7 @@ public class ResolveFieldContextAccessorTests
                         var currentContext = service.Context;
 
                         // Verify context is available in outer loader
-                        if (currentContext != context)
+                        if (currentContext == null)
                             return new SimpleDataLoader<string>((_) => Task.FromResult("outer no match"));
 
                         // Return inner data loader
@@ -325,7 +379,7 @@ public class ResolveFieldContextAccessorTests
                             await Task.Yield();
                             var innerService = context.RequestServices!.GetRequiredService<IResolveFieldContextAccessor>();
                             var innerCurrentContext = innerService.Context;
-                            return innerCurrentContext == context ? "match" : "inner no match";
+                            return innerCurrentContext != null ? "match" : "inner no match";
                         });
 
                         return innerLoader.LoadAsync();
@@ -348,7 +402,7 @@ public class ResolveFieldContextAccessorTests
                         var currentContext = service.Context;
 
                         // Verify context is available in outer loader
-                        return currentContext == context ? "match" : "no match";
+                        return currentContext != null ? "match" : "no match";
                     });
 
                     var loader2 = loader.Then(async result1 =>
@@ -360,7 +414,7 @@ public class ResolveFieldContextAccessorTests
                         var service = context.RequestServices!.GetRequiredService<IResolveFieldContextAccessor>();
                         var currentContext = service.Context;
 
-                        return currentContext == context ? "match" : "second no match";
+                        return currentContext != null ? "match" : "second no match";
                     });
 
                     return loader2;

@@ -550,13 +550,31 @@ public abstract class ExecutionStrategy : IExecutionStrategy
         if (node.Result is not IDataLoaderResult dataLoaderResult)
             throw new InvalidOperationException("This execution node is not pending completion");
 
+        var resolveFieldContextAccessor = (context.Schema as Schema)?.ResolveFieldContextAccessor;
         try
         {
-            node.Result = await dataLoaderResult.GetResultAsync(context.CancellationToken).ConfigureAwait(false);
-
-            if (node.Result is not IDataLoaderResult)
+            if (resolveFieldContextAccessor != null)
             {
-                await CompleteNodeAsync(context, node).ConfigureAwait(false);
+                // duplicate the async context to avoid polluting it for other continuations (since callers
+                // to this method do not always immediately await it)
+                await Inner().ConfigureAwait(false);
+
+                async Task Inner()
+                {
+                    resolveFieldContextAccessor.Context = new ReadonlyResolveFieldContext(node, context);
+                    try
+                    {
+                        await CompleteDataLoaderNodeImplAsync().ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        resolveFieldContextAccessor.Context = null;
+                    }
+                }
+            }
+            else
+            {
+                await CompleteDataLoaderNodeImplAsync().ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
@@ -571,6 +589,16 @@ public abstract class ExecutionStrategy : IExecutionStrategy
         {
             if (await ProcessNodeUnhandledExceptionAsync(context, node, ex).ConfigureAwait(false))
                 throw;
+        }
+
+        async Task CompleteDataLoaderNodeImplAsync()
+        {
+            node.Result = await dataLoaderResult.GetResultAsync(context.CancellationToken).ConfigureAwait(false);
+
+            if (node.Result is not IDataLoaderResult)
+            {
+                await CompleteNodeAsync(context, node).ConfigureAwait(false);
+            }
         }
     }
 
