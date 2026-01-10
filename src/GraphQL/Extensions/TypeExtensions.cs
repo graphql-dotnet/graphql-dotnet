@@ -181,7 +181,7 @@ public static class TypeExtensions
     /// </summary>
     /// <param name="type">The CLR type to convert (e.g., <see cref="int"/>, <see cref="string"/>, custom classes, enums, or collections).</param>
     /// <param name="isNullable">
-    /// <see langword="true"/> if the type is nullable; <see langword="false"/> to wrap it in <see cref="NonNullGraphType{T}"/>.
+    /// Indicates whether the GraphQL type should allow null values. When <see langword="false"/>, the returned type is wrapped in <see cref="NonNullGraphType{T}"/>.
     /// </param>
     /// <param name="mode">The mapping mode: <see cref="TypeMappingMode.InputType"/>, <see cref="TypeMappingMode.OutputType"/>, or <see cref="TypeMappingMode.UseBuiltInScalarMappings"/> (legacy).</param>
     /// <returns>
@@ -287,7 +287,7 @@ public static class TypeExtensions
     /// </summary>
     /// <param name="type">The CLR type to convert (e.g., <see cref="int"/>, <see cref="string"/>, custom classes, enums, or collections).</param>
     /// <param name="isNullable">
-    /// <see langword="true"/> if the type is nullable; <see langword="false"/> to wrap it in <see cref="NonNullGraphType{T}"/>.
+    /// Indicates whether the GraphQL type should allow null values. When <see langword="false"/>, the returned type is wrapped in <see cref="NonNullGraphType{T}"/>.
     /// </param>
     /// <param name="isInputType">
     /// <see langword="true"/> for input types (arguments, input objects); <see langword="false"/> for output types (fields, query results).
