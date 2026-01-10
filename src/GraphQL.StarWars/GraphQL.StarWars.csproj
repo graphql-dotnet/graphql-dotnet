@@ -18,10 +18,10 @@
 
       Note: The GraphQL.Analyzers.CodeFixes project will never be published to NuGet.
     -->
-    <ProjectReference Include="..\GraphQL.Analyzers\GraphQL.Analyzers.csproj"
+    <ProjectReference Include="..\GraphQL.Analyzers\GraphQL.Analyzers.Roslyn4.8.csproj"
                       ReferenceOutputAssembly="false"
                       OutputItemType="Analyzer" />
-    <ProjectReference Include="..\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.csproj"
+    <ProjectReference Include="..\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.Roslyn4.8.csproj"
                       ReferenceOutputAssembly="false"
                       OutputItemType="Analyzer" />
   </ItemGroup>

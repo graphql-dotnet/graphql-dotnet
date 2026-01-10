@@ -109,13 +109,17 @@ public class FederationKeyTests
     [Theory]
     [InlineData(10, "\"id\"", "id")]
     [InlineData(11, "\"id name\"", "id", "name")]
+#if ROSLYN4_8_OR_GREATER
     [InlineData(12, "[\"id\", \"name\"]", "id", "name")]
+#endif
     [InlineData(13, "new[] { \"id\", \"name\" }", "id", "name")]
     [InlineData(14, "new string[] { \"id\", \"name\" }", "id", "name")]
     // const
     [InlineData(15, "ConstFieldName", "Id")]
     [InlineData(16, "Constants.ConstFieldName", "Id")]
+#if ROSLYN4_8_OR_GREATER
     [InlineData(17, "[ConstFieldName, \"name\"]", "Id", "name")]
+#endif
     [InlineData(18, "new[] { ConstFieldName, \"name\" }", "Id", "name")]
     [InlineData(19, "new string[] { ConstFieldName, \"name\" }", "Id", "name")]
     // nameof
@@ -127,10 +131,14 @@ public class FederationKeyTests
     [InlineData(24, "$\"{nameof(User.Id)} name\"", "Id", "name")]
     [InlineData(25, "$\"{ConstFieldName} name\"", "Id", "name")]
     [InlineData(26, "$\"{ConstFieldName} name {nameof(User.Organization)}\"", "Id", "name", "Organization")]
+#if ROSLYN4_8_OR_GREATER
     [InlineData(27, "[$\"{ConstFieldName} organization\", \"name\"]", "Id", "organization", "name")]
+#endif
     [InlineData(28, "new[] { $\"{ConstFieldName} organization\", \"name\" }", "Id", "organization", "name")]
     [InlineData(29, "new string[] { $\"{ConstFieldName} organization\", \"name\" }", "Id", "organization", "name")]
+#if ROSLYN4_8_OR_GREATER
     [InlineData(30, "[$\"{ConstFieldName} {nameof(User.Organization)}\", \"name\"]", "Id", "Organization", "name")]
+#endif
     [InlineData(31, "new[] { $\"{ConstFieldName} {nameof(User.Organization)}\", \"name\" }", "Id", "Organization", "name")]
     [InlineData(32, "new string[] { $\"{ConstFieldName} {nameof(User.Organization)}\", \"name\" }", "Id", "Organization", "name")]
     public async Task FederationKey_PlainFields_ParsesCorrectly(int idx, string keyExpression, params string[] expectedFields)

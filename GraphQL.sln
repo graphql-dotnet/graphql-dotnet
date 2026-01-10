@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31919.166
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL", "src\GraphQL\GraphQL.csproj", "{1DD5E10B-2361-467A-82AC-36EFB8C61A1D}"
 EndProject
@@ -118,13 +118,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.DataLoader", "src\G
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzer", "Analyzer", "{53446652-CE87-43A4-A9FA-10F8A4BB441C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers", "src\GraphQL.Analyzers\GraphQL.Analyzers.csproj", "{2D135FB8-6250-4F31-A2EA-6E9E80ABD59F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers.Roslyn4.8", "src\GraphQL.Analyzers\GraphQL.Analyzers.Roslyn4.8.csproj", "{2D135FB8-6250-4F31-A2EA-6E9E80ABD59F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers.CodeFixes", "src\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.csproj", "{DF91353F-1212-4938-AF04-69492910BCE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers.CodeFixes.Roslyn4.8", "src\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.Roslyn4.8.csproj", "{DF91353F-1212-4938-AF04-69492910BCE1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers.Package", "src\GraphQL.Analyzers.Package\GraphQL.Analyzers.Package.csproj", "{05145332-BE71-460A-A63E-51931D8F7F67}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers.Tests", "src\GraphQL.Analyzers.Tests\GraphQL.Analyzers.Tests.csproj", "{754A684B-A13A-4A48-8C87-53FF84617B62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers.Roslyn4.8.Tests", "src\GraphQL.Analyzers.Tests\GraphQL.Analyzers.Roslyn4.8.Tests.csproj", "{754A684B-A13A-4A48-8C87-53FF84617B62}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{C42DD8F2-4B21-40A3-954F-EF736FF9CA0B}"
 	ProjectSection(SolutionItems) = preProject
@@ -193,6 +193,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.DataLoader.Sample.Default", "samples\GraphQL.DataLoader.Sample.Default\GraphQL.DataLoader.Sample.Default.csproj", "{A1EA5D62-6C67-40FA-8978-5239B94B0892}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Federation.Tests", "samples\GraphQL.Federation.Tests\GraphQL.Federation.Tests.csproj", "{00CF432E-6E58-D2DF-02F6-7C2C8E88C307}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Analyzers.Roslyn3.11", "src\GraphQL.Analyzers\GraphQL.Analyzers.Roslyn3.11.csproj", "{E407CBE9-C85B-6A37-B746-1914FF2109D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Analyzers.CodeFixes.Roslyn3.11", "src\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.Roslyn3.11.csproj", "{ADCD01DC-6C61-79EF-0834-05CD6BD20C6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Analyzers.Roslyn3.11.Tests", "src\GraphQL.Analyzers.Tests\GraphQL.Analyzers.Roslyn3.11.Tests.csproj", "{3814B315-25C6-7102-2DDD-BB29F0329184}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -324,6 +330,18 @@ Global
 		{00CF432E-6E58-D2DF-02F6-7C2C8E88C307}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00CF432E-6E58-D2DF-02F6-7C2C8E88C307}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00CF432E-6E58-D2DF-02F6-7C2C8E88C307}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E407CBE9-C85B-6A37-B746-1914FF2109D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E407CBE9-C85B-6A37-B746-1914FF2109D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E407CBE9-C85B-6A37-B746-1914FF2109D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E407CBE9-C85B-6A37-B746-1914FF2109D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADCD01DC-6C61-79EF-0834-05CD6BD20C6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADCD01DC-6C61-79EF-0834-05CD6BD20C6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADCD01DC-6C61-79EF-0834-05CD6BD20C6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADCD01DC-6C61-79EF-0834-05CD6BD20C6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3814B315-25C6-7102-2DDD-BB29F0329184}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3814B315-25C6-7102-2DDD-BB29F0329184}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3814B315-25C6-7102-2DDD-BB29F0329184}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3814B315-25C6-7102-2DDD-BB29F0329184}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -361,6 +379,9 @@ Global
 		{9555B98B-4088-459A-A42F-187F7A33A4DA} = {90080504-5840-4624-B240-82A6F9E723B5}
 		{A1EA5D62-6C67-40FA-8978-5239B94B0892} = {90080504-5840-4624-B240-82A6F9E723B5}
 		{00CF432E-6E58-D2DF-02F6-7C2C8E88C307} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
+		{E407CBE9-C85B-6A37-B746-1914FF2109D8} = {53446652-CE87-43A4-A9FA-10F8A4BB441C}
+		{ADCD01DC-6C61-79EF-0834-05CD6BD20C6B} = {53446652-CE87-43A4-A9FA-10F8A4BB441C}
+		{3814B315-25C6-7102-2DDD-BB29F0329184} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61AAA7F9-9D46-4050-A3A5-F4358BBD95B8}

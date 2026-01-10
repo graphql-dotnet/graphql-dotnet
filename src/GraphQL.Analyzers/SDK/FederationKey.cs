@@ -172,11 +172,13 @@ public sealed class FederationKey
                 implicitArray.Initializer.Expressions.ToArray(),
             ArrayCreationExpressionSyntax { Initializer: not null } arrayCreation =>
                 arrayCreation.Initializer.Expressions.ToArray(),
+#if ROSLYN4_8_OR_GREATER
             CollectionExpressionSyntax collectionExpression =>
                 collectionExpression.Elements
                     .OfType<ExpressionElementSyntax>()
                     .Select(e => e.Expression)
                     .ToArray(),
+#endif
             _ => null
         };
 
@@ -267,6 +269,7 @@ public sealed class FederationKey
             // Handle interpolated strings
             case InterpolatedStringExpressionSyntax interpolatedString when TryHandleInterpolatedString(interpolatedString, out var location):
                 return location;
+#if ROSLYN4_8_OR_GREATER
             // Handle collection expression syntax: ["id", "name"]
             case CollectionExpressionSyntax collectionExpression:
             {
@@ -276,6 +279,7 @@ public sealed class FederationKey
 
                 break;
             }
+#endif
             // Handle implicit array creation: new[] { "id", "name" }
             case ImplicitArrayCreationExpressionSyntax implicitArray:
             {

@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <RoslynApiVersion>4.8</RoslynApiVersion>
+    <DefineConstants>$(DefineConstants);ROSLYN4_8_OR_GREATER</DefineConstants>
+    <BaseIntermediateOutputPath>obj\Roslyn$(RoslynApiVersion)\</BaseIntermediateOutputPath>
+    <BaseOutputPath>bin\Roslyn$(RoslynApiVersion)\</BaseOutputPath>
+  </PropertyGroup>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <Import Project="GraphQL.Analyzers.targets" />
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+</Project>

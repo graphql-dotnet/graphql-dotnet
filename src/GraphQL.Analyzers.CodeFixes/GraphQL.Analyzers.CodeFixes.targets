@@ -1,0 +1,24 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>GraphQL.Analyzers</RootNamespace>
+    <Nullable>enable</Nullable>
+    <IncludeSymbols>false</IncludeSymbols>
+    <PackageId>GraphQL.Analyzers.CodeFixes</PackageId>
+    <AssemblyName>$(PackageId)</AssemblyName>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <AnalyzerLanguage>cs</AnalyzerLanguage>
+    <DefaultItemExcludes>$(DefaultItemExcludes);obj\**\*;bin\**\*</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- https://github.com/graphql-dotnet/graphql-dotnet/issues/3829 -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(RoslynApiVersion)" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GraphQL.Analyzers\GraphQL.Analyzers.Roslyn$(RoslynApiVersion).csproj" />
+  </ItemGroup>
+</Project>

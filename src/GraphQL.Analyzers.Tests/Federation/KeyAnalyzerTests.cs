@@ -7,62 +7,6 @@ namespace GraphQL.Analyzers.Tests.Federation;
 public class KeyAnalyzerTests
 {
     [Fact]
-    public async Task Test()
-    {
-        string source =
-            $$"""
-              using GraphQL.Federation;
-              using GraphQL.Types;
-              using System.Collections.Generic;
-
-              namespace Sample.Server;
-
-              public class UserGraphType : ObjectGraphType<User>
-              {
-                  private const string Address = "Address";
-                  public UserGraphType()
-                  {
-                      this.Key(["id", "name"]);
-                      this.Key(new[] { "id", "name" });
-                      this.Key(new string[] { "id", "name" });
-                      this.Key("id");
-                      this.Key("id name");
-                      this.Key("id organization { id }");
-                      this.Key("id organization { location { city zip } }");
-                      this.ResolveReference((_, source) => source);
-
-                      Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
-                      Field<NonNullGraphType<IdGraphType>>("Name");
-                      Field<StringGraphType>(Address);
-                      Field<OrganizationGraphType>("Organization");
-                  }
-              }
-
-              public class OrganizationGraphType : ObjectGraphType<Organization>
-              {
-                  public OrganizationGraphType()
-                  {
-                      Field<NonNullGraphType<IdGraphType>>("Id").Resolve(ctx => ctx.Source.Id);
-                  }
-              }
-
-              public class User
-              {
-                  public int Id { get; set; }
-                  public string Name { get; set; }
-                  public string Address { get; set; }
-              }
-
-              public class Organization
-              {
-                  public int Id { get; set; }
-              }
-              """;
-
-        await VerifyCS.VerifyAnalyzerAsync(source);
-    }
-
-    [Fact]
     public async Task Sanity_NoDiagnostics()
     {
         const string source = "";
@@ -99,13 +43,17 @@ public class KeyAnalyzerTests
     // literals
     [InlineData(10, "\"id\"")]
     [InlineData(11, "\"id name\"")]
+#if ROSLYN4_8_OR_GREATER
     [InlineData(12, "[\"id\", \"name\"]")]
+#endif
     [InlineData(13, "new[] { \"id\", \"name\" }")]
     [InlineData(14, "new string[] { \"id\", \"name\" }")]
     // const
     [InlineData(15, "ConstFieldName")]
     [InlineData(16, "Constants.ConstFieldName")]
+#if ROSLYN4_8_OR_GREATER
     [InlineData(17, "[ConstFieldName, \"name\"]")]
+#endif
     [InlineData(18, "new[] { ConstFieldName, \"name\" }")]
     [InlineData(19, "new string[] { ConstFieldName, \"name\" }")]
     // nameof
@@ -117,10 +65,14 @@ public class KeyAnalyzerTests
     [InlineData(24, "$\"{nameof(User.Id)} name\"")]
     [InlineData(25, "$\"{ConstFieldName} name\"")]
     [InlineData(26, "$\"{ConstFieldName} name {nameof(User.Organization)}\"")]
+#if ROSLYN4_8_OR_GREATER
     [InlineData(27, "[$\"{ConstFieldName} organization\", \"name\"]")]
+#endif
     [InlineData(28, "new[] { $\"{ConstFieldName} organization\", \"name\" }")]
     [InlineData(29, "new string[] { $\"{ConstFieldName} organization\", \"name\" }")]
+#if ROSLYN4_8_OR_GREATER
     [InlineData(30, "[$\"{ConstFieldName} {nameof(User.Organization)}\", \"name\"]")]
+#endif
     [InlineData(31, "new[] { $\"{ConstFieldName} {nameof(User.Organization)}\", \"name\" }")]
     [InlineData(32, "new string[] { $\"{ConstFieldName} {nameof(User.Organization)}\", \"name\" }")]
     public async Task ValidKey_SingleKey_NoDiagnostics(int idx, string keyExpression)
@@ -229,39 +181,51 @@ public class KeyAnalyzerTests
     // literal cases
     [InlineData(10, "\"{|#0:nonExistentField|}\"", "nonExistentField")]
     [InlineData(11, "\"id {|#0:nonExistentField|}\"", "nonExistentField")]
+#if ROSLYN4_8_OR_GREATER
     [InlineData(12, "[\"id\", \"{|#0:nonExistentField|}\"]", "nonExistentField")]
     [InlineData(13, "[\"id\", \"name {|#0:nonExistentField|}\"]", "nonExistentField")]
+#endif
     [InlineData(14, "new [] { \"id\", \"{|#0:nonExistentField|}\" }", "nonExistentField")]
     [InlineData(15, "new string[] { \"id\", \"{|#0:nonExistentField|}\" }", "nonExistentField")]
     // const cases
     [InlineData(16, "{|#0:ConstFieldName|}", "nonExistentField")]
     [InlineData(17, "{|#0:Constants.ConstFieldName|}", "nonExistentField")]
+#if ROSLYN4_8_OR_GREATER
     [InlineData(18, "[{|#0:ConstFieldName|}]", "nonExistentField")]
     [InlineData(19, "[{|#0:Constants.ConstFieldName|}]", "nonExistentField")]
+#endif
     [InlineData(20, "new [] { \"id\", {|#0:ConstFieldName|} }", "nonExistentField")]
     [InlineData(21, "new string[] { \"id\", {|#0:ConstFieldName|} }", "nonExistentField")]
     // nameof cases
     [InlineData(22, "{|#0:nameof(User.AnotherField)|}", "AnotherField")]
     [InlineData(23, "new [] { \"id\", {|#0:nameof(User.AnotherField)|} }", "AnotherField")]
     [InlineData(24, "new string[] { \"id\", {|#0:nameof(User.AnotherField)|} }", "AnotherField")]
+#if ROSLYN4_8_OR_GREATER
     [InlineData(25, "[{|#0:nameof(User.AnotherField)|}]", "AnotherField")]
     [InlineData(26, "[\"id\", {|#0:nameof(User.AnotherField)|}]", "AnotherField")]
+#endif
     // string interpolation cases
     [InlineData(27, "$\"{{|#0:nameof(User.AnotherField)|}}\"", "AnotherField")]
     [InlineData(28, "$\"id {{|#0:nameof(User.AnotherField)|}}\"", "AnotherField")]
     [InlineData(29, "$\"{{|#0:ConstFieldName|}}\"", "nonExistentField")]
     [InlineData(30, "$\"id {{|#0:ConstFieldName|}}\"", "nonExistentField")]
+#if ROSLYN4_8_OR_GREATER
     [InlineData(31, "[$\"{{|#0:nameof(User.AnotherField)|}}\"]", "AnotherField")]
+#endif
     [InlineData(32, "new[] { $\"{{|#0:nameof(User.AnotherField)|}}\" }", "AnotherField")]
     [InlineData(33, "new string[] { $\"{{|#0:nameof(User.AnotherField)|}}\" }", "AnotherField")]
+#if ROSLYN4_8_OR_GREATER
     [InlineData(34, "[$\"id {{|#0:nameof(User.AnotherField)|}}\"]", "AnotherField")]
+#endif
     [InlineData(35, "new[] { $\"id {{|#0:nameof(User.AnotherField)|}}\" }", "AnotherField")]
     // mixed interpolation cases
     [InlineData(36, "$\"{{|#0:ConstFieldName|}} {{|#1:nameof(User.AnotherField)|}}\"", "nonExistentField", "AnotherField")]
     [InlineData(37, "$\"{{|#0:ConstFieldName|}} {|#1:whateverField|} {{|#2:nameof(User.AnotherField)|}}\"", "nonExistentField", "whateverField", "AnotherField")]
     [InlineData(38, "$\"{{|#0:ConstFieldName|}} {|#1:whateverField1|} {|#2:whateverField2|} {{|#3:nameof(User.AnotherField)|}}\"", "nonExistentField", "whateverField1", "whateverField2", "AnotherField")]
     [InlineData(39, "$\"{{|#0:ConstFieldName|}} {|#1:whateverField1|} {|#2:whateverField2|} {{|#3:nameof(User.AnotherField)|}} {|#4:whateverField3|}\"", "nonExistentField", "whateverField1", "whateverField2", "AnotherField", "whateverField3")]
+#if ROSLYN4_8_OR_GREATER
     [InlineData(40, "[$\"{{|#0:ConstFieldName|}}\", $\"{{|#1:nameof(User.AnotherField)|}}\"]", "nonExistentField", "AnotherField")]
+#endif
     [InlineData(41, "new[] { $\"{{|#0:ConstFieldName|}}\", $\"{{|#1:nameof(User.AnotherField)|}}\" }", "nonExistentField", "AnotherField")]
     public async Task InvalidKey_FieldDoesNotExist_ReportsError(int idx, string keyFields, params string[] missingFields)
     {

@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <RoslynApiVersion>3.11</RoslynApiVersion>
+    <BaseIntermediateOutputPath>obj\Roslyn$(RoslynApiVersion)\</BaseIntermediateOutputPath>
+    <BaseOutputPath>bin\Roslyn$(RoslynApiVersion)\</BaseOutputPath>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <Import Project="GraphQL.Analyzers.Tests.targets" />
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+</Project>
