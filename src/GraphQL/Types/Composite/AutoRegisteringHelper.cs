@@ -230,6 +230,7 @@ public static class AutoRegisteringHelper
     /// from the resolve context. The returned lambda is similar to the following:
     /// <code>context =&gt; context.GetArgument&lt;T&gt;(queryArgument.Name, queryArgument.DefaultValue)</code>
     /// </summary>
+    [RequiresDynamicCode("Uses MakeGenericMethod and Expression.Lambda which require dynamic code generation.")]
     internal static LambdaExpression GetParameterExpression(Type parameterType, QueryArgument queryArgument)
     {
         //construct a typed call to AutoRegisteringHelper.GetArgumentInternal, passing in queryArgument

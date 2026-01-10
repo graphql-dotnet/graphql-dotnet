@@ -616,12 +616,13 @@ namespace GraphQL
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter)]
     public class InputTypeAttribute : GraphQL.GraphQLAttribute
     {
-        public InputTypeAttribute(System.Type graphType) { }
+        public InputTypeAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type graphType) { }
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
         public System.Type InputType { get; set; }
         public override void Modify(GraphQL.Types.QueryArgument queryArgument) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
-    public class InputTypeAttribute<TGraphType> : GraphQL.InputTypeAttribute
+    public class InputTypeAttribute<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType> : GraphQL.InputTypeAttribute
         where TGraphType : GraphQL.Types.IGraphType
     {
         public InputTypeAttribute() { }
@@ -722,11 +723,12 @@ namespace GraphQL
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface)]
     public class OutputTypeAttribute : GraphQL.GraphQLAttribute
     {
-        public OutputTypeAttribute(System.Type graphType) { }
+        public OutputTypeAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type graphType) { }
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
         public System.Type OutputType { get; set; }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
-    public class OutputTypeAttribute<TGraphType> : GraphQL.OutputTypeAttribute
+    public class OutputTypeAttribute<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType> : GraphQL.OutputTypeAttribute
         where TGraphType : GraphQL.Types.IGraphType
     {
         public OutputTypeAttribute() { }
@@ -900,12 +902,20 @@ namespace GraphQL
         public static string? Description(this System.Reflection.ParameterInfo parameterInfo) { }
         public static System.Collections.Generic.IEnumerable<GraphQL.GraphQLAttribute> GetGraphQLAttributes(this System.Reflection.MemberInfo memberInfo) { }
         public static System.Collections.Generic.IEnumerable<GraphQL.GraphQLAttribute> GetGraphQLAttributes(this System.Reflection.ParameterInfo parameterInfo) { }
-        public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable = false, GraphQL.TypeMappingMode mode = 0) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This method uses reflection to create types at runtime which is not compatible wi" +
+            "th trimming and AOT.")]
+        [System.Obsolete("Use TypeExtensions.GetGraphTypeFromType(Type, bool, bool) overload instead. This " +
+            "method will be removed in v10.")]
+        public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable, GraphQL.TypeMappingMode mode) { }
+        [return: System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
+        public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable, bool isInputType) { }
         public static string GraphQLName(this System.Type type) { }
         public static bool ImplementsGenericType(this System.Type type, System.Type genericType) { }
         public static bool IsGraphType(this System.Type type) { }
         public static string? ObsoleteMessage(this System.Reflection.MemberInfo memberInfo) { }
     }
+    [System.Obsolete("Use TypeExtensions.GetGraphTypeFromType(Type, bool, bool) overload instead. This " +
+        "enum will be removed in v10.")]
     public enum TypeMappingMode
     {
         UseBuiltInScalarMappings = 0,
@@ -1076,6 +1086,7 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(GraphQL.Resolvers.IFieldResolver? resolver) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.IResolveFieldContext<TSourceType>, TReturnType?> resolve) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>> resolve) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Uses Expression.Lambda which requires dynamic code generation.")]
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveDelegate(System.Delegate? resolve) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveStream(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.IObservable<TReturnType?>> sourceStreamResolver) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveStreamAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType?>>> sourceStreamResolver) { }
@@ -2253,6 +2264,7 @@ namespace GraphQL.Types
     {
         public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, GraphQL.Types.TypeInformation typeInformation) { }
         public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, GraphQL.Types.TypeInformation typeInformation, System.Linq.Expressions.LambdaExpression? expression) { }
+        [set: System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Uses Expression.Lambda which requires dynamic code generation.")]
         public System.Linq.Expressions.LambdaExpression? Expression { get; set; }
         public GraphQL.Types.FieldType? FieldType { get; }
         public System.Reflection.ParameterInfo ParameterInfo { get; }
@@ -2265,6 +2277,7 @@ namespace GraphQL.Types
         public virtual System.ValueTuple<GraphQL.Types.QueryArgument?, System.Linq.Expressions.LambdaExpression?> ConstructQueryArgument() { }
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Please use the SetDelegateWithCast method when using with AOT compilation")]
         public void SetDelegate<TParameterType>(System.Func<GraphQL.IResolveFieldContext, TParameterType?> argumentDelegate) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Uses Expression.Lambda which requires dynamic code generation.")]
         public void SetDelegateWithCast(System.Func<GraphQL.IResolveFieldContext, object?> argumentDelegate) { }
     }
     public class AsIsCaseAttribute : GraphQL.Types.EnumCaseAttribute

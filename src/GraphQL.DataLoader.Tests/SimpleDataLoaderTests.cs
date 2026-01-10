@@ -154,7 +154,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
     public void GetGraphTypeFromType_Works_With_IDataLoaderResult()
     {
         var type = typeof(IDataLoaderResult<int>);
-        var result = type.GetGraphTypeFromType(false);
-        result.ShouldBe(typeof(NonNullGraphType<IntGraphType>));
+        var result = type.GetGraphTypeFromType(false, false);
+        result.ShouldBe(typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>));
     }
 }

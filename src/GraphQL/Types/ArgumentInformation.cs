@@ -81,6 +81,7 @@ public class ArgumentInformation
     public LambdaExpression? Expression
     {
         get;
+        [RequiresDynamicCode("Uses Expression.Lambda which requires dynamic code generation.")]
         set
         {
             if (value != null)
@@ -143,6 +144,7 @@ public class ArgumentInformation
     /// See <see cref="SetDelegate{TParameterType}(Func{IResolveFieldContext, TParameterType})"/> for a
     /// type-safe version of this method, recommended for use with <see cref="GraphQLAttribute.Modify{TParameterType}(ArgumentInformation)"/>.
     /// </summary>
+    [RequiresDynamicCode("Uses Expression.Lambda which requires dynamic code generation.")]
     public void SetDelegateWithCast(Func<IResolveFieldContext, object?> argumentDelegate)
     {
         if (argumentDelegate == null)

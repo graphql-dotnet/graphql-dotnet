@@ -20,7 +20,7 @@ public class PossibleTypeAttribute : GraphQLAttribute
         }
         else if (type.IsClass)
         {
-            ObjectGraphType = typeof(GraphQLClrOutputTypeReference<>).MakeGenericType(type);
+            ObjectGraphType = type.MakeClrTypeReference(false);
         }
         else
         {

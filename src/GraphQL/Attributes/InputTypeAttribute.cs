@@ -9,12 +9,13 @@ namespace GraphQL;
 public class InputTypeAttribute : GraphQLAttribute
 {
     /// <inheritdoc cref="InputTypeAttribute"/>
-    public InputTypeAttribute(Type graphType)
+    public InputTypeAttribute([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type graphType)
     {
         InputType = graphType;
     }
 
     /// <inheritdoc cref="InputTypeAttribute"/>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
     public Type InputType
     {
         get;
@@ -47,7 +48,7 @@ public class InputTypeAttribute : GraphQLAttribute
 }
 
 /// <inheritdoc cref="InputTypeAttribute"/>
-public class InputTypeAttribute<TGraphType> : InputTypeAttribute
+public class InputTypeAttribute<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType> : InputTypeAttribute
     where TGraphType : IGraphType
 {
     /// <inheritdoc cref="InputTypeAttribute"/>

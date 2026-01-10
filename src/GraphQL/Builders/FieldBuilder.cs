@@ -173,6 +173,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
 
     /// <inheritdoc cref="Resolve(IFieldResolver)"/>
     [AllowedOn<IObjectGraphType>]
+    [RequiresDynamicCode("Uses Expression.Lambda which requires dynamic code generation.")]
     public virtual FieldBuilder<TSourceType, TReturnType> ResolveDelegate(Delegate? resolve)
     {
         IFieldResolver? resolver = null;
@@ -250,7 +251,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
         try
         {
             var isNullable = nullable ?? (Nullable.GetUnderlyingType(typeof(TArgumentClrType)) != null);
-            type = typeof(TArgumentClrType).GetGraphTypeFromType(isNullable, TypeMappingMode.InputType);
+            type = typeof(TArgumentClrType).GetGraphTypeFromType(isNullable, true);
         }
         catch (ArgumentOutOfRangeException exp)
         {
