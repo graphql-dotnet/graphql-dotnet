@@ -3,8 +3,6 @@ using GraphQL.Analyzers.Helpers;
 using GraphQL.Analyzers.SDK;
 using GraphQLParser.AST;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace GraphQL.Analyzers.Federation;
@@ -28,19 +26,11 @@ public class KeyAnalyzer : DiagnosticAnalyzer
     {
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-        context.RegisterSyntaxNodeAction(AnalyzeClassDeclaration, SyntaxKind.ClassDeclaration);
+        context.OnGraphQLGraphType(AnalyzeGraphQLGraphType);
     }
 
-    private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context)
+    private void AnalyzeGraphQLGraphType(GraphQLGraphType graphType, SyntaxNodeAnalysisContext context)
     {
-        var classDeclaration = (ClassDeclarationSyntax)context.Node;
-        var graphType = GraphQLGraphType.TryCreate(classDeclaration, context.SemanticModel);
-
-        if (graphType == null)
-        {
-            return;
-        }
-
         var federationKeys = graphType.FederationKeys;
         if (federationKeys == null || federationKeys.Count == 0)
         {
