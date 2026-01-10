@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Numerics;
 using GraphQL.DataLoader;
 using GraphQL.Types;
 using GraphQLParser.AST;
@@ -8,253 +7,108 @@ namespace GraphQL.Tests.Utilities;
 
 public class GetGraphTypeFromTypeTests
 {
-    [Fact]
-    public void supports_decimal_type()
-    {
-        typeof(decimal).GetGraphTypeFromType(true).ShouldBe(typeof(DecimalGraphType));
-    }
-
-    [Fact]
-    public void supports_float_type()
-    {
-        typeof(float).GetGraphTypeFromType(true).ShouldBe(typeof(FloatGraphType));
-    }
-
-    [Fact]
-    public void supports_short_type()
-    {
-        typeof(short).GetGraphTypeFromType(true).ShouldBe(typeof(ShortGraphType));
-    }
-
-    [Fact]
-    public void supports_ushort_type()
-    {
-        typeof(ushort).GetGraphTypeFromType(true).ShouldBe(typeof(UShortGraphType));
-    }
-
-    [Fact]
-    public void supports_ulong_type()
-    {
-        typeof(ulong).GetGraphTypeFromType(true).ShouldBe(typeof(ULongGraphType));
-    }
-
-    [Fact]
-    public void supports_uint_type()
-    {
-        typeof(uint).GetGraphTypeFromType(true).ShouldBe(typeof(UIntGraphType));
-    }
-
-    [Fact]
-    public void GetGraphTypeFromType_ForIList_EqualToListGraphType() =>
-        typeof(IList<string>).GetGraphTypeFromType(true).ShouldBe(typeof(ListGraphType<StringGraphType>));
-
-    [Fact]
-    public void GetGraphTypeFromType_ForIReadOnlyCollection_EqualToListGraphType() =>
-        typeof(IReadOnlyCollection<string>).GetGraphTypeFromType(true).ShouldBe(typeof(ListGraphType<StringGraphType>));
-
-    [Fact]
-    public void GetGraphTypeFromType_ForIEnumerable_EqualToListGraphType() =>
-        typeof(IEnumerable<string>).GetGraphTypeFromType(true).ShouldBe(typeof(ListGraphType<StringGraphType>));
-
-    [Fact]
-    public void GetGraphTypeFromType_ForICollection_EqualToListGraphType() =>
-        typeof(ICollection<string>).GetGraphTypeFromType(true).ShouldBe(typeof(ListGraphType<StringGraphType>));
-
-    [Fact]
-    public void GetGraphTypeFromType_ForList_EqualToListGraphType() =>
-        typeof(List<string>).GetGraphTypeFromType(true).ShouldBe(typeof(ListGraphType<StringGraphType>));
-
-    [Fact]
-    public void GetGraphTypeFromType_ForArray_EqualToListGraphType() =>
-        typeof(string[]).GetGraphTypeFromType(true).ShouldBe(typeof(ListGraphType<StringGraphType>));
-
-    [Fact]
-    public void GetGraphTypeFromType_ForString_EqualToStringGraphType() =>
-        typeof(string).GetGraphTypeFromType(true).ShouldBe(typeof(StringGraphType));
-
-    [Fact]
-    public void GetGraphTypeFromType_ForOpenGeneric_ThrowsArgumentOutOfRangeException() =>
-        Assert.Throws<ArgumentOutOfRangeException>(() => typeof(List<>).GetGraphTypeFromType(true));
-
     [TheoryEx]
-    //built-in mapping mode
-    [InlineData(typeof(byte), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ByteGraphType))]
-    [InlineData(typeof(sbyte), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(SByteGraphType))]
-    [InlineData(typeof(short), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ShortGraphType))]
-    [InlineData(typeof(ushort), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(UShortGraphType))]
-    [InlineData(typeof(int), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(IntGraphType))]
-    [InlineData(typeof(uint), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(UIntGraphType))]
-    [InlineData(typeof(long), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(LongGraphType))]
-    [InlineData(typeof(ulong), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ULongGraphType))]
-    [InlineData(typeof(BigInteger), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(BigIntGraphType))]
-    [InlineData(typeof(decimal), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(DecimalGraphType))]
-    [InlineData(typeof(float), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(FloatGraphType))]
-    [InlineData(typeof(double), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(FloatGraphType))]
-    [InlineData(typeof(DateTime), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(DateTimeGraphType))]
-    [InlineData(typeof(DateTimeOffset), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(DateTimeOffsetGraphType))]
-    [InlineData(typeof(TimeSpan), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(TimeSpanSecondsGraphType))]
-    [InlineData(typeof(bool), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(BooleanGraphType))]
-    [InlineData(typeof(string), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(StringGraphType))]
-    [InlineData(typeof(Guid), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(IdGraphType))]
-    [InlineData(typeof(Uri), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(UriGraphType))]
-    [InlineData(typeof(object), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(MyClass), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(MyEnum), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(EnumerationGraphType<MyEnum>))]
-    //built-in mapping mode - nullable structs
-    [InlineData(typeof(int?), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(IntGraphType))]
-    [InlineData(typeof(decimal?), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(DecimalGraphType))]
-    [InlineData(typeof(Guid?), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(IdGraphType))]
-    [InlineData(typeof(MyEnum?), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(EnumerationGraphType<MyEnum>))]
-    //built-in mapping mode - not nullable types
-    [InlineData(typeof(int), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<IntGraphType>))]
-    [InlineData(typeof(string), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<StringGraphType>))]
-    [InlineData(typeof(decimal), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<DecimalGraphType>))]
-    [InlineData(typeof(Guid), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<IdGraphType>))]
-    [InlineData(typeof(Uri), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<UriGraphType>))]
-    [InlineData(typeof(object), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(MyClass), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(MyEnum), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<EnumerationGraphType<MyEnum>>))]
-    //built-in mapping mode - nullable structs
-    [InlineData(typeof(int?), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(decimal?), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(Guid?), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(MyEnum?), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    //built-in mapping mode - various types of lists
-    [InlineData(typeof(IEnumerable), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(IEnumerable<int>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ListGraphType<NonNullGraphType<IntGraphType>>))]
-    [InlineData(typeof(IEnumerable<string>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ListGraphType<StringGraphType>))]
-    [InlineData(typeof(IEnumerable<decimal>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ListGraphType<NonNullGraphType<DecimalGraphType>>))]
-    [InlineData(typeof(IEnumerable<Guid>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ListGraphType<NonNullGraphType<IdGraphType>>))]
-    [InlineData(typeof(IEnumerable<Uri>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ListGraphType<UriGraphType>))]
-    [InlineData(typeof(IEnumerable<MyClass>), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(IEnumerable<MyEnum>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ListGraphType<NonNullGraphType<EnumerationGraphType<MyEnum>>>))]
-    [InlineData(typeof(IList<int>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ListGraphType<NonNullGraphType<IntGraphType>>))]
-    [InlineData(typeof(ICollection<int>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ListGraphType<NonNullGraphType<IntGraphType>>))]
-    [InlineData(typeof(IReadOnlyCollection<int>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ListGraphType<NonNullGraphType<IntGraphType>>))]
-    [InlineData(typeof(List<int>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ListGraphType<NonNullGraphType<IntGraphType>>))]
-    [InlineData(typeof(int[]), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ListGraphType<NonNullGraphType<IntGraphType>>))]
-    [InlineData(typeof(IDictionary<int, string>), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(IEnumerable<int>), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>))]
-    [InlineData(typeof(IEnumerable<IEnumerable<int>>), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>))]
-    //built-in mapping mode - graph types
-    [InlineData(typeof(IntGraphType), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(NonNullGraphType<IntGraphType>), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(ListGraphType<IntGraphType>), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(IntGraphType), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(NonNullGraphType<IntGraphType>), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(ListGraphType<IntGraphType>), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
     //output mapping mode
-    [InlineData(typeof(int), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<int>))]
-    [InlineData(typeof(string), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<string>))]
-    [InlineData(typeof(decimal), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<decimal>))]
-    [InlineData(typeof(Guid), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<Guid>))]
-    [InlineData(typeof(Uri), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<Uri>))]
-    [InlineData(typeof(object), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<object>))]
-    [InlineData(typeof(MyClass), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<MyClass>))]
-    [InlineData(typeof(MyEnum), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<MyEnum>))]
+    [InlineData(typeof(int), true, false, typeof(GraphQLClrOutputTypeReference<int>))]
+    [InlineData(typeof(string), true, false, typeof(GraphQLClrOutputTypeReference<string>))]
+    [InlineData(typeof(decimal), true, false, typeof(GraphQLClrOutputTypeReference<decimal>))]
+    [InlineData(typeof(Guid), true, false, typeof(GraphQLClrOutputTypeReference<Guid>))]
+    [InlineData(typeof(Uri), true, false, typeof(GraphQLClrOutputTypeReference<Uri>))]
+    [InlineData(typeof(object), true, false, typeof(GraphQLClrOutputTypeReference<object>))]
+    [InlineData(typeof(MyClass), true, false, typeof(GraphQLClrOutputTypeReference<MyClass>))]
+    [InlineData(typeof(MyEnum), true, false, typeof(GraphQLClrOutputTypeReference<MyEnum>))]
     //output mapping mode - nullable structs
-    [InlineData(typeof(int?), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<int>))]
-    [InlineData(typeof(decimal?), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<decimal>))]
-    [InlineData(typeof(Guid?), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<Guid>))]
-    [InlineData(typeof(MyEnum?), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<MyEnum>))]
+    [InlineData(typeof(int?), true, false, typeof(GraphQLClrOutputTypeReference<int>))]
+    [InlineData(typeof(decimal?), true, false, typeof(GraphQLClrOutputTypeReference<decimal>))]
+    [InlineData(typeof(Guid?), true, false, typeof(GraphQLClrOutputTypeReference<Guid>))]
+    [InlineData(typeof(MyEnum?), true, false, typeof(GraphQLClrOutputTypeReference<MyEnum>))]
     //output mapping mode - not nullable types
-    [InlineData(typeof(int), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
-    [InlineData(typeof(string), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
-    [InlineData(typeof(decimal), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<decimal>>))]
-    [InlineData(typeof(Guid), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<Guid>>))]
-    [InlineData(typeof(Uri), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<Uri>>))]
-    [InlineData(typeof(object), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<object>>))]
-    [InlineData(typeof(MyClass), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<MyClass>>))]
-    [InlineData(typeof(MyEnum), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<MyEnum>>))]
+    [InlineData(typeof(int), false, false, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
+    [InlineData(typeof(string), false, false, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
+    [InlineData(typeof(decimal), false, false, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<decimal>>))]
+    [InlineData(typeof(Guid), false, false, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<Guid>>))]
+    [InlineData(typeof(Uri), false, false, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<Uri>>))]
+    [InlineData(typeof(object), false, false, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<object>>))]
+    [InlineData(typeof(MyClass), false, false, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<MyClass>>))]
+    [InlineData(typeof(MyEnum), false, false, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<MyEnum>>))]
     //output mapping mode - nullable structs
-    [InlineData(typeof(int?), false, TypeMappingMode.OutputType, null)]
-    [InlineData(typeof(decimal?), false, TypeMappingMode.OutputType, null)]
-    [InlineData(typeof(Guid?), false, TypeMappingMode.OutputType, null)]
-    [InlineData(typeof(MyEnum?), false, TypeMappingMode.OutputType, null)]
+    [InlineData(typeof(int?), false, false, null)]
+    [InlineData(typeof(decimal?), false, false, null)]
+    [InlineData(typeof(Guid?), false, false, null)]
+    [InlineData(typeof(MyEnum?), false, false, null)]
     //output mapping mode - various types of lists
-    [InlineData(typeof(IEnumerable), true, TypeMappingMode.OutputType, typeof(ListGraphType<GraphQLClrOutputTypeReference<object>>))]
-    [InlineData(typeof(IEnumerable<int>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
-    [InlineData(typeof(IEnumerable<string>), true, TypeMappingMode.OutputType, typeof(ListGraphType<GraphQLClrOutputTypeReference<string>>))]
-    [InlineData(typeof(IEnumerable<decimal>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<decimal>>>))]
-    [InlineData(typeof(IEnumerable<Guid>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<Guid>>>))]
-    [InlineData(typeof(IEnumerable<Uri>), true, TypeMappingMode.OutputType, typeof(ListGraphType<GraphQLClrOutputTypeReference<Uri>>))]
-    [InlineData(typeof(IEnumerable<MyClass>), true, TypeMappingMode.OutputType, typeof(ListGraphType<GraphQLClrOutputTypeReference<MyClass>>))]
-    [InlineData(typeof(IEnumerable<MyEnum>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<MyEnum>>>))]
-    [InlineData(typeof(IList<int>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
-    [InlineData(typeof(ICollection<int>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
-    [InlineData(typeof(IReadOnlyCollection<int>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
-    [InlineData(typeof(List<int>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
-    [InlineData(typeof(int[]), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
-    [InlineData(typeof(IDictionary<int, string>), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<IDictionary<int, string>>))]
-    [InlineData(typeof(IEnumerable<KeyValuePair<int, string>>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<KeyValuePair<int, string>>>>))]
-    [InlineData(typeof(IEnumerable<int>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>>))]
+    [InlineData(typeof(IEnumerable), true, false, typeof(ListGraphType<GraphQLClrOutputTypeReference<object>>))]
+    [InlineData(typeof(IEnumerable<int>), true, false, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
+    [InlineData(typeof(IEnumerable<string>), true, false, typeof(ListGraphType<GraphQLClrOutputTypeReference<string>>))]
+    [InlineData(typeof(IEnumerable<decimal>), true, false, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<decimal>>>))]
+    [InlineData(typeof(IEnumerable<Guid>), true, false, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<Guid>>>))]
+    [InlineData(typeof(IEnumerable<Uri>), true, false, typeof(ListGraphType<GraphQLClrOutputTypeReference<Uri>>))]
+    [InlineData(typeof(IEnumerable<MyClass>), true, false, typeof(ListGraphType<GraphQLClrOutputTypeReference<MyClass>>))]
+    [InlineData(typeof(IEnumerable<MyEnum>), true, false, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<MyEnum>>>))]
+    [InlineData(typeof(IList<int>), true, false, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
+    [InlineData(typeof(ICollection<int>), true, false, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
+    [InlineData(typeof(IReadOnlyCollection<int>), true, false, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
+    [InlineData(typeof(List<int>), true, false, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
+    [InlineData(typeof(int[]), true, false, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
+    [InlineData(typeof(IDictionary<int, string>), true, false, typeof(GraphQLClrOutputTypeReference<IDictionary<int, string>>))]
+    [InlineData(typeof(IEnumerable<KeyValuePair<int, string>>), true, false, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<KeyValuePair<int, string>>>>))]
+    [InlineData(typeof(IEnumerable<int>), false, false, typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>>))]
     //output mapping mode - graph types
-    [InlineData(typeof(IntGraphType), true, TypeMappingMode.OutputType, null)]
-    [InlineData(typeof(NonNullGraphType<IntGraphType>), true, TypeMappingMode.OutputType, null)]
-    [InlineData(typeof(ListGraphType<IntGraphType>), true, TypeMappingMode.OutputType, null)]
-    [InlineData(typeof(IntGraphType), false, TypeMappingMode.OutputType, null)]
-    [InlineData(typeof(NonNullGraphType<IntGraphType>), false, TypeMappingMode.OutputType, null)]
-    [InlineData(typeof(ListGraphType<IntGraphType>), false, TypeMappingMode.OutputType, null)]
+    [InlineData(typeof(IntGraphType), true, false, null)]
+    [InlineData(typeof(NonNullGraphType<IntGraphType>), true, false, null)]
+    [InlineData(typeof(ListGraphType<IntGraphType>), true, false, null)]
+    [InlineData(typeof(IntGraphType), false, false, null)]
+    [InlineData(typeof(NonNullGraphType<IntGraphType>), false, false, null)]
+    [InlineData(typeof(ListGraphType<IntGraphType>), false, false, null)]
     //input mapping mode
-    [InlineData(typeof(int), true, TypeMappingMode.InputType, typeof(GraphQLClrInputTypeReference<int>))]
+    [InlineData(typeof(int), true, true, typeof(GraphQLClrInputTypeReference<int>))]
     //data loader compatibility
-    [InlineData(typeof(IDataLoaderResult), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(IDataLoaderResult), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<object>))]
-    [InlineData(typeof(IDataLoaderResult), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<object>>))]
-    [InlineData(typeof(IDataLoaderResult<string>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(StringGraphType))]
-    [InlineData(typeof(IDataLoaderResult<string>), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<StringGraphType>))]
-    [InlineData(typeof(IDataLoaderResult<string>), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<string>))]
-    [InlineData(typeof(IDataLoaderResult<string>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
-    [InlineData(typeof(IDataLoaderResult<int>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(IntGraphType))]
-    [InlineData(typeof(IDataLoaderResult<int>), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<IntGraphType>))]
-    [InlineData(typeof(IDataLoaderResult<int>), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<int>))]
-    [InlineData(typeof(IDataLoaderResult<int>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
-    [InlineData(typeof(IDataLoaderResult<int?>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(IntGraphType))]
-    [InlineData(typeof(IDataLoaderResult<int?>), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(IDataLoaderResult<int?>), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<int>))]
-    [InlineData(typeof(IDataLoaderResult<int?>), false, TypeMappingMode.OutputType, null)]
-    [InlineData(typeof(IDataLoaderResult<IDataLoaderResult<string>>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(StringGraphType))]
-    [InlineData(typeof(IDataLoaderResult<IDataLoaderResult<int>>), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<IntGraphType>))]
-    [InlineData(typeof(IDataLoaderResult<IDataLoaderResult<int>>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
-    [InlineData(typeof(IDataLoaderResult<IEnumerable<IDataLoaderResult<int>>>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<int>>>))]
+    [InlineData(typeof(IDataLoaderResult), true, false, typeof(GraphQLClrOutputTypeReference<object>))]
+    [InlineData(typeof(IDataLoaderResult), false, false, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<object>>))]
+    [InlineData(typeof(IDataLoaderResult<string>), true, false, typeof(GraphQLClrOutputTypeReference<string>))]
+    [InlineData(typeof(IDataLoaderResult<string>), false, false, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
+    [InlineData(typeof(IDataLoaderResult<int>), true, false, typeof(GraphQLClrOutputTypeReference<int>))]
+    [InlineData(typeof(IDataLoaderResult<int>), false, false, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
+    [InlineData(typeof(IDataLoaderResult<int?>), true, false, typeof(GraphQLClrOutputTypeReference<int>))]
+    [InlineData(typeof(IDataLoaderResult<int?>), false, false, null)]
+    [InlineData(typeof(IDataLoaderResult<IDataLoaderResult<int>>), false, false, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
+    [InlineData(typeof(IDataLoaderResult<IEnumerable<IDataLoaderResult<int>>>), false, false, typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<int>>>))]
     //task incompatibility
-    [InlineData(typeof(Task), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(Task), true, TypeMappingMode.OutputType, null)]
-    [InlineData(typeof(Task<string>), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
-    [InlineData(typeof(Task<string>), true, TypeMappingMode.OutputType, null)]
-    [InlineData(typeof(AttributeTest1), true, TypeMappingMode.InputType, typeof(CustomInputGraphType))]
-    [InlineData(typeof(AttributeTest1), false, TypeMappingMode.InputType, typeof(NonNullGraphType<CustomInputGraphType>))]
-    [InlineData(typeof(AttributeTest2), true, TypeMappingMode.InputType, typeof(CustomInputGraphType))]
-    [InlineData(typeof(AttributeTest2), false, TypeMappingMode.InputType, typeof(NonNullGraphType<CustomInputGraphType>))]
-    [InlineData(typeof(AttributeTest3), true, TypeMappingMode.InputType, typeof(GraphQLClrInputTypeReference<AttributeTest3>))]
-    [InlineData(typeof(AttributeTest3), false, TypeMappingMode.InputType, typeof(NonNullGraphType<GraphQLClrInputTypeReference<AttributeTest3>>))]
-    [InlineData(typeof(AttributeTest1), true, TypeMappingMode.OutputType, typeof(CustomOutputGraphType))]
-    [InlineData(typeof(AttributeTest1), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<CustomOutputGraphType>))]
-    [InlineData(typeof(AttributeTest2), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<AttributeTest2>))]
-    [InlineData(typeof(AttributeTest2), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<AttributeTest2>>))]
-    [InlineData(typeof(AttributeTest3), true, TypeMappingMode.OutputType, typeof(CustomOutputGraphType))]
-    [InlineData(typeof(AttributeTest3), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<CustomOutputGraphType>))]
-    [InlineData(typeof(AttributeTest4), true, TypeMappingMode.InputType, typeof(CustomInputGraphType))]
-    [InlineData(typeof(AttributeTest4), false, TypeMappingMode.InputType, typeof(NonNullGraphType<CustomInputGraphType>))]
-    [InlineData(typeof(AttributeTest5), true, TypeMappingMode.InputType, typeof(CustomInputGraphType))]
-    [InlineData(typeof(AttributeTest5), false, TypeMappingMode.InputType, typeof(NonNullGraphType<CustomInputGraphType>))]
-    [InlineData(typeof(AttributeTest6), true, TypeMappingMode.InputType, typeof(GraphQLClrInputTypeReference<AttributeTest6>))]
-    [InlineData(typeof(AttributeTest6), false, TypeMappingMode.InputType, typeof(NonNullGraphType<GraphQLClrInputTypeReference<AttributeTest6>>))]
-    [InlineData(typeof(AttributeTest4), true, TypeMappingMode.OutputType, typeof(CustomOutputGraphType))]
-    [InlineData(typeof(AttributeTest4), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<CustomOutputGraphType>))]
-    [InlineData(typeof(AttributeTest5), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<AttributeTest5>))]
-    [InlineData(typeof(AttributeTest5), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<AttributeTest5>>))]
-    [InlineData(typeof(AttributeTest6), true, TypeMappingMode.OutputType, typeof(CustomOutputGraphType))]
-    [InlineData(typeof(AttributeTest6), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<CustomOutputGraphType>))]
-    public void GetGraphTypeFromType_Matrix(Type type, bool nullable, TypeMappingMode typeMappingMode, Type expectedType)
+    [InlineData(typeof(Task), true, false, null)]
+    [InlineData(typeof(Task<string>), true, false, null)]
+    [InlineData(typeof(AttributeTest1), true, true, typeof(CustomInputGraphType))]
+    [InlineData(typeof(AttributeTest1), false, true, typeof(NonNullGraphType<CustomInputGraphType>))]
+    [InlineData(typeof(AttributeTest2), true, true, typeof(CustomInputGraphType))]
+    [InlineData(typeof(AttributeTest2), false, true, typeof(NonNullGraphType<CustomInputGraphType>))]
+    [InlineData(typeof(AttributeTest3), true, true, typeof(GraphQLClrInputTypeReference<AttributeTest3>))]
+    [InlineData(typeof(AttributeTest3), false, true, typeof(NonNullGraphType<GraphQLClrInputTypeReference<AttributeTest3>>))]
+    [InlineData(typeof(AttributeTest1), true, false, typeof(CustomOutputGraphType))]
+    [InlineData(typeof(AttributeTest1), false, false, typeof(NonNullGraphType<CustomOutputGraphType>))]
+    [InlineData(typeof(AttributeTest2), true, false, typeof(GraphQLClrOutputTypeReference<AttributeTest2>))]
+    [InlineData(typeof(AttributeTest2), false, false, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<AttributeTest2>>))]
+    [InlineData(typeof(AttributeTest3), true, false, typeof(CustomOutputGraphType))]
+    [InlineData(typeof(AttributeTest3), false, false, typeof(NonNullGraphType<CustomOutputGraphType>))]
+    [InlineData(typeof(AttributeTest4), true, true, typeof(CustomInputGraphType))]
+    [InlineData(typeof(AttributeTest4), false, true, typeof(NonNullGraphType<CustomInputGraphType>))]
+    [InlineData(typeof(AttributeTest5), true, true, typeof(CustomInputGraphType))]
+    [InlineData(typeof(AttributeTest5), false, true, typeof(NonNullGraphType<CustomInputGraphType>))]
+    [InlineData(typeof(AttributeTest6), true, true, typeof(GraphQLClrInputTypeReference<AttributeTest6>))]
+    [InlineData(typeof(AttributeTest6), false, true, typeof(NonNullGraphType<GraphQLClrInputTypeReference<AttributeTest6>>))]
+    [InlineData(typeof(AttributeTest4), true, false, typeof(CustomOutputGraphType))]
+    [InlineData(typeof(AttributeTest4), false, false, typeof(NonNullGraphType<CustomOutputGraphType>))]
+    [InlineData(typeof(AttributeTest5), true, false, typeof(GraphQLClrOutputTypeReference<AttributeTest5>))]
+    [InlineData(typeof(AttributeTest5), false, false, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<AttributeTest5>>))]
+    [InlineData(typeof(AttributeTest6), true, false, typeof(CustomOutputGraphType))]
+    [InlineData(typeof(AttributeTest6), false, false, typeof(NonNullGraphType<CustomOutputGraphType>))]
+    public void GetGraphTypeFromType_Matrix(Type type, bool nullable, bool isInputMode, Type expectedType)
     {
         if (expectedType == null)
         {
-            Should.Throw<ArgumentOutOfRangeException>(() => type.GetGraphTypeFromType(nullable, typeMappingMode));
+            Should.Throw<ArgumentOutOfRangeException>(() => type.GetGraphTypeFromType(nullable, isInputMode));
         }
         else
         {
-            type.GetGraphTypeFromType(nullable, typeMappingMode).ShouldBe(expectedType);
+            type.GetGraphTypeFromType(nullable, isInputMode).ShouldBe(expectedType);
         }
     }
 
@@ -418,7 +272,7 @@ public class GetGraphTypeFromTypeTests
     {
         var expectedMessage = "The graph type 'IntGraphType' cannot be used as a CLR type.";
 
-        Should.Throw<ArgumentOutOfRangeException>(() => typeof(IntGraphType).GetGraphTypeFromType())
+        Should.Throw<ArgumentOutOfRangeException>(() => typeof(IntGraphType).GetGraphTypeFromType(false, false))
             .Message.ShouldStartWith(expectedMessage);
 
         var graphType = new ObjectGraphType();

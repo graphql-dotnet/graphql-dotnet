@@ -712,7 +712,7 @@ Make sure that your ServiceProvider is configured correctly.");
     /// <returns>The graph type to be used, or <see langword="null"/> if no match can be found.</returns>
     /// <remarks>
     /// This method should not return wrapped types such as <see cref="ListGraphType"/> or <see cref="NonNullGraphType"/>.
-    /// These are handled within <see cref="GraphQL.TypeExtensions.GetGraphTypeFromType(Type, bool, TypeMappingMode)"/>,
+    /// These are handled within <see cref="GraphQL.TypeExtensions.GetGraphTypeFromType(Type, bool, bool)"/>,
     /// and should already have been wrapped around the type reference.
     /// </remarks>
     protected virtual Type? GetGraphTypeFromClrType(Type clrType, bool isInputType, IEnumerable<IGraphTypeMappingProvider>? typeMappings)

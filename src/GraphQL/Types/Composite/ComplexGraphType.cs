@@ -204,7 +204,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
 
         try
         {
-            type = typeof(TReturnType).GetGraphTypeFromType(nullable, this is IInputObjectGraphType ? TypeMappingMode.InputType : TypeMappingMode.OutputType);
+            type = typeof(TReturnType).GetGraphTypeFromType(nullable, this is IInputObjectGraphType);
         }
         catch (ArgumentOutOfRangeException exp)
         {
@@ -278,13 +278,13 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
                 else
                 {
                     nullable = typeof(TProperty).IsValueType && Nullable.GetUnderlyingType(typeof(TProperty)) != null;
-                    type = typeof(TProperty).GetGraphTypeFromType(nullable.Value, this is IInputObjectGraphType ? TypeMappingMode.InputType : TypeMappingMode.OutputType);
+                    type = typeof(TProperty).GetGraphTypeFromType(nullable.Value, this is IInputObjectGraphType);
                 }
             }
             else if (type == null)
             {
                 nullable ??= false;
-                type = typeof(TProperty).GetGraphTypeFromType(nullable.Value, this is IInputObjectGraphType ? TypeMappingMode.InputType : TypeMappingMode.OutputType);
+                type = typeof(TProperty).GetGraphTypeFromType(nullable.Value, this is IInputObjectGraphType);
             }
         }
         catch (ArgumentOutOfRangeException exp)

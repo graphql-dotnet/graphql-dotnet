@@ -20,7 +20,7 @@ public class ImplementsAttribute : GraphQLAttribute
         }
         else if (type.IsInterface)
         {
-            InterfaceGraphType = typeof(GraphQLClrOutputTypeReference<>).MakeGenericType(type);
+            InterfaceGraphType = type.MakeClrTypeReference(false);
         }
         else
         {

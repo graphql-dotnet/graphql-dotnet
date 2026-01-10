@@ -41,7 +41,7 @@ public class Bug3331
         // Note: we register different types on purpose here (the generic method registers a 2nd instance)
         queryGraphType.Field<MyObjectGraphType>(singular)
             .Arguments(new QueryArguments(
-                new QueryArgument(typeof(Guid?).GetGraphTypeFromType(true)) { Name = "Id" }))
+                new QueryArgument(typeof(Guid?).GetGraphTypeFromType(true, true)) { Name = "Id" }))
             .Resolve(context => new MyObject
             {
                 Id = Guid.NewGuid(),
@@ -54,8 +54,8 @@ public class Bug3331
 
         queryGraphType.Field(plural, objectDataResultGraphType)
             .Arguments(new QueryArguments(
-                new QueryArgument(typeof(int?).GetGraphTypeFromType(true)) { Name = "Skip" },
-                new QueryArgument(typeof(int?).GetGraphTypeFromType(true)) { Name = "Take" }))
+                new QueryArgument(typeof(int?).GetGraphTypeFromType(true, true)) { Name = "Skip" },
+                new QueryArgument(typeof(int?).GetGraphTypeFromType(true, true)) { Name = "Take" }))
             .Resolve(context =>
             {
                 var dataResult = new DataResult<MyObject>

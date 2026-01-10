@@ -184,8 +184,14 @@ public static class TypeExtensions
     /// <param name="mode">Mode to use when mapping CLR type to GraphType.</param>
     /// <returns>A Type object representing a GraphType that matches the indicated type.</returns>
     /// <remarks>This can handle arrays, lists and other collections implementing IEnumerable.</remarks>
-    public static Type GetGraphTypeFromType(this Type type, bool isNullable = false, TypeMappingMode mode = TypeMappingMode.UseBuiltInScalarMappings)
+    [Obsolete("Use TypeExtensions.GetGraphTypeFromType(Type, bool, bool) overload instead. This method will be removed in v10.")]
+    [RequiresDynamicCode("This method uses reflection to create types at runtime which is not compatible with trimming and AOT.")]
+    public static Type GetGraphTypeFromType(this Type type, bool isNullable, TypeMappingMode mode)
     {
+        if (mode == TypeMappingMode.InputType || mode == TypeMappingMode.OutputType)
+            return GetGraphTypeFromType(type, isNullable, mode == TypeMappingMode.InputType);
+
+        // legacy path for UseBuiltInScalarMappings
         if (typeof(IGraphType).IsAssignableFrom(type))
         {
             throw new ArgumentOutOfRangeException(nameof(type), $"The graph type '{type.GetFriendlyName()}' cannot be used as a CLR type.");
@@ -244,23 +250,16 @@ public static class TypeExtensions
 
             if (graphType == null)
             {
-                if (mode == TypeMappingMode.UseBuiltInScalarMappings)
+                if (!SchemaTypesBase.BuiltInScalarMappings.TryGetValue(type, out graphType))
                 {
-                    if (!SchemaTypesBase.BuiltInScalarMappings.TryGetValue(type, out graphType))
+                    if (type.IsEnum)
                     {
-                        if (type.IsEnum)
-                        {
-                            graphType = typeof(EnumerationGraphType<>).MakeGenericType(type);
-                        }
-                        else
-                        {
-                            throw new ArgumentOutOfRangeException(nameof(type), $"The CLR type '{type.FullName}' cannot be coerced effectively to a GraphQL type.");
-                        }
+                        graphType = typeof(EnumerationGraphType<>).MakeGenericType(type);
                     }
-                }
-                else
-                {
-                    graphType = (mode == TypeMappingMode.OutputType ? typeof(GraphQLClrOutputTypeReference<>) : typeof(GraphQLClrInputTypeReference<>)).MakeGenericType(type);
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(type), $"The CLR type '{type.FullName}' cannot be coerced effectively to a GraphQL type.");
+                    }
                 }
             }
         }
@@ -272,19 +271,135 @@ public static class TypeExtensions
 
         return graphType;
 
-        //TODO: rewrite nullability condition in v5
         static bool IsNullableType(Type type) => !type.IsValueType || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
     }
 
+    /// <summary>
+    /// Gets the graph type for the indicated type.
+    /// </summary>
+    /// <param name="type">The type for which a graph type is desired.</param>
+    /// <param name="isNullable">if set to <see langword="false"/> if the type explicitly non-nullable.</param>
+    /// <param name="isInputType">Indicates if the type is an input type</param>
+    /// <returns>A Type object representing a GraphType that matches the indicated type.</returns>
+    /// <remarks>This can handle arrays, lists and other collections implementing IEnumerable.</remarks>
+    [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+    [UnconditionalSuppressMessage("Trimming", "IL2073: 'target method' method return value does not satisfy 'DynamicallyAccessedMembersAttribute' requirements. The return value of method 'source method' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to",
+        Justification = "The return type is a marker type and will never have constructors.")]
+    public static Type GetGraphTypeFromType(this Type type, bool isNullable, bool isInputType)
+    {
+        if (typeof(IGraphType).IsAssignableFrom(type))
+        {
+            throw new ArgumentOutOfRangeException(nameof(type), $"The graph type '{type.GetFriendlyName()}' cannot be used as a CLR type.");
+        }
+
+        while (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDataLoaderResult<>))
+        {
+            type = type.GetGenericArguments()[0];
+        }
+
+        if (type == typeof(IDataLoaderResult))
+        {
+            type = typeof(object);
+        }
+
+        if (typeof(Task).IsAssignableFrom(type))
+            throw new ArgumentOutOfRangeException(nameof(type), "Task types cannot be coerced to a graph type; please unwrap the task type before calling this method.");
+
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+        {
+            type = type.GetGenericArguments()[0];
+            if (!isNullable)
+            {
+                throw new ArgumentOutOfRangeException(nameof(isNullable),
+                    $"Explicitly nullable type: Nullable<{type.Name}> cannot be coerced to a non nullable GraphQL type.");
+            }
+        }
+
+        Type? graphType = null;
+
+        if (type.IsArray)
+        {
+            var clrElementType = type.GetElementType()!;
+            var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), isInputType); // isNullable from elementType, not from parent array
+            graphType = MakeListType(elementType);
+        }
+        else if (TryGetEnumerableElementType(type, out var clrElementType))
+        {
+            var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), isInputType); // isNullable from elementType, not from parent container
+            graphType = MakeListType(elementType);
+        }
+        else
+        {
+            if (isInputType)
+            {
+                var inputAttr = type.GetCustomAttribute<InputTypeAttribute>();
+                if (inputAttr != null)
+                    graphType = inputAttr.InputType;
+            }
+            else
+            {
+                var outputAttr = type.GetCustomAttribute<OutputTypeAttribute>();
+                if (outputAttr != null)
+                    graphType = outputAttr.OutputType;
+            }
+
+            if (graphType == null)
+            {
+                graphType = MakeClrTypeReference(type, isInputType);
+            }
+        }
+
+        if (!isNullable)
+        {
+            graphType = MakeNonNullType(graphType);
+        }
+
+        return graphType;
+
+        static bool IsNullableType(Type type) => !type.IsValueType || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+    }
+
+    // typeof(NonNullGraphType<>).MakeGenericType(type) will always succeed with .NET 10, but it will always
+    // be missing native code; which doesn't matter because these types are never instantiated
     [UnconditionalSuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
         Justification = "The supplied type is expected to be a reference type. NonNullGraphType<T> constrains T to IGraphType, and all supported implementations are classes, so MakeGenericType(type) should be valid.")]
-    private static Type MakeNonNullType(Type type)
+    [UnconditionalSuppressMessage("Trimming", "IL2071:Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
+        Justification = "The supplied type is expected to be a reference type. NonNullGraphType<T> constrains T to IGraphType, and all supported implementations are classes, so MakeGenericType(type) should be valid.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2073: 'target method' method return value does not satisfy 'DynamicallyAccessedMembersAttribute' requirements. The return value of method 'source method' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to",
+        Justification = "The return type is a marker type and will never have constructors.")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050:Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT",
+        Justification = "T in NonNullGraphType<T> is constrained to IGraphType (a reference type), so MakeGenericType always works.")]
+    [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+    internal static Type MakeNonNullType(this Type type)
         => typeof(NonNullGraphType<>).MakeGenericType(type);
 
+    // typeof(ListGraphType<>).MakeGenericType(type) will always succeed with .NET 10, but it will always
+    // be missing native code; which doesn't matter because these types are never instantiated
     [UnconditionalSuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
         Justification = "The supplied type is expected to be a reference type. ListGraphType<T> constrains T to IGraphType, and all supported implementations are classes, so MakeGenericType(type) should be valid.")]
-    private static Type MakeListType(Type type)
+    [UnconditionalSuppressMessage("Trimming", "IL2071:Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
+        Justification = "The supplied type is expected to be a reference type. ListGraphType<T> constrains T to IGraphType, and all supported implementations are classes, so MakeGenericType(type) should be valid.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2073: 'target method' method return value does not satisfy 'DynamicallyAccessedMembersAttribute' requirements. The return value of method 'source method' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to",
+        Justification = "The return type is a marker type and will never have constructors.")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050:Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT",
+        Justification = "T in ListGraphType<T> is constrained to IGraphType (a reference type), so MakeGenericType always works.")]
+    [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+    internal static Type MakeListType(this Type type)
         => typeof(ListGraphType<>).MakeGenericType(type);
+
+    // typeof(GraphQLClrOutputTypeReference<>).MakeGenericType(type) will always succeed with .NET 10, but it will always
+    // be missing native code; which doesn't matter because these types are never instantiated
+    [UnconditionalSuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
+        Justification = "The supplied type is expected to be a reference type. GraphQLClrOutputTypeReference<T> and GraphQLClrInputTypeReference<T> constrain T to class, and all supported implementations are classes, so MakeGenericType(type) should be valid.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2071:Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
+        Justification = "The supplied type is expected to be a reference type. GraphQLClrOutputTypeReference<T> and GraphQLClrInputTypeReference<T> constrain T to class, and all supported implementations are classes, so MakeGenericType(type) should be valid.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2073: 'target method' method return value does not satisfy 'DynamicallyAccessedMembersAttribute' requirements. The return value of method 'source method' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to",
+        Justification = "The return type is a marker type and will never have constructors.")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050:Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT",
+        Justification = "GraphQLClrOutputTypeReference<T> and GraphQLClrInputTypeReference<T> constrain T to class (a reference type), so MakeGenericType always works.")]
+    [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+    internal static Type MakeClrTypeReference(this Type clrType, bool isInputType)
+        => (isInputType ? typeof(GraphQLClrInputTypeReference<>) : typeof(GraphQLClrOutputTypeReference<>)).MakeGenericType(clrType);
 
     /// <summary>
     /// Returns the friendly name of a type, using C# angle-bracket syntax for generics.
@@ -542,12 +657,13 @@ public static class TypeExtensions
 }
 
 /// <summary>
-/// Mode used when mapping CLR type to GraphType in <see cref="TypeExtensions.GetGraphTypeFromType"/>.
+/// Mode used when mapping CLR type to GraphType in <see cref="TypeExtensions.GetGraphTypeFromType(Type, bool, TypeMappingMode)"/>.
 /// </summary>
+[Obsolete("Use TypeExtensions.GetGraphTypeFromType(Type, bool, bool) overload instead. This enum will be removed in v10.")]
 public enum TypeMappingMode
 {
     /// <summary>
-    /// This mode is left for backward compatibility in cases where you call <see cref="TypeExtensions.GetGraphTypeFromType"/> directly.
+    /// This mode is left for backward compatibility in cases where you call <see cref="TypeExtensions.GetGraphTypeFromType(Type, bool, TypeMappingMode)"/> directly.
     /// </summary>
     UseBuiltInScalarMappings,
 
