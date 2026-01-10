@@ -1,5 +1,5 @@
-using GraphQL.Types;
 using GraphQL.Analyzers.Tests.VerifiersExtensions;
+using GraphQL.Types;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
