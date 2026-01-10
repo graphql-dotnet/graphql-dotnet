@@ -407,13 +407,13 @@ public static class TypeExtensions
     // typeof(GraphQLClrOutputTypeReference<>).MakeGenericType(type) will always succeed with .NET 10, but it will always
     // be missing native code; which doesn't matter because these types are never instantiated
     [UnconditionalSuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
-        Justification = "The supplied type is expected to be a reference type. GraphQLClrOutputTypeReference<T> and GraphQLClrInputTypeReference<T> constrain T to class, and all supported implementations are classes, so MakeGenericType(type) should be valid.")]
+        Justification = "MakeGenericType always works in .NET 10 even if it does not generate any code, which doesn't matter because the type is never instantiated.")]
     [UnconditionalSuppressMessage("Trimming", "IL2071:Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
-        Justification = "The supplied type is expected to be a reference type. GraphQLClrOutputTypeReference<T> and GraphQLClrInputTypeReference<T> constrain T to class, and all supported implementations are classes, so MakeGenericType(type) should be valid.")]
+        Justification = "MakeGenericType always works in .NET 10 even if it does not generate any code, which doesn't matter because the type is never instantiated.")]
     [UnconditionalSuppressMessage("Trimming", "IL2073: 'target method' method return value does not satisfy 'DynamicallyAccessedMembersAttribute' requirements. The return value of method 'source method' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to",
         Justification = "The return type is a marker type and will never have constructors.")]
     [UnconditionalSuppressMessage("Trimming", "IL3050:Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT",
-        Justification = "GraphQLClrOutputTypeReference<T> and GraphQLClrInputTypeReference<T> constrain T to class (a reference type), so MakeGenericType always works.")]
+        Justification = "MakeGenericType always works in .NET 10 even if it does not generate any code, which doesn't matter because the type is never instantiated.")]
     [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
     internal static Type MakeClrTypeReference(this Type clrType, bool isInputType)
         => (isInputType ? typeof(GraphQLClrInputTypeReference<>) : typeof(GraphQLClrOutputTypeReference<>)).MakeGenericType(clrType);
