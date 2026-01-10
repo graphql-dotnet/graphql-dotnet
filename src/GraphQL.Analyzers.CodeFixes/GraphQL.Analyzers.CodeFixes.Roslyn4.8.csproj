@@ -1,10 +1,10 @@
 ﻿<Project>
   <PropertyGroup>
+    <!-- https://github.com/graphql-dotnet/graphql-dotnet/issues/3829 -->
     <RoslynApiVersion>4.8</RoslynApiVersion>
     <DefineConstants>$(DefineConstants);ROSLYN4_8_OR_GREATER</DefineConstants>
     <BaseIntermediateOutputPath>obj\Roslyn$(RoslynApiVersion)\</BaseIntermediateOutputPath>
     <BaseOutputPath>bin\Roslyn$(RoslynApiVersion)\</BaseOutputPath>
-    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />

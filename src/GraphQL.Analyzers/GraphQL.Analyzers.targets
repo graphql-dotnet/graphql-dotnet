@@ -17,7 +17,6 @@
   <ItemGroup>
     <PackageReference Include="GraphQL-Parser" Version="9.5.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
-    <!-- https://github.com/graphql-dotnet/graphql-dotnet/issues/3829 -->
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynApiVersion)" PrivateAssets="all" />
   </ItemGroup>
 

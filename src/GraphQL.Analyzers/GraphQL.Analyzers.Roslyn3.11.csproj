@@ -1,5 +1,6 @@
 ﻿<Project>
   <PropertyGroup>
+    <!-- https://github.com/graphql-dotnet/graphql-dotnet/issues/3829 -->
     <RoslynApiVersion>3.11</RoslynApiVersion>
     <BaseIntermediateOutputPath>obj\Roslyn$(RoslynApiVersion)\</BaseIntermediateOutputPath>
     <BaseOutputPath>bin\Roslyn$(RoslynApiVersion)\</BaseOutputPath>

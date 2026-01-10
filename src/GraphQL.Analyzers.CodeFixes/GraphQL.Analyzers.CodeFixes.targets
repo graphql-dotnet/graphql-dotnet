@@ -14,7 +14,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- https://github.com/graphql-dotnet/graphql-dotnet/issues/3829 -->
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(RoslynApiVersion)" PrivateAssets="all" />
   </ItemGroup>
 
