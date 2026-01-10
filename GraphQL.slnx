@@ -1,0 +1,146 @@
+<Solution>
+  <Folder Name="/.github/">
+    <File Path=".github/codecov.yml" />
+    <File Path=".github/codeql-config.yml" />
+    <File Path=".github/dependabot.yml" />
+    <File Path=".github/FUNDING.yml" />
+    <File Path=".github/labeler.yml" />
+  </Folder>
+  <Folder Name="/.github/ISSUE_TEMPLATE/">
+    <File Path=".github/ISSUE_TEMPLATE/bug_report.md" />
+    <File Path=".github/ISSUE_TEMPLATE/feature_request.md" />
+    <File Path=".github/ISSUE_TEMPLATE/question.md" />
+  </Folder>
+  <Folder Name="/.Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="global.json" />
+    <File Path="graphql.snk" />
+    <File Path="LICENSE.md" />
+    <File Path="README.md" />
+    <File Path="Tests.props" />
+  </Folder>
+  <Folder Name="/Analyzer/">
+    <Project Path="src/GraphQL.Analyzers.CodeFixes/GraphQL.Analyzers.CodeFixes.csproj" />
+    <Project Path="src/GraphQL.Analyzers.Package/GraphQL.Analyzers.Package.csproj" />
+    <Project Path="src/GraphQL.Analyzers/GraphQL.Analyzers.csproj" />
+  </Folder>
+  <Folder Name="/Caching/">
+    <Project Path="src/GraphQL.MemoryCache/GraphQL.MemoryCache.csproj" />
+  </Folder>
+  <Folder Name="/DependencyInjection/">
+    <Project Path="src/GraphQL.MicrosoftDI/GraphQL.MicrosoftDI.csproj" />
+  </Folder>
+  <Folder Name="/Docs/">
+    <File Path="docs2/site/sitemap.yml" />
+  </Folder>
+  <Folder Name="/Docs/analyzers/">
+    <File Path="docs2/site/docs/analyzers/gql001.md" />
+    <File Path="docs2/site/docs/analyzers/gql002.md" />
+    <File Path="docs2/site/docs/analyzers/gql003.md" />
+    <File Path="docs2/site/docs/analyzers/gql004.md" />
+    <File Path="docs2/site/docs/analyzers/gql005.md" />
+    <File Path="docs2/site/docs/analyzers/gql006.md" />
+    <File Path="docs2/site/docs/analyzers/gql007.md" />
+    <File Path="docs2/site/docs/analyzers/gql008.md" />
+    <File Path="docs2/site/docs/analyzers/gql009.md" />
+    <File Path="docs2/site/docs/analyzers/gql010.md" />
+    <File Path="docs2/site/docs/analyzers/gql011.md" />
+    <File Path="docs2/site/docs/analyzers/gql012.md" />
+    <File Path="docs2/site/docs/analyzers/gql013.md" />
+    <File Path="docs2/site/docs/analyzers/gql014.md" />
+    <File Path="docs2/site/docs/analyzers/gql015.md" />
+    <File Path="docs2/site/docs/analyzers/gql016.md" />
+    <File Path="docs2/site/docs/analyzers/gql017.md" />
+    <File Path="docs2/site/docs/analyzers/gql018.md" />
+    <File Path="docs2/site/docs/analyzers/gql019.md" />
+    <File Path="docs2/site/docs/analyzers/gql020.md" />
+    <File Path="docs2/site/docs/analyzers/overview.md" />
+  </Folder>
+  <Folder Name="/Docs/getting-started/">
+    <File Path="docs2/site/docs/getting-started/aliases.md" />
+    <File Path="docs2/site/docs/getting-started/arguments.md" />
+    <File Path="docs2/site/docs/getting-started/authorization.md" />
+    <File Path="docs2/site/docs/getting-started/custom-scalars.md" />
+    <File Path="docs2/site/docs/getting-started/databases.md" />
+    <File Path="docs2/site/docs/getting-started/dependency-injection.md" />
+    <File Path="docs2/site/docs/getting-started/directives.md" />
+    <File Path="docs2/site/docs/getting-started/errors.md" />
+    <File Path="docs2/site/docs/getting-started/field-middleware.md" />
+    <File Path="docs2/site/docs/getting-started/fields.md" />
+    <File Path="docs2/site/docs/getting-started/fragments.md" />
+    <File Path="docs2/site/docs/getting-started/global-switches.md" />
+    <File Path="docs2/site/docs/getting-started/graphiql.md" />
+    <File Path="docs2/site/docs/getting-started/installation.md" />
+    <File Path="docs2/site/docs/getting-started/interfaces.md" />
+    <File Path="docs2/site/docs/getting-started/introduction.md" />
+    <File Path="docs2/site/docs/getting-started/lists-non-null.md" />
+    <File Path="docs2/site/docs/getting-started/malicious-queries.md" />
+    <File Path="docs2/site/docs/getting-started/metadata.md" />
+    <File Path="docs2/site/docs/getting-started/metrics.md" />
+    <File Path="docs2/site/docs/getting-started/mutations.md" />
+    <File Path="docs2/site/docs/getting-started/queries.md" />
+    <File Path="docs2/site/docs/getting-started/query-organization.md" />
+    <File Path="docs2/site/docs/getting-started/query-validation.md" />
+    <File Path="docs2/site/docs/getting-started/relay.md" />
+    <File Path="docs2/site/docs/getting-started/schema-types.md" />
+    <File Path="docs2/site/docs/getting-started/subscriptions.md" />
+    <File Path="docs2/site/docs/getting-started/unions.md" />
+    <File Path="docs2/site/docs/getting-started/user-context.md" />
+    <File Path="docs2/site/docs/getting-started/variables.md" />
+  </Folder>
+  <Folder Name="/Docs/guides/">
+    <File Path="docs2/site/docs/guides/complexity-analyzer.md" />
+    <File Path="docs2/site/docs/guides/dataloader.md" />
+    <File Path="docs2/site/docs/guides/document-caching.md" />
+    <File Path="docs2/site/docs/guides/federated-tracing.md" />
+    <File Path="docs2/site/docs/guides/known-issues.md" />
+    <File Path="docs2/site/docs/guides/links.md" />
+    <File Path="docs2/site/docs/guides/schema-generation.md" />
+    <File Path="docs2/site/docs/guides/serialization.md" />
+  </Folder>
+  <Folder Name="/Docs/migrations/">
+    <File Path="docs2/site/docs/migrations/migration2.md" />
+    <File Path="docs2/site/docs/migrations/migration3.md" />
+    <File Path="docs2/site/docs/migrations/migration4.md" />
+    <File Path="docs2/site/docs/migrations/migration5.md" />
+    <File Path="docs2/site/docs/migrations/migration7.md" />
+    <File Path="docs2/site/docs/migrations/migration8.md" />
+    <File Path="docs2/site/docs/migrations/v0_11_0.md" />
+    <File Path="docs2/site/docs/migrations/v0_8_0.md" />
+  </Folder>
+  <Folder Name="/Samples/">
+    <Project Path="samples/GraphQL.AotCompilationSample.CodeFirst/GraphQL.AotCompilationSample.CodeFirst.csproj" />
+    <Project Path="samples/GraphQL.AotCompilationSample.TypeFirst/GraphQL.AotCompilationSample.TypeFirst.csproj" />
+    <Project Path="samples/GraphQL.DataLoader.Sample.Default/GraphQL.DataLoader.Sample.Default.csproj" />
+    <Project Path="samples/GraphQL.DataLoader.Sample.DI/GraphQL.DataLoader.Sample.DI.csproj" />
+    <Project Path="samples/GraphQL.Federation.CodeFirst.Sample3/GraphQL.Federation.CodeFirst.Sample3.csproj" />
+    <Project Path="samples/GraphQL.Federation.SchemaFirst.Sample1/GraphQL.Federation.SchemaFirst.Sample1.csproj" />
+    <Project Path="samples/GraphQL.Federation.SchemaFirst.Sample2/GraphQL.Federation.SchemaFirst.Sample2.csproj" />
+    <Project Path="samples/GraphQL.Federation.TypeFirst.Sample4/GraphQL.Federation.TypeFirst.Sample4.csproj" />
+    <Project Path="samples/GraphQL.Harness/GraphQL.Harness.csproj" />
+    <Project Path="samples/GraphQL.Server.Polyfill/GraphQL.Server.Polyfill.csproj" />
+    <Project Path="src/GraphQL.StarWars.TypeFirst/GraphQL.StarWars.TypeFirst.csproj" />
+    <Project Path="src/GraphQL.StarWars/GraphQL.StarWars.csproj" />
+  </Folder>
+  <Folder Name="/Serialization/">
+    <Project Path="src/GraphQL.NewtonsoftJson/GraphQL.NewtonsoftJson.csproj" />
+    <Project Path="src/GraphQL.SystemTextJson/GraphQL.SystemTextJson.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="samples/GraphQL.Federation.Tests/GraphQL.Federation.Tests.csproj" />
+    <Project Path="samples/GraphQL.Harness.Tests/GraphQL.Harness.Tests.csproj" />
+    <Project Path="src/GraphQL.Analyzers.Tests/GraphQL.Analyzers.Tests.csproj" />
+    <Project Path="src/GraphQL.ApiTests/GraphQL.ApiTests.csproj" />
+    <Project Path="src/GraphQL.DataLoader.Tests/GraphQL.DataLoader.Tests.csproj" />
+    <Project Path="src/GraphQL.Dummy/GraphQL.Dummy.csproj" />
+    <Project Path="src/GraphQL.MicrosoftDI.Tests/GraphQL.MicrosoftDI.Tests.csproj" />
+    <Project Path="src/GraphQL.Tests/GraphQL.Tests.csproj" />
+  </Folder>
+  <Project Path="src/GraphQL.Benchmarks.Merge/GraphQL.Benchmarks.Merge.csproj" />
+  <Project Path="src/GraphQL.Benchmarks/GraphQL.Benchmarks.csproj" />
+  <Project Path="src/GraphQL.DataLoader/GraphQL.DataLoader.csproj" />
+  <Project Path="src/GraphQL/GraphQL.csproj" />
+</Solution>
