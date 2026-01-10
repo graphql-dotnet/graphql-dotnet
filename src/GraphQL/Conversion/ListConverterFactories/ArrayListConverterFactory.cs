@@ -17,6 +17,7 @@ internal sealed class ArrayListConverterFactory : IListConverterFactory
     /// <inheritdoc cref="ArrayListConverterFactory"/>
     public static ArrayListConverterFactory Instance { get; } = new();
 
+    [UnconditionalSuppressMessage("Trimming", "IL2072:Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.")]
     public IListConverter Create(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
         Type listType)
@@ -41,9 +42,7 @@ internal sealed class ArrayListConverterFactory : IListConverterFactory
         }
 
         // for non-nullable value types, coerce null to default(T)
-#pragma warning disable IL2072 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
         var elementDefault = Activator.CreateInstance(elementType);
-#pragma warning restore IL2072 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
 
         // then return a converter that coerces null to default(T)
         return new ListConverter(elementType, list =>

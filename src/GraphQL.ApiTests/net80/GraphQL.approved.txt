@@ -70,10 +70,11 @@ namespace GraphQL
     [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field, AllowMultiple=false)]
     public class ComplexityAttribute : GraphQL.GraphQLAttribute
     {
-        public ComplexityAttribute(System.Type fieldComplexityAnalyzer) { }
+        public ComplexityAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] System.Type fieldComplexityAnalyzer) { }
         public ComplexityAttribute(double fieldImpact) { }
         public ComplexityAttribute(double fieldImpact, double childImpactMultiplier) { }
         public double? ChildImpactMultiplier { get; }
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
         public System.Type? FieldComplexityAnalyzer { get; }
         public double? FieldImpact { get; }
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
@@ -97,6 +98,8 @@ namespace GraphQL
     }
     public sealed class DefaultServiceProvider : System.IServiceProvider
     {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This class uses Activator.CreateInstance which requires access to the target type" +
+            "\'s constructor.")]
         public DefaultServiceProvider() { }
         public object? GetService(System.Type serviceType) { }
     }
@@ -323,19 +326,27 @@ namespace GraphQL
     {
         public const float SORT_ORDER_CONFIGURATION = 200F;
         public const float SORT_ORDER_OPTIONS = 100F;
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the CLR types used by your schema are not trimmed by the compi" +
+            "ler.")]
         public static GraphQL.DI.IGraphQLBuilder AddAutoClrMappings(this GraphQL.DI.IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true) { }
-        public static GraphQL.DI.IGraphQLBuilder AddAutoSchema<TQueryClrType>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.IConfigureAutoSchema>? configure = null) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the CLR types used by your schema are not trimmed by the compi" +
+            "ler.")]
+        public static GraphQL.DI.IGraphQLBuilder AddAutoSchema<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TQueryClrType>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.IConfigureAutoSchema>? configure = null) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are" +
+            " not trimmed by the compiler.")]
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are" +
+            " not trimmed by the compiler.")]
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
         public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityOptions>? action = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityOptions, System.IServiceProvider>? action) { }
-        public static GraphQL.DI.IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this GraphQL.DI.IGraphQLBuilder builder)
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentExecuter<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TDocumentExecuter>(this GraphQL.DI.IGraphQLBuilder builder)
             where TDocumentExecuter :  class, GraphQL.IDocumentExecuter { }
         public static GraphQL.DI.IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TDocumentExecuter> documentExecuterFactory)
             where TDocumentExecuter :  class, GraphQL.IDocumentExecuter { }
         public static GraphQL.DI.IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this GraphQL.DI.IGraphQLBuilder builder, TDocumentExecuter documentExecuter)
             where TDocumentExecuter :  class, GraphQL.IDocumentExecuter { }
-        public static GraphQL.DI.IGraphQLBuilder AddDocumentListener<TDocumentListener>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentListener<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TDocumentListener>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TDocumentListener :  class, GraphQL.Execution.IDocumentExecutionListener { }
         public static GraphQL.DI.IGraphQLBuilder AddDocumentListener<TDocumentListener>(this GraphQL.DI.IGraphQLBuilder builder, TDocumentListener documentListener)
             where TDocumentListener :  class, GraphQL.Execution.IDocumentExecutionListener { }
@@ -343,25 +354,25 @@ namespace GraphQL
             where TDocumentListener :  class, GraphQL.Execution.IDocumentExecutionListener { }
         public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.ErrorInfoProviderOptions>? action = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.ErrorInfoProviderOptions, System.IServiceProvider>? action) { }
-        public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider<TProvider>(this GraphQL.DI.IGraphQLBuilder builder)
+        public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TProvider>(this GraphQL.DI.IGraphQLBuilder builder)
             where TProvider :  class, GraphQL.Execution.IErrorInfoProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TProvider> errorInfoProviderFactory)
             where TProvider :  class, GraphQL.Execution.IErrorInfoProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, TProvider errorInfoProvider)
             where TProvider :  class, GraphQL.Execution.IErrorInfoProvider { }
-        public static GraphQL.DI.IGraphQLBuilder AddExecutionStrategy<TExecutionStrategy>(this GraphQL.DI.IGraphQLBuilder builder, GraphQLParser.AST.OperationType operationType)
+        public static GraphQL.DI.IGraphQLBuilder AddExecutionStrategy<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TExecutionStrategy>(this GraphQL.DI.IGraphQLBuilder builder, GraphQLParser.AST.OperationType operationType)
             where TExecutionStrategy :  class, GraphQL.Execution.IExecutionStrategy { }
         public static GraphQL.DI.IGraphQLBuilder AddExecutionStrategy<TExecutionStrategy>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TExecutionStrategy> executionStrategyFactory, GraphQLParser.AST.OperationType operationType)
             where TExecutionStrategy :  class, GraphQL.Execution.IExecutionStrategy { }
         public static GraphQL.DI.IGraphQLBuilder AddExecutionStrategy<TExecutionStrategy>(this GraphQL.DI.IGraphQLBuilder builder, TExecutionStrategy executionStrategy, GraphQLParser.AST.OperationType operationType)
             where TExecutionStrategy :  class, GraphQL.Execution.IExecutionStrategy { }
-        public static GraphQL.DI.IGraphQLBuilder AddExecutionStrategySelector<TExecutionStrategySelector>(this GraphQL.DI.IGraphQLBuilder builder)
+        public static GraphQL.DI.IGraphQLBuilder AddExecutionStrategySelector<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TExecutionStrategySelector>(this GraphQL.DI.IGraphQLBuilder builder)
             where TExecutionStrategySelector :  class, GraphQL.Execution.IExecutionStrategySelector { }
         public static GraphQL.DI.IGraphQLBuilder AddExecutionStrategySelector<TExecutionStrategySelector>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TExecutionStrategySelector> executionStrategySelectorFactory)
             where TExecutionStrategySelector :  class, GraphQL.Execution.IExecutionStrategySelector { }
         public static GraphQL.DI.IGraphQLBuilder AddExecutionStrategySelector<TExecutionStrategySelector>(this GraphQL.DI.IGraphQLBuilder builder, TExecutionStrategySelector executionStrategySelector)
             where TExecutionStrategySelector :  class, GraphQL.Execution.IExecutionStrategySelector { }
-        public static GraphQL.DI.IGraphQLBuilder AddGraphTypeMappingProvider<TGraphTypeMappingProvider>(this GraphQL.DI.IGraphQLBuilder builder)
+        public static GraphQL.DI.IGraphQLBuilder AddGraphTypeMappingProvider<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphTypeMappingProvider>(this GraphQL.DI.IGraphQLBuilder builder)
             where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypeMappingProvider<TGraphTypeMappingProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TGraphTypeMappingProvider> factory)
             where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
@@ -370,19 +381,19 @@ namespace GraphQL
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
         public static GraphQL.DI.IGraphQLBuilder AddResolveFieldContextAccessor(this GraphQL.DI.IGraphQLBuilder builder) { }
-        public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
+        public static GraphQL.DI.IGraphQLBuilder AddSchema<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, TSchema schema)
             where TSchema :  class, GraphQL.Types.ISchema { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TSchema> schemaFactory, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
-        public static GraphQL.DI.IGraphQLBuilder AddSchemaVisitor<TSchemaVisitor>(this GraphQL.DI.IGraphQLBuilder builder)
+        public static GraphQL.DI.IGraphQLBuilder AddSchemaVisitor<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TSchemaVisitor>(this GraphQL.DI.IGraphQLBuilder builder)
             where TSchemaVisitor :  class, GraphQL.Utilities.ISchemaNodeVisitor { }
         public static GraphQL.DI.IGraphQLBuilder AddSchemaVisitor<TSchemaVisitor>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TSchemaVisitor> schemaVisitorFactory)
             where TSchemaVisitor :  class, GraphQL.Utilities.ISchemaNodeVisitor { }
         public static GraphQL.DI.IGraphQLBuilder AddSchemaVisitor<TSchemaVisitor>(this GraphQL.DI.IGraphQLBuilder builder, TSchemaVisitor schemaVisitor)
             where TSchemaVisitor :  class, GraphQL.Utilities.ISchemaNodeVisitor { }
-        public static GraphQL.DI.IGraphQLBuilder AddSerializer<TSerializer>(this GraphQL.DI.IGraphQLBuilder builder)
+        public static GraphQL.DI.IGraphQLBuilder AddSerializer<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TSerializer>(this GraphQL.DI.IGraphQLBuilder builder)
             where TSerializer :  class, GraphQL.IGraphQLSerializer { }
         public static GraphQL.DI.IGraphQLBuilder AddSerializer<TSerializer>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TSerializer> serializerFactory)
             where TSerializer :  class, GraphQL.IGraphQLSerializer { }
@@ -393,14 +404,14 @@ namespace GraphQL
         public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.Execution.UnhandledExceptionContext, GraphQL.ExecutionOptions, System.Threading.Tasks.Task> unhandledExceptionDelegate) { }
         public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, TValidationRule validationRule, bool useForCachedDocuments = false)
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
-        public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, bool useForCachedDocuments = false, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
+        public static GraphQL.DI.IGraphQLBuilder AddValidationRule<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, bool useForCachedDocuments = false, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
         public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TValidationRule> validationRuleFactory, bool useForCachedDocuments = false, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
-        public static GraphQL.DI.IServiceRegister Configure<TOptions>(this GraphQL.DI.IServiceRegister services, System.Action<TOptions>? action)
+        public static GraphQL.DI.IServiceRegister Configure<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]  TOptions>(this GraphQL.DI.IServiceRegister services, System.Action<TOptions>? action)
             where TOptions :  class, new () { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecution(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, GraphQL.DI.ExecutionDelegate, System.Threading.Tasks.Task<GraphQL.ExecutionResult>> action) { }
-        public static GraphQL.DI.IGraphQLBuilder ConfigureExecution<TConfigureExecution>(this GraphQL.DI.IGraphQLBuilder builder)
+        public static GraphQL.DI.IGraphQLBuilder ConfigureExecution<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TConfigureExecution>(this GraphQL.DI.IGraphQLBuilder builder)
             where TConfigureExecution :  class, GraphQL.DI.IConfigureExecution { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecution<TConfigureExecution>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TConfigureExecution> factory)
             where TConfigureExecution :  class, GraphQL.DI.IConfigureExecution { }
@@ -410,24 +421,24 @@ namespace GraphQL
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecutionOptions(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, System.Threading.Tasks.Task> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema, System.IServiceProvider> action) { }
-        public static GraphQL.DI.IGraphQLBuilder ConfigureSchema<TConfigureSchema>(this GraphQL.DI.IGraphQLBuilder builder)
+        public static GraphQL.DI.IGraphQLBuilder ConfigureSchema<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TConfigureSchema>(this GraphQL.DI.IGraphQLBuilder builder)
             where TConfigureSchema :  class, GraphQL.DI.IConfigureSchema { }
-        public static GraphQL.DI.IServiceRegister Register<TService>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
+        public static GraphQL.DI.IServiceRegister Register<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TService>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
             where TService :  class { }
         public static GraphQL.DI.IServiceRegister Register<TService>(this GraphQL.DI.IServiceRegister services, TService implementationInstance, bool replace = false)
             where TService :  class { }
         public static GraphQL.DI.IServiceRegister Register<TService>(this GraphQL.DI.IServiceRegister services, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
             where TService :  class { }
-        public static GraphQL.DI.IServiceRegister Register<TService, TImplementation>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
+        public static GraphQL.DI.IServiceRegister Register<TService, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TImplementation>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
             where TService :  class
             where TImplementation :  class, TService { }
-        public static GraphQL.DI.IServiceRegister TryRegister<TService>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime)
+        public static GraphQL.DI.IServiceRegister TryRegister<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TService>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime)
             where TService :  class { }
         public static GraphQL.DI.IServiceRegister TryRegister<TService>(this GraphQL.DI.IServiceRegister services, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime)
             where TService :  class { }
         public static GraphQL.DI.IServiceRegister TryRegister<TService>(this GraphQL.DI.IServiceRegister services, TService implementationInstance, GraphQL.DI.RegistrationCompareMode mode = 0)
             where TService :  class { }
-        public static GraphQL.DI.IServiceRegister TryRegister<TService, TImplementation>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime, GraphQL.DI.RegistrationCompareMode mode = 0)
+        public static GraphQL.DI.IServiceRegister TryRegister<TService, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TImplementation>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime, GraphQL.DI.RegistrationCompareMode mode = 0)
             where TService :  class
             where TImplementation :  class, TService { }
         public static GraphQL.DI.IServiceRegister TryRegister<TService, TImplementation>(this GraphQL.DI.IServiceRegister services, System.Func<System.IServiceProvider, TImplementation> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, GraphQL.DI.RegistrationCompareMode mode = 0)
@@ -435,22 +446,38 @@ namespace GraphQL
             where TImplementation :  class, TService { }
         public static GraphQL.DI.IGraphQLBuilder UseApolloTracing(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, bool> enableMetricsPredicate) { }
         public static GraphQL.DI.IGraphQLBuilder UseApolloTracing(this GraphQL.DI.IGraphQLBuilder builder, bool enableMetrics = true) { }
-        public static GraphQL.DI.IGraphQLBuilder UseMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate, GraphQL.DI.ServiceLifetime serviceLifetime = 2)
+        public static GraphQL.DI.IGraphQLBuilder UseMiddleware<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate, GraphQL.DI.ServiceLifetime serviceLifetime = 2)
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.DI.IGraphQLBuilder UseMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, TMiddleware middleware, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate)
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.DI.IGraphQLBuilder UseMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, TMiddleware middleware, bool install = true)
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
-        public static GraphQL.DI.IGraphQLBuilder UseMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, bool install = true, GraphQL.DI.ServiceLifetime serviceLifetime = 2)
+        public static GraphQL.DI.IGraphQLBuilder UseMiddleware<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, bool install = true, GraphQL.DI.ServiceLifetime serviceLifetime = 2)
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions>? action) { }
         public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions, System.IServiceProvider>? action) { }
         public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments<TLoader>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions, System.IServiceProvider>? action)
             where TLoader :  class, GraphQL.PersistedDocuments.IPersistedDocumentLoader { }
-        public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments<TLoader>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions>? action = null)
+        public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TLoader>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions>? action = null)
             where TLoader :  class, GraphQL.PersistedDocuments.IPersistedDocumentLoader { }
-        public static GraphQL.IConfigureAutoSchema WithMutation<TMutationClrType>(this GraphQL.IConfigureAutoSchema builder) { }
-        public static GraphQL.IConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this GraphQL.IConfigureAutoSchema builder) { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions>? configure = null) { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions, System.IServiceProvider>? configure) { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions>? configure = null)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions, System.IServiceProvider>? configure)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TProvider> telemetryProviderFactory)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, TProvider telemetryProvider)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TProvider, TOptions>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<TOptions>? configure = null)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider
+            where TOptions : GraphQL.Telemetry.GraphQLTelemetryOptions, new () { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TProvider, TOptions>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<TOptions, System.IServiceProvider>? configure)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider
+            where TOptions : GraphQL.Telemetry.GraphQLTelemetryOptions, new () { }
+        public static GraphQL.IConfigureAutoSchema WithMutation<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TMutationClrType>(this GraphQL.IConfigureAutoSchema builder) { }
+        public static GraphQL.IConfigureAutoSchema WithSubscription<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSubscriptionClrType>(this GraphQL.IConfigureAutoSchema builder) { }
         public static GraphQL.DI.IGraphQLBuilder WithTimeout(this GraphQL.DI.IGraphQLBuilder builder, System.TimeSpan timeout) { }
         public static GraphQL.DI.IGraphQLBuilder WithTimeout(this GraphQL.DI.IGraphQLBuilder builder, System.TimeSpan timeout, GraphQL.Execution.TimeoutAction timeoutAction) { }
         public static GraphQL.DI.IGraphQLBuilder WithTimeout(this GraphQL.DI.IGraphQLBuilder builder, System.TimeSpan timeout, System.Func<GraphQL.ExecutionOptions, GraphQL.ExecutionResult> timeoutDelegate) { }
@@ -672,10 +699,11 @@ namespace GraphQL
     }
     public static class ObjectExtensions
     {
-        public static System.Func<System.Collections.Generic.IDictionary<string, object?>, object> CompileToObject(System.Type sourceType, GraphQL.Types.IInputObjectGraphType graphType) { }
+        public static System.Func<System.Collections.Generic.IDictionary<string, object?>, object> CompileToObject([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] System.Type sourceType, GraphQL.Types.IInputObjectGraphType graphType) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Recursively converts propertyValue to fieldType.")]
         public static object? GetPropertyValue(this object? propertyValue, System.Type fieldType, GraphQL.Types.IGraphType mappedType) { }
         public static bool IsDefinedEnumValue(System.Type type, object? value) { }
-        public static object ToObject(this System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IGraphType mappedType) { }
+        public static object ToObject(this System.Collections.Generic.IDictionary<string, object?> source, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] System.Type type, GraphQL.Types.IGraphType mappedType) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class)]
     public class OneOfAttribute : GraphQL.GraphQLAttribute
@@ -706,9 +734,11 @@ namespace GraphQL
     [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter)]
     public sealed class ParserAttribute : GraphQL.GraphQLAttribute
     {
-        public ParserAttribute(System.Type parserType) { }
+        public ParserAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type parserType) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure the specified method is not trimmed or use an alternative construct" +
+            "or.")]
         public ParserAttribute(string parserMethodName) { }
-        public ParserAttribute(System.Type parserType, string parserMethodName) { }
+        public ParserAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type parserType, string parserMethodName) { }
         public override void Modify(GraphQL.Types.QueryArgument queryArgument, System.Reflection.ParameterInfo parameterInfo) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType, GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, ref bool ignore) { }
     }
@@ -818,8 +848,10 @@ namespace GraphQL
     public static class SchemaExtensions
     {
         public static void AddLinkDirectiveSupport(this GraphQL.Types.ISchema schema, System.Action<GraphQL.Utilities.LinkConfiguration>? configuration = null) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the CLR type and the related auto-registering graph type are n" +
+            "ot trimmed by the compiler.")]
         public static void AutoRegister(this GraphQL.Types.ISchema schema, System.Type clrType, GraphQL.AutoRegisteringMode mode = 3) { }
-        public static void AutoRegister<TClrType>(this GraphQL.Types.ISchema schema, GraphQL.AutoRegisteringMode mode = 3) { }
+        public static void AutoRegister<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TClrType>(this GraphQL.Types.ISchema schema, GraphQL.AutoRegisteringMode mode = 3) { }
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
             where TSchema : GraphQL.Types.ISchema { }
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IGraphQLTextSerializer serializer, System.Action<GraphQL.ExecutionOptions> configure) { }
@@ -827,14 +859,19 @@ namespace GraphQL
         public static void LinkSchema(this GraphQL.Types.ISchema schema, string url, System.Action<GraphQL.Utilities.LinkConfiguration>? configuration = null) { }
         public static string Print(this GraphQL.Types.ISchema schema, GraphQL.Utilities.PrintOptions? options = null) { }
         public static System.Threading.Tasks.ValueTask PrintAsync(this GraphQL.Types.ISchema schema, System.IO.TextWriter writer, GraphQL.Utilities.PrintOptions? options = null, System.Threading.CancellationToken cancellationToken = default) { }
-        public static void RegisterType<T>(this GraphQL.Types.ISchema schema)
+        public static void RegisterType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T>(this GraphQL.Types.ISchema schema)
             where T : GraphQL.Types.IGraphType { }
-        public static void RegisterTypeMapping<TClrType, TGraphType>(this GraphQL.Types.ISchema schema)
+        public static void RegisterTypeMapping<TClrType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(this GraphQL.Types.ISchema schema)
             where TGraphType : GraphQL.Types.IGraphType { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are" +
+            " not trimmed by the compiler.")]
         public static void RegisterTypeMappings(this GraphQL.Types.ISchema schema) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are" +
+            " not trimmed by the compiler.")]
         public static void RegisterTypeMappings(this GraphQL.Types.ISchema schema, System.Reflection.Assembly assembly) { }
         public static void RegisterTypes<TSchema>(this TSchema schema, params GraphQL.Types.IGraphType[] types)
             where TSchema : GraphQL.Types.ISchema { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the graph types\' constructors are not trimmed by the compiler.")]
         public static TSchema RegisterTypes<TSchema>(this TSchema schema, params System.Type[] types)
             where TSchema : GraphQL.Types.ISchema { }
         public static void RegisterVisitor<TVisitor>(this GraphQL.Types.ISchema schema)
@@ -878,17 +915,21 @@ namespace GraphQL
     [System.AttributeUsage(System.AttributeTargets.Method)]
     public sealed class ValidateArgumentsAttribute : GraphQL.GraphQLAttribute
     {
-        public ValidateArgumentsAttribute(System.Type validationType) { }
+        public ValidateArgumentsAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type validationType) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure the specified method is not trimmed or use an alternative construct" +
+            "or.")]
         public ValidateArgumentsAttribute(string validationMethodName) { }
-        public ValidateArgumentsAttribute(System.Type validationType, string validationMethodName) { }
+        public ValidateArgumentsAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type validationType, string validationMethodName) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType, GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, ref bool ignore) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter, AllowMultiple=true)]
     public sealed class ValidatorAttribute : GraphQL.GraphQLAttribute
     {
-        public ValidatorAttribute(System.Type validatorType) { }
+        public ValidatorAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type validatorType) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure the specified method is not trimmed or use an alternative construct" +
+            "or.")]
         public ValidatorAttribute(string validatorMethodName) { }
-        public ValidatorAttribute(System.Type validatorType, string validatorMethodName) { }
+        public ValidatorAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type validatorType, string validatorMethodName) { }
         public override void Modify(GraphQL.Types.QueryArgument queryArgument, System.Reflection.ParameterInfo parameterInfo) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType, GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, ref bool ignore) { }
     }
@@ -898,7 +939,10 @@ namespace GraphQL
         public static object? ConvertTo(object? value, System.Type targetType) { }
         public static T? ConvertTo<T>(object? value) { }
         public static System.Func<object, object>? GetConversion(System.Type valueType, System.Type targetType) { }
-        public static GraphQL.Conversion.IListConverter GetListConverter(System.Type listType) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2067:Target parameter argument does not satisfy \'DynamicallyAccessedMembersAttr" +
+            "ibute\' in call to target method. The parameter of method does not have matching " +
+            "annotations.", Justification="False positive; type will always equal listType, which is properly marked")]
+        public static GraphQL.Conversion.IListConverter GetListConverter([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type listType) { }
         public static GraphQL.Conversion.IListConverterFactory GetListConverterFactory(System.Type listType) { }
         public static void Register(System.Type valueType, System.Type targetType, System.Func<object, object>? conversion) { }
         public static void Register<TTarget>(System.Func<System.Collections.Generic.IDictionary<string, object>, TTarget>? conversion)
@@ -907,7 +951,8 @@ namespace GraphQL
         public static void RegisterListConverter<TListType, TElementType>(System.Func<System.Collections.Generic.IEnumerable<TElementType>, TListType>? conversion)
             where TListType : System.Collections.Generic.IEnumerable<TElementType> { }
         public static void RegisterListConverterFactory(System.Type listType, GraphQL.Conversion.IListConverterFactory? converter) { }
-        public static void RegisterListConverterFactory(System.Type listType, System.Type implementationType) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(@"For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors or other members, which can cause runtime failures.")]
+        public static void RegisterListConverterFactory(System.Type listType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type implementationType) { }
     }
     public struct VariableName
     {
@@ -925,12 +970,12 @@ namespace GraphQL.Builders
 {
     public static class ConnectionBuilder
     {
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TSourceType>(string name)
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, TSourceType>(string name)
             where TNodeType : GraphQL.Types.IGraphType { }
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TSourceType>(string name)
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType, TSourceType>(string name)
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, TSourceType>(string name)
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TConnectionType, TSourceType>(string name)
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
@@ -961,12 +1006,12 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<object?>> resolver) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> ReturnAll() { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType>(string name)
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType>(string name)
             where TNodeType : GraphQL.Types.IGraphType { }
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>(string name)
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType>(string name)
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>(string name)
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TConnectionType>(string name)
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
@@ -992,12 +1037,12 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, TReturnType?> resolver) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Create<TNodeType>(string name = "default")
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType>(string name = "default")
             where TNodeType : GraphQL.Types.IGraphType { }
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Create<TNodeType, TEdgeType>(string name = "default")
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType>(string name = "default")
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Create<TNodeType, TEdgeType, TConnectionType>(string name = "default")
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TConnectionType>(string name = "default")
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
@@ -1011,13 +1056,13 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ApplyMiddleware<TMiddleware>()
             where TMiddleware : GraphQL.Instrumentation.IFieldMiddleware { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument(GraphQL.Types.IGraphType type, string name, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument(System.Type type, string name, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name)
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type, string name, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TArgumentGraphType>(string name)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentClrType>(string name, bool? nullable = default, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null)
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentClrType>(string name, bool? nullable, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Arguments(params GraphQL.Types.QueryArgument[] arguments) { }
@@ -1040,7 +1085,7 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ValidateArguments(System.Action<GraphQL.Validation.FieldArgumentsValidationContext> validation) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ValidateArguments(System.Func<GraphQL.Validation.FieldArgumentsValidationContext, System.Threading.Tasks.ValueTask> validation) { }
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(string name, GraphQL.Types.IGraphType type) { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(string name, System.Type? type = null) { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(string name, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null) { }
     }
     public interface IResolveConnectionContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
     {
@@ -1086,7 +1131,7 @@ namespace GraphQL.Conversion
     }
     public interface IListConverterFactory
     {
-        GraphQL.Conversion.IListConverter Create(System.Type listType);
+        GraphQL.Conversion.IListConverter Create([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type listType);
     }
     public interface INameConverter
     {
@@ -1101,8 +1146,9 @@ namespace GraphQL.Conversion
     }
     public abstract class ListConverterFactoryBase : GraphQL.Conversion.IListConverterFactory
     {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection to access generic method information which may be trimmed.")]
         protected ListConverterFactoryBase() { }
-        public virtual GraphQL.Conversion.IListConverter Create(System.Type listType) { }
+        public virtual GraphQL.Conversion.IListConverter Create([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type listType) { }
         public abstract System.Func<object?[], object> Create<T>();
         protected virtual System.Type GetElementType(System.Type listType) { }
     }
@@ -1121,6 +1167,7 @@ namespace GraphQL.DI
     {
         protected GraphQLBuilderBase() { }
         public abstract GraphQL.DI.IServiceRegister Services { get; }
+        [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(GraphQL.Execution.ErrorInfoProviderOptions))]
         protected virtual void RegisterDefaultServices() { }
     }
     public interface IConfigureExecution
@@ -1139,14 +1186,14 @@ namespace GraphQL.DI
     }
     public interface IServiceRegister
     {
-        GraphQL.DI.IServiceRegister Configure<TOptions>(System.Action<TOptions, System.IServiceProvider>? action = null)
+        GraphQL.DI.IServiceRegister Configure<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]  TOptions>(System.Action<TOptions, System.IServiceProvider>? action = null)
             where TOptions :  class, new ();
         GraphQL.DI.IServiceRegister Register(System.Type serviceType, object implementationInstance, bool replace = false);
         GraphQL.DI.IServiceRegister Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false);
-        GraphQL.DI.IServiceRegister Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false);
+        GraphQL.DI.IServiceRegister Register(System.Type serviceType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false);
         GraphQL.DI.IServiceRegister TryRegister(System.Type serviceType, object implementationInstance, GraphQL.DI.RegistrationCompareMode mode = 0);
         GraphQL.DI.IServiceRegister TryRegister(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, GraphQL.DI.RegistrationCompareMode mode = 0);
-        GraphQL.DI.IServiceRegister TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime, GraphQL.DI.RegistrationCompareMode mode = 0);
+        GraphQL.DI.IServiceRegister TryRegister(System.Type serviceType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime, GraphQL.DI.RegistrationCompareMode mode = 0);
     }
     public enum RegistrationCompareMode
     {
@@ -1769,30 +1816,44 @@ namespace GraphQL.Instrumentation
     public class ApolloTrace
     {
         public ApolloTrace(System.DateTime start, double durationMs) { }
+        [System.Text.Json.Serialization.JsonPropertyName("duration")]
         public long Duration { get; }
+        [System.Text.Json.Serialization.JsonPropertyName("endTime")]
         public System.DateTime EndTime { get; }
+        [System.Text.Json.Serialization.JsonPropertyName("execution")]
         public GraphQL.Instrumentation.ApolloTrace.ExecutionTrace Execution { get; }
+        [System.Text.Json.Serialization.JsonPropertyName("parsing")]
         public GraphQL.Instrumentation.ApolloTrace.OperationTrace Parsing { get; }
+        [System.Text.Json.Serialization.JsonPropertyName("startTime")]
         public System.DateTime StartTime { get; }
+        [System.Text.Json.Serialization.JsonPropertyName("validation")]
         public GraphQL.Instrumentation.ApolloTrace.OperationTrace Validation { get; }
+        [System.Text.Json.Serialization.JsonPropertyName("version")]
         public int Version { get; }
         public class ExecutionTrace
         {
             public ExecutionTrace() { }
+            [System.Text.Json.Serialization.JsonPropertyName("resolvers")]
             public System.Collections.Generic.List<GraphQL.Instrumentation.ApolloTrace.ResolverTrace> Resolvers { get; }
         }
         public class OperationTrace
         {
             public OperationTrace() { }
+            [System.Text.Json.Serialization.JsonPropertyName("duration")]
             public long Duration { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("startOffset")]
             public long StartOffset { get; set; }
         }
         public class ResolverTrace : GraphQL.Instrumentation.ApolloTrace.OperationTrace
         {
             public ResolverTrace() { }
+            [System.Text.Json.Serialization.JsonPropertyName("fieldName")]
             public string? FieldName { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("parentType")]
             public string? ParentType { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("path")]
             public System.Collections.Generic.List<object>? Path { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("returnType")]
             public string? ReturnType { get; set; }
         }
     }
@@ -2115,6 +2176,34 @@ namespace GraphQL.Resolvers
         public System.Threading.Tasks.ValueTask<System.IObservable<object?>> ResolveAsync(GraphQL.IResolveFieldContext context) { }
     }
 }
+namespace GraphQL.Telemetry
+{
+    public class GraphQLTelemetryOptions
+    {
+        public GraphQLTelemetryOptions() { }
+        public System.Action<System.Diagnostics.Activity, GraphQL.ExecutionOptions, GraphQL.Types.ISchema, GraphQLParser.AST.GraphQLDocument, GraphQLParser.AST.GraphQLOperationDefinition> EnrichWithDocument { get; set; }
+        public System.Action<System.Diagnostics.Activity, System.Exception> EnrichWithException { get; set; }
+        public System.Action<System.Diagnostics.Activity, GraphQL.ExecutionOptions> EnrichWithExecutionOptions { get; set; }
+        public System.Action<System.Diagnostics.Activity, GraphQL.ExecutionOptions, GraphQL.ExecutionResult> EnrichWithExecutionResult { get; set; }
+        public System.Func<GraphQL.ExecutionOptions, bool> Filter { get; set; }
+        public bool RecordDocument { get; set; }
+        public bool RecordException { get; set; }
+        public System.Func<GraphQL.ExecutionOptions, string?> SanitizeDocument { get; set; }
+    }
+    public class GraphQLTelemetryProvider : GraphQL.DI.IConfigureExecution
+    {
+        public GraphQLTelemetryProvider(GraphQL.Telemetry.GraphQLTelemetryOptions options) { }
+        public virtual float SortOrder { get; }
+        protected static System.Diagnostics.ActivitySource ActivitySource { get; }
+        public static string SourceName { get; }
+        public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
+        protected virtual System.Threading.Tasks.Task OnExceptionAsync(System.Diagnostics.Activity activity, System.Exception ex) { }
+        protected virtual System.Threading.Tasks.Task SetInitialTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options) { }
+        protected virtual System.Threading.Tasks.Task SetOperationTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options, GraphQL.Types.ISchema schema, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation) { }
+        protected virtual System.Threading.Tasks.Task SetResultTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions executionOptions, GraphQL.ExecutionResult result) { }
+        protected virtual System.Diagnostics.Activity? StartActivity(GraphQL.ExecutionOptions options) { }
+    }
+}
 namespace GraphQL.Transport
 {
     public class GraphQLRequest
@@ -2174,6 +2263,7 @@ namespace GraphQL.Types
                 "QueryArgument",
                 "Expression"})]
         public virtual System.ValueTuple<GraphQL.Types.QueryArgument?, System.Linq.Expressions.LambdaExpression?> ConstructQueryArgument() { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Please use the SetDelegateWithCast method when using with AOT compilation")]
         public void SetDelegate<TParameterType>(System.Func<GraphQL.IResolveFieldContext, TParameterType?> argumentDelegate) { }
         public void SetDelegateWithCast(System.Func<GraphQL.IResolveFieldContext, object?> argumentDelegate) { }
     }
@@ -2186,6 +2276,9 @@ namespace GraphQL.Types
     {
         public AutoRegisteringGraphTypeMappingProvider() { }
         public AutoRegisteringGraphTypeMappingProvider(bool mapInputTypes, bool mapOutputTypes, bool mapInterfaceTypes = true) { }
+        [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(GraphQL.Types.AutoRegisteringInputObjectGraphType<TSourceType?>?))]
+        [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(GraphQL.Types.AutoRegisteringInterfaceGraphType<TSourceType?>?))]
+        [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(GraphQL.Types.AutoRegisteringObjectGraphType<TSourceType?>?))]
         public virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredType) { }
     }
     public static class AutoRegisteringHelper
@@ -2193,7 +2286,7 @@ namespace GraphQL.Types
         public static GraphQL.Resolvers.IFieldResolver BuildFieldResolver(System.Reflection.MemberInfo memberInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, System.Linq.Expressions.LambdaExpression instanceExpression) { }
         public static GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver(System.Reflection.MethodInfo methodInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, System.Linq.Expressions.LambdaExpression instanceExpression) { }
     }
-    public class AutoRegisteringInputObjectGraphType<TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
+    public class AutoRegisteringInputObjectGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
     {
         public AutoRegisteringInputObjectGraphType() { }
         public AutoRegisteringInputObjectGraphType(params System.Linq.Expressions.Expression<System.Func<TSourceType, object?>>[]? excludedProperties) { }
@@ -2203,7 +2296,7 @@ namespace GraphQL.Types
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
     }
-    public class AutoRegisteringInterfaceGraphType<TSourceType> : GraphQL.Types.InterfaceGraphType<TSourceType>
+    public class AutoRegisteringInterfaceGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType> : GraphQL.Types.InterfaceGraphType<TSourceType>
     {
         public AutoRegisteringInterfaceGraphType() { }
         public AutoRegisteringInterfaceGraphType(params System.Linq.Expressions.Expression<System.Func<TSourceType, object?>>[]? excludedProperties) { }
@@ -2217,7 +2310,7 @@ namespace GraphQL.Types
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.ParameterInfo parameterInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
     }
-    public class AutoRegisteringObjectGraphType<TSourceType> : GraphQL.Types.ObjectGraphType<TSourceType>
+    public class AutoRegisteringObjectGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType> : GraphQL.Types.ObjectGraphType<TSourceType>
     {
         public AutoRegisteringObjectGraphType() { }
         public AutoRegisteringObjectGraphType(params System.Linq.Expressions.Expression<System.Func<TSourceType, object?>>[]? excludedProperties) { }
@@ -2272,29 +2365,29 @@ namespace GraphQL.Types
         protected ComplexGraphType() { }
         public GraphQL.Types.TypeFields Fields { get; }
         public virtual GraphQL.Types.FieldType AddField(GraphQL.Types.FieldType fieldType) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType>(string name)
+        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType>(string name)
             where TNodeType : GraphQL.Types.IGraphType { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>(string name)
+        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType>(string name)
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>(string name)
+        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TConnectionType>(string name)
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
         protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(string name, GraphQL.Types.IGraphType type) { }
-        protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(string name, System.Type type) { }
+        protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(string name, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field(string name, GraphQL.Types.IGraphType type) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field(string name, System.Type type) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field(string name, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<TGraphType>(string name)
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(string name)
             where TGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, System.Type type) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TReturnType>(string name, bool nullable = false) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, System.Type type) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name)
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType, TReturnType>(string name)
             where TGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Types.FieldType? GetField(GraphQLParser.ROM name) { }
         public bool HasField(string name) { }
@@ -2318,6 +2411,13 @@ namespace GraphQL.Types
     public class DateGraphType : GraphQL.Types.ScalarGraphType
     {
         public DateGraphType() { }
+        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override object? ParseValue(object? value) { }
+        public override object? Serialize(object? value) { }
+    }
+    public class DateOnlyGraphType : GraphQL.Types.ScalarGraphType
+    {
+        public DateOnlyGraphType() { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
         public override object? Serialize(object? value) { }
@@ -2500,6 +2600,14 @@ namespace GraphQL.Types
         public override object? Serialize(object? value) { }
         public override System.Collections.IEnumerable SerializeList(System.Collections.IEnumerable list) { }
     }
+    public class HalfGraphType : GraphQL.Types.ScalarGraphType
+    {
+        public HalfGraphType() { }
+        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
+        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override object? ParseValue(object? value) { }
+    }
     public interface IAbstractGraphType : GraphQL.Types.IGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         GraphQL.Types.PossibleTypes PossibleTypes { get; }
@@ -2619,8 +2727,8 @@ namespace GraphQL.Types
         GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
         void Initialize();
         void RegisterType(GraphQL.Types.IGraphType type);
-        void RegisterType(System.Type type);
-        void RegisterTypeMapping(System.Type clrType, System.Type graphType);
+        void RegisterType([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type);
+        void RegisterTypeMapping(System.Type clrType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type graphType);
         void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor);
         void RegisterVisitor(System.Type type);
     }
@@ -2642,7 +2750,7 @@ namespace GraphQL.Types
     {
         public InputObjectGraphType() { }
     }
-    public class InputObjectGraphType<TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInputObjectGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
+    public class InputObjectGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInputObjectGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         public InputObjectGraphType() { }
         public bool IsOneOf { get; set; }
@@ -2717,7 +2825,7 @@ namespace GraphQL.Types
         public override int GetHashCode() { }
         public override string ToString() { }
     }
-    public sealed class ListGraphType<T> : GraphQL.Types.ListGraphType
+    public sealed class ListGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T> : GraphQL.Types.ListGraphType
         where T : GraphQL.Types.IGraphType { }
     public class LongGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2735,7 +2843,7 @@ namespace GraphQL.Types
         public override int GetHashCode() { }
         public override string ToString() { }
     }
-    public sealed class NonNullGraphType<T> : GraphQL.Types.NonNullGraphType
+    public sealed class NonNullGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T> : GraphQL.Types.NonNullGraphType
         where T : GraphQL.Types.IGraphType { }
     public class ObjectGraphType : GraphQL.Types.ObjectGraphType<object?>
     {
@@ -2840,6 +2948,8 @@ namespace GraphQL.Types
     [System.Diagnostics.DebuggerTypeProxy(typeof(GraphQL.Types.Schema.SchemaDebugView))]
     public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.ISchema, System.IDisposable, System.IServiceProvider
     {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This class uses Activator.CreateInstance which requires access to the target type" +
+            "\'s constructor.")]
         public Schema() { }
         public Schema(System.IServiceProvider services) { }
         public Schema(System.IServiceProvider services, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureSchema> configurations) { }
@@ -2877,8 +2987,8 @@ namespace GraphQL.Types
         public void Initialize() { }
         protected virtual void OnBeforeInitializeType(GraphQL.Types.IGraphType graphType) { }
         public void RegisterType(GraphQL.Types.IGraphType type) { }
-        public void RegisterType(System.Type type) { }
-        public void RegisterTypeMapping(System.Type clrType, System.Type graphType) { }
+        public void RegisterType([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
+        public void RegisterTypeMapping(System.Type clrType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type graphType) { }
         public void RegisterTypes(params System.Type[] types) { }
         public void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor) { }
         public void RegisterVisitor(System.Type type) { }
@@ -2938,6 +3048,13 @@ namespace GraphQL.Types
         public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
+    }
+    public class TimeOnlyGraphType : GraphQL.Types.ScalarGraphType
+    {
+        public TimeOnlyGraphType() { }
+        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override object? ParseValue(object? value) { }
+        public override object? Serialize(object? value) { }
     }
     public class TimeSpanMillisecondsGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -3034,18 +3151,18 @@ namespace GraphQL.Types
 }
 namespace GraphQL.Types.Relay
 {
-    public class ConnectionType<TNodeType> : GraphQL.Types.Relay.ConnectionType<TNodeType, GraphQL.Types.Relay.EdgeType<TNodeType>>
+    public class ConnectionType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType> : GraphQL.Types.Relay.ConnectionType<TNodeType, GraphQL.Types.Relay.EdgeType<TNodeType>>
         where TNodeType : GraphQL.Types.IGraphType
     {
         public ConnectionType() { }
     }
-    public class ConnectionType<TNodeType, TEdgeType> : GraphQL.Types.ObjectGraphType<object>
+    public class ConnectionType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType> : GraphQL.Types.ObjectGraphType<object>
         where TNodeType : GraphQL.Types.IGraphType
         where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
     {
         public ConnectionType() { }
     }
-    public class EdgeType<TNodeType> : GraphQL.Types.ObjectGraphType<object>
+    public class EdgeType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType> : GraphQL.Types.ObjectGraphType<object>
         where TNodeType : GraphQL.Types.IGraphType
     {
         public EdgeType() { }

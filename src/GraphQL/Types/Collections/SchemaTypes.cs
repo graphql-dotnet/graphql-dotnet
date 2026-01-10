@@ -803,12 +803,21 @@ public sealed partial class SchemaTypes : SchemaTypesBase
             {
                 // Note: GraphQLClrInputTypeReference and GraphQLClrOutputTypeReference are both classes, and
                 //   and so will the graph type be, therefore we can safely use MakeGenericType here.
-#pragma warning disable IL2055 // Call to 'System.Type.MakeGenericType' cannot be statically analyzed by the trimmer
-                return genericDef.MakeGenericType(newGenericArgs);
-#pragma warning restore IL2055 // Call to 'System.Type.MakeGenericType' cannot be statically analyzed by the trimmer
+                // For example, MyType<int, GraphQLClrOutputTypeReference<string>> is essentially MyType<int, {reftype}>
+                // since GraphQLClrOutputTypeReference<string> is a reference type; and since any graph type (e.g. StringGraphType)
+                // is also a reference type, it is always safe to replace {reftype} with a graph type; so in the above example
+                // the constructed type becomes MyType<int, StringGraphType> which is also MyType<int, {reftype}>.
+                return MakeGenericTypeNoWarn(genericDef, newGenericArgs);
             }
 
             return type;
+        }
+
+        [UnconditionalSuppressMessage("Trimming", "IL2055:Either the type on which the MakeGenericType is called can't be statically determined, or the type parameters to be used for generic arguments can't be statically determined.")]
+        [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
+        private static Type MakeGenericTypeNoWarn(Type genericTypeDefinition, Type[] innerTypes)
+        {
+            return genericTypeDefinition.MakeGenericType(innerTypes);
         }
 
         /// <summary>
@@ -871,10 +880,16 @@ public sealed partial class SchemaTypes : SchemaTypesBase
 
             // Auto-generate EnumerationGraphType<T> for enum types
             if (clrType.IsEnum)
-                return typeof(EnumerationGraphType<>).MakeGenericType(clrType);
+                return CreateEnumerationGraphTypeNoWarn(clrType);
 
             // No mapping found
             throw new InvalidOperationException($"Could not find type mapping from CLR type '{clrType.FullName}' to GraphType. Did you forget to register the type mapping with the '{nameof(ISchema)}.{nameof(ISchema.RegisterTypeMapping)}'?");
+        }
+
+        [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
+        private Type CreateEnumerationGraphTypeNoWarn(Type enumType)
+        {
+            return typeof(EnumerationGraphType<>).MakeGenericType(enumType);
         }
 
         /// <summary>

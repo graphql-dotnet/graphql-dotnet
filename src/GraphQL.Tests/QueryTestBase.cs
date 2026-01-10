@@ -52,6 +52,8 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
 
     public IDocumentExecuter Executer { get; }
 
+    public bool AllWriters { get; set; } = true;
+
     public ExecutionResult AssertQuerySuccess(
         string query,
         string expected,
@@ -168,9 +170,14 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
 
         var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data, Executed = runResult.Executed };
 
-        foreach (var writer in GraphQLSerializersTestData.AllWriters)
+        var writers = AllWriters ? GraphQLSerializersTestData.AllWriters : GraphQLSerializersTestData.AllNonAotWriters;
+
+        foreach (var writer in writers)
         {
             string writtenResult = writer.Serialize(renderResult);
+            expectedExecutionResult.Data = expectedExecutionResult.Data == null ? null :
+                writer.Deserialize<Inputs>(new SystemTextJson.GraphQLSerializer().Serialize(expectedExecutionResult.Data));
+
             string expectedResult = writer.Serialize(expectedExecutionResult);
 
             writtenResult.ShouldBeCrossPlat(expectedResult);
@@ -209,7 +216,9 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
             options.RequestServices = ServiceProvider;
         }).GetAwaiter().GetResult();
 
-        foreach (var writer in GraphQLSerializersTestData.AllWriters)
+        var writers = AllWriters ? GraphQLSerializersTestData.AllWriters : GraphQLSerializersTestData.AllNonAotWriters;
+
+        foreach (var writer in writers)
         {
             string writtenResult = writer.Serialize(runResult);
             string expectedResult = expectedExecutionResultOrJson is string s ? s : writer.Serialize((ExecutionResult)expectedExecutionResultOrJson);

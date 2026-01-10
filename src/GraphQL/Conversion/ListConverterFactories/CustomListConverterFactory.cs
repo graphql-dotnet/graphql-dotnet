@@ -22,6 +22,8 @@ namespace GraphQL.Conversion;
 internal sealed class CustomListConverterFactory : IListConverterFactory
 {
     private static readonly MethodInfo _castMethodInfo;
+
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
     private Type? _implementationType { get; }
 
     static CustomListConverterFactory()
@@ -36,7 +38,13 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
         _implementationType = null;
     }
 
-    public CustomListConverterFactory(Type implementationType)
+    [RequiresUnreferencedCode(
+        "For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. " +
+        "If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors " +
+        "or other members, which can cause runtime failures.")]
+    public CustomListConverterFactory(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
+        Type implementationType)
     {
         if (implementationType == null)
             throw new ArgumentNullException(nameof(implementationType));
@@ -54,6 +62,15 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
     public static CustomListConverterFactory DefaultInstance { get; } = new();
 
     public IListConverter Create(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
+        Type listType)
+    {
+        return CreateImpl(listType);
+    }
+
+    [UnconditionalSuppressMessage("Trimming", "IL2055:Either the type on which the MakeGenericType is called can't be statically determined, or the type parameters to be used for generic arguments can't be statically determined.")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
+    private IListConverter CreateImpl(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
         Type listType)
     {
@@ -122,11 +139,10 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
     /// <summary>
     /// Finds an 'Add' method that can be used to add items to the list.
     /// </summary>
+    [UnconditionalSuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.")]
     private static MethodInfo? GetAddMethod(Type listType, Type elementType)
     {
-#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
         var addMethod = listType.GetMethod("Add", [elementType]);
-#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
         if (addMethod == null && typeof(IList).IsAssignableFrom(listType))
         {
             addMethod = typeof(IList).GetMethod("Add")!;

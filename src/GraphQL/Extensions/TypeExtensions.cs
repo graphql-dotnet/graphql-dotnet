@@ -220,12 +220,12 @@ public static class TypeExtensions
         {
             var clrElementType = type.GetElementType()!;
             var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent array
-            graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
+            graphType = MakeListType(elementType);
         }
         else if (TryGetEnumerableElementType(type, out var clrElementType))
         {
             var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent container
-            graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
+            graphType = MakeListType(elementType);
         }
         else
         {
@@ -267,7 +267,7 @@ public static class TypeExtensions
 
         if (!isNullable)
         {
-            graphType = typeof(NonNullGraphType<>).MakeGenericType(graphType);
+            graphType = MakeNonNullType(graphType);
         }
 
         return graphType;
@@ -275,6 +275,16 @@ public static class TypeExtensions
         //TODO: rewrite nullability condition in v5
         static bool IsNullableType(Type type) => !type.IsValueType || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
     }
+
+    [UnconditionalSuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
+        Justification = "The supplied type is expected to be a reference type. NonNullGraphType<T> constrains T to IGraphType, and all supported implementations are classes, so MakeGenericType(type) should be valid.")]
+    private static Type MakeNonNullType(Type type)
+        => typeof(NonNullGraphType<>).MakeGenericType(type);
+
+    [UnconditionalSuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
+        Justification = "The supplied type is expected to be a reference type. ListGraphType<T> constrains T to IGraphType, and all supported implementations are classes, so MakeGenericType(type) should be valid.")]
+    private static Type MakeListType(Type type)
+        => typeof(ListGraphType<>).MakeGenericType(type);
 
     /// <summary>
     /// Returns the friendly name of a type, using C# angle-bracket syntax for generics.

@@ -102,6 +102,7 @@ A list of the available extension methods is below:
 | `AddSelfActivatingSchema<>` | Registers the specified schema which will create instances of unregistered graph types during initialization | |
 | `AddSerializer<>`       | Registers the specified serializer | |
 | `AddSystemTextJson`     | Registers the serializer that uses System.Text.Json as its underlying JSON serialization engine | GraphQL.SystemTextJson |
+| `AddSystemTextJsonAot`  | Registers the AOT-compatible serializer that uses System.Text.Json's source generator for Native AOT deployments (.NET 8+) | GraphQL.SystemTextJson |
 | `AddUnhandledExceptionHandler` | Configures the unhandled exception handler | |
 | `AddValidationRule<>`   | Registers the specified validation rule and configures it to be used at runtime | |
 | `ConfigureExecution`    | Configures execution middleware to monitor or modify both options and the result | |

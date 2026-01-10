@@ -24,6 +24,7 @@ public static class ValueConverter
     /// <summary>
     /// Register built-in conversions. This list is expected to grow over time.
     /// </summary>
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
     static ValueConverter()
     {
         Register<string, sbyte>(value => sbyte.Parse(value, NumberFormatInfo.InvariantInfo));
@@ -331,7 +332,13 @@ public static class ValueConverter
     /// public constructor and Add method that accepts a single argument of the generic type argument,
     /// or a public constructor that accepts a single argument of type <see cref="IEnumerable{T}"/>.
     /// </summary>
-    public static void RegisterListConverterFactory(Type listType, Type implementationType)
+    [RequiresUnreferencedCode(
+        "For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. " +
+        "If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors " +
+        "or other members, which can cause runtime failures.")]
+    public static void RegisterListConverterFactory(Type listType,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
+        Type implementationType)
     {
         // check if running under AOT
         var dynamicCodeCompiled =
@@ -397,12 +404,12 @@ public static class ValueConverter
     /// Returns a converter which will convert items from a given <c>object[]</c> list
     /// into a list instance of the specified type. The list converter is cached for the specified type.
     /// </summary>
+    [UnconditionalSuppressMessage("Trimming", "IL2067:Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
+        Justification = "False positive; type will always equal listType, which is properly marked")]
     public static IListConverter GetListConverter(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
         Type listType)
     {
-#pragma warning disable IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
         return _listConverterCache.GetOrAdd(listType, static type => GetListConverterFactory(type).Create(type));
-#pragma warning restore IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
     }
 }

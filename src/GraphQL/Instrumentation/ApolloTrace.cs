@@ -1,3 +1,7 @@
+#if NETCOREAPP3_0_OR_GREATER
+using System.Text.Json.Serialization;
+#endif
+
 namespace GraphQL.Instrumentation;
 
 /// <summary>
@@ -22,36 +26,57 @@ public class ApolloTrace
     /// <summary>
     /// Returns the Apollo tracing version number.
     /// </summary>
+#if NETCOREAPP3_0_OR_GREATER
+    [JsonPropertyName("version")]
+#endif
     public int Version => 1;
 
     /// <summary>
     /// Returns the UTC date and time when the document began execution. Should be serialized as a RFC 3339 string.
     /// </summary>
+#if NETCOREAPP3_0_OR_GREATER
+    [JsonPropertyName("startTime")]
+#endif
     public DateTime StartTime { get; }
 
     /// <summary>
     /// Returns the UTC date and time when the document completed execution. Should be serialized as a RFC 3339 string.
     /// </summary>
+#if NETCOREAPP3_0_OR_GREATER
+    [JsonPropertyName("endTime")]
+#endif
     public DateTime EndTime { get; }
 
     /// <summary>
     /// Returns the duration of the document's execution, in nanoseconds.
     /// </summary>
+#if NETCOREAPP3_0_OR_GREATER
+    [JsonPropertyName("duration")]
+#endif
     public long Duration { get; }
 
     /// <summary>
     /// Returns the parsing metrics.
     /// </summary>
+#if NETCOREAPP3_0_OR_GREATER
+    [JsonPropertyName("parsing")]
+#endif
     public OperationTrace Parsing { get; } = new OperationTrace();
 
     /// <summary>
     /// Returns the validation metrics.
     /// </summary>
+#if NETCOREAPP3_0_OR_GREATER
+    [JsonPropertyName("validation")]
+#endif
     public OperationTrace Validation { get; } = new OperationTrace();
 
     /// <summary>
     /// Returns the execution metrics.
     /// </summary>
+#if NETCOREAPP3_0_OR_GREATER
+    [JsonPropertyName("execution")]
+#endif
     public ExecutionTrace Execution { get; } = new ExecutionTrace();
 
     /// <summary>
@@ -67,11 +92,17 @@ public class ApolloTrace
         /// <summary>
         /// Gets or sets the start offset of the operation, in nanoseconds.
         /// </summary>
+#if NETCOREAPP3_0_OR_GREATER
+        [JsonPropertyName("startOffset")]
+#endif
         public long StartOffset { get; set; }
 
         /// <summary>
         /// Gets or sets the duration of the operation, in nanoseconds.
         /// </summary>
+#if NETCOREAPP3_0_OR_GREATER
+        [JsonPropertyName("duration")]
+#endif
         public long Duration { get; set; }
     }
 
@@ -83,6 +114,9 @@ public class ApolloTrace
         /// <summary>
         /// Returns a list of resolvers executed during the execution of a GraphQL document.
         /// </summary>
+#if NETCOREAPP3_0_OR_GREATER
+        [JsonPropertyName("resolvers")]
+#endif
         public List<ResolverTrace> Resolvers { get; } = [];
     }
 
@@ -94,21 +128,33 @@ public class ApolloTrace
         /// <summary>
         /// Gets or sets the path of the field.
         /// </summary>
+#if NETCOREAPP3_0_OR_GREATER
+        [JsonPropertyName("path")]
+#endif
         public List<object>? Path { get; set; }
 
         /// <summary>
         /// Gets or sets the parent graph type name.
         /// </summary>
+#if NETCOREAPP3_0_OR_GREATER
+        [JsonPropertyName("parentType")]
+#endif
         public string? ParentType { get; set; }
 
         /// <summary>
         /// Gets or sets the field name.
         /// </summary>
+#if NETCOREAPP3_0_OR_GREATER
+        [JsonPropertyName("fieldName")]
+#endif
         public string? FieldName { get; set; }
 
         /// <summary>
         /// Gets or sets the returned graph type name.
         /// </summary>
+#if NETCOREAPP3_0_OR_GREATER
+        [JsonPropertyName("returnType")]
+#endif
         public string? ReturnType { get; set; }
     }
 }

@@ -42,6 +42,27 @@ public class OperationMessageTests : DeserializationTestBase
 
     [Theory]
     [ClassData(typeof(GraphQLSerializersTestData))]
+    public void Writes_OperationMessage_PopulatedSimple(IGraphQLTextSerializer serializer)
+    {
+        var message = new OperationMessage
+        {
+            Id = "hello",
+            Type = "hello2",
+            Payload = new GraphQLRequest
+            {
+                Query = "hello3",
+                Variables = new Inputs(new Dictionary<string, object?> {
+                    { "arg", ExampleDataSimple },
+                }),
+            }
+        };
+        string actual = serializer.Serialize(message);
+        string expected = $"{{\"type\":\"hello2\",\"id\":\"hello\",\"payload\":{{\"query\":\"hello3\",\"variables\":{{\"arg\":{ExampleJson}}}}}}}";
+        actual.ShouldBeCrossPlatJson(expected);
+    }
+
+    [Theory]
+    [ClassData(typeof(GraphQLSerializersNoAotTestData))]
     public void Writes_OperationMessage_Populated(IGraphQLTextSerializer serializer)
     {
         var message = new OperationMessage
