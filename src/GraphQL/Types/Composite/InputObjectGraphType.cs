@@ -109,7 +109,7 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
 
     /// <summary>
     /// Converts a supplied dictionary of keys and values to an object.
-    /// The default implementation uses <see cref="ObjectExtensions.ToObject(IDictionary{string, object?}, Type, IGraphType, IValueConverter)"/> to convert the
+    /// The default implementation uses <see cref="IValueConverter.ToObject(IDictionary{string, object?}, Type, IInputObjectGraphType)"/> to convert the
     /// supplied field values into an object of type <typeparamref name="TSourceType"/>.
     /// When <see cref="GlobalSwitches.DynamicallyCompileToObject"/> is <see langword="true"/>, this method is compiled to a delegate
     /// during <see cref="Initialize"/> and the compiled delegate is used for all subsequent calls.
@@ -130,7 +130,11 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
     }
 
     private object ParseDictionaryViaReflection(IDictionary<string, object?> value)
-        => value.ToObject(typeof(TSourceType), this, _schema!.ValueConverter);
+    {
+        if (_schema == null)
+            throw new InvalidOperationException($"The '{GetType().Name}' type has not been initialized. Ensure that the '{nameof(Initialize)}' method has been called with a valid schema before using this type.");
+        return _schema!.ValueConverter.ToObject(value, typeof(TSourceType), this);
+    }
 
     /// <inheritdoc/>
     public virtual bool IsValidDefault(object value)

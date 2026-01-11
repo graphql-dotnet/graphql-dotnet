@@ -80,19 +80,7 @@ public static class ResolveFieldContextExtensions
         var resolvedType = context.FieldDefinition?.Arguments?.Find(argumentName)?.ResolvedType
             ?? throw new InvalidOperationException($"Could not obtain graph type instance for argument '{argumentName}'");
 
-        if (arg.Value is IDictionary<string, object?> inputObject)
-        {
-            if (argumentType == typeof(object))
-            {
-                result = arg.Value;
-                return true;
-            }
-
-            result = inputObject.ToObject(argumentType, resolvedType, context.Schema.ValueConverter);
-            return true;
-        }
-
-        result = arg.Value.GetPropertyValue(argumentType, resolvedType, context.Schema.ValueConverter);
+        result = context.Schema.ValueConverter.GetPropertyValue(arg.Value, argumentType, resolvedType);
         return true;
     }
 

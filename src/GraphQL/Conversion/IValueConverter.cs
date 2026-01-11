@@ -1,4 +1,5 @@
 using GraphQL.Conversion;
+using GraphQL.Types;
 
 namespace GraphQL;
 
@@ -7,27 +8,6 @@ namespace GraphQL;
 /// </summary>
 public interface IValueConverter
 {
-    /// <summary>
-    /// <para>
-    /// If a conversion delegate was registered, converts an object to the specified type and
-    /// returns <see langword="true"/>; returns <see langword="false"/> if no conversion delegate is registered.
-    /// </para>
-    /// <para>Conversion delegates may throw exceptions if the conversion was unsuccessful</para>
-    /// </summary>
-    public bool TryConvertTo(object? value, Type targetType, out object? result, Type? sourceType = null);
-
-    /// <summary>
-    /// <para>Returns an object of the specified type and whose value is equivalent to the specified object.</para>
-    /// <para>Throws a <see cref="InvalidOperationException"/> if there is no conversion registered; conversion functions may throw other exceptions</para>
-    /// </summary>
-    public T? ConvertTo<T>(object? value);
-
-    /// <summary>
-    /// <para>Returns an object of the specified type and whose value is equivalent to the specified object.</para>
-    /// <para>Throws a <see cref="InvalidOperationException"/> if there is no conversion registered; conversion functions may throw other exceptions</para>
-    /// </summary>
-    public object? ConvertTo(object? value, Type targetType);
-
     /// <summary>
     /// Returns the conversion delegate registered to convert objects of type <paramref name="valueType"/>
     /// to type <paramref name="targetType"/>, if any.
@@ -41,7 +21,18 @@ public interface IValueConverter
     /// Returns a converter which will convert items from a given <c>object[]</c> list
     /// into a list instance of the specified type. The list converter is cached for the specified type.
     /// </summary>
-    public IListConverter GetListConverter(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
-        Type listType);
+    public IListConverter GetListConverter(Type listType);
+
+    /// <summary>
+    /// Creates a new instance of the indicated type, populating it with the dictionary.
+    /// </summary>
+    /// <param name="source">The source of values.</param>
+    /// <param name="type">The type to create.</param>
+    /// <param name="inputGraphType">
+    /// GraphType for matching dictionary keys with <paramref name="type"/> property names.
+    /// GraphType contains information about this matching in Metadata property.
+    /// In case of configuring field as Field("FirstName", x => x.FName) source dictionary
+    /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
+    /// </param>
+    public object ToObject(IDictionary<string, object?> source, Type type, IInputObjectGraphType inputGraphType);
 }

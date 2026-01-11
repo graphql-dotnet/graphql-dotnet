@@ -75,7 +75,7 @@ public class ObjectExtensionsTests
         double[] doubles = new[] { 1.00, 2.01, 3.14 };
 
         // Act
-        object? actual = doubles.GetPropertyValue(typeof(double[]), new ListGraphType(new NonNullGraphType(new FloatGraphType())), _converter);
+        object? actual = _converter.GetPropertyValue(doubles, typeof(double[]), new ListGraphType(new NonNullGraphType(new FloatGraphType())));
 
         // Assert
         actual.ShouldBe(doubles);
@@ -88,7 +88,7 @@ public class ObjectExtensionsTests
         var doubles = new List<double> { 1.00, 2.01, 3.14 };
 
         // Act
-        object? actual = doubles.GetPropertyValue(typeof(double[]), new ListGraphType(new NonNullGraphType(new FloatGraphType())), _converter);
+        object? actual = _converter.GetPropertyValue(doubles, typeof(double[]), new ListGraphType(new NonNullGraphType(new FloatGraphType())));
 
         // Assert
         actual.ShouldBe(doubles);
@@ -101,7 +101,7 @@ public class ObjectExtensionsTests
         var doubles = new List<double?> { 1.00, 2.01, 3.14, null };
 
         // Act
-        object? actual = doubles.GetPropertyValue(typeof(double?[]), new ListGraphType(new FloatGraphType()), _converter);
+        object? actual = _converter.GetPropertyValue(doubles, typeof(double?[]), new ListGraphType(new FloatGraphType()));
 
         // Assert
         actual.ShouldBe(doubles);
@@ -114,7 +114,7 @@ public class ObjectExtensionsTests
         double?[] doubles = new double?[] { 1.00, 2.01, 3.14 };
 
         // Act
-        object? actual = doubles.GetPropertyValue(typeof(double?[]), new ListGraphType(new FloatGraphType()), _converter);
+        object? actual = _converter.GetPropertyValue(doubles, typeof(double?[]), new ListGraphType(new FloatGraphType()));
 
         // Assert
         actual.ShouldBe(doubles);
@@ -127,7 +127,7 @@ public class ObjectExtensionsTests
         var doubles = new List<double> { 1.00, 2.01, 3.14 };
 
         // Act
-        object? actual = doubles.GetPropertyValue(typeof(List<double>), new ListGraphType(new NonNullGraphType(new FloatGraphType())), _converter);
+        object? actual = _converter.GetPropertyValue(doubles, typeof(List<double>), new ListGraphType(new NonNullGraphType(new FloatGraphType())));
 
         // Assert
         actual.ShouldBe(doubles);
@@ -140,7 +140,7 @@ public class ObjectExtensionsTests
         var doubles = new List<double[]> { new[] { 1.00, 2.01, 3.14 }, new[] { 3.25, 2.21, 1.10 } };
 
         // Act
-        object? actual = doubles.GetPropertyValue(typeof(List<double[]>), new ListGraphType(new ListGraphType(new NonNullGraphType(new FloatGraphType()))), _converter);
+        object? actual = _converter.GetPropertyValue(doubles, typeof(List<double[]>), new ListGraphType(new ListGraphType(new NonNullGraphType(new FloatGraphType()))));
 
         // Assert
         actual.ShouldBe(doubles);
@@ -153,7 +153,7 @@ public class ObjectExtensionsTests
         double[][] doubles = new[] { new[] { 1.00, 2.01, 3.14 }, new[] { 3.25, 2.21, 1.10 } };
 
         // Act
-        object? actual = doubles.GetPropertyValue(typeof(double[][]), new ListGraphType(new ListGraphType(new NonNullGraphType(new FloatGraphType()))), _converter);
+        object? actual = _converter.GetPropertyValue(doubles, typeof(double[][]), new ListGraphType(new ListGraphType(new NonNullGraphType(new FloatGraphType()))));
 
         // Assert
         actual.ShouldBe(doubles);
@@ -166,7 +166,7 @@ public class ObjectExtensionsTests
         var doubles = new List<double[]> { new[] { 1.00, 2.01, 3.14 }, new[] { 3.25, 2.21, 1.10 } };
 
         // Act
-        object? actual = doubles.GetPropertyValue(typeof(double[][]), new ListGraphType(new ListGraphType(new NonNullGraphType(new FloatGraphType()))), _converter);
+        object? actual = _converter.GetPropertyValue(doubles, typeof(double[][]), new ListGraphType(new ListGraphType(new NonNullGraphType(new FloatGraphType()))));
 
         // Assert
         actual.ShouldBe(doubles);
@@ -179,7 +179,7 @@ public class ObjectExtensionsTests
         string[] strings = new[] { "foo", "bar", "new" };
 
         // Act
-        object? actual = strings.GetPropertyValue(typeof(string[]), new ListGraphType(new NonNullGraphType(new StringGraphType())), _converter);
+        object? actual = _converter.GetPropertyValue(strings, typeof(string[]), new ListGraphType(new NonNullGraphType(new StringGraphType())));
 
         // Assert
         actual.ShouldBe(strings);
@@ -192,7 +192,7 @@ public class ObjectExtensionsTests
         var strings = new List<string> { "foo", "bar", "new" };
 
         // Act
-        object? actual = strings.GetPropertyValue(typeof(string[]), new ListGraphType(new NonNullGraphType(new StringGraphType())), _converter);
+        object? actual = _converter.GetPropertyValue(strings, typeof(string[]), new ListGraphType(new NonNullGraphType(new StringGraphType())));
 
         // Assert
         actual.ShouldBe(strings);
@@ -205,7 +205,7 @@ public class ObjectExtensionsTests
         var strings = new List<string> { "foo", "bar", "new" };
 
         // Act
-        object? actual = strings.GetPropertyValue(typeof(List<string>), new ListGraphType(new NonNullGraphType(new StringGraphType())), _converter);
+        object? actual = _converter.GetPropertyValue(strings, typeof(List<string>), new ListGraphType(new NonNullGraphType(new StringGraphType())));
 
         // Assert
         actual.ShouldBe(strings);
@@ -218,7 +218,7 @@ public class ObjectExtensionsTests
         var strings = new List<string[]> { new[] { "foo", "bar", "boo" }, new[] { "new", "year", "eve" } };
 
         // Act
-        object? actual = strings.GetPropertyValue(typeof(List<string[]>), new ListGraphType(new NonNullGraphType(new StringGraphType())), _converter);
+        object? actual = _converter.GetPropertyValue(strings, typeof(List<string[]>), new ListGraphType(new NonNullGraphType(new StringGraphType())));
 
         // Assert
         actual.ShouldBe(strings);
@@ -231,7 +231,7 @@ public class ObjectExtensionsTests
         string[][] strings = new[] { new[] { "foo", "bar", "boo" }, new[] { "new", "year", "eve" } };
 
         // Act
-        object? actual = strings.GetPropertyValue(typeof(string[][]), new ListGraphType(new ListGraphType(new NonNullGraphType(new StringGraphType()))), _converter);
+        object? actual = _converter.GetPropertyValue(strings, typeof(string[][]), new ListGraphType(new ListGraphType(new NonNullGraphType(new StringGraphType()))));
 
         // Assert
         actual.ShouldBe(strings);
@@ -244,7 +244,7 @@ public class ObjectExtensionsTests
         var strings = new List<string[]> { new[] { "foo", "bar", "boo" }, new[] { "new", "year", "eve" } };
 
         // Act
-        object? actual = strings.GetPropertyValue(typeof(string[][]), new ListGraphType(new ListGraphType(new NonNullGraphType(new StringGraphType()))), _converter);
+        object? actual = _converter.GetPropertyValue(strings, typeof(string[][]), new ListGraphType(new ListGraphType(new NonNullGraphType(new StringGraphType()))));
 
         // Assert
         actual.ShouldBe(strings);
@@ -257,7 +257,7 @@ public class ObjectExtensionsTests
         var strings = new List<List<string>> { new List<string> { "foo", "bar", "boo" }, new List<string> { "new", "year", "eve" } };
 
         // Act
-        object? actual = strings.GetPropertyValue(typeof(string[][]), new ListGraphType(new ListGraphType(new NonNullGraphType(new StringGraphType()))), _converter);
+        object? actual = _converter.GetPropertyValue(strings, typeof(string[][]), new ListGraphType(new ListGraphType(new NonNullGraphType(new StringGraphType()))));
 
         // Assert
         actual.ShouldBe(strings);
@@ -548,7 +548,7 @@ public class ObjectExtensionsTests
         }
         else
         {
-            value = inputs.ToObject(typeof(MyInput12), inputType, _converter);
+            value = _converter.ToObject(inputs, typeof(MyInput12), inputType);
         }
         value.ShouldBeOfType<MyInput12>().Name.ShouldBe("tom");
     }
@@ -626,7 +626,7 @@ public class ObjectExtensionsTests
         }
         else
         {
-            value = inputs.ToObject(typeof(MyInput14), inputType, _converter);
+            value = _converter.ToObject(inputs, typeof(MyInput14), inputType);
         }
         value.ShouldBeOfType<MyInput14>().Person.ShouldNotBeNull().Name.ShouldBe("tom");
     }
@@ -692,7 +692,7 @@ public class ObjectExtensionsTests
             Validate(GraphQL.ObjectExtensions.CompileToObject(classToTest, inputType, _converter)(inputs));
 
             // test via reflection
-            Validate(inputs.ToObject(classToTest, inputType, _converter));
+            Validate(_converter.ToObject(inputs, classToTest, inputType));
 
             void Validate(object value)
             {

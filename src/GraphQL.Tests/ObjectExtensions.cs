@@ -18,9 +18,10 @@ internal static class ObjectExtensions
             ((Schema)schema).ValueConverter = valueConverter;
         schema.Initialize();
         var type = schema.Query.Fields.Find("test")!.Arguments!.Single().ResolvedType!;
+        var inputType = (IInputObjectGraphType)type.GetNamedType();
         if (compile)
-            return (T?)GraphQL.ObjectExtensions.CompileToObject(typeof(T), (IInputObjectGraphType)type.GetNamedType(), schema.ValueConverter)(data);
-        return (T?)data.ToObject(typeof(T), type, schema.ValueConverter);
+            return (T?)GraphQL.ObjectExtensions.CompileToObject(typeof(T), inputType, schema.ValueConverter)(data);
+        return (T?)schema.ValueConverter.ToObject(data, typeof(T), inputType);
     }
 
     private class QueryT<T>

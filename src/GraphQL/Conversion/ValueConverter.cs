@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Globalization;
 using System.Numerics;
 using GraphQL.Conversion;
+using GraphQL.Types;
 
 namespace GraphQL;
 
@@ -10,15 +11,15 @@ namespace GraphQL;
 /// This class provides value conversions between objects of different types.
 /// Conversions are registered in a thread safe dictionary and are used for a specific schema instance.
 /// <br/><br/>
-/// Each ScalarGraphType calls <see cref="ConvertTo(object, Type)">ConvertTo</see> method to return correct value
+/// Each ScalarGraphType calls <see cref="ValueConverterExtensions.ConvertTo(IValueConverter, object?, Type)">ConvertTo</see> method to return correct value
 /// type from its <see cref=" GraphQL.Types.ScalarGraphType.ParseValue(object)">ParseValue</see> method.
 /// Also conversions may be useful in advanced <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
 /// use cases when deserialization from the values dictionary to the complex input argument is required.
 /// </summary>
-public class ValueConverter : IValueConverter
+public class ValueConverter : ValueConverterBase
 {
-    private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>> _valueConversions = new();
-    private readonly ConcurrentDictionary<Type, IListConverterFactory> _listConverterFactories = new();
+    private readonly Dictionary<(Type, Type), Func<object, object>> _valueConversions = new();
+    private readonly Dictionary<Type, IListConverterFactory> _listConverterFactories = new();
     private readonly ConcurrentDictionary<Type, IListConverter> _listConverterCache = new();
 
     /// <summary>
@@ -190,153 +191,45 @@ public class ValueConverter : IValueConverter
         }
     }
 
-    /// <summary>
-    /// <para>Returns an object of the specified type and whose value is equivalent to the specified object.</para>
-    /// <para>Throws a <see cref="InvalidOperationException"/> if there is no conversion registered; conversion functions may throw other exceptions</para>
-    /// </summary>
-    public T? ConvertTo<T>(object? value)
+    /// <inheritdoc/>
+    public override Func<object, object>? GetConversion(Type valueType, Type targetType)
     {
-        object? v = ConvertTo(value, typeof(T));
-
-        return v == null ? default : (T)v;
-    }
-
-    /// <summary>
-    /// <para>Returns an object of the specified type and whose value is equivalent to the specified object.</para>
-    /// <para>Throws a <see cref="InvalidOperationException"/> if there is no conversion registered; conversion functions may throw other exceptions</para>
-    /// </summary>
-    public object? ConvertTo(object? value, Type targetType)
-    {
-        if (value == null)
-            return null;
-
-        if (!TryConvertTo(value, targetType, out object? result))
-            throw new InvalidOperationException($"Could not find conversion from '{value.GetType().FullName}' to '{targetType.FullName}'");
-
-        return result;
-    }
-
-    /// <summary>
-    /// <para>
-    /// If a conversion delegate was registered, converts an object to the specified type and
-    /// returns <see langword="true"/>; returns <see langword="false"/> if no conversion delegate is registered.
-    /// </para>
-    /// <para>Conversion delegates may throw exceptions if the conversion was unsuccessful</para>
-    /// </summary>
-    public bool TryConvertTo(object? value, Type targetType, out object? result, Type? sourceType = null)
-    {
-        if (value == null || targetType.IsInstanceOfType(value))
-        {
-            result = value;
-            return true;
-        }
-
-        sourceType ??= value.GetType();
-        targetType = Nullable.GetUnderlyingType(targetType) ?? targetType;
-        var conversion = GetConversion(sourceType, targetType);
-        if (conversion == null)
-        {
-            result = null;
-            return false;
-        }
-        else
-        {
-            result = conversion(value);
-            return true;
-        }
-    }
-
-    /// <summary>
-    /// Returns the conversion delegate registered to convert objects of type <paramref name="valueType"/>
-    /// to type <paramref name="targetType"/>, if any.
-    /// </summary>
-    /// <param name="valueType">Type of original values.</param>
-    /// <param name="targetType">Converted value type.</param>
-    /// <returns>The conversion delegate if it is present, <see langword="null"/> otherwise.</returns>
-    public Func<object, object>? GetConversion(Type valueType, Type targetType)
-    {
-        return _valueConversions.TryGetValue(valueType, out var conversions) && conversions.TryGetValue(targetType, out var conversion)
+        return _valueConversions.TryGetValue((valueType, targetType), out var conversion)
             ? conversion
             : null;
     }
 
-    /// <summary>
-    /// Allows you to register your own conversion delegate from one type to another.
-    /// <br/><br/>
-    /// If the conversion from valueType to targetType is already registered, then it will be overwritten.
-    /// </summary>
-    /// <param name="valueType">Type of original value.</param>
-    /// <param name="targetType">Converted value type.</param>
-    /// <param name="conversion">Conversion delegate; <see langword="null"/> for unregister already registered conversion.</param>
-    public void Register(Type valueType, Type targetType, Func<object, object>? conversion)
+    /// <inheritdoc/>
+    public override void Register(Type valueType, Type targetType, Func<object, object>? conversion)
     {
-        if (!_valueConversions.TryGetValue(valueType, out var conversions) &&
-            !_valueConversions.TryAdd(valueType, conversions = new ConcurrentDictionary<Type, Func<object, object>>()))
-            conversions = _valueConversions[valueType];
-
         if (conversion == null)
-            conversions.TryRemove(targetType, out var _);
+            _valueConversions.Remove((valueType, targetType));
         else
-            conversions[targetType] = conversion;
+            _valueConversions[(valueType, targetType)] = conversion;
     }
 
-    /// <summary>
-    /// Allows you to register your own conversion delegate from one type to another.
-    /// <br/><br/>
-    /// If the conversion from TSource to TTarget is already registered, then it will be overwritten.
-    /// </summary>
-    /// <typeparam name="TSource">Type of original value.</typeparam>
-    /// <typeparam name="TTarget">Converted value type.</typeparam>
-    /// <param name="conversion">Conversion delegate; <see langword="null"/> for unregister already registered conversion.</param>
-    public void Register<TSource, TTarget>(Func<TSource, TTarget>? conversion)
+    /// <inheritdoc/>
+    public override void Register<TSource, TTarget>(Func<TSource, TTarget>? conversion)
         => Register(typeof(TSource), typeof(TTarget), conversion == null ? null : v => conversion((TSource)v)!);
 
-    /// <summary>
-    /// Allows you to register your own conversion delegate from dictionary to some complex object.
-    /// <br/><br/>
-    /// This method may be useful in advanced <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
-    /// use cases when deserialization from the values dictionary to the complex input argument is required.
-    /// <br/><br/>
-    /// If the conversion from dictionary to TTarget is already registered, then it will be overwritten.
-    /// </summary>
-    /// <typeparam name="TTarget">Converted value type.</typeparam>
-    /// <param name="conversion">Conversion delegate; <see langword="null"/> for unregister already registered conversion.</param>
-    public void Register<TTarget>(Func<IDictionary<string, object>, TTarget>? conversion)
-        where TTarget : class
-        => Register<IDictionary<string, object>, TTarget>(conversion);
-
-    /// <summary>
-    /// Registers or removes a list converter factory for a specified list type.
-    /// The list type may be a generic type definition, such as <see cref="List{T}"/>
-    /// or a non-generic collection type such as <see cref="IList"/>. Closed
-    /// generic types are also supported, such as <c>List&lt;int&gt;</c>.
-    /// Array types cannot be registered. If the converter is <see langword="null"/>,
-    /// the factory is removed.
-    /// </summary>
-    public void RegisterListConverterFactory(Type listType, IListConverterFactory? converter)
+    /// <inheritdoc/>
+    public override void RegisterListConverterFactory(Type listType, IListConverterFactory? converter)
     {
         if (listType.IsArray)
             throw new ArgumentException("Array types cannot be registered.", nameof(listType));
         if (converter == null)
-            _listConverterFactories.TryRemove(listType, out var _);
+            _listConverterFactories.Remove(listType);
         else
             _listConverterFactories[listType] = converter;
         _listConverterCache.Clear();
     }
 
-    /// <summary>
-    /// Registers a generic list converter factory for a specified list type.
-    /// For example, it can be used to register a custom list converter for <see cref="IList{T}"/>.
-    /// If the implementation type is an open generic type, the generic type argument from the list
-    /// type will be used to create the implementation type. The implementation type must have a
-    /// public constructor and Add method that accepts a single argument of the generic type argument,
-    /// or a public constructor that accepts a single argument of type <see cref="IEnumerable{T}"/>.
-    /// </summary>
+    /// <inheritdoc/>
     [RequiresUnreferencedCode(
         "For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. " +
         "If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors " +
         "or other members, which can cause runtime failures.")]
-    public void RegisterListConverterFactory(Type listType,
+    public override void RegisterListConverterFactory(Type listType,
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
         Type implementationType)
     {
@@ -354,19 +247,8 @@ public class ValueConverter : IValueConverter
             RegisterListConverterFactory(listType, new CustomListConverterFactory(implementationType));
     }
 
-    /// <summary>
-    /// Registers a list converter for a specified list type. Especially useful for AOT scenarios where
-    /// dynamic compilation is not available. Each element type must be individually registered.
-    /// To register an open generic list type, use <see cref="RegisterListConverterFactory(Type, Type)"/>.
-    /// <para>
-    /// Sample usage:
-    /// <code>
-    /// RegisterListConverter&lt;List&lt;int&gt;, int&gt;(list => list.Cast&lt;int&gt;().ToList());
-    /// </code>
-    /// </para>
-    /// </summary>
-    public void RegisterListConverter<TListType, TElementType>(Func<IEnumerable<TElementType>, TListType>? conversion)
-        where TListType : IEnumerable<TElementType>
+    /// <inheritdoc/>
+    public override void RegisterListConverter<TListType, TElementType>(Func<IEnumerable<TElementType>, TListType>? conversion)
         => RegisterListConverterFactory(typeof(TListType), conversion != null ? new DelegateListConverter<TListType, TElementType>(conversion) : null);
 
     /// <summary>
@@ -376,11 +258,8 @@ public class ValueConverter : IValueConverter
     /// </summary>
     public IListConverterFactory? DefaultListConverterFactory { get; set; } = CustomListConverterFactory.DefaultInstance;
 
-    /// <summary>
-    /// Gets the list converter factory for the specified list type, if any.
-    /// Array types are supported.
-    /// </summary>
-    public IListConverterFactory GetListConverterFactory(Type listType)
+    /// <inheritdoc/>
+    public override IListConverterFactory GetListConverterFactory(Type listType)
     {
         if (listType.IsArray)
             return ArrayListConverterFactory.Instance;
@@ -400,16 +279,19 @@ public class ValueConverter : IValueConverter
             ?? throw new InvalidOperationException($"No list converter is registered for type '{listType.GetFriendlyName()}' and no default list converter is specified.");
     }
 
-    /// <summary>
-    /// Returns a converter which will convert items from a given <c>object[]</c> list
-    /// into a list instance of the specified type. The list converter is cached for the specified type.
-    /// </summary>
-    [UnconditionalSuppressMessage("Trimming", "IL2067:Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
-        Justification = "False positive; type will always equal listType, which is properly marked")]
-    public IListConverter GetListConverter(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
-        Type listType)
+    /// <inheritdoc/>
+    public override IListConverter GetListConverter(Type listType)
     {
         return _listConverterCache.GetOrAdd(listType, type => GetListConverterFactory(type).Create(type));
+    }
+
+    /// <inheritdoc/>
+    public override object ToObject(IDictionary<string, object?> source, Type type, IInputObjectGraphType inputGraphType)
+    {
+        var conversion = GetConversion(typeof(IDictionary<string, object?>), type);
+        if (conversion != null)
+            return conversion(source);
+
+        return ObjectExtensions.ToObjectReflection(source, type, inputGraphType, this);
     }
 }

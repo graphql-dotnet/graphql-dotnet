@@ -12,6 +12,7 @@ public static partial class ObjectExtensions
     /// Compiles a function to convert a dictionary to an object based on a specified <see cref="IInputObjectGraphType"/> instance.
     /// The compiled function assumes the passed dictionary object is not <see langword="null"/>.
     /// </summary>
+    [RequiresDynamicCode("This method uses expression trees to compile code at runtime.")]
     public static Func<IDictionary<string, object?>, object> CompileToObject(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
         Type sourceType,
@@ -36,6 +37,7 @@ public static partial class ObjectExtensions
     /// <summary>
     /// Compiles a function to convert a dictionary to an object based on a specified <see cref="ReflectionInfo"/> instance.
     /// </summary>
+    [RequiresDynamicCode("This method uses expression trees to compile code at runtime.")]
     private static Func<IDictionary<string, object?>, object> CompileToObject(ReflectionInfo info, IValueConverter valueConverter)
     {
         var bestConstructor = info.Constructor;
@@ -232,9 +234,8 @@ public static partial class ObjectExtensions
                 return ret;
             }
 
-            return !asObject
-                ? Expression.Call(_getPropertyValueTypedMethod.MakeGenericMethod(type), expr, Expression.Constant(graphType), Expression.Constant(valueConverter))
-                : Expression.Call(_getPropertyValueUntypedMethod, Expression.Constant(type), expr, Expression.Constant(graphType), Expression.Constant(valueConverter));
+            var ret2 = Expression.Call(_getPropertyValueMethod, Expression.Constant(type), expr, Expression.Constant(graphType), Expression.Constant(valueConverter));
+            return !asObject ? Expression.Convert(ret2, type) : ret2;
         }
     }
 
@@ -247,8 +248,8 @@ public static partial class ObjectExtensions
         throw new InvalidOperationException($"Cannot coerce collection of type '{list?.GetType().GetFriendlyName()}' to IEnumerable.");
     }
 
-    private static readonly MethodInfo _getPropertyValueUntypedMethod = typeof(ObjectExtensions).GetMethod(nameof(GetPropertyValueUntyped), BindingFlags.NonPublic | BindingFlags.Static)!;
-    private static object? GetPropertyValueUntyped(
+    private static readonly MethodInfo _getPropertyValueMethod = typeof(ObjectExtensions).GetMethod(nameof(GetPropertyValue), BindingFlags.NonPublic | BindingFlags.Static)!;
+    private static object? GetPropertyValue(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields)]
         Type returnType, object? value, IGraphType mappedType, IValueConverter valueConverter)
     {
@@ -267,36 +268,12 @@ public static partial class ObjectExtensions
         if (value is IDictionary<string, object?> dictionary && mappedType is IInputObjectGraphType inputObjectGraphType)
         {
             // note that ToObject checks the ValueConverter before parsing the dictionary
-            return ToObject(dictionary, returnType, inputObjectGraphType, valueConverter);
+            return valueConverter.ToObject(dictionary, returnType, inputObjectGraphType);
         }
 
         return valueConverter.ConvertTo(value, returnType);
     }
 
-    private static readonly MethodInfo _getPropertyValueTypedMethod = typeof(ObjectExtensions).GetMethod(nameof(GetPropertyValueTyped), BindingFlags.NonPublic | BindingFlags.Static)!;
-    private static T? GetPropertyValueTyped<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields)] T>(
-        object? value, IGraphType mappedType, IValueConverter valueConverter)
-    {
-        // CoerceExpression already contains short-circuit logic for null and type compatibility
-
-        // in the rare circumstance that the value is not a compatible type,
-        //   use the reflection-based converter for object types, and
-        //   the value converter for value types
-
-        // note that during literal/variable parsing, input object graph types
-        //   are typically already converted to the correct type, as ParseDictionary
-        //   is called during parsing, so this code path would not normally be hit.
-
-        // matches only when mappedType is an input object graph type AND the value is a
-        //   dictionary (not yet parsed from a dictionary into an object)
-        if (value is IDictionary<string, object?> dictionary && mappedType is IInputObjectGraphType inputObjectGraphType)
-        {
-            // note that ToObject checks the ValueConverter before parsing the dictionary
-            return (T)ToObject(dictionary, typeof(T), inputObjectGraphType, valueConverter);
-        }
-
-        return valueConverter.ConvertTo<T>(value);
-    }
 
     private static Expression UpdateArray(ParameterExpression objectArray, Func<ParameterExpression, Expression> loopContent)
     {

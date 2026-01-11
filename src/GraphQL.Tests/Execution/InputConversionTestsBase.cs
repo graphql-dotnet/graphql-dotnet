@@ -343,7 +343,7 @@ public abstract class InputConversionTestsBase
         person1.Age.ShouldBe(10);
 
         var converter = new ValueConverter();
-        converter.Register(v => new Person { Name = (string)v["name"] + "sample", Age = (int)v["age"] + 2 });
+        converter.Register(v => new Person { Name = (string)v["name"]! + "sample", Age = (int)v["age"]! + 2 });
 
         // after registering custom converter
         var person2 = inputs.ToObject<Person>(valueConverter: converter)!;

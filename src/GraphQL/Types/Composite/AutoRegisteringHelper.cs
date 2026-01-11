@@ -174,7 +174,7 @@ public static class AutoRegisteringHelper
         {
             fieldType.WithMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, memberInfo.Name);
             var memberType = memberInfo is PropertyInfo propertyInfo ? propertyInfo.PropertyType : ((FieldInfo)memberInfo).FieldType;
-            fieldType.Parser = (value, vc) => memberType.IsInstanceOfType(value) ? value : value.GetPropertyValue(memberType, fieldType.ResolvedType!, vc)!;
+            fieldType.Parser = (value, vc) => memberType.IsInstanceOfType(value) ? value : vc.GetPropertyValue(value, memberType, fieldType.ResolvedType!)!;
         }
         if (fieldType.Name.EndsWith("Async") && ShouldRemoveAsyncSuffix(isInputType, memberInfo))
         {

@@ -560,11 +560,9 @@ namespace GraphQL
     }
     public interface IValueConverter
     {
-        object? ConvertTo(object? value, System.Type targetType);
-        T? ConvertTo<T>(object? value);
         System.Func<object, object>? GetConversion(System.Type valueType, System.Type targetType);
         GraphQL.Conversion.IListConverter GetListConverter(System.Type listType);
-        bool TryConvertTo(object? value, System.Type targetType, out object? result, System.Type? sourceType = null);
+        object ToObject(System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IInputObjectGraphType inputGraphType);
     }
     [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter)]
     public class IdAttribute : GraphQL.GraphQLAttribute
@@ -681,9 +679,7 @@ namespace GraphQL
     public static class ObjectExtensions
     {
         public static System.Func<System.Collections.Generic.IDictionary<string, object?>, object> CompileToObject(System.Type sourceType, GraphQL.Types.IInputObjectGraphType graphType, GraphQL.IValueConverter valueConverter) { }
-        public static object? GetPropertyValue(this object? propertyValue, System.Type fieldType, GraphQL.Types.IGraphType mappedType, GraphQL.IValueConverter valueConverter) { }
-        public static bool IsDefinedEnumValue(System.Type type, object? value) { }
-        public static object ToObject(this System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IGraphType mappedType, GraphQL.IValueConverter valueConverter) { }
+        public static object ToObjectReflection(System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IInputObjectGraphType inputGraphType, GraphQL.IValueConverter valueConverter) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class)]
     public class OneOfAttribute : GraphQL.GraphQLAttribute
@@ -906,24 +902,42 @@ namespace GraphQL
         public override void Modify(GraphQL.Types.QueryArgument queryArgument, System.Reflection.ParameterInfo parameterInfo) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType, GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, ref bool ignore) { }
     }
-    public class ValueConverter : GraphQL.IValueConverter
+    public class ValueConverter : GraphQL.ValueConverterBase
     {
         public ValueConverter() { }
         public GraphQL.Conversion.IListConverterFactory? DefaultListConverterFactory { get; set; }
-        public object? ConvertTo(object? value, System.Type targetType) { }
-        public T? ConvertTo<T>(object? value) { }
-        public System.Func<object, object>? GetConversion(System.Type valueType, System.Type targetType) { }
-        public GraphQL.Conversion.IListConverter GetListConverter(System.Type listType) { }
-        public GraphQL.Conversion.IListConverterFactory GetListConverterFactory(System.Type listType) { }
-        public void Register(System.Type valueType, System.Type targetType, System.Func<object, object>? conversion) { }
-        public void Register<TTarget>(System.Func<System.Collections.Generic.IDictionary<string, object>, TTarget>? conversion)
-            where TTarget :  class { }
-        public void Register<TSource, TTarget>(System.Func<TSource, TTarget>? conversion) { }
-        public void RegisterListConverter<TListType, TElementType>(System.Func<System.Collections.Generic.IEnumerable<TElementType>, TListType>? conversion)
+        public override System.Func<object, object>? GetConversion(System.Type valueType, System.Type targetType) { }
+        public override GraphQL.Conversion.IListConverter GetListConverter(System.Type listType) { }
+        public override GraphQL.Conversion.IListConverterFactory GetListConverterFactory(System.Type listType) { }
+        public override void Register(System.Type valueType, System.Type targetType, System.Func<object, object>? conversion) { }
+        public override void Register<TSource, TTarget>(System.Func<TSource, TTarget>? conversion) { }
+        public override void RegisterListConverter<TListType, TElementType>(System.Func<System.Collections.Generic.IEnumerable<TElementType>, TListType>? conversion)
             where TListType : System.Collections.Generic.IEnumerable<TElementType> { }
-        public void RegisterListConverterFactory(System.Type listType, GraphQL.Conversion.IListConverterFactory? converter) { }
-        public void RegisterListConverterFactory(System.Type listType, System.Type implementationType) { }
-        public bool TryConvertTo(object? value, System.Type targetType, out object? result, System.Type? sourceType = null) { }
+        public override void RegisterListConverterFactory(System.Type listType, GraphQL.Conversion.IListConverterFactory? converter) { }
+        public override void RegisterListConverterFactory(System.Type listType, System.Type implementationType) { }
+        public override object ToObject(System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IInputObjectGraphType inputGraphType) { }
+    }
+    public abstract class ValueConverterBase : GraphQL.IValueConverter
+    {
+        protected ValueConverterBase() { }
+        public abstract System.Func<object, object>? GetConversion(System.Type valueType, System.Type targetType);
+        public abstract GraphQL.Conversion.IListConverter GetListConverter(System.Type listType);
+        public abstract GraphQL.Conversion.IListConverterFactory GetListConverterFactory(System.Type listType);
+        public abstract void Register(System.Type valueType, System.Type targetType, System.Func<object, object>? conversion);
+        public abstract void Register<TSource, TTarget>(System.Func<TSource, TTarget>? conversion);
+        public abstract void RegisterListConverter<TListType, TElementType>(System.Func<System.Collections.Generic.IEnumerable<TElementType>, TListType>? conversion)
+            where TListType : System.Collections.Generic.IEnumerable<TElementType>;
+        public abstract void RegisterListConverterFactory(System.Type listType, GraphQL.Conversion.IListConverterFactory? converter);
+        public abstract void RegisterListConverterFactory(System.Type listType, System.Type implementationType);
+        public abstract object ToObject(System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IInputObjectGraphType inputGraphType);
+    }
+    public static class ValueConverterExtensions
+    {
+        public static object? ConvertTo(this GraphQL.IValueConverter valueConverter, object? value, System.Type targetType) { }
+        public static T? ConvertTo<T>(this GraphQL.IValueConverter valueConverter, object? value) { }
+        public static object? GetPropertyValue(this GraphQL.IValueConverter valueConverter, object? propertyValue, System.Type fieldType, GraphQL.Types.IGraphType mappedType) { }
+        public static void Register<TObjectType>(this GraphQL.ValueConverterBase valueConverter, System.Func<System.Collections.Generic.IDictionary<string, object?>, TObjectType>? converter) { }
+        public static bool TryConvertTo(this GraphQL.IValueConverter valueConverter, object? value, System.Type targetType, out object? result, System.Type? sourceType = null) { }
     }
     public struct VariableName
     {
@@ -2634,7 +2648,7 @@ namespace GraphQL.Types
         System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeMappings { get; }
         GraphQL.Types.FieldType TypeMetaFieldType { get; }
         GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
-        GraphQL.IValueConverter ValueConverter { get; }
+        GraphQL.ValueConverter ValueConverter { get; }
         void Initialize();
         void RegisterType(GraphQL.Types.IGraphType type);
         void RegisterType(System.Type type);

@@ -23,31 +23,22 @@ public static partial class ObjectExtensions
     /// </summary>
     /// <param name="source">The source of values.</param>
     /// <param name="type">The type to create.</param>
-    /// <param name="mappedType">
+    /// <param name="inputGraphType">
     /// GraphType for matching dictionary keys with <paramref name="type"/> property names.
     /// GraphType contains information about this matching in Metadata property.
     /// In case of configuring field as Field("FirstName", x => x.FName) source dictionary
     /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
     /// </param>
     /// <param name="valueConverter">The value converter instance to use for type conversions.</param>
-    public static object ToObject(
-        this IDictionary<string, object?> source,
+    public static object ToObjectReflection(
+        IDictionary<string, object?> source,
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
         Type type,
-        IGraphType mappedType,
+        IInputObjectGraphType inputGraphType,
         IValueConverter valueConverter)
     {
-        var inputGraphType = (mappedType is NonNullGraphType nonNullGraphType
-            ? nonNullGraphType.ResolvedType as IInputObjectGraphType
-            : mappedType as IInputObjectGraphType)
-            ?? throw new InvalidOperationException($"Graph type supplied is not an input object graph type.");
-
         if (source == null)
             throw new ArgumentNullException(nameof(source));
-
-        // if conversion from IDictionary<string, object> to desired type is registered then use it
-        if (valueConverter.TryConvertTo(source, type, out object? result, typeof(IDictionary<string, object>)))
-            return result!;
 
         var reflectionInfo = GetReflectionInformation(type, inputGraphType);
         return ToObject(source, reflectionInfo, valueConverter);
@@ -68,7 +59,7 @@ public static partial class ObjectExtensions
         {
             var ctorField = reflectionInfo.CtorFields[i];
             ctorArguments[i] = ctorField.Key != null
-                ? GetPropertyValue(source.TryGetValue(ctorField.Key, out var value) ? value : null, ctorField.ParameterInfo.ParameterType, ctorField.GraphType!, valueConverter)
+                ? valueConverter.GetPropertyValue(source.TryGetValue(ctorField.Key, out var value) ? value : null, ctorField.ParameterInfo.ParameterType, ctorField.GraphType!)
                 : ctorField.ParameterInfo.DefaultValue;
         }
 
@@ -93,12 +84,12 @@ public static partial class ObjectExtensions
             {
                 if (field.Member is PropertyInfo propertyInfo)
                 {
-                    var coercedValue = GetPropertyValue(value, propertyInfo.PropertyType, field.GraphType, valueConverter);
+                    var coercedValue = valueConverter.GetPropertyValue(value, propertyInfo.PropertyType, field.GraphType);
                     propertyInfo.SetValue(obj, coercedValue); //issue: this works even if propertyInfo is ValueType and value is null
                 }
                 else if (field.Member is FieldInfo fieldInfo)
                 {
-                    var coercedValue = GetPropertyValue(value, fieldInfo.FieldType, field.GraphType, valueConverter);
+                    var coercedValue = valueConverter.GetPropertyValue(value, fieldInfo.FieldType, field.GraphType);
                     fieldInfo.SetValue(obj, coercedValue);
                 }
             }
@@ -268,142 +259,6 @@ public static partial class ObjectExtensions
         }
 
         return new ReflectionInfo(clrType, bestConstructor, ctorFields, members);
-    }
-
-    /// <summary>
-    /// Converts the indicated value into a type that is compatible with fieldType.
-    /// </summary>
-    /// <param name="propertyValue">The value to be converted.</param>
-    /// <param name="fieldType">The desired type.</param>
-    /// <param name="mappedType">
-    /// GraphType for matching dictionary keys with <paramref name="fieldType"/> property names.
-    /// GraphType contains information about this matching in Metadata property.
-    /// In case of configuring field as Field("FirstName", x => x.FName) source dictionary
-    /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
-    /// </param>
-    /// <param name="valueConverter">The value converter instance to use for type conversions.</param>
-    /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
-    [RequiresUnreferencedCode("Recursively converts propertyValue to fieldType.")]
-    public static object? GetPropertyValue(this object? propertyValue, Type fieldType, IGraphType mappedType, IValueConverter valueConverter)
-    {
-        if (mappedType == null)
-        {
-            throw new ArgumentNullException(nameof(mappedType));
-        }
-
-        if (mappedType is NonNullGraphType nonNullGraphType)
-        {
-            mappedType = nonNullGraphType.ResolvedType
-                ?? throw new InvalidOperationException("ResolvedType not set for non-null graph type.");
-        }
-
-        // Short-circuit conversion if the property value already of the right type
-        if (propertyValue == null || fieldType == typeof(object) || fieldType.IsInstanceOfType(propertyValue))
-        {
-            return propertyValue;
-        }
-
-        if (valueConverter.TryConvertTo(propertyValue, fieldType, out object? result))
-            return result;
-
-        if (mappedType is ListGraphType listGraphType)
-        {
-            var itemGraphType = listGraphType.ResolvedType
-                ?? throw new InvalidOperationException("Graph type is not a list graph type or ResolvedType not set.");
-
-            var listConverter = valueConverter.GetListConverter(fieldType);
-
-            var underlyingType = Nullable.GetUnderlyingType(listConverter.ElementType) ?? listConverter.ElementType;
-
-            // typically, propertyValue is an object[], and no allocations occur
-            var objectArray = (propertyValue as IEnumerable
-                ?? throw new InvalidOperationException($"Cannot coerce collection of type '{propertyValue.GetType().GetFriendlyName()}' to IEnumerable."))
-                .ToObjectArray();
-
-            for (int i = 0; i < objectArray.Length; ++i)
-            {
-                var listItem = objectArray[i];
-                objectArray[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType, itemGraphType, valueConverter);
-            }
-
-            return listConverter.Convert(objectArray);
-        }
-
-        var value = propertyValue;
-
-        var nullableFieldType = Nullable.GetUnderlyingType(fieldType);
-
-        // if this is a nullable type and the value is null, return null
-        if (nullableFieldType != null && value == null)
-        {
-            return null;
-        }
-
-        if (nullableFieldType != null)
-        {
-            fieldType = nullableFieldType;
-        }
-
-        if (propertyValue is IDictionary<string, object?> objects)
-        {
-            return ToObject(objects, fieldType, mappedType, valueConverter);
-        }
-
-        if (fieldType.IsEnum)
-        {
-            if (value == null)
-            {
-                var enumNames = Enum.GetNames(fieldType);
-                value = enumNames[0];
-            }
-
-            if (!IsDefinedEnumValue(fieldType, value))
-            {
-                throw new InvalidOperationException($"Unknown value '{value}' for enum '{fieldType.Name}'.");
-            }
-
-            string str = value.ToString()!;
-            value = Enum.Parse(fieldType, str, true);
-        }
-
-        return valueConverter.ConvertTo(value, fieldType);
-    }
-
-    /// <summary>
-    /// Returns <see langword="true"/> if the value is <see langword="null"/>, value.ToString equals an empty string, or the value can be converted into a named enum value.
-    /// </summary>
-    /// <param name="type">An enum type.</param>
-    /// <param name="value">The value being tested.</param>
-    public static bool IsDefinedEnumValue(Type type, object? value) //TODO: rewrite, comment above seems wrong
-    {
-        try
-        {
-            var names = Enum.GetNames(type);
-            if (names.Contains(value?.ToString() ?? "", StringComparer.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-
-            var underlyingType = Enum.GetUnderlyingType(type);
-            var converted = Convert.ChangeType(value, underlyingType);
-
-            var values = Enum.GetValues(type);
-
-            foreach (var val in values)
-            {
-                var convertedVal = Convert.ChangeType(val, underlyingType);
-                if (convertedVal.Equals(converted))
-                {
-                    return true;
-                }
-            }
-        }
-        catch
-        {
-            // TODO: refactor IsDefinedEnumValue
-        }
-
-        return false;
     }
 
     /// <summary>

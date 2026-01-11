@@ -176,9 +176,6 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     /// </summary>
     public ValueConverter ValueConverter { get; set; } = new ValueConverter();
 
-    /// <inheritdoc cref="ISchema.ValueConverter"/>
-    IValueConverter ISchema.ValueConverter => ValueConverter;
-
     /// <inheritdoc/>
     public IFieldMiddlewareBuilder FieldMiddleware { get; internal set; } = new FieldMiddlewareBuilder();
 
