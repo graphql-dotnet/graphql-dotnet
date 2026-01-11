@@ -36,6 +36,42 @@ public sealed class GraphQLFieldArgument
     }
 
     /// <summary>
+    /// Creates a GraphQLFieldArgument from an invocation expression, if it represents an Argument() method call.
+    /// </summary>
+    public static GraphQLFieldArgument? TryCreate(InvocationExpressionSyntax invocation, SemanticModel semanticModel)
+    {
+        if (!invocation.IsGraphQLMethodInvocation(semanticModel, METHOD_NAME))
+        {
+            return null;
+        }
+
+        return new GraphQLFieldArgument(invocation, semanticModel);
+    }
+
+    /// <summary>
+    /// Creates a GraphQLFieldArgument from an invocation expression with a known parent field.
+    /// </summary>
+    internal static GraphQLFieldArgument? TryCreate(InvocationExpressionSyntax invocation, SemanticModel semanticModel, GraphQLFieldInvocation parentField)
+    {
+        if (!invocation.IsGraphQLMethodInvocation(semanticModel, METHOD_NAME))
+        {
+            return null;
+        }
+
+        return new GraphQLFieldArgument(invocation, semanticModel, parentField);
+    }
+
+    /// <summary>
+    /// Gets the underlying invocation expression syntax.
+    /// </summary>
+    public InvocationExpressionSyntax Syntax { get; }
+
+    /// <summary>
+    /// Gets the semantic model used for analysis.
+    /// </summary>
+    public SemanticModel SemanticModel { get; }
+
+    /// <summary>
     /// Gets the 'name' argument from the Argument() method call.
     /// </summary>
     public GraphQLObjectProperty<string?>? Name => _nameArgument.Value;
@@ -69,16 +105,6 @@ public sealed class GraphQLFieldArgument
     /// Gets the parent field invocation that this argument belongs to, if it can be determined.
     /// </summary>
     public GraphQLFieldInvocation? ParentField => _parentField.Value;
-
-    /// <summary>
-    /// Gets the underlying invocation expression syntax.
-    /// </summary>
-    public InvocationExpressionSyntax Syntax { get; }
-
-    /// <summary>
-    /// Gets the semantic model used for analysis.
-    /// </summary>
-    public SemanticModel SemanticModel { get; }
 
     /// <summary>
     /// Gets the name of the argument, checking the 'configure' action first, then the 'name' argument.
@@ -118,32 +144,6 @@ public sealed class GraphQLFieldArgument
     public GraphQLObjectProperty<string?>? GetDeprecationReason()
     {
         return ConfigureAction?.DeprecationReason;
-    }
-
-    /// <summary>
-    /// Creates a GraphQLFieldArgument from an invocation expression, if it represents an Argument() method call.
-    /// </summary>
-    public static GraphQLFieldArgument? TryCreate(InvocationExpressionSyntax invocation, SemanticModel semanticModel)
-    {
-        if (!invocation.IsGraphQLMethodInvocation(semanticModel, METHOD_NAME))
-        {
-            return null;
-        }
-
-        return new GraphQLFieldArgument(invocation, semanticModel);
-    }
-
-    /// <summary>
-    /// Creates a GraphQLFieldArgument from an invocation expression with a known parent field.
-    /// </summary>
-    internal static GraphQLFieldArgument? TryCreate(InvocationExpressionSyntax invocation, SemanticModel semanticModel, GraphQLFieldInvocation parentField)
-    {
-        if (!invocation.IsGraphQLMethodInvocation(semanticModel, METHOD_NAME))
-        {
-            return null;
-        }
-
-        return new GraphQLFieldArgument(invocation, semanticModel, parentField);
     }
 
     private GraphQLFieldInvocation? FindParentField()

@@ -29,6 +29,34 @@ public sealed class GraphQLFieldArgumentConfigureAction
     }
 
     /// <summary>
+    /// Creates a GraphQLFieldArgumentConfigureAction from a lambda expression.
+    /// </summary>
+    public static GraphQLFieldArgumentConfigureAction? TryCreate(ExpressionSyntax? lambdaExpression, SemanticModel semanticModel)
+    {
+        if (lambdaExpression is null)
+        {
+            return null;
+        }
+
+        if (lambdaExpression is not (SimpleLambdaExpressionSyntax or ParenthesizedLambdaExpressionSyntax))
+        {
+            return null;
+        }
+
+        return new GraphQLFieldArgumentConfigureAction(lambdaExpression, semanticModel);
+    }
+
+    /// <summary>
+    /// Gets the underlying lambda expression syntax.
+    /// </summary>
+    public ExpressionSyntax Syntax { get; }
+
+    /// <summary>
+    /// Gets the semantic model used for analysis.
+    /// </summary>
+    public SemanticModel SemanticModel { get; }
+
+    /// <summary>
     /// Gets the name property from the configure action.
     /// </summary>
     public GraphQLObjectProperty<string?>? Name => _name.Value;
@@ -52,34 +80,6 @@ public sealed class GraphQLFieldArgumentConfigureAction
     /// Gets the deprecation reason property from the configure action.
     /// </summary>
     public GraphQLObjectProperty<string?>? DeprecationReason => _deprecationReason.Value;
-
-    /// <summary>
-    /// Gets the underlying lambda expression syntax.
-    /// </summary>
-    public ExpressionSyntax Syntax { get; }
-
-    /// <summary>
-    /// Gets the semantic model used for analysis.
-    /// </summary>
-    public SemanticModel SemanticModel { get; }
-
-    /// <summary>
-    /// Creates a GraphQLFieldArgumentConfigureAction from a lambda expression.
-    /// </summary>
-    public static GraphQLFieldArgumentConfigureAction? TryCreate(ExpressionSyntax? lambdaExpression, SemanticModel semanticModel)
-    {
-        if (lambdaExpression is null)
-        {
-            return null;
-        }
-
-        if (lambdaExpression is not (SimpleLambdaExpressionSyntax or ParenthesizedLambdaExpressionSyntax))
-        {
-            return null;
-        }
-
-        return new GraphQLFieldArgumentConfigureAction(lambdaExpression, semanticModel);
-    }
 
     private GraphQLObjectProperty<string?>? GetName()
     {

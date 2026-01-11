@@ -37,6 +37,29 @@ public sealed class GraphQLFieldInvocation
     }
 
     /// <summary>
+    /// Creates a GraphQLFieldInvocation from an invocation expression, if it represents a Field() method call.
+    /// </summary>
+    public static GraphQLFieldInvocation? TryCreate(InvocationExpressionSyntax invocation, SemanticModel semanticModel)
+    {
+        if (!invocation.IsGraphQLMethodInvocation(semanticModel, "Field"))
+        {
+            return null;
+        }
+
+        return new GraphQLFieldInvocation(invocation, semanticModel);
+    }
+
+    /// <summary>
+    /// Gets the underlying invocation expression syntax.
+    /// </summary>
+    public InvocationExpressionSyntax Syntax { get; }
+
+    /// <summary>
+    /// Gets the semantic model used for analysis.
+    /// </summary>
+    public SemanticModel SemanticModel { get; }
+
+    /// <summary>
     /// Gets the name of the field from explicit 'name' argument, if specified.
     /// </summary>
     public GraphQLObjectProperty<string?>? Name => _name.Value;
@@ -81,29 +104,6 @@ public sealed class GraphQLFieldInvocation
     /// Gets the location of the entire field invocation in source code.
     /// </summary>
     public Location Location => _location.Value;
-
-    /// <summary>
-    /// Gets the underlying invocation expression syntax.
-    /// </summary>
-    public InvocationExpressionSyntax Syntax { get; }
-
-    /// <summary>
-    /// Gets the semantic model used for analysis.
-    /// </summary>
-    public SemanticModel SemanticModel { get; }
-
-    /// <summary>
-    /// Creates a GraphQLFieldInvocation from an invocation expression, if it represents a Field() method call.
-    /// </summary>
-    public static GraphQLFieldInvocation? TryCreate(InvocationExpressionSyntax invocation, SemanticModel semanticModel)
-    {
-        if (!invocation.IsGraphQLMethodInvocation(semanticModel, "Field"))
-        {
-            return null;
-        }
-
-        return new GraphQLFieldInvocation(invocation, semanticModel);
-    }
 
     /// <summary>
     /// Gets the name of the field, checking the explicit 'name' argument first, then the field expression.

@@ -4,7 +4,6 @@ namespace GraphQL.Analyzers.SDK;
 
 /// <summary>
 /// Represents a property value with its source location.
-/// Used for properties that may need location-specific diagnostics.
 /// </summary>
 /// <typeparam name="T">The type of the property value.</typeparam>
 public sealed class GraphQLObjectProperty<T>

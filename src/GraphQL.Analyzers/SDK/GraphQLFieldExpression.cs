@@ -26,6 +26,36 @@ public sealed class GraphQLFieldExpression
     }
 
     /// <summary>
+    /// Creates a GraphQLFieldExpression from a lambda expression.
+    /// Returns null if the expression is not a lambda expression.
+    /// </summary>
+    public static GraphQLFieldExpression? TryCreate(ExpressionSyntax? expression, SemanticModel semanticModel)
+    {
+        if (expression is null)
+        {
+            return null;
+        }
+
+        // Check if it's a lambda expression
+        if (expression is not (SimpleLambdaExpressionSyntax or ParenthesizedLambdaExpressionSyntax))
+        {
+            return null;
+        }
+
+        return new GraphQLFieldExpression(expression, semanticModel);
+    }
+
+    /// <summary>
+    /// Gets the underlying expression syntax.
+    /// </summary>
+    public ExpressionSyntax Syntax { get; }
+
+    /// <summary>
+    /// Gets the semantic model used for analysis.
+    /// </summary>
+    public SemanticModel SemanticModel { get; }
+
+    /// <summary>
     /// Gets a value indicating whether the expression is a valid member access expression.
     /// </summary>
     public bool IsValid => GetMemberAccess() != null;
@@ -53,36 +83,6 @@ public sealed class GraphQLFieldExpression
     /// Returns null when the expression is not valid.
     /// </summary>
     public GraphQLObjectProperty<object?>? DefaultValue => _defaultValue.Value;
-
-    /// <summary>
-    /// Gets the underlying expression syntax.
-    /// </summary>
-    public ExpressionSyntax Syntax { get; }
-
-    /// <summary>
-    /// Gets the semantic model used for analysis.
-    /// </summary>
-    public SemanticModel SemanticModel { get; }
-
-    /// <summary>
-    /// Creates a GraphQLFieldExpression from a lambda expression.
-    /// Returns null if the expression is not a lambda expression.
-    /// </summary>
-    public static GraphQLFieldExpression? TryCreate(ExpressionSyntax? expression, SemanticModel semanticModel)
-    {
-        if (expression is null)
-        {
-            return null;
-        }
-
-        // Check if it's a lambda expression
-        if (expression is not (SimpleLambdaExpressionSyntax or ParenthesizedLambdaExpressionSyntax))
-        {
-            return null;
-        }
-
-        return new GraphQLFieldExpression(expression, semanticModel);
-    }
 
     private GraphQLObjectProperty<string?>? GetName()
     {

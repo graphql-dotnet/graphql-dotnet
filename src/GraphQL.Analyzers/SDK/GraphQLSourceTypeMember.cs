@@ -67,10 +67,10 @@ public sealed class GraphQLSourceTypeMember
     /// <summary>
     /// Gets the type symbol of the member.
     /// </summary>
-    public ITypeSymbol Type => Symbol switch
+    public ITypeSymbol? Type => Symbol switch
     {
         IPropertySymbol property => property.Type,
         IFieldSymbol fldSymbol => fldSymbol.Type,
-        _ => throw new InvalidOperationException("Unexpected symbol type")
+        _ => null
     };
 }

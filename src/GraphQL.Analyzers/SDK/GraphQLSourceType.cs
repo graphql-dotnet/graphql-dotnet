@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 namespace GraphQL.Analyzers.SDK;
 
 /// <summary>
-/// Represents the source type (TSourceType) of a GraphQL graph type with its members.
+/// Represents the source type (TSourceType) of a GraphQL graph type.
 /// </summary>
 public sealed class GraphQLSourceType
 {

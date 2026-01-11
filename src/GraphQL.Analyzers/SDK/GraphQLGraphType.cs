@@ -31,6 +31,34 @@ public sealed class GraphQLGraphType
     }
 
     /// <summary>
+    /// Creates a GraphQLGraphType from a class declaration, if it represents a GraphQL graph type.
+    /// </summary>
+    public static GraphQLGraphType? TryCreate(ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
+    {
+        if (semanticModel.GetDeclaredSymbol(classDeclaration) is not INamedTypeSymbol typeSymbol)
+        {
+            return null;
+        }
+
+        if (!IsGraphType(typeSymbol))
+        {
+            return null;
+        }
+
+        return new GraphQLGraphType(classDeclaration, semanticModel);
+    }
+
+    /// <summary>
+    /// Gets the underlying class declaration syntax.
+    /// </summary>
+    public ClassDeclarationSyntax Syntax { get; }
+
+    /// <summary>
+    /// Gets the semantic model used for analysis.
+    /// </summary>
+    public SemanticModel SemanticModel { get; }
+
+    /// <summary>
     /// Gets the type symbol of the graph type class.
     /// </summary>
     public INamedTypeSymbol? TypeSymbol => _typeSymbol.Value;
@@ -64,34 +92,6 @@ public sealed class GraphQLGraphType
     /// Gets the name of the graph type class.
     /// </summary>
     public string Name => Syntax.Identifier.Text;
-
-    /// <summary>
-    /// Gets the underlying class declaration syntax.
-    /// </summary>
-    public ClassDeclarationSyntax Syntax { get; }
-
-    /// <summary>
-    /// Gets the semantic model used for analysis.
-    /// </summary>
-    public SemanticModel SemanticModel { get; }
-
-    /// <summary>
-    /// Creates a GraphQLGraphType from a class declaration, if it represents a GraphQL graph type.
-    /// </summary>
-    public static GraphQLGraphType? TryCreate(ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
-    {
-        if (semanticModel.GetDeclaredSymbol(classDeclaration) is not INamedTypeSymbol typeSymbol)
-        {
-            return null;
-        }
-
-        if (!IsGraphType(typeSymbol))
-        {
-            return null;
-        }
-
-        return new GraphQLGraphType(classDeclaration, semanticModel);
-    }
 
     private static bool IsGraphType(INamedTypeSymbol typeSymbol)
     {

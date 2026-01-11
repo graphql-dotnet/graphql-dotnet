@@ -8,8 +8,7 @@ public static class SyntaxNodeExtensions
     extension(SyntaxNode root)
     {
         /// <summary>
-        /// Finds the first Field() invocation in the syntax tree by checking the actual method name
-        /// rather than using unreliable string matching.
+        /// Finds the first Field() invocation in the syntax tree.
         /// </summary>
         public InvocationExpressionSyntax FindFieldInvocation() =>
             root.FindMethodInvocation("Field");
