@@ -292,3 +292,32 @@ var type = typeof(MyClass).GetGraphTypeFromType(isNullable: false, TypeMappingMo
 // After
 var type = typeof(MyClass).GetGraphTypeFromType(isNullable: false, isInputType: false);
 ```
+
+### 15. `ValueConverter` is now an instance class
+
+`ValueConverter` has been changed from a static class to a non-static class. Each `ISchema` instance now has its own `ValueConverter` property, enabling per-schema value conversion customization.
+
+**Impact:** If you were using `ValueConverter.Register()` or other static methods, you must now use the schema's `ValueConverter` property instead.
+
+**Before:**
+```csharp
+ValueConverter.Register<string, int>(value => int.Parse(value));
+var result = ValueConverter.ConvertTo("123", typeof(int));
+```
+
+**After:**
+```csharp
+schema.ValueConverter.Register<string, int>(value => int.Parse(value));
+var result = schema.ValueConverter.ConvertTo("123", typeof(int));
+```
+
+**Related changes:**
+
+- `ToObject`, `GetPropertyValue`, and `CompileToObject` extension methods now require an `IValueConverter` parameter
+- `Parser` delegate signature changed from `Func<object, object>?` to `Func<object, IValueConverter, object>?`
+- `IFederationResolver.ParseRepresentation` now includes an `IValueConverter valueConverter` parameter
+- `ExecutionHelper.GetArguments` and `CoerceValue` now include an `IValueConverter valueConverter` parameter
+
+**Backward compatibility:** Overloads are provided in `FieldBuilder.ParseValue()` and `QueryArgumentExtensions.ParseValue()` that accept the old `Func<object, object>` signature. The `[Parser]` attribute now supports both old `(object)` and new `(object, IValueConverter)` parser method signatures.
+
+**Benefits:** This change enables different schemas to have different conversion rules, improves testability with isolated converters, eliminates shared static state, and provides better thread-safety.

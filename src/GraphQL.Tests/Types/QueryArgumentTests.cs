@@ -79,6 +79,6 @@ public class QueryArgumentTests
                 return "789";
             return value;
         });
-        arg.Parser.ShouldNotBeNull().Invoke("123").ShouldBeOfType<string>().ShouldBe("789");
+        arg.Parser.ShouldNotBeNull().Invoke("123", new ValueConverter()).ShouldBeOfType<string>().ShouldBe("789");
     }
 }

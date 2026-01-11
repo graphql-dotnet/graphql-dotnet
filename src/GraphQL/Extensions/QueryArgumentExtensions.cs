@@ -14,6 +14,13 @@ public static class QueryArgumentExtensions
     /// </summary>
     public static QueryArgument ParseValue(this QueryArgument argument, Func<object, object> parseValue)
     {
+        argument.Parser = (value, _) => parseValue(value);
+        return argument;
+    }
+
+    /// <inheritdoc cref="ParseValue(QueryArgument, Func{object, object})"/>
+    public static QueryArgument ParseValue(this QueryArgument argument, Func<object, IValueConverter, object> parseValue)
+    {
         argument.Parser = parseValue;
         return argument;
     }

@@ -75,7 +75,7 @@ public sealed class EntityResolver : IFieldResolver
             object value;
             try
             {
-                value = resolver.ParseRepresentation(complexGraphType, rep);
+                value = resolver.ParseRepresentation(complexGraphType, rep, schema.ValueConverter);
             }
             catch (Exception ex)
             {

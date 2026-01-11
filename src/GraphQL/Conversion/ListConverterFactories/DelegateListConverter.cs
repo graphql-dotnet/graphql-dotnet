@@ -21,8 +21,7 @@ internal class DelegateListConverter<TListType, TElementType> : IListConverter, 
 
     public object Convert(object?[] list) => _converter(list);
 
-    public IListConverter Create([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] Type listType)
-        => this;
+    public IListConverter Create(Type listType) => this;
 
     /// <summary>
     /// Casts each item in the array to the specified type, returning the default value for null items.

@@ -9,7 +9,5 @@ public interface IListConverterFactory
     /// Returns a converter that can be used to convert an array of objects to a specific list type,
     /// such as <see cref="HashSet{T}"/>.
     /// </summary>
-    public IListConverter Create(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
-        Type listType);
+    public IListConverter Create(Type listType);
 }

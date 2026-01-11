@@ -38,6 +38,7 @@ public class Bug947
                     new QueryArgument(inputObjectGraphType) { Name = "object" },
                 ],
             },
+            Schema = new Schema(),
         };
 
         // int arg

@@ -313,6 +313,7 @@ public class FieldBuilderTests
             {
                 {"episode", new ArgumentValue("JEDI", ArgumentSource.Literal) }
             },
+            Schema = new Schema(),
             FieldDefinition = field
         });
     }
@@ -356,6 +357,7 @@ public class FieldBuilderTests
             {
                 {"episodes", new ArgumentValue(new object[] {"JEDI", "EMPIRE" }, ArgumentSource.Literal) }
             },
+            Schema = new Schema(),
             FieldDefinition = field
         });
     }
@@ -379,6 +381,7 @@ public class FieldBuilderTests
             {
                 {"episodes", new ArgumentValue(new object[] {"JEDI", "EMPIRE" }, ArgumentSource.Literal) }
             },
+            Schema = new Schema(),
             FieldDefinition = field
         });
     }

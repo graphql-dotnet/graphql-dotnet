@@ -29,6 +29,7 @@ public class Bug1626
             {
                 Arguments = new QueryArguments(new QueryArgument(myDerivedGraphType) { Name = "root" }),
             },
+            Schema = new Schema(),
         };
 
         var arg = context.GetArgument<MyDerivedType>("root");

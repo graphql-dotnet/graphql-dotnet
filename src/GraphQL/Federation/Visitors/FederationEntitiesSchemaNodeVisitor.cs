@@ -67,8 +67,11 @@ internal class FederationEntitiesSchemaNodeVisitor : BaseSchemaNodeVisitor
         else
         {
             var representationsArgumentType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(anyScalarGraphType)));
-            var representationsArgument = new QueryArgument(representationsArgumentType) { Name = "representations" };
-            representationsArgument.Parser += (value) => EntityResolver.Instance.ConvertRepresentations(schema, (IList)value);
+            var representationsArgument = new QueryArgument(representationsArgumentType)
+            {
+                Name = "representations",
+                Parser = (value, _) => EntityResolver.Instance.ConvertRepresentations(schema, (IList)value)
+            };
             schema.Query.AddField(new FieldType
             {
                 Name = "_entities",

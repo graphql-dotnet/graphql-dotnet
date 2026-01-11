@@ -56,6 +56,7 @@ public sealed class ParserAttribute : GraphQLAttribute
     }
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "The parser type is marked with DynamicallyAccessedMembers.PublicMethods")]
     public override void Modify(FieldType fieldType, bool isInputType, IGraphType graphType, MemberInfo memberInfo, ref bool ignore)
     {
         if (!isInputType)
@@ -64,28 +65,51 @@ public sealed class ParserAttribute : GraphQLAttribute
         var bindingFlags = BindingFlags.Public | BindingFlags.Static;
         if (parserType == memberInfo.DeclaringType!)
             bindingFlags |= BindingFlags.NonPublic;
-#pragma warning disable IL2075 // UnrecognizedReflectionPattern
-        var method = parserType.GetMethod(_parserMethodName, bindingFlags, null, [typeof(object)], null)
-            ?? throw new InvalidOperationException($"Could not find method '{_parserMethodName}' on CLR type '{parserType.GetFriendlyName()}' while initializing '{graphType.Name}.{fieldType.Name}'. The method must have a single parameter of type object.");
-#pragma warning restore IL2075 // UnrecognizedReflectionPattern
-        if (method.ReturnType != typeof(object))
-            throw new InvalidOperationException($"Method '{_parserMethodName}' on CLR type '{parserType.GetFriendlyName()}' must have a return type of object.");
-        fieldType.Parser = (Func<object, object>)method.CreateDelegate(typeof(Func<object, object>));
+        // Try to find method with new signature first: (object, IValueConverter)
+        var method = parserType.GetMethod(_parserMethodName, bindingFlags, null, [typeof(object), typeof(IValueConverter)], null);
+        if (method != null)
+        {
+            if (method.ReturnType != typeof(object))
+                throw new InvalidOperationException($"Method '{_parserMethodName}' on CLR type '{parserType.GetFriendlyName()}' must have a return type of object.");
+            fieldType.Parser = (Func<object, IValueConverter, object>)method.CreateDelegate(typeof(Func<object, IValueConverter, object>));
+        }
+        else
+        {
+            // Fall back to old signature: (object)
+            method = parserType.GetMethod(_parserMethodName, bindingFlags, null, [typeof(object)], null)
+                ?? throw new InvalidOperationException($"Could not find method '{_parserMethodName}' on CLR type '{parserType.GetFriendlyName()}' while initializing '{graphType.Name}.{fieldType.Name}'. The method must have a single parameter of type object, or two parameters of type object and IValueConverter.");
+            if (method.ReturnType != typeof(object))
+                throw new InvalidOperationException($"Method '{_parserMethodName}' on CLR type '{parserType.GetFriendlyName()}' must have a return type of object.");
+            var parser = (Func<object, object>)method.CreateDelegate(typeof(Func<object, object>));
+            fieldType.Parser = (value, _) => parser(value);
+        }
     }
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "The parser type is marked with DynamicallyAccessedMembers.PublicMethods")]
     public override void Modify(QueryArgument queryArgument, ParameterInfo parameterInfo)
     {
         var parserType = _parserType ?? parameterInfo.Member.DeclaringType!;
         var bindingFlags = BindingFlags.Public | BindingFlags.Static;
         if (parserType == parameterInfo.Member.DeclaringType)
             bindingFlags |= BindingFlags.NonPublic;
-#pragma warning disable IL2075 // UnrecognizedReflectionPattern
-        var method = parserType.GetMethod(_parserMethodName, bindingFlags, null, [typeof(object)], null)
-            ?? throw new InvalidOperationException($"Could not find method '{_parserMethodName}' on CLR type '{parserType.GetFriendlyName()}' while initializing argument '{queryArgument.Name}'. The method must have a single parameter of type object.");
-#pragma warning restore IL2075 // UnrecognizedReflectionPattern
-        if (method.ReturnType != typeof(object))
-            throw new InvalidOperationException($"Method '{_parserMethodName}' on CLR type '{parserType.GetFriendlyName()}' must have a return type of object.");
-        queryArgument.Parser = (Func<object, object>)method.CreateDelegate(typeof(Func<object, object>));
+        // Try to find method with new signature first: (object, IValueConverter)
+        var method = parserType.GetMethod(_parserMethodName, bindingFlags, null, [typeof(object), typeof(IValueConverter)], null);
+        if (method != null)
+        {
+            if (method.ReturnType != typeof(object))
+                throw new InvalidOperationException($"Method '{_parserMethodName}' on CLR type '{parserType.GetFriendlyName()}' must have a return type of object.");
+            queryArgument.Parser = (Func<object, IValueConverter, object>)method.CreateDelegate(typeof(Func<object, IValueConverter, object>));
+        }
+        else
+        {
+            // Fall back to old signature: (object)
+            method = parserType.GetMethod(_parserMethodName, bindingFlags, null, [typeof(object)], null)
+                ?? throw new InvalidOperationException($"Could not find method '{_parserMethodName}' on CLR type '{parserType.GetFriendlyName()}' while initializing argument '{queryArgument.Name}'. The method must have a single parameter of type object, or two parameters of type object and IValueConverter.");
+            if (method.ReturnType != typeof(object))
+                throw new InvalidOperationException($"Method '{_parserMethodName}' on CLR type '{parserType.GetFriendlyName()}' must have a return type of object.");
+            var parser = (Func<object, object>)method.CreateDelegate(typeof(Func<object, object>));
+            queryArgument.Parser = (value, _) => parser(value);
+        }
     }
 }
