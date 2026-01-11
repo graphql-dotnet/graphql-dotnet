@@ -195,7 +195,7 @@ public class ArgumentInformation
             Description = ParameterInfo.Description(),
             DefaultValue = ParameterInfo.IsOptional ? ParameterInfo.DefaultValue : null,
         };
-        argument.Parser = value => memberType.IsInstanceOfType(value) ? value : value.GetPropertyValue(memberType, argument.ResolvedType!)!;
+        argument.Parser = (value, vc) => memberType.IsInstanceOfType(value) ? value : value.GetPropertyValue(memberType, argument.ResolvedType!, vc)!;
         return (argument, null);
     }
 }

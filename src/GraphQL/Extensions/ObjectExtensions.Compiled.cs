@@ -15,16 +15,17 @@ public static partial class ObjectExtensions
     public static Func<IDictionary<string, object?>, object> CompileToObject(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
         Type sourceType,
-        IInputObjectGraphType graphType)
+        IInputObjectGraphType graphType,
+        IValueConverter valueConverter)
     {
-        var conv = ValueConverter.GetConversion(typeof(IDictionary<string, object?>), sourceType);
+        var conv = valueConverter.GetConversion(typeof(IDictionary<string, object?>), sourceType);
         if (conv != null)
             return conv;
 
         var info = GetReflectionInformation(sourceType, graphType);
         try
         {
-            return CompileToObject(info);
+            return CompileToObject(info, valueConverter);
         }
         catch (Exception ex)
         {
@@ -35,7 +36,7 @@ public static partial class ObjectExtensions
     /// <summary>
     /// Compiles a function to convert a dictionary to an object based on a specified <see cref="ReflectionInfo"/> instance.
     /// </summary>
-    private static Func<IDictionary<string, object?>, object> CompileToObject(ReflectionInfo info)
+    private static Func<IDictionary<string, object?>, object> CompileToObject(ReflectionInfo info, IValueConverter valueConverter)
     {
         var bestConstructor = info.Constructor;
         var ctorFields = info.CtorFields;
@@ -75,7 +76,7 @@ public static partial class ObjectExtensions
         // compile the lambda and return it
         return lambda.Compile();
 
-        static Expression GetExpressionForCtorParameter(ReflectionInfo.CtorParameterInfo member)
+        Expression GetExpressionForCtorParameter(ReflectionInfo.CtorParameterInfo member)
         {
             if (member.Key == null)
                 return Expression.Constant(member.ParameterInfo.DefaultValue, member.ParameterInfo.ParameterType);
@@ -87,7 +88,7 @@ public static partial class ObjectExtensions
                 member.ParameterInfo.Name!);
         }
 
-        static MemberAssignment GetBindingForMember(ReflectionInfo.MemberFieldInfo member)
+        MemberAssignment GetBindingForMember(ReflectionInfo.MemberFieldInfo member)
         {
             var type = member.Member is PropertyInfo propertyInfo ? propertyInfo.PropertyType : ((FieldInfo)member.Member).FieldType;
 
@@ -96,7 +97,7 @@ public static partial class ObjectExtensions
                 GetCoerceOrDefault(member.Key, type, member.GraphType, member.Member.Name));
         }
 
-        static Expression GetCoerceOrDefault(string key, Type type, IGraphType graphType, string fieldName)
+        Expression GetCoerceOrDefault(string key, Type type, IGraphType graphType, string fieldName)
         {
             /*
              * ValueTuple<object?, bool> value;
@@ -135,7 +136,7 @@ public static partial class ObjectExtensions
                 ret);
         }
 
-        static Expression ConditionallySetMember(ParameterExpression objParam, ReflectionInfo.MemberFieldInfo member)
+        Expression ConditionallySetMember(ParameterExpression objParam, ReflectionInfo.MemberFieldInfo member)
         {
             var type = member.Member is PropertyInfo propertyInfo ? propertyInfo.PropertyType : ((FieldInfo)member.Member).FieldType;
 
@@ -167,7 +168,7 @@ public static partial class ObjectExtensions
                             member.Member.Name))));
         }
 
-        static Expression CoerceExpression(Expression expr, Type type, IGraphType graphType, bool asObject, string fieldName)
+        Expression CoerceExpression(Expression expr, Type type, IGraphType graphType, bool asObject, string fieldName)
         {
             // if requested type is object, return the expression as is
             if (type == typeof(object))
@@ -189,7 +190,7 @@ public static partial class ObjectExtensions
                         CoerceExpressionInternal(param, type, graphType, asObject, fieldName))));
         }
 
-        static Expression CoerceExpressionInternal(Expression expr, Type type, IGraphType graphType, bool asObject, string fieldName)
+        Expression CoerceExpressionInternal(Expression expr, Type type, IGraphType graphType, bool asObject, string fieldName)
         {
             // unwrap non-null graph type
             graphType = graphType is NonNullGraphType nonNullGraphType
@@ -210,7 +211,7 @@ public static partial class ObjectExtensions
                 IListConverter listConverter;
                 try
                 {
-                    listConverter = ValueConverter.GetListConverter(type);
+                    listConverter = valueConverter.GetListConverter(type);
                 }
                 catch (Exception ex)
                 {
@@ -232,8 +233,8 @@ public static partial class ObjectExtensions
             }
 
             return !asObject
-                ? Expression.Call(_getPropertyValueTypedMethod.MakeGenericMethod(type), expr, Expression.Constant(graphType))
-                : Expression.Call(_getPropertyValueUntypedMethod, Expression.Constant(type), expr, Expression.Constant(graphType));
+                ? Expression.Call(_getPropertyValueTypedMethod.MakeGenericMethod(type), expr, Expression.Constant(graphType), Expression.Constant(valueConverter))
+                : Expression.Call(_getPropertyValueUntypedMethod, Expression.Constant(type), expr, Expression.Constant(graphType), Expression.Constant(valueConverter));
         }
     }
 
@@ -249,7 +250,7 @@ public static partial class ObjectExtensions
     private static readonly MethodInfo _getPropertyValueUntypedMethod = typeof(ObjectExtensions).GetMethod(nameof(GetPropertyValueUntyped), BindingFlags.NonPublic | BindingFlags.Static)!;
     private static object? GetPropertyValueUntyped(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields)]
-        Type returnType, object? value, IGraphType mappedType)
+        Type returnType, object? value, IGraphType mappedType, IValueConverter valueConverter)
     {
         // CoerceExpression already contains short-circuit logic for null and type compatibility
 
@@ -266,15 +267,15 @@ public static partial class ObjectExtensions
         if (value is IDictionary<string, object?> dictionary && mappedType is IInputObjectGraphType inputObjectGraphType)
         {
             // note that ToObject checks the ValueConverter before parsing the dictionary
-            return ToObject(dictionary, returnType, inputObjectGraphType);
+            return ToObject(dictionary, returnType, inputObjectGraphType, valueConverter);
         }
 
-        return ValueConverter.ConvertTo(value, returnType);
+        return valueConverter.ConvertTo(value, returnType);
     }
 
     private static readonly MethodInfo _getPropertyValueTypedMethod = typeof(ObjectExtensions).GetMethod(nameof(GetPropertyValueTyped), BindingFlags.NonPublic | BindingFlags.Static)!;
     private static T? GetPropertyValueTyped<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields)] T>(
-        object? value, IGraphType mappedType)
+        object? value, IGraphType mappedType, IValueConverter valueConverter)
     {
         // CoerceExpression already contains short-circuit logic for null and type compatibility
 
@@ -291,10 +292,10 @@ public static partial class ObjectExtensions
         if (value is IDictionary<string, object?> dictionary && mappedType is IInputObjectGraphType inputObjectGraphType)
         {
             // note that ToObject checks the ValueConverter before parsing the dictionary
-            return (T)ToObject(dictionary, typeof(T), inputObjectGraphType);
+            return (T)ToObject(dictionary, typeof(T), inputObjectGraphType, valueConverter);
         }
 
-        return ValueConverter.ConvertTo<T>(value);
+        return valueConverter.ConvertTo<T>(value);
     }
 
     private static Expression UpdateArray(ParameterExpression objectArray, Func<ParameterExpression, Expression> loopContent)

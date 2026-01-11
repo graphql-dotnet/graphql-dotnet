@@ -7,14 +7,17 @@ namespace GraphQL.Execution;
 /// </summary>
 public class DirectiveInfo
 {
+    private readonly ISchema _schema;
+
     /// <summary>
     /// Creates an instance of <see cref="DirectiveInfo"/> with the specified
-    /// directive definition and directive arguments.
+    /// directive definition, directive arguments, and schema.
     /// </summary>
-    public DirectiveInfo(Directive directive, IDictionary<string, ArgumentValue> arguments)
+    public DirectiveInfo(Directive directive, IDictionary<string, ArgumentValue> arguments, ISchema schema)
     {
         Directive = directive;
         Arguments = arguments;
+        _schema = schema;
     }
 
     /// <summary>
@@ -68,11 +71,11 @@ public class DirectiveInfo
                 return true;
             }
 
-            result = inputObject.ToObject(argumentType, resolvedType);
+            result = inputObject.ToObject(argumentType, resolvedType, _schema.ValueConverter);
             return true;
         }
 
-        result = arg.Value.GetPropertyValue(argumentType, resolvedType);
+        result = arg.Value.GetPropertyValue(argumentType, resolvedType, _schema.ValueConverter);
         return true;
     }
 }

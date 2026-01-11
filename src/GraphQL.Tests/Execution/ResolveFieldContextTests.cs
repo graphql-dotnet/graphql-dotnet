@@ -29,6 +29,7 @@ public class ResolveFieldContextTests
             Errors = [],
             OutputExtensions = new Dictionary<string, object?>(),
             FieldDefinition = fieldDef,
+            Schema = new Schema(),
         };
     }
 

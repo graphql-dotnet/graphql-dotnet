@@ -46,6 +46,7 @@ public class InputObjectGraphType : InputObjectGraphType<object>
 public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TSourceType> : ComplexGraphType<TSourceType>, IInputObjectGraphType
 {
     private Func<IDictionary<string, object?>, object>? _parseDictionary;
+    private ISchema? _schema;
 
     /// <summary>
     /// Initializes a new instance.
@@ -74,11 +75,12 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
     public override void Initialize(ISchema schema)
     {
         base.Initialize(schema);
+        _schema = schema;
 
         if (_parseDictionary == null) // when typeof(TSourceType) != typeof(object)
         {
             // check the value converter for a conversion from dictionary to this object type
-            var conv = ValueConverter.GetConversion(typeof(IDictionary<string, object?>), typeof(TSourceType));
+            var conv = schema.ValueConverter.GetConversion(typeof(IDictionary<string, object?>), typeof(TSourceType));
             if (conv != null)
             {
                 _parseDictionary = conv;
@@ -89,12 +91,12 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
                 if (GetType().GetMethod(nameof(ParseDictionary), [typeof(IDictionary<string, object?>)])!.DeclaringType == typeof(InputObjectGraphType<TSourceType>))
                 {
                     // if the user has not, validate and compile the conversion from dictionary to object immediately
-                    _parseDictionary = ObjectExtensions.CompileToObject(typeof(TSourceType), this);
+                    _parseDictionary = ObjectExtensions.CompileToObject(typeof(TSourceType), this, schema.ValueConverter);
                 }
                 else
                 {
                     // if they have, validate and compile upon first use (if any)
-                    _parseDictionary = data => (_parseDictionary = ObjectExtensions.CompileToObject(typeof(TSourceType), this))(data);
+                    _parseDictionary = data => (_parseDictionary = ObjectExtensions.CompileToObject(typeof(TSourceType), this, schema.ValueConverter))(data);
                 }
             }
             else
@@ -107,7 +109,7 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
 
     /// <summary>
     /// Converts a supplied dictionary of keys and values to an object.
-    /// The default implementation uses <see cref="ObjectExtensions.ToObject(IDictionary{string, object?}, Type, IGraphType)"/> to convert the
+    /// The default implementation uses <see cref="ObjectExtensions.ToObject(IDictionary{string, object?}, Type, IGraphType, IValueConverter)"/> to convert the
     /// supplied field values into an object of type <typeparamref name="TSourceType"/>.
     /// When <see cref="GlobalSwitches.DynamicallyCompileToObject"/> is <see langword="true"/>, this method is compiled to a delegate
     /// during <see cref="Initialize"/> and the compiled delegate is used for all subsequent calls.
@@ -128,7 +130,7 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
     }
 
     private object ParseDictionaryViaReflection(IDictionary<string, object?> value)
-        => value.ToObject(typeof(TSourceType), this);
+        => value.ToObject(typeof(TSourceType), this, _schema!.ValueConverter);
 
     /// <inheritdoc/>
     public virtual bool IsValidDefault(object value)

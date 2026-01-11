@@ -88,11 +88,11 @@ public static class ResolveFieldContextExtensions
                 return true;
             }
 
-            result = inputObject.ToObject(argumentType, resolvedType);
+            result = inputObject.ToObject(argumentType, resolvedType, context.Schema.ValueConverter);
             return true;
         }
 
-        result = arg.Value.GetPropertyValue(argumentType, resolvedType);
+        result = arg.Value.GetPropertyValue(argumentType, resolvedType, context.Schema.ValueConverter);
         return true;
     }
 

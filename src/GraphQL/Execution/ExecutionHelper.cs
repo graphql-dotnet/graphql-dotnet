@@ -41,7 +41,8 @@ public static class ExecutionHelper
 
             (directives ??= [])[dirDefinition.Name] = new DirectiveInfo(
                 dirDefinition,
-                GetArguments(dirDefinition.Arguments, dir.Arguments, variables, document, (ASTNode)node, dir) ?? _emptyDirectiveArguments);
+                GetArguments(dirDefinition.Arguments, dir.Arguments, variables, document, (ASTNode)node, dir, schema.ValueConverter) ?? _emptyDirectiveArguments,
+                schema);
         }
 
         return directives;
@@ -51,7 +52,7 @@ public static class ExecutionHelper
     /// Returns a dictionary of arguments and their values for a field or directive.
     /// Values will be retrieved from literals or variables as specified by the document.
     /// </summary>
-    public static Dictionary<string, ArgumentValue>? GetArguments(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables, GraphQLDocument document, ASTNode fieldOrFragmentSpread, GraphQLDirective? directive)
+    public static Dictionary<string, ArgumentValue>? GetArguments(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables, GraphQLDocument document, ASTNode fieldOrFragmentSpread, GraphQLDirective? directive, IValueConverter valueConverter)
     {
         if (definitionArguments == null || definitionArguments.Count == 0)
             return null;
@@ -81,7 +82,7 @@ public static class ExecutionHelper
                 Directive = directive,
                 ParentNode = fieldOrFragmentSpread,
                 Variables = variables,
-            }, arg.DefaultValue);
+            }, arg.DefaultValue, valueConverter);
 
             if (value != null) // if value is null, it's a default value (and argValue.Source == ArgumentSource.FieldDefault)
             {
@@ -91,7 +92,7 @@ public static class ExecutionHelper
                     try
                     {
                         if (arg.Parser != null)
-                            parsedValue = arg.Parser(parsedValue);
+                            parsedValue = arg.Parser(parsedValue, valueConverter);
                         if (parsedValue != null && arg.Validator != null)
                             arg.Validator(parsedValue);
                     }
@@ -139,7 +140,7 @@ public static class ExecutionHelper
     /// Exceptions thrown by scalars are passed through.
     /// </summary>
     public static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, Variables? variables = null, object? fieldDefault = null)
-        => CoerceValue(type, input, new CoerceValueContext { Variables = variables }, fieldDefault);
+        => CoerceValue(type, input, new CoerceValueContext { Variables = variables }, fieldDefault, new ValueConverter());
 
     /// <summary>
     /// Coerces a literal value to a compatible .NET type for the variable's graph type.
@@ -147,7 +148,7 @@ public static class ExecutionHelper
     /// Exceptions thrown by scalars are wrapped in <see cref="InvalidLiteralError"/>
     /// if <see cref="CoerceValueContext.Document"/> and <see cref="CoerceValueContext.ParentNode"/> are set.
     /// </summary>
-    internal static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, CoerceValueContext context, object? fieldDefault = null)
+    internal static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, CoerceValueContext context, object? fieldDefault, IValueConverter valueConverter)
     {
         if (type == null)
             throw new ArgumentNullException(nameof(type));
@@ -156,7 +157,7 @@ public static class ExecutionHelper
         {
             // validation rules have verified that this is not null; if the validation rule was not executed, it
             // is assumed that the caller does not wish this check to be executed
-            return CoerceValue(nonNull.ResolvedType!, input, context, fieldDefault);
+            return CoerceValue(nonNull.ResolvedType!, input, context, fieldDefault, valueConverter);
         }
 
         if (input == null)
@@ -243,12 +244,12 @@ public static class ExecutionHelper
 
                 var values = new object?[count];
                 for (int i = 0; i < count; ++i)
-                    values[i] = CoerceValue(listItemType, list.Values![i], context).Value;
+                    values[i] = CoerceValue(listItemType, list.Values![i], context, null, valueConverter).Value;
                 return new ArgumentValue(values, ArgumentSource.Literal);
             }
             else
             {
-                return new ArgumentValue(new[] { CoerceValue(listItemType, input, context).Value }, ArgumentSource.Literal);
+                return new ArgumentValue(new[] { CoerceValue(listItemType, input, context, null, valueConverter).Value }, ArgumentSource.Literal);
             }
         }
 
@@ -290,7 +291,7 @@ public static class ExecutionHelper
                     // If the variable definition does not provide a default value, the input object field definition’s
                     // default value should be used.
 
-                    var value = CoerceValue(field.ResolvedType!, objectField.Value, context, field.DefaultValue);
+                    var value = CoerceValue(field.ResolvedType!, objectField.Value, context, field.DefaultValue, valueConverter);
                     // when a optional variable is specified for the input field, and the variable is not defined, and
                     //   when there is no default value specified for the input field, then do not add the entry to the
                     //   unordered map.
@@ -302,7 +303,7 @@ public static class ExecutionHelper
                             try
                             {
                                 if (field.Parser != null)
-                                    parsedValue = field.Parser(parsedValue);
+                                    parsedValue = field.Parser(parsedValue, valueConverter);
                                 if (parsedValue != null && field.Validator != null)
                                     field.Validator(parsedValue);
                             }

@@ -52,7 +52,7 @@ public partial class FederationResolverAttribute
             return true;
         }
 
-        public object ParseRepresentation(IComplexGraphType graphType, IDictionary<string, object?> representation)
+        public object ParseRepresentation(IComplexGraphType graphType, IDictionary<string, object?> representation, IValueConverter valueConverter)
         {
             // Creates a dictionary of arguments for the field type based on the entity representation properties.
             // The argument dictionary is returned as the parsed representation, to be used by the synthesized IResolveFieldContext.
@@ -74,7 +74,7 @@ public partial class FederationResolverAttribute
                     value = Deserialize(arg.ResolvedType!, arg.Name, value);
                     // coerce the value based on the argument's parser, useful for coercing ID strings to integers, etc
                     if (arg.Parser != null && value != null)
-                        value = arg.Parser(value);
+                        value = arg.Parser(value, valueConverter);
                 }
                 // set the argument value based on the matched value or the default value otherwise
                 arguments[arg.Name] = matched

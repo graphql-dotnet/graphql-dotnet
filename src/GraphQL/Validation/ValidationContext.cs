@@ -233,7 +233,7 @@ public partial class ValidationContext : IProvideUserContext
                         {
                             Document = Document,
                             ParentNode = variableDef,
-                        }).Value;
+                        }, null, Schema.ValueConverter).Value;
                     }
                     catch (ValidationError ex)
                     {
@@ -405,7 +405,7 @@ public partial class ValidationContext : IProvideUserContext
                     try
                     {
                         if (parsedFieldValue != null && field.Parser != null)
-                            parsedFieldValue = field.Parser(parsedFieldValue);
+                            parsedFieldValue = field.Parser(parsedFieldValue, Schema.ValueConverter);
                         if (parsedFieldValue != null && field.Validator != null)
                             field.Validator(parsedFieldValue);
                     }

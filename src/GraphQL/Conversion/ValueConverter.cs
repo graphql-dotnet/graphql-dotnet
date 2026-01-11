@@ -8,24 +8,24 @@ namespace GraphQL;
 
 /// <summary>
 /// This class provides value conversions between objects of different types.
-/// Conversions are registered in a static thread safe dictionary and are used for all schemas in the application.
+/// Conversions are registered in a thread safe dictionary and are used for a specific schema instance.
 /// <br/><br/>
 /// Each ScalarGraphType calls <see cref="ConvertTo(object, Type)">ConvertTo</see> method to return correct value
 /// type from its <see cref=" GraphQL.Types.ScalarGraphType.ParseValue(object)">ParseValue</see> method.
 /// Also conversions may be useful in advanced <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
 /// use cases when deserialization from the values dictionary to the complex input argument is required.
 /// </summary>
-public static class ValueConverter
+public class ValueConverter : IValueConverter
 {
-    private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>> _valueConversions = new();
-    private static readonly ConcurrentDictionary<Type, IListConverterFactory> _listConverterFactories = new();
-    private static readonly ConcurrentDictionary<Type, IListConverter> _listConverterCache = new();
+    private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>> _valueConversions = new();
+    private readonly ConcurrentDictionary<Type, IListConverterFactory> _listConverterFactories = new();
+    private readonly ConcurrentDictionary<Type, IListConverter> _listConverterCache = new();
 
     /// <summary>
     /// Register built-in conversions. This list is expected to grow over time.
     /// </summary>
     [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
-    static ValueConverter()
+    public ValueConverter()
     {
         Register<string, sbyte>(value => sbyte.Parse(value, NumberFormatInfo.InvariantInfo));
         Register<string, byte>(value => byte.Parse(value, NumberFormatInfo.InvariantInfo));
@@ -194,7 +194,7 @@ public static class ValueConverter
     /// <para>Returns an object of the specified type and whose value is equivalent to the specified object.</para>
     /// <para>Throws a <see cref="InvalidOperationException"/> if there is no conversion registered; conversion functions may throw other exceptions</para>
     /// </summary>
-    public static T? ConvertTo<T>(object? value)
+    public T? ConvertTo<T>(object? value)
     {
         object? v = ConvertTo(value, typeof(T));
 
@@ -205,7 +205,7 @@ public static class ValueConverter
     /// <para>Returns an object of the specified type and whose value is equivalent to the specified object.</para>
     /// <para>Throws a <see cref="InvalidOperationException"/> if there is no conversion registered; conversion functions may throw other exceptions</para>
     /// </summary>
-    public static object? ConvertTo(object? value, Type targetType)
+    public object? ConvertTo(object? value, Type targetType)
     {
         if (value == null)
             return null;
@@ -223,7 +223,7 @@ public static class ValueConverter
     /// </para>
     /// <para>Conversion delegates may throw exceptions if the conversion was unsuccessful</para>
     /// </summary>
-    internal static bool TryConvertTo(object? value, Type targetType, out object? result, Type? sourceType = null)
+    public bool TryConvertTo(object? value, Type targetType, out object? result, Type? sourceType = null)
     {
         if (value == null || targetType.IsInstanceOfType(value))
         {
@@ -253,7 +253,7 @@ public static class ValueConverter
     /// <param name="valueType">Type of original values.</param>
     /// <param name="targetType">Converted value type.</param>
     /// <returns>The conversion delegate if it is present, <see langword="null"/> otherwise.</returns>
-    public static Func<object, object>? GetConversion(Type valueType, Type targetType)
+    public Func<object, object>? GetConversion(Type valueType, Type targetType)
     {
         return _valueConversions.TryGetValue(valueType, out var conversions) && conversions.TryGetValue(targetType, out var conversion)
             ? conversion
@@ -268,7 +268,7 @@ public static class ValueConverter
     /// <param name="valueType">Type of original value.</param>
     /// <param name="targetType">Converted value type.</param>
     /// <param name="conversion">Conversion delegate; <see langword="null"/> for unregister already registered conversion.</param>
-    public static void Register(Type valueType, Type targetType, Func<object, object>? conversion)
+    public void Register(Type valueType, Type targetType, Func<object, object>? conversion)
     {
         if (!_valueConversions.TryGetValue(valueType, out var conversions) &&
             !_valueConversions.TryAdd(valueType, conversions = new ConcurrentDictionary<Type, Func<object, object>>()))
@@ -288,7 +288,7 @@ public static class ValueConverter
     /// <typeparam name="TSource">Type of original value.</typeparam>
     /// <typeparam name="TTarget">Converted value type.</typeparam>
     /// <param name="conversion">Conversion delegate; <see langword="null"/> for unregister already registered conversion.</param>
-    public static void Register<TSource, TTarget>(Func<TSource, TTarget>? conversion)
+    public void Register<TSource, TTarget>(Func<TSource, TTarget>? conversion)
         => Register(typeof(TSource), typeof(TTarget), conversion == null ? null : v => conversion((TSource)v)!);
 
     /// <summary>
@@ -301,7 +301,7 @@ public static class ValueConverter
     /// </summary>
     /// <typeparam name="TTarget">Converted value type.</typeparam>
     /// <param name="conversion">Conversion delegate; <see langword="null"/> for unregister already registered conversion.</param>
-    public static void Register<TTarget>(Func<IDictionary<string, object>, TTarget>? conversion)
+    public void Register<TTarget>(Func<IDictionary<string, object>, TTarget>? conversion)
         where TTarget : class
         => Register<IDictionary<string, object>, TTarget>(conversion);
 
@@ -313,7 +313,7 @@ public static class ValueConverter
     /// Array types cannot be registered. If the converter is <see langword="null"/>,
     /// the factory is removed.
     /// </summary>
-    public static void RegisterListConverterFactory(Type listType, IListConverterFactory? converter)
+    public void RegisterListConverterFactory(Type listType, IListConverterFactory? converter)
     {
         if (listType.IsArray)
             throw new ArgumentException("Array types cannot be registered.", nameof(listType));
@@ -336,7 +336,7 @@ public static class ValueConverter
         "For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. " +
         "If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors " +
         "or other members, which can cause runtime failures.")]
-    public static void RegisterListConverterFactory(Type listType,
+    public void RegisterListConverterFactory(Type listType,
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
         Type implementationType)
     {
@@ -365,7 +365,7 @@ public static class ValueConverter
     /// </code>
     /// </para>
     /// </summary>
-    public static void RegisterListConverter<TListType, TElementType>(Func<IEnumerable<TElementType>, TListType>? conversion)
+    public void RegisterListConverter<TListType, TElementType>(Func<IEnumerable<TElementType>, TListType>? conversion)
         where TListType : IEnumerable<TElementType>
         => RegisterListConverterFactory(typeof(TListType), conversion != null ? new DelegateListConverter<TListType, TElementType>(conversion) : null);
 
@@ -374,13 +374,13 @@ public static class ValueConverter
     /// When set to <see langword="null"/>, attempting to convert a list type that is not explicitly
     /// registerd will lead to an exception being thrown.
     /// </summary>
-    public static IListConverterFactory? DefaultListConverterFactory { get; set; } = CustomListConverterFactory.DefaultInstance;
+    public IListConverterFactory? DefaultListConverterFactory { get; set; } = CustomListConverterFactory.DefaultInstance;
 
     /// <summary>
     /// Gets the list converter factory for the specified list type, if any.
     /// Array types are supported.
     /// </summary>
-    public static IListConverterFactory GetListConverterFactory(Type listType)
+    public IListConverterFactory GetListConverterFactory(Type listType)
     {
         if (listType.IsArray)
             return ArrayListConverterFactory.Instance;
@@ -406,10 +406,10 @@ public static class ValueConverter
     /// </summary>
     [UnconditionalSuppressMessage("Trimming", "IL2067:Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
         Justification = "False positive; type will always equal listType, which is properly marked")]
-    public static IListConverter GetListConverter(
+    public IListConverter GetListConverter(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
         Type listType)
     {
-        return _listConverterCache.GetOrAdd(listType, static type => GetListConverterFactory(type).Create(type));
+        return _listConverterCache.GetOrAdd(listType, type => GetListConverterFactory(type).Create(type));
     }
 }

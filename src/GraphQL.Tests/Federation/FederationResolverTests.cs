@@ -19,8 +19,8 @@ public class FederationResolverTests
         var mockResolver = new Mock<IFederationResolver>(MockBehavior.Strict);
         mockResolver.Setup(x => x.MatchKeys(It.IsAny<IDictionary<string, object?>>()))
             .Returns<IDictionary<string, object?>>(args => args.ContainsKey("id2"));
-        mockResolver.Setup(x => x.ParseRepresentation(objectGraphType, It.IsAny<IDictionary<string, object?>>()))
-            .Returns<IObjectGraphType, IDictionary<string, object?>>((_, args) => args["id2"].ShouldBeOfType<int>());
+        mockResolver.Setup(x => x.ParseRepresentation(objectGraphType, It.IsAny<IDictionary<string, object?>>(), It.IsAny<IValueConverter>()))
+            .Returns<IObjectGraphType, IDictionary<string, object?>, IValueConverter>((_, args, __) => args["id2"].ShouldBeOfType<int>());
         mockResolver.Setup(x => x.ResolveAsync(It.IsAny<IResolveFieldContext>(), objectGraphType, 1))
             .Returns(new ValueTask<object?>(new Class1 { Id = 11 }));
         objectGraphType.ResolveReference(mockResolver.Object);
@@ -136,8 +136,8 @@ public class FederationResolverTests
         var mockResolver = new Mock<IFederationResolver>(MockBehavior.Strict);
         mockResolver.Setup(x => x.MatchKeys(It.IsAny<IDictionary<string, object?>>()))
             .Returns<IDictionary<string, object?>>(args => args.ContainsKey("id2"));
-        mockResolver.Setup(x => x.ParseRepresentation(It.IsAny<IObjectGraphType>(), It.IsAny<IDictionary<string, object?>>()))
-            .Returns<IObjectGraphType, IDictionary<string, object?>>((_, args) => args["id2"].ShouldBeOfType<int>());
+        mockResolver.Setup(x => x.ParseRepresentation(It.IsAny<IObjectGraphType>(), It.IsAny<IDictionary<string, object?>>(), It.IsAny<IValueConverter>()))
+            .Returns<IObjectGraphType, IDictionary<string, object?>, IValueConverter>((_, args, __) => args["id2"].ShouldBeOfType<int>());
         mockResolver.Setup(x => x.ResolveAsync(It.IsAny<IResolveFieldContext>(), It.IsAny<IObjectGraphType>(), 1))
             .Returns(new ValueTask<object?>(new Class1 { Id = 11 }));
 
@@ -443,6 +443,7 @@ public class FederationResolverTests
         var schemaTypes = new MySchemaTypes([objectGraphType]);
         var mockSchema = new Mock<ISchema>(MockBehavior.Strict);
         mockSchema.Setup(x => x.AllTypes).Returns(schemaTypes);
+        mockSchema.Setup(x => x.ValueConverter).Returns(new ValueConverter());
 
         // first simulate parsing
         var parsedData = EntityResolver.Instance.ConvertRepresentations(mockSchema.Object, data);

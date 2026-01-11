@@ -38,6 +38,11 @@ public interface ISchema : IMetadataReader, IMetadataWriter, IProvideDescription
     public INameConverter NameConverter { get; }
 
     /// <summary>
+    /// Value converter for converting between different types; provides type conversions used throughout the schema.
+    /// </summary>
+    public IValueConverter ValueConverter { get; }
+
+    /// <summary>
     /// Note that field middlewares from this property apply only to an uninitialized schema. If the schema is initialized
     /// then adding additional middleware through the builder does nothing. The schema is initialized (if not yet)
     /// at the beginning of the first call to <see cref="DocumentExecuter"/>.<see cref="DocumentExecuter.ExecuteAsync(ExecutionOptions)">ExecuteAsync</see>.

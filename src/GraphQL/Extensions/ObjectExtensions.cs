@@ -29,11 +29,13 @@ public static partial class ObjectExtensions
     /// In case of configuring field as Field("FirstName", x => x.FName) source dictionary
     /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
     /// </param>
+    /// <param name="valueConverter">The value converter instance to use for type conversions.</param>
     public static object ToObject(
         this IDictionary<string, object?> source,
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
         Type type,
-        IGraphType mappedType)
+        IGraphType mappedType,
+        IValueConverter valueConverter)
     {
         var inputGraphType = (mappedType is NonNullGraphType nonNullGraphType
             ? nonNullGraphType.ResolvedType as IInputObjectGraphType
@@ -44,18 +46,18 @@ public static partial class ObjectExtensions
             throw new ArgumentNullException(nameof(source));
 
         // if conversion from IDictionary<string, object> to desired type is registered then use it
-        if (ValueConverter.TryConvertTo(source, type, out object? result, typeof(IDictionary<string, object>)))
+        if (valueConverter.TryConvertTo(source, type, out object? result, typeof(IDictionary<string, object>)))
             return result!;
 
         var reflectionInfo = GetReflectionInformation(type, inputGraphType);
-        return ToObject(source, reflectionInfo);
+        return ToObject(source, reflectionInfo, valueConverter);
     }
 
     /// <summary>
     /// Creates a new instance of the indicated type, populating it with the dictionary.
     /// Uses the constructor and properties specified by the supplied <see cref="ReflectionInfo"/>.
     /// </summary>
-    private static object ToObject(this IDictionary<string, object?> source, ReflectionInfo reflectionInfo)
+    private static object ToObject(this IDictionary<string, object?> source, ReflectionInfo reflectionInfo, IValueConverter valueConverter)
     {
         // build the constructor arguments
         object?[] ctorArguments = reflectionInfo.CtorFields.Length == 0
@@ -66,7 +68,7 @@ public static partial class ObjectExtensions
         {
             var ctorField = reflectionInfo.CtorFields[i];
             ctorArguments[i] = ctorField.Key != null
-                ? GetPropertyValue(source.TryGetValue(ctorField.Key, out var value) ? value : null, ctorField.ParameterInfo.ParameterType, ctorField.GraphType!)
+                ? GetPropertyValue(source.TryGetValue(ctorField.Key, out var value) ? value : null, ctorField.ParameterInfo.ParameterType, ctorField.GraphType!, valueConverter)
                 : ctorField.ParameterInfo.DefaultValue;
         }
 
@@ -91,12 +93,12 @@ public static partial class ObjectExtensions
             {
                 if (field.Member is PropertyInfo propertyInfo)
                 {
-                    var coercedValue = GetPropertyValue(value, propertyInfo.PropertyType, field.GraphType);
+                    var coercedValue = GetPropertyValue(value, propertyInfo.PropertyType, field.GraphType, valueConverter);
                     propertyInfo.SetValue(obj, coercedValue); //issue: this works even if propertyInfo is ValueType and value is null
                 }
                 else if (field.Member is FieldInfo fieldInfo)
                 {
-                    var coercedValue = GetPropertyValue(value, fieldInfo.FieldType, field.GraphType);
+                    var coercedValue = GetPropertyValue(value, fieldInfo.FieldType, field.GraphType, valueConverter);
                     fieldInfo.SetValue(obj, coercedValue);
                 }
             }
@@ -279,9 +281,10 @@ public static partial class ObjectExtensions
     /// In case of configuring field as Field("FirstName", x => x.FName) source dictionary
     /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
     /// </param>
+    /// <param name="valueConverter">The value converter instance to use for type conversions.</param>
     /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
     [RequiresUnreferencedCode("Recursively converts propertyValue to fieldType.")]
-    public static object? GetPropertyValue(this object? propertyValue, Type fieldType, IGraphType mappedType)
+    public static object? GetPropertyValue(this object? propertyValue, Type fieldType, IGraphType mappedType, IValueConverter valueConverter)
     {
         if (mappedType == null)
         {
@@ -300,7 +303,7 @@ public static partial class ObjectExtensions
             return propertyValue;
         }
 
-        if (ValueConverter.TryConvertTo(propertyValue, fieldType, out object? result))
+        if (valueConverter.TryConvertTo(propertyValue, fieldType, out object? result))
             return result;
 
         if (mappedType is ListGraphType listGraphType)
@@ -308,7 +311,7 @@ public static partial class ObjectExtensions
             var itemGraphType = listGraphType.ResolvedType
                 ?? throw new InvalidOperationException("Graph type is not a list graph type or ResolvedType not set.");
 
-            var listConverter = ValueConverter.GetListConverter(fieldType);
+            var listConverter = valueConverter.GetListConverter(fieldType);
 
             var underlyingType = Nullable.GetUnderlyingType(listConverter.ElementType) ?? listConverter.ElementType;
 
@@ -320,7 +323,7 @@ public static partial class ObjectExtensions
             for (int i = 0; i < objectArray.Length; ++i)
             {
                 var listItem = objectArray[i];
-                objectArray[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType, itemGraphType);
+                objectArray[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType, itemGraphType, valueConverter);
             }
 
             return listConverter.Convert(objectArray);
@@ -343,7 +346,7 @@ public static partial class ObjectExtensions
 
         if (propertyValue is IDictionary<string, object?> objects)
         {
-            return ToObject(objects, fieldType, mappedType);
+            return ToObject(objects, fieldType, mappedType, valueConverter);
         }
 
         if (fieldType.IsEnum)
@@ -363,7 +366,7 @@ public static partial class ObjectExtensions
             value = Enum.Parse(fieldType, str, true);
         }
 
-        return ValueConverter.ConvertTo(value, fieldType);
+        return valueConverter.ConvertTo(value, fieldType);
     }
 
     /// <summary>

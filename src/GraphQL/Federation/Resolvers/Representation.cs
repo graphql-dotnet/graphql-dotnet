@@ -13,6 +13,6 @@ namespace GraphQL.Federation.Resolvers;
 /// Each entity type has its specific implementation of <see cref="IFederationResolver"/>
 /// to handle its resolution logic.</param>
 /// <param name="Value">The representation of the entity, parsed to an object by
-/// <see cref="IFederationResolver.ParseRepresentation(IComplexGraphType, IDictionary{string, object?})"/>.
+/// <see cref="IFederationResolver.ParseRepresentation(IComplexGraphType, IDictionary{string, object?}, IValueConverter)"/>.
 /// This is the actual data passed to the resolver for processing and fetching the corresponding entity.</param>
 public record class Representation(IComplexGraphType GraphType, IFederationResolver Resolver, object Value);

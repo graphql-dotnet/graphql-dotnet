@@ -30,6 +30,8 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
         public INameConverter NameConverter => _schema.NameConverter;
 
+        public IValueConverter ValueConverter => _schema.ValueConverter;
+
         public IFieldMiddlewareBuilder FieldMiddleware => _schema.FieldMiddleware;
 
         public bool Initialized => _schema.Initialized;
@@ -168,6 +170,14 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
     /// <inheritdoc/>
     public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
+
+    /// <summary>
+    /// Value converter for converting between different types; provides type conversions used throughout the schema.
+    /// </summary>
+    public ValueConverter ValueConverter { get; set; } = new ValueConverter();
+
+    /// <inheritdoc cref="ISchema.ValueConverter"/>
+    IValueConverter ISchema.ValueConverter => ValueConverter;
 
     /// <inheritdoc/>
     public IFieldMiddlewareBuilder FieldMiddleware { get; internal set; } = new FieldMiddlewareBuilder();
