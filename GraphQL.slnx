@@ -23,9 +23,11 @@
     <File Path="Tests.props" />
   </Folder>
   <Folder Name="/Analyzer/">
-    <Project Path="src/GraphQL.Analyzers.CodeFixes/GraphQL.Analyzers.CodeFixes.csproj" />
+    <Project Path="src/GraphQL.Analyzers.CodeFixes/GraphQL.Analyzers.CodeFixes.Roslyn3.11.csproj" />
+    <Project Path="src/GraphQL.Analyzers.CodeFixes/GraphQL.Analyzers.CodeFixes.Roslyn4.8.csproj" />
     <Project Path="src/GraphQL.Analyzers.Package/GraphQL.Analyzers.Package.csproj" />
-    <Project Path="src/GraphQL.Analyzers/GraphQL.Analyzers.csproj" />
+    <Project Path="src/GraphQL.Analyzers/GraphQL.Analyzers.Roslyn3.11.csproj" />
+    <Project Path="src/GraphQL.Analyzers/GraphQL.Analyzers.Roslyn4.8.csproj" />
   </Folder>
   <Folder Name="/Caching/">
     <Project Path="src/GraphQL.MemoryCache/GraphQL.MemoryCache.csproj" />
@@ -132,7 +134,8 @@
   <Folder Name="/Tests/">
     <Project Path="samples/GraphQL.Federation.Tests/GraphQL.Federation.Tests.csproj" />
     <Project Path="samples/GraphQL.Harness.Tests/GraphQL.Harness.Tests.csproj" />
-    <Project Path="src/GraphQL.Analyzers.Tests/GraphQL.Analyzers.Tests.csproj" />
+    <Project Path="src/GraphQL.Analyzers.Tests/GraphQL.Analyzers.Roslyn3.11.Tests.csproj" />
+    <Project Path="src/GraphQL.Analyzers.Tests/GraphQL.Analyzers.Roslyn4.8.Tests.csproj" />
     <Project Path="src/GraphQL.ApiTests/GraphQL.ApiTests.csproj" />
     <Project Path="src/GraphQL.DataLoader.Tests/GraphQL.DataLoader.Tests.csproj" />
     <Project Path="src/GraphQL.Dummy/GraphQL.Dummy.csproj" />

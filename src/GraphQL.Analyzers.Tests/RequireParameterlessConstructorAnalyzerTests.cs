@@ -49,6 +49,7 @@ public class RequireParameterlessConstructorAnalyzerTests
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
+#if ROSLYN4_8_OR_GREATER
     [Theory]
     [InlineData(1, "()", false)]
     [InlineData(2, "(int i)", true)]
@@ -78,4 +79,5 @@ public class RequireParameterlessConstructorAnalyzerTests
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
+#endif
 }

@@ -1,14 +1,23 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project>
   <Import Project="../../Tests.props" />
 
   <PropertyGroup>
     <TargetFrameworks>$(SingleFramework)</TargetFrameworks>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <DefaultItemExcludes>$(DefaultItemExcludes);obj\**\*;bin\**\*</DefaultItemExcludes>
   </PropertyGroup>
 
+  <!-- Force minimal version 4.0 to support file-scoped namespaces -->
+  <ItemGroup Condition="'$(RoslynApiVersion)' &lt; '4.0'">
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RoslynApiVersion)' &gt;= '4.0'">
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="$(RoslynApiVersion)" />
+  </ItemGroup>
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.8.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="1.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeRefactoring.Testing" Version="1.*" />
@@ -19,8 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.csproj" />
-    <ProjectReference Include="..\GraphQL.Analyzers\GraphQL.Analyzers.csproj" />
+    <ProjectReference Include="..\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.Roslyn$(RoslynApiVersion).csproj" />
+    <ProjectReference Include="..\GraphQL.Analyzers\GraphQL.Analyzers.Roslyn$(RoslynApiVersion).csproj" />
     <ProjectReference Include="..\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj" />
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
   </ItemGroup>

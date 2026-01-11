@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -10,7 +10,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>GraphQL.Analyzers</PackageId>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>GraphQL.Analyzers</Description>
     <PackageTags>GraphQL.Analyzers, analyzers</PackageTags>
@@ -22,22 +21,35 @@
   <ItemDefinitionGroup>
     <ProjectReference>
       <PrivateAssets>all</PrivateAssets>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemDefinitionGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.csproj" />
-    <ProjectReference Include="..\GraphQL.Analyzers\GraphQL.Analyzers.csproj" />
+    <!-- Roslyn 3.11 -->
+    <ProjectReference Include="..\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.Roslyn3.11.csproj" />
+    <ProjectReference Include="..\GraphQL.Analyzers\GraphQL.Analyzers.Roslyn3.11.csproj" />
+
+    <!-- Roslyn 4.8 -->
+    <ProjectReference Include="..\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.Roslyn4.8.csproj" />
+    <ProjectReference Include="..\GraphQL.Analyzers\GraphQL.Analyzers.Roslyn4.8.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="tools\*.ps1" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="" />
   </ItemGroup>
 
-  <Target Name="_AddAnalyzersToOutput">
+  <Target Name="_AddAnalyzersToOutput" DependsOnTargets="ResolveProjectReferences">
     <ItemGroup>
-      <TfmSpecificPackageFile Include="$(OutputPath)\GraphQL.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
-      <TfmSpecificPackageFile Include="$(OutputPath)\GraphQL.Analyzers.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
+      <!-- Roslyn 3.11 -->
+      <TfmSpecificPackageFile Include="..\GraphQL.Analyzers\bin\Roslyn3.11\$(Configuration)\netstandard2.0\GraphQL.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.11/cs" Visible="false" />
+      <TfmSpecificPackageFile Include="..\GraphQL.Analyzers.CodeFixes\bin\Roslyn3.11\$(Configuration)\netstandard2.0\GraphQL.Analyzers.CodeFixes.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.11/cs" Visible="false" />
+      <TfmSpecificPackageFile Include="..\GraphQL.Analyzers\bin\Roslyn3.11\$(Configuration)\netstandard2.0\GraphQLParser.dll" PackagePath="analyzers/dotnet/roslyn3.11/cs" />
+
+      <!-- Roslyn 4.8 -->
+      <TfmSpecificPackageFile Include="..\GraphQL.Analyzers\bin\Roslyn4.8\$(Configuration)\netstandard2.0\GraphQL.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.8/cs" Visible="false" />
+      <TfmSpecificPackageFile Include="..\GraphQL.Analyzers.CodeFixes\bin\Roslyn4.8\$(Configuration)\netstandard2.0\GraphQL.Analyzers.CodeFixes.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.8/cs" Visible="false" />
+      <TfmSpecificPackageFile Include="..\GraphQL.Analyzers\bin\Roslyn4.8\$(Configuration)\netstandard2.0\GraphQLParser.dll" PackagePath="analyzers/dotnet/roslyn4.8/cs" />
     </ItemGroup>
   </Target>
 
