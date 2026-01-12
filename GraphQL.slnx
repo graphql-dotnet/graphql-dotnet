@@ -57,8 +57,8 @@
     <File Path="docs2/site/docs/analyzers/gql018.md" />
     <File Path="docs2/site/docs/analyzers/gql019.md" />
     <File Path="docs2/site/docs/analyzers/gql020.md" />
+    <File Path="docs2/site/docs/analyzers/gqlfed001.md" />
     <File Path="docs2/site/docs/analyzers/overview.md" />
-    <File Path="gqlfed001.md" />
   </Folder>
   <Folder Name="/Docs/getting-started/">
     <File Path="docs2/site/docs/getting-started/aliases.md" />
