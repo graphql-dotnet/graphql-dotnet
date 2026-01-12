@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 namespace GraphQL.Analyzers.SDK;
 
 /// <summary>
-/// Represents the graph type of field with its properties.
+/// Represents the graph type of a field with its properties.
 /// Provides information about type modifiers (List, NonNull) and the unwrapped core type.
 /// </summary>
 public sealed class GraphQLFieldGraphType
