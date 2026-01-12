@@ -61,3 +61,9 @@ For more information about analyzers configuration see
 | [GQL019](../gql019) | `Validator` method must be valid                                                                  |
 | [GQL020](../gql020) | `ValidateArguments` method must be valid                                                          |
 | [GQL021](../gql021) | Nullable reference type argument should specify nullable parameter                                |
+
+# Federation Analyzers
+
+| Identifier                | Name                                                                                              |
+| ------------------------- | ------------------------------------------------------------------------------------------------- |
+| [GQLFED001](../gqlfed001) | Key field does not exist                                                                          |

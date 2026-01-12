@@ -28,6 +28,16 @@ public static class SyntaxNodeExtensions
                 .OfType<InvocationExpressionSyntax>()
                 .First(i => i.GetMethodName() == methodName);
         }
+
+        /// <summary>
+        /// Finds the first class declaration with the specified <paramref name="className"/> in the syntax tree.
+        /// </summary>
+        public ClassDeclarationSyntax FindClassDeclaration(string className)
+        {
+            return root.DescendantNodes()
+                .OfType<ClassDeclarationSyntax>()
+                .First(c => c.Identifier.Text == className);
+        }
     }
 
     extension(InvocationExpressionSyntax invocation)
