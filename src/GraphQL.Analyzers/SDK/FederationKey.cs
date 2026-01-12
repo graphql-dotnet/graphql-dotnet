@@ -36,6 +36,29 @@ public sealed class FederationKey
     }
 
     /// <summary>
+    /// Creates a FederationKey from an invocation expression, if it represents a .Key() method call.
+    /// Returns null if the invocation is not a Key method or cannot be analyzed.
+    /// </summary>
+    public static FederationKey? TryCreate(InvocationExpressionSyntax invocation, SemanticModel semanticModel, GraphQLGraphType graphType)
+    {
+        // Check if this is a .Key() method call
+        if (!invocation.IsGraphQLMethodInvocation(semanticModel, "Key"))
+            return null;
+
+        return new FederationKey(graphType, invocation, semanticModel);
+    }
+
+    /// <summary>
+    /// Gets the underlying invocation expression syntax.
+    /// </summary>
+    public InvocationExpressionSyntax Syntax { get; }
+
+    /// <summary>
+    /// Gets the semantic model used for analysis.
+    /// </summary>
+    public SemanticModel SemanticModel { get; }
+
+    /// <summary>
     /// Gets the parsed selection set representing the key fields.
     /// </summary>
     public GraphQLSelectionSet? Fields => _fields.Value;
@@ -59,38 +82,6 @@ public sealed class FederationKey
     /// Gets the graph type that this key is applied to.
     /// </summary>
     public GraphQLGraphType GraphType { get; }
-
-    /// <summary>
-    /// Gets the underlying invocation expression syntax.
-    /// </summary>
-    public InvocationExpressionSyntax Syntax { get; }
-
-    /// <summary>
-    /// Gets the semantic model used for analysis.
-    /// </summary>
-    public SemanticModel SemanticModel { get; }
-
-    /// <summary>
-    /// Creates a FederationKey from an invocation expression, if it represents a .Key() method call.
-    /// Returns null if the invocation is not a Key method or cannot be analyzed.
-    /// </summary>
-    public static FederationKey? TryCreate(InvocationExpressionSyntax invocation, SemanticModel semanticModel, GraphQLGraphType graphType)
-    {
-        // Check if this is a .Key() method call
-        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess ||
-            memberAccess.Name.Identifier.Text != "Key")
-        {
-            return null;
-        }
-
-        // Verify it's a GraphQL Federation Key method
-        if (!invocation.IsGraphQLSymbol(semanticModel))
-        {
-            return null;
-        }
-
-        return new FederationKey(graphType, invocation, semanticModel);
-    }
 
     private string? GetFieldsString()
     {
