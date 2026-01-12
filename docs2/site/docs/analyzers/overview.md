@@ -64,6 +64,6 @@ For more information about analyzers configuration see
 
 ## Federation Analyzers
 
-| Identifier                | Name                                                                                         |
+| Identifier                | Name                     |
 | ------------------------- | ------------------------ |
 | [GQLFED001](../gqlfed001) | Key field does not exist |
