@@ -2356,7 +2356,7 @@ namespace GraphQL.Types
         public override object? ParseValue(object? value) { }
         public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
-    public class BuiltInScalarMappingProvider : GraphQL.Types.IGraphTypeMappingProvider
+    public sealed class BuiltInScalarMappingProvider : GraphQL.Types.IGraphTypeMappingProvider
     {
         public BuiltInScalarMappingProvider() { }
         public static System.Collections.ObjectModel.ReadOnlyDictionary<System.Type, System.Type> BuiltInScalarMappings { get; }
@@ -2488,7 +2488,7 @@ namespace GraphQL.Types
         protected EnumCaseAttribute() { }
         public abstract string ChangeEnumCase(string val);
     }
-    public class EnumGraphTypeMappingProvider : GraphQL.Types.IGraphTypeMappingProvider
+    public sealed class EnumGraphTypeMappingProvider : GraphQL.Types.IGraphTypeMappingProvider
     {
         public EnumGraphTypeMappingProvider() { }
         public System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredType) { }

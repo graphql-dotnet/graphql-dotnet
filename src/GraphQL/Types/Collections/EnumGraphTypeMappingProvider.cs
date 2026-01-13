@@ -3,7 +3,7 @@ namespace GraphQL.Types;
 /// <summary>
 /// Maps CLR enum types to <see cref="EnumerationGraphType{TEnum}"/>.
 /// </summary>
-public class EnumGraphTypeMappingProvider : IGraphTypeMappingProvider
+public sealed class EnumGraphTypeMappingProvider : IGraphTypeMappingProvider
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="EnumGraphTypeMappingProvider"/> class.

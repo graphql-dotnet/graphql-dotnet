@@ -6,7 +6,7 @@ namespace GraphQL.Types;
 /// <summary>
 /// Maps CLR types to built-in scalar graph types.
 /// </summary>
-public class BuiltInScalarMappingProvider : IGraphTypeMappingProvider
+public sealed class BuiltInScalarMappingProvider : IGraphTypeMappingProvider
 {
     /// <summary>
     /// Returns a dictionary of default CLR type to graph type mappings for a set of built-in (primitive) types.
