@@ -258,7 +258,7 @@ public static class TypeExtensions
 
             if (graphType == null)
             {
-                if (!SchemaTypesBase.BuiltInScalarMappings.TryGetValue(type, out graphType))
+                if (!BuiltInScalarMappingProvider.BuiltInScalarMappings.TryGetValue(type, out graphType))
                 {
                     if (type.IsEnum)
                     {

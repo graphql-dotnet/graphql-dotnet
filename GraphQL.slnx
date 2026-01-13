@@ -109,6 +109,7 @@
     <File Path="docs2/site/docs/migrations/migration5.md" />
     <File Path="docs2/site/docs/migrations/migration7.md" />
     <File Path="docs2/site/docs/migrations/migration8.md" />
+    <File Path="docs2/site/docs/migrations/migration9.md" />
     <File Path="docs2/site/docs/migrations/v0_11_0.md" />
     <File Path="docs2/site/docs/migrations/v0_8_0.md" />
   </Folder>

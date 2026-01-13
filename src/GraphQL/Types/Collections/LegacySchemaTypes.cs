@@ -732,7 +732,7 @@ Make sure that your ServiceProvider is configured correctly.");
             return mappedType;
 
         // then built-in mappings
-        if (BuiltInScalarMappings.TryGetValue(clrType, out var graphType))
+        if (BuiltInScalarMappingProvider.BuiltInScalarMappings.TryGetValue(clrType, out var graphType))
             return graphType;
 
         // create an enumeration graph type if applicable

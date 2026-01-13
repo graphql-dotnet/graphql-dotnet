@@ -862,7 +862,7 @@ public sealed partial class SchemaTypes : SchemaTypesBase
                     return mappedGraphType;
             }
 
-            // Check custom mapping providers next
+            // Check mapping providers (includes built-in scalar and enum providers prepended by Schema)
             if (_graphTypeMappings != null)
             {
                 Type? graphType = null;
@@ -874,22 +874,8 @@ public sealed partial class SchemaTypes : SchemaTypesBase
                     return graphType;
             }
 
-            // Fall back to built-in scalar mappings
-            if (BuiltInScalarMappings.TryGetValue(clrType, out var builtInType))
-                return builtInType;
-
-            // Auto-generate EnumerationGraphType<T> for enum types
-            if (clrType.IsEnum)
-                return CreateEnumerationGraphTypeNoWarn(clrType);
-
             // No mapping found
             throw new InvalidOperationException($"Could not find type mapping from CLR type '{clrType.FullName}' to GraphType. Did you forget to register the type mapping with the '{nameof(ISchema)}.{nameof(ISchema.RegisterTypeMapping)}'?");
-        }
-
-        [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
-        private Type CreateEnumerationGraphTypeNoWarn(Type enumType)
-        {
-            return typeof(EnumerationGraphType<>).MakeGenericType(enumType);
         }
 
         /// <summary>

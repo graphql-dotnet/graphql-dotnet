@@ -292,3 +292,28 @@ var type = typeof(MyClass).GetGraphTypeFromType(isNullable: false, TypeMappingMo
 // After
 var type = typeof(MyClass).GetGraphTypeFromType(isNullable: false, isInputType: false);
 ```
+
+### 15. `SchemaTypesBase.BuiltInScalarMappings` moved to `BuiltInScalarMappingProvider`
+
+The static `BuiltInScalarMappings` property has been moved from `SchemaTypesBase` to the new `BuiltInScalarMappingProvider` class. This change is part of a refactoring to support a more modular and extensible type mapping system using the `IGraphTypeMappingProvider` interface.
+
+If you reference `SchemaTypesBase.BuiltInScalarMappings` in your code, update it to use `BuiltInScalarMappingProvider.BuiltInScalarMappings`:
+
+```csharp
+// Before
+var mappings = SchemaTypesBase.BuiltInScalarMappings;
+
+// After
+var mappings = BuiltInScalarMappingProvider.BuiltInScalarMappings;
+```
+
+Additionally, two new mapping provider classes have been introduced:
+
+- `BuiltInScalarMappingProvider` - Maps CLR types to built-in scalar graph types (e.g., `int` → `IntGraphType`, `string` → `StringGraphType`)
+- `EnumGraphTypeMappingProvider` - Maps CLR enum types to `EnumerationGraphType<TEnum>`
+
+These providers are automatically prepended to the list of custom mapping providers during schema initialization, ensuring that built-in scalar and enum mappings are always available. This change improves Native AOT compatibility by isolating dynamic code generation to specific provider classes that can be properly annotated with `RequiresDynamicCode` attributes.
+
+Most users will not need to make any changes, as the schema initialization process automatically includes these providers. However, if you have custom schema initialization logic or override `CreateSchemaTypes()`, be aware that the built-in providers are now prepended automatically via the `PrependBuiltInProviders` method.
+
+Please note that since the built-in providers are prepended to the list of custom providers, custom mapping providers will receive the suggested mapping from the built-in providers in the `preferredType` parameter of their `GetGraphTypeFromClrType` method. If your custom provider should override built-in mappings, ensure it ignores the `preferredType` parameter for those specific CLR types. Otherwise, return `preferredType` if it's not null to respect the built-in mappings. If you are using the `LegacySchemaTypes` class as described above, it will continue to function as it did in v8 with no changes to your mapping providers.

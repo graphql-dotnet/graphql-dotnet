@@ -13,39 +13,6 @@ namespace GraphQL.Types;
 public abstract class SchemaTypesBase : IReadOnlyCollection<IGraphType>
 {
     /// <summary>
-    /// Returns a dictionary of default CLR type to graph type mappings for a set of built-in (primitive) types.
-    /// </summary>
-    public static ReadOnlyDictionary<Type, Type> BuiltInScalarMappings { get; } = new(new Dictionary<Type, Type>
-    {
-        [typeof(int)] = typeof(IntGraphType),
-        [typeof(long)] = typeof(LongGraphType),
-        [typeof(BigInteger)] = typeof(BigIntGraphType),
-        [typeof(double)] = typeof(FloatGraphType),
-        [typeof(float)] = typeof(FloatGraphType),
-        [typeof(decimal)] = typeof(DecimalGraphType),
-        [typeof(string)] = typeof(StringGraphType),
-        [typeof(bool)] = typeof(BooleanGraphType),
-        [typeof(DateTime)] = typeof(DateTimeGraphType),
-#if NET5_0_OR_GREATER
-        [typeof(Half)] = typeof(HalfGraphType),
-#endif
-#if NET6_0_OR_GREATER
-        [typeof(DateOnly)] = typeof(DateOnlyGraphType),
-        [typeof(TimeOnly)] = typeof(TimeOnlyGraphType),
-#endif
-        [typeof(DateTimeOffset)] = typeof(DateTimeOffsetGraphType),
-        [typeof(TimeSpan)] = typeof(TimeSpanSecondsGraphType),
-        [typeof(Guid)] = typeof(IdGraphType),
-        [typeof(short)] = typeof(ShortGraphType),
-        [typeof(ushort)] = typeof(UShortGraphType),
-        [typeof(ulong)] = typeof(ULongGraphType),
-        [typeof(uint)] = typeof(UIntGraphType),
-        [typeof(byte)] = typeof(ByteGraphType),
-        [typeof(sbyte)] = typeof(SByteGraphType),
-        [typeof(Uri)] = typeof(UriGraphType),
-    });
-
-    /// <summary>
     /// Built-in scalar instances (preinitialized and shared across all schema instances).
     /// </summary>
     protected static readonly ReadOnlyDictionary<Type, ScalarGraphType> BuiltInScalars = new(new ScalarGraphType[]
@@ -102,7 +69,7 @@ public abstract class SchemaTypesBase : IReadOnlyCollection<IGraphType>
         // by the auto-registering graph types such as AutoRegisteringObjectGraphType and
         // similar code.
 
-        if (BuiltInScalarMappings != null) // always true
+        if (BuiltInScalars != null) // always true
             return; // no need to actually execute the below code, but it must be present in the compiled IL
 
         // prevent trimming of these input and output type reference types

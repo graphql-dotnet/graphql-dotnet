@@ -392,7 +392,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     {
         get
         {
-            foreach (var pair in SchemaTypesBase.BuiltInScalarMappings)
+            foreach (var pair in BuiltInScalarMappingProvider.BuiltInScalarMappings)
                 yield return (pair.Key, pair.Value);
         }
     }
@@ -507,7 +507,24 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     protected virtual SchemaTypesBase CreateSchemaTypes()
     {
         var graphTypeMappingProviders = (IEnumerable<IGraphTypeMappingProvider>?)_services.GetService(typeof(IEnumerable<IGraphTypeMappingProvider>));
-        return new SchemaTypes(this, _services, graphTypeMappingProviders, OnBeforeInitializeType);
+        return new SchemaTypes(this, _services, PrependBuiltInProviders(graphTypeMappingProviders), OnBeforeInitializeType);
+    }
+
+    /// <summary>
+    /// Prepends built-in mapping providers (for built-in scalars and enums) to the provided list of providers.
+    /// </summary>
+    /// <param name="graphTypeMappings">Custom CLR-to-GraphQL type mappings, or null.</param>
+    /// <returns>A new enumerable with built-in providers prepended.</returns>
+    private static IEnumerable<IGraphTypeMappingProvider> PrependBuiltInProviders(IEnumerable<IGraphTypeMappingProvider>? graphTypeMappings)
+    {
+        yield return new BuiltInScalarMappingProvider();
+        yield return new EnumGraphTypeMappingProvider();
+
+        if (graphTypeMappings != null)
+        {
+            foreach (var provider in graphTypeMappings)
+                yield return provider;
+        }
     }
 
     /// <summary>
