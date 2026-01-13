@@ -15,6 +15,7 @@ public sealed class GraphQLGraphType
     private readonly Lazy<bool> _isInputType;
     private readonly Lazy<bool> _isOutputType;
     private readonly Lazy<Location> _location;
+    private readonly Lazy<IReadOnlyList<FederationKey>?> _federationKeys;
 
     private GraphQLGraphType(ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
     {
@@ -28,6 +29,7 @@ public sealed class GraphQLGraphType
         _isInputType = new Lazy<bool>(CheckIsInputType);
         _isOutputType = new Lazy<bool>(CheckIsOutputType);
         _location = new Lazy<Location>(classDeclaration.Identifier.GetLocation);
+        _federationKeys = new Lazy<IReadOnlyList<FederationKey>?>(GetFederationKeys);
     }
 
     /// <summary>
@@ -92,6 +94,12 @@ public sealed class GraphQLGraphType
     /// Gets the name of the graph type class.
     /// </summary>
     public string Name => Syntax.Identifier.Text;
+
+    /// <summary>
+    /// Gets the Federation @key directives applied to this graph type.
+    /// Returns an empty list if no @key directives are applied.
+    /// </summary>
+    public IReadOnlyList<FederationKey>? FederationKeys => _federationKeys.Value;
 
     private static bool IsGraphType(INamedTypeSymbol typeSymbol)
     {
@@ -199,5 +207,21 @@ public sealed class GraphQLGraphType
     public bool HasField(string name)
     {
         return GetField(name) != null;
+    }
+
+    private List<FederationKey>? GetFederationKeys()
+    {
+        List<FederationKey>? keys = null;
+
+        foreach (var invocation in Syntax.DescendantNodes().OfType<InvocationExpressionSyntax>())
+        {
+            var key = FederationKey.TryCreate(invocation, SemanticModel, this);
+            if (key != null)
+            {
+                (keys ??= []).Add(key);
+            }
+        }
+
+        return keys;
     }
 }
