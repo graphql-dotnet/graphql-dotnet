@@ -77,6 +77,8 @@
         items:
           - title: Serialization
             file: serialization.md
+          - title: Value Converter
+            file: value-converter.md
           - title: Dataloader
             file: dataloader.md
           - title: Complexity Analyzer
