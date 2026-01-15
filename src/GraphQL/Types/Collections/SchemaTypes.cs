@@ -265,7 +265,6 @@ public sealed partial class SchemaTypes : SchemaTypesBase
             foreach (var (mappedClrType, mappedGraphType) in _schema.TypeMappings)
             {
                 // note that a mapped graph type might be both an input and output graph type
-
                 if (mappedGraphType.IsInputType())
                     _inputClrTypeMappingCache[mappedClrType] = mappedGraphType;
 
@@ -871,7 +870,7 @@ public sealed partial class SchemaTypes : SchemaTypesBase
         /// </summary>
         private Type GetGraphTypeFromClrType(Type clrType, bool isInputType)
         {
-            // Check cache first
+            // Check cache first, which includes mappings within schema.TypeMappings
             var cache = isInputType ? _inputClrTypeMappingCache : _outputClrTypeMappingCache;
             if (cache.TryGetValue(clrType, out var cachedType))
                 return cachedType;
