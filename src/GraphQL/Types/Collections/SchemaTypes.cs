@@ -264,6 +264,8 @@ public sealed partial class SchemaTypes : SchemaTypesBase
             _outputClrTypeMappingCache = new();
             foreach (var (mappedClrType, mappedGraphType) in _schema.TypeMappings)
             {
+                // note that a mapped graph type might be both an input and output graph type
+
                 if (mappedGraphType.IsInputType())
                     _inputClrTypeMappingCache[mappedClrType] = mappedGraphType;
 
