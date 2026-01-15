@@ -258,11 +258,19 @@ public sealed partial class SchemaTypes : SchemaTypesBase
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _graphTypeMappings = graphTypeMappings;
             _onBeforeInitialize = onBeforeInitialize;
-            
+
             // Initialize CLR type mapping caches from schema.TypeMappings
             _inputClrTypeMappingCache = new();
             _outputClrTypeMappingCache = new();
-            
+            foreach (var (mappedClrType, mappedGraphType) in _schema.TypeMappings)
+            {
+                if (mappedGraphType.IsInputType())
+                    _inputClrTypeMappingCache[mappedClrType] = mappedGraphType;
+
+                if (mappedGraphType.IsOutputType())
+                    _outputClrTypeMappingCache[mappedClrType] = mappedGraphType;
+            }
+
             if (schema.TypeMappings != null)
             {
                 foreach (var (clrType, graphType) in schema.TypeMappings)
@@ -883,16 +891,6 @@ public sealed partial class SchemaTypes : SchemaTypesBase
                 return cachedType;
 
             Type? mappedType = null;
-
-            // Check schema explicit type mappings
-            foreach (var (mappedClrType, mappedGraphType) in _schema.TypeMappings)
-            {
-                if (mappedClrType == clrType && (isInputType ? mappedGraphType.IsInputType() : mappedGraphType.IsOutputType()))
-                {
-                    mappedType = mappedGraphType;
-                    break;
-                }
-            }
 
             // Check custom mapping providers next
             if (mappedType == null && _graphTypeMappings != null)
