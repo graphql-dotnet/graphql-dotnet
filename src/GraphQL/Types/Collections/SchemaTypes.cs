@@ -258,8 +258,26 @@ public sealed partial class SchemaTypes : SchemaTypesBase
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _graphTypeMappings = graphTypeMappings;
             _onBeforeInitialize = onBeforeInitialize;
+            
+            // Initialize CLR type mapping caches from schema.TypeMappings
             _inputClrTypeMappingCache = new();
             _outputClrTypeMappingCache = new();
+            
+            if (schema.TypeMappings != null)
+            {
+                foreach (var (clrType, graphType) in schema.TypeMappings)
+                {
+                    var namedGraphType = graphType.GetNamedType();
+                    if (typeof(IInputObjectGraphType).IsAssignableFrom(namedGraphType) || typeof(ScalarGraphType).IsAssignableFrom(namedGraphType))
+                    {
+                        _inputClrTypeMappingCache[clrType] = namedGraphType;
+                    }
+                    if (!typeof(IInputObjectGraphType).IsAssignableFrom(namedGraphType) || typeof(ScalarGraphType).IsAssignableFrom(namedGraphType))
+                    {
+                        _outputClrTypeMappingCache[clrType] = namedGraphType;
+                    }
+                }
+            }
         }
 
         /// <summary>
