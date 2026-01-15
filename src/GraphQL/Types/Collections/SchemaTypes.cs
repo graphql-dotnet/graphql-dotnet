@@ -222,6 +222,8 @@ public sealed partial class SchemaTypes : SchemaTypesBase
         private readonly IServiceProvider _serviceProvider;
         private readonly IEnumerable<IGraphTypeMappingProvider>? _graphTypeMappings;
         private readonly Action<IGraphType>? _onBeforeInitialize;
+        private readonly Dictionary<Type, Type> _inputClrTypeMappingCache;
+        private readonly Dictionary<Type, Type> _outputClrTypeMappingCache;
 
         // Set of base GraphQL types that may be used to build a schema manually, and as such must not use type mapping
         private static readonly HashSet<Type> _baseTypes = new()
@@ -256,6 +258,8 @@ public sealed partial class SchemaTypes : SchemaTypesBase
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _graphTypeMappings = graphTypeMappings;
             _onBeforeInitialize = onBeforeInitialize;
+            _inputClrTypeMappingCache = new();
+            _outputClrTypeMappingCache = new();
         }
 
         /// <summary>
@@ -855,15 +859,25 @@ public sealed partial class SchemaTypes : SchemaTypesBase
         /// </summary>
         private Type GetGraphTypeFromClrType(Type clrType, bool isInputType)
         {
+            // Check cache first
+            var cache = isInputType ? _inputClrTypeMappingCache : _outputClrTypeMappingCache;
+            if (cache.TryGetValue(clrType, out var cachedType))
+                return cachedType;
+
+            Type? mappedType = null;
+
             // Check schema explicit type mappings
             foreach (var (mappedClrType, mappedGraphType) in _schema.TypeMappings)
             {
                 if (mappedClrType == clrType && (isInputType ? mappedGraphType.IsInputType() : mappedGraphType.IsOutputType()))
-                    return mappedGraphType;
+                {
+                    mappedType = mappedGraphType;
+                    break;
+                }
             }
 
             // Check custom mapping providers next
-            if (_graphTypeMappings != null)
+            if (mappedType == null && _graphTypeMappings != null)
             {
                 Type? graphType = null;
 
@@ -871,19 +885,24 @@ public sealed partial class SchemaTypes : SchemaTypesBase
                     graphType = provider.GetGraphTypeFromClrType(clrType, isInputType, graphType);
 
                 if (graphType != null)
-                    return graphType;
+                    mappedType = graphType;
             }
 
             // Fall back to built-in scalar mappings
-            if (BuiltInScalarMappings.TryGetValue(clrType, out var builtInType))
-                return builtInType;
+            if (mappedType == null && BuiltInScalarMappings.TryGetValue(clrType, out var builtInType))
+                mappedType = builtInType;
 
             // Auto-generate EnumerationGraphType<T> for enum types
-            if (clrType.IsEnum)
-                return CreateEnumerationGraphTypeNoWarn(clrType);
+            if (mappedType == null && clrType.IsEnum)
+                mappedType = CreateEnumerationGraphTypeNoWarn(clrType);
 
             // No mapping found
-            throw new InvalidOperationException($"Could not find type mapping from CLR type '{clrType.FullName}' to GraphType. Did you forget to register the type mapping with the '{nameof(ISchema)}.{nameof(ISchema.RegisterTypeMapping)}'?");
+            if (mappedType == null)
+                throw new InvalidOperationException($"Could not find type mapping from CLR type '{clrType.FullName}' to GraphType. Did you forget to register the type mapping with the '{nameof(ISchema)}.{nameof(ISchema.RegisterTypeMapping)}'?");
+
+            // Add to cache before returning
+            cache[clrType] = mappedType;
+            return mappedType;
         }
 
         [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
