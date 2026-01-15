@@ -270,22 +270,6 @@ public sealed partial class SchemaTypes : SchemaTypesBase
                 if (mappedGraphType.IsOutputType())
                     _outputClrTypeMappingCache[mappedClrType] = mappedGraphType;
             }
-
-            if (schema.TypeMappings != null)
-            {
-                foreach (var (clrType, graphType) in schema.TypeMappings)
-                {
-                    var namedGraphType = graphType.GetNamedType();
-                    if (typeof(IInputObjectGraphType).IsAssignableFrom(namedGraphType) || typeof(ScalarGraphType).IsAssignableFrom(namedGraphType))
-                    {
-                        _inputClrTypeMappingCache[clrType] = namedGraphType;
-                    }
-                    if (!typeof(IInputObjectGraphType).IsAssignableFrom(namedGraphType) || typeof(ScalarGraphType).IsAssignableFrom(namedGraphType))
-                    {
-                        _outputClrTypeMappingCache[clrType] = namedGraphType;
-                    }
-                }
-            }
         }
 
         /// <summary>
