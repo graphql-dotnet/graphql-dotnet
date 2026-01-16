@@ -4,7 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild Condition="'$(NoBuild)' != 'true'">true</GeneratePackageOnBuild>
+    <BuildProjectReferences Condition="'$(NoBuild)' == 'true'">false</BuildProjectReferences>
     <Authors>Joe McBride</Authors>
     <Copyright>Copyright (c) 2015-2023 Joseph T. McBride, Ivan Maximov, Shane Krueger, et al. All rights reserved.</Copyright>
   </PropertyGroup>
@@ -34,10 +35,11 @@
     <None Update="tools\*.ps1" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="" />
   </ItemGroup>
 
-  <Target Name="_AddAnalyzersToOutput">
+  <Target Name="_AddAnalyzersToOutput" DependsOnTargets="ResolveProjectReferences">
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(OutputPath)\GraphQL.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
       <TfmSpecificPackageFile Include="$(OutputPath)\GraphQL.Analyzers.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="..\GraphQL.Analyzers\bin\$(Configuration)\netstandard2.0\GraphQLParser.dll" PackagePath="analyzers/dotnet/cs" />
     </ItemGroup>
   </Target>
 

@@ -16,6 +16,7 @@ public class AutoRegisteringGraphTypeMappingProvider : IGraphTypeMappingProvider
     /// Creates an instance that maps both input and output types.
     /// CLR interface output types will be mapped as GraphQL interfaces.
     /// </summary>
+    [RequiresDynamicCode("Creating generic types requires dynamic code.")]
     public AutoRegisteringGraphTypeMappingProvider()
         : this(true, true)
     {
@@ -26,6 +27,7 @@ public class AutoRegisteringGraphTypeMappingProvider : IGraphTypeMappingProvider
     /// When output types are enabled, <paramref name="mapInterfaceTypes"/> indicates whether CLR
     /// interface output types are mapped as GraphQL interfaces or GraphQL object types.
     /// </summary>
+    [RequiresDynamicCode("Creating generic types requires dynamic code.")]
     public AutoRegisteringGraphTypeMappingProvider(bool mapInputTypes, bool mapOutputTypes, bool mapInterfaceTypes = true)
     {
         _mapInputTypes = mapInputTypes;
@@ -37,15 +39,14 @@ public class AutoRegisteringGraphTypeMappingProvider : IGraphTypeMappingProvider
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(AutoRegisteringObjectGraphType<>))]
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(AutoRegisteringInterfaceGraphType<>))]
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(AutoRegisteringInputObjectGraphType<>))]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
     public virtual Type? GetGraphTypeFromClrType(Type clrType, bool isInputType, Type? preferredType)
     {
         if (preferredType != null)
             return preferredType;
 
         if (isInputType && !_mapInputTypes && !IsForcedType(clrType) ||
-            !isInputType && !_mapOutputTypes && !IsForcedType(clrType) ||
-            clrType.IsEnum ||
-            SchemaTypesBase.BuiltInScalarMappings.ContainsKey(clrType))
+            !isInputType && !_mapOutputTypes && !IsForcedType(clrType))
             return null;
 
         if (isInputType)

@@ -2315,11 +2315,15 @@ namespace GraphQL.Types
     }
     public class AutoRegisteringGraphTypeMappingProvider : GraphQL.Types.IGraphTypeMappingProvider
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Creating generic types requires dynamic code.")]
         public AutoRegisteringGraphTypeMappingProvider() { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Creating generic types requires dynamic code.")]
         public AutoRegisteringGraphTypeMappingProvider(bool mapInputTypes, bool mapOutputTypes, bool mapInterfaceTypes = true) { }
         [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(GraphQL.Types.AutoRegisteringInputObjectGraphType<TSourceType?>?))]
         [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(GraphQL.Types.AutoRegisteringInterfaceGraphType<TSourceType?>?))]
         [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(GraphQL.Types.AutoRegisteringObjectGraphType<TSourceType?>?))]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
         public virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredType) { }
     }
     public static class AutoRegisteringHelper
@@ -2387,6 +2391,12 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
         public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
+    }
+    public sealed class BuiltInScalarMappingProvider : GraphQL.Types.IGraphTypeMappingProvider
+    {
+        public BuiltInScalarMappingProvider() { }
+        public static System.Collections.ObjectModel.ReadOnlyDictionary<System.Type, System.Type> BuiltInScalarMappings { get; }
+        public System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredType) { }
     }
     public class ByteGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2520,6 +2530,12 @@ namespace GraphQL.Types
     {
         protected EnumCaseAttribute() { }
         public abstract string ChangeEnumCase(string val);
+    }
+    public sealed class EnumGraphTypeMappingProvider : GraphQL.Types.IGraphTypeMappingProvider
+    {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Creating generic types requires dynamic code.")]
+        public EnumGraphTypeMappingProvider() { }
+        public System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredType) { }
     }
     public class EnumValueDefinition : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription
     {
@@ -3068,7 +3084,6 @@ namespace GraphQL.Types
         public GraphQL.Types.FieldType SchemaMetaFieldType { get; protected set; }
         public GraphQL.Types.FieldType TypeMetaFieldType { get; protected set; }
         public GraphQL.Types.FieldType TypeNameMetaFieldType { get; protected set; }
-        public static System.Collections.ObjectModel.ReadOnlyDictionary<System.Type, System.Type> BuiltInScalarMappings { get; }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
     }
     public class ShortGraphType : GraphQL.Types.ScalarGraphType
