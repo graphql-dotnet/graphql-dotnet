@@ -7,3 +7,5 @@ Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 GQL021 | Usage | Warning | NullableReferenceTypeArgumentAnalyzer
 GQLFED001 | Federation | Error | KeyAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gqlfed001)
+GQLFED002 | Federation | Error | KeyAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gqlfed002)
+
