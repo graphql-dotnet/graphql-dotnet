@@ -19,8 +19,17 @@ public class KeyAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.KEY_FIELD_DOES_NOT_EXIST);
 
+    public static readonly DiagnosticDescriptor KeyMustNotBeNullOrEmpty = new(
+        id: DiagnosticIds.KEY_MUST_NOT_BE_NULL_OR_EMPTY,
+        title: "Key must not be null or empty",
+        messageFormat: "Key must not be null or empty on type '{0}'",
+        category: DiagnosticCategories.FEDERATION,
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        helpLinkUri: HelpLinks.KEY_MUST_NOT_BE_NULL_OR_EMPTY);
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(KeyFieldDoesNotExist);
+        ImmutableArray.Create(KeyFieldDoesNotExist, KeyMustNotBeNullOrEmpty);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -44,6 +53,17 @@ public class KeyAnalyzer : DiagnosticAnalyzer
         GraphQLGraphType graphType,
         FederationKey key)
     {
+        // Check if the key is empty or whitespace
+        if (string.IsNullOrWhiteSpace(key.FieldsString))
+        {
+            var diagnostic = Diagnostic.Create(
+                KeyMustNotBeNullOrEmpty,
+                key.Location,
+                graphType.Name);
+            context.ReportDiagnostic(diagnostic);
+            return;
+        }
+
         var selectionSet = key.Fields;
         if (selectionSet == null)
             return;

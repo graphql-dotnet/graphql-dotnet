@@ -489,4 +489,132 @@ public class KeyAnalyzerTests
 
         await VerifyCS.VerifyAnalyzerAsync(source, expectedDiagnostics);
     }
+
+    [Theory]
+    // literals
+    [InlineData(10, "\"\"")]
+    [InlineData(11, "\"  \"")]
+    [InlineData(12, "\"\\t\"")]
+    // const
+    [InlineData(13, "EmptyFieldName")]
+    [InlineData(14, "Constants.EmptyFieldName")]
+    [InlineData(15, "WhitespaceFieldName")]
+    [InlineData(16, "Constants.WhitespaceFieldName")]
+    // interpolation
+    [InlineData(17, "$\"\"")]
+    [InlineData(18, "$\"  \"")]
+    public async Task InvalidKey_NullOrEmpty_ReportsError(int idx, string keyExpression)
+    {
+        _ = idx;
+
+        string source =
+            $$"""
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                private const string EmptyFieldName = "";
+                private const string WhitespaceFieldName = "  ";
+
+                public UserGraphType()
+                {
+                    {|#0:this.Key({{keyExpression}})|};
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+            }
+
+            public class Constants
+            {
+                public const string EmptyFieldName = "";
+                public const string WhitespaceFieldName = "  ";
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.KeyMustNotBeNullOrEmpty)
+            .WithLocation(0)
+            .WithArguments("UserGraphType");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Theory]
+    [InlineData(10, "[\"\"]")]
+    [InlineData(11, "new[] { \"\" }")]
+    [InlineData(12, "new string[] { \"\" }")]
+    [InlineData(13, "[\"  \"]")]
+    [InlineData(14, "new[] { \"  \" }")]
+    [InlineData(15, "new string[] { \"  \" }")]
+    public async Task InvalidKey_EmptyInArray_ReportsError(int idx, string keyExpression)
+    {
+        _ = idx;
+
+        string source =
+            $$"""
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    {|#0:this.Key({{keyExpression}})|};
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.KeyMustNotBeNullOrEmpty)
+            .WithLocation(0)
+            .WithArguments("UserGraphType");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task InvalidKey_MultipleKeys_OneEmpty_ReportsError()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id");
+                    {|#0:this.Key("")|};
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.KeyMustNotBeNullOrEmpty)
+            .WithLocation(0)
+            .WithArguments("UserGraphType");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
 }
