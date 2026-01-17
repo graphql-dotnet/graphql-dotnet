@@ -1,4 +1,6 @@
+#if !NET8_0_OR_GREATER
 using System.Reflection;
+#endif
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Microsoft.Extensions.DependencyInjection;
