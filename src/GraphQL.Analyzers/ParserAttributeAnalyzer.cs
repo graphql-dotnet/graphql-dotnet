@@ -73,6 +73,9 @@ public class ParserAttributeAnalyzer : ParserValidatorAttributeAnalyzer
             return;
         }
 
+        // Get the IValueConverter type from the compilation
+        var valueConverterType = context.Compilation.GetTypeByMetadataName($"{Constants.GraphQL}.{Constants.Types.IValueConverter}");
+
         bool hasValidMethod = false;
         bool hasParserMethods = false;
         foreach (var method in parserType.GetMembers(parserMethodName).OfType<IMethodSymbol>())
@@ -105,7 +108,8 @@ public class ParserAttributeAnalyzer : ParserValidatorAttributeAnalyzer
             {
                 // Check for Func<object, IValueConverter, object> signature
                 if (method.Parameters[0].Type.SpecialType == SpecialType.System_Object &&
-                    IsIValueConverter(method.Parameters[1].Type))
+                    valueConverterType != null &&
+                    SymbolEqualityComparer.Default.Equals(method.Parameters[1].Type, valueConverterType))
                 {
                     hasValidMethod = true;
                     break;
@@ -135,11 +139,5 @@ public class ParserAttributeAnalyzer : ParserValidatorAttributeAnalyzer
                     parserMethodName,
                     accessor));
         }
-    }
-
-    private static bool IsIValueConverter(ITypeSymbol type)
-    {
-        // Check if the type is GraphQL.IValueConverter
-        return type.ToDisplayString() == "GraphQL.IValueConverter";
     }
 }

@@ -68,6 +68,7 @@ public static class Constants
         public const string FieldBuilder = "FieldBuilder";
         public const string FieldType = "FieldType";
         public const string GraphQLConstructorAttribute = "GraphQLConstructorAttribute";
+        public const string IValueConverter = "IValueConverter";
         public const string NonNullGraphType = "NonNullGraphType";
     }
 
