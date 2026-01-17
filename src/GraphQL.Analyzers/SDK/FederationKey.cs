@@ -309,7 +309,9 @@ public sealed class FederationKey
             var token = expression.Token;
             var literalValue = token.ValueText;
 
-            // Find the field name within the string literal using the GraphQL position hint
+            // Find the field name within the string literal; when the same field name appears multiple
+            // times in the key expression, the GraphQL position hint is used to select the occurrence
+            // whose position is closest to the specified GraphQL location.
             var fieldIndex = FindFieldInString(literalValue, fieldName, graphQLPosition);
             if (fieldIndex >= 0)
             {
