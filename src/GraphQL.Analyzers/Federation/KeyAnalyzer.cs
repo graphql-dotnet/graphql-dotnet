@@ -33,14 +33,10 @@ public class KeyAnalyzer : DiagnosticAnalyzer
     {
         var federationKeys = graphType.FederationKeys;
         if (federationKeys == null || federationKeys.Count == 0)
-        {
             return;
-        }
 
         foreach (var key in federationKeys)
-        {
             ValidateKeyFields(context, graphType, key);
-        }
     }
 
     private static void ValidateKeyFields(
@@ -50,9 +46,7 @@ public class KeyAnalyzer : DiagnosticAnalyzer
     {
         var selectionSet = key.Fields;
         if (selectionSet == null)
-        {
             return;
-        }
 
         ValidateSelectionSet(context, graphType, key, selectionSet, graphType.Name);
     }
@@ -71,13 +65,20 @@ public class KeyAnalyzer : DiagnosticAnalyzer
 
             if (graphTypeField == null)
             {
-                var fieldLocation = key.GetFieldLocation(fieldName);
+                var fieldLocation = key.GetFieldLocation(fieldName, field.Location.Start);
                 var diagnostic = Diagnostic.Create(
                     KeyFieldDoesNotExist,
                     fieldLocation,
                     fieldName,
                     typeName);
                 context.ReportDiagnostic(diagnostic);
+            }
+            else if (field.SelectionSet != null)
+            {
+                // Validate nested selection set
+                var nestedGraphType = graphTypeField.GraphType?.GetUnwrappedType();
+                if (nestedGraphType != null)
+                    ValidateSelectionSet(context, nestedGraphType, key, field.SelectionSet, nestedGraphType.Name);
             }
         }
     }

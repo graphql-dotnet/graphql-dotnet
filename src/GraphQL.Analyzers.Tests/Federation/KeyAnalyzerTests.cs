@@ -284,4 +284,209 @@ public class KeyAnalyzerTests
             .WithArguments("nonExistent", "UserGraphType");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
+
+    [Theory]
+    [InlineData(1, "\"organization { id }\"")]
+    [InlineData(2, "\"organization { id name }\"")]
+    [InlineData(3, "\"id organization { id }\"")]
+    [InlineData(4, "\"organization { id } name\"")]
+    [InlineData(5, "\"organization { id name } name\"")]
+    [InlineData(6, "\"organization { address { city } }\"")]
+    public async Task ValidKey_NestedKey_NoDiagnostics(int idx, string keyExpression)
+    {
+        _ = idx;
+
+        string source =
+            $$"""
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key({{keyExpression}});
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name");
+                    Field<NonNullGraphType<OrganizationGraphType>>("organization");
+                }
+            }
+
+            public class OrganizationGraphType : ObjectGraphType<Organization>
+            {
+                public OrganizationGraphType()
+                {
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name");
+                    Field<NonNullGraphType<AddressGraphType>>("address");
+                }
+            }
+
+            public class AddressGraphType : ObjectGraphType<Address>
+            {
+                public AddressGraphType()
+                {
+                    Field<NonNullGraphType<StringGraphType>>("city");
+                    Field<NonNullGraphType<StringGraphType>>("state");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public Organization Organization { get; set; }
+            }
+
+            public class Organization
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public Address Address { get; set; }
+            }
+
+            public class Address
+            {
+                public string City { get; set; }
+                public string State { get; set; }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Theory]
+    [InlineData(1, "\"organization { {|#0:nonExistent|} }\"", "nonExistent", "OrganizationGraphType")]
+    [InlineData(2, "\"organization { id {|#0:nonExistent|} }\"", "nonExistent", "OrganizationGraphType")]
+    [InlineData(3, "\"id organization { {|#0:nonExistent|} }\"", "nonExistent", "OrganizationGraphType")]
+    [InlineData(4, "\"{|#0:nonExistent|} { id }\"", "nonExistent", "UserGraphType")]
+    [InlineData(5, "\"organization { id {|#0:nonExistent|} name }\"", "nonExistent", "OrganizationGraphType")]
+    [InlineData(6, "\"organization { address { {|#0:nonExistent|} } }\"", "nonExistent", "AddressGraphType")]
+    public async Task InvalidKey_NestedFieldDoesNotExist_ReportsError(int idx, string keyExpression, string missingField, string typeName)
+    {
+        _ = idx;
+
+        string source =
+            $$"""
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key({{keyExpression}});
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name");
+                    Field<NonNullGraphType<OrganizationGraphType>>("organization");
+                }
+            }
+
+            public class OrganizationGraphType : ObjectGraphType<Organization>
+            {
+                public OrganizationGraphType()
+                {
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name");
+                    Field<NonNullGraphType<AddressGraphType>>("address");
+                }
+            }
+
+            public class AddressGraphType : ObjectGraphType<Address>
+            {
+                public AddressGraphType()
+                {
+                    Field<NonNullGraphType<StringGraphType>>("city");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public Organization Organization { get; set; }
+            }
+
+            public class Organization
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public Address Address { get; set; }
+            }
+
+            public class Address
+            {
+                public string City { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldDoesNotExist)
+            .WithLocation(0)
+            .WithArguments(missingField, typeName);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task InvalidKey_MultipleNestedFieldsDoNotExist_ReportsMultipleErrors()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("{|#0:nonExistent|} organization { {|#1:nonExistent|} }");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name");
+                    Field<NonNullGraphType<OrganizationGraphType>>("organization");
+                }
+            }
+
+            public class OrganizationGraphType : ObjectGraphType<Organization>
+            {
+                public OrganizationGraphType()
+                {
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public Organization Organization { get; set; }
+            }
+
+            public class Organization
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        var expectedDiagnostics = new[]
+        {
+            VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldDoesNotExist)
+                .WithLocation(0)
+                .WithArguments("nonExistent", "UserGraphType"),
+            VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldDoesNotExist)
+                .WithLocation(1)
+                .WithArguments("nonExistent", "OrganizationGraphType")
+        };
+
+        await VerifyCS.VerifyAnalyzerAsync(source, expectedDiagnostics);
+    }
 }
