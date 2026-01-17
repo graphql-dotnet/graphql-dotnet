@@ -978,12 +978,12 @@ namespace GraphQL
         public virtual GraphQL.Conversion.IListConverterFactory GetListConverterFactory(System.Type listType) { }
         public virtual void Register(System.Type valueType, System.Type targetType, System.Func<object, object>? conversion) { }
         public virtual void Register<TSource, TTarget>(System.Func<TSource, TTarget>? conversion) { }
-        protected void RegisterBasics() { }
         public virtual void RegisterListConverter<TListType, TElementType>(System.Func<System.Collections.Generic.IEnumerable<TElementType>, TListType>? conversion)
             where TListType : System.Collections.Generic.IEnumerable<TElementType> { }
         public virtual void RegisterListConverterFactory(System.Type listType, GraphQL.Conversion.IListConverterFactory? converter) { }
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(@"For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors or other members, which can cause runtime failures.")]
         public abstract void RegisterListConverterFactory(System.Type listType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type implementationType);
+        protected void RegisterScalarConversions() { }
         public abstract object ToObject(System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IInputObjectGraphType inputGraphType);
     }
     public static class ValueConverterExtensions

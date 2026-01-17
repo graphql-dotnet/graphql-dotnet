@@ -21,7 +21,7 @@ public class ValueConverter : ValueConverterBase
     [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
     public ValueConverter()
     {
-        RegisterBasics();
+        RegisterScalarConversions();
 
         // check if running under AOT
         var dynamicCodeCompiled =

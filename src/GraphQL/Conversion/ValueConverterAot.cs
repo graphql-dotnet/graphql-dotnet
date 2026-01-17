@@ -13,7 +13,7 @@ public class ValueConverterAot : ValueConverterBase
     /// </summary>
     public ValueConverterAot()
     {
-        RegisterBasics();
+        RegisterScalarConversions();
     }
 
     /// <inheritdoc/>

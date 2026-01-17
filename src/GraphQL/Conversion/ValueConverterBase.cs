@@ -30,7 +30,7 @@ public abstract class ValueConverterBase : IValueConverter
     /// <summary>
     /// Registers common built-in conversions.
     /// </summary>
-    protected void RegisterBasics()
+    protected void RegisterScalarConversions()
     {
         Register<string, sbyte>(value => sbyte.Parse(value, NumberFormatInfo.InvariantInfo));
         Register<string, byte>(value => byte.Parse(value, NumberFormatInfo.InvariantInfo));
