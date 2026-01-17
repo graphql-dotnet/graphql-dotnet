@@ -1,5 +1,7 @@
 using System.Collections;
 using GraphQL.DI;
+using GraphQL.Execution;
+using GraphQL.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -34,13 +36,33 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
         ServiceCollection = services ?? throw new ArgumentNullException(nameof(services));
         configure?.Invoke(this);
         RegisterDefaultServices();
+        _registerDefaultServices = base.RegisterDefaultServices;
     }
 
+    internal GraphQLBuilder(IServiceCollection services, Action<IGraphQLBuilder>? configure, bool skipDefaultServices)
+    {
+        ServiceCollection = services ?? throw new ArgumentNullException(nameof(services));
+        configure?.Invoke(this);
+        if (!skipDefaultServices)
+            throw new InvalidOperationException("This constructor is only for use by AotGraphQLBuilder which skips default service registration.");
+        _registerDefaultServices = () =>
+        {
+            // only basic services
+            Services.TryRegister<IDocumentExecuter, DocumentExecuter>(ServiceLifetime.Singleton);
+            Services.TryRegister<IDocumentBuilder, GraphQLDocumentBuilder>(ServiceLifetime.Singleton);
+            Services.TryRegister<IDocumentValidator, DocumentValidator>(ServiceLifetime.Singleton);
+            Services.TryRegister<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
+            Services.TryRegister<IExecutionStrategySelector, DefaultExecutionStrategySelector>(ServiceLifetime.Singleton);
+            Services.Configure<ErrorInfoProviderOptions>();
+        };
+    }
+
+    private readonly Action _registerDefaultServices;
     /// <inheritdoc/>
     protected override void RegisterDefaultServices()
     {
         ServiceCollection.AddOptions();
-        base.RegisterDefaultServices();
+        _registerDefaultServices();
     }
 
     private static MSServiceLifetime TranslateLifetime(ServiceLifetime serviceLifetime)

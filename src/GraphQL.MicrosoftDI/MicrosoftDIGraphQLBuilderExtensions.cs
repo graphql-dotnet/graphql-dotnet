@@ -25,6 +25,20 @@ public static class MicrosoftDIGraphQLBuilderExtensions
     }
 
     /// <summary>
+    /// Configures a GraphQL pipeline using the configuration delegate passed into
+    /// <paramref name="configure"/> for the specified service collection and
+    /// registers a minimal set of services required by GraphQL for AOT compatibility.
+    /// <br/><br/>
+    /// Does not include <see cref="IGraphQLSerializer"/>, and the default <see cref="IDocumentExecuter"/>
+    /// implementation does not support subscriptions.
+    /// </summary>
+    public static IServiceCollection AddGraphQLAot(this IServiceCollection services, Action<IGraphQLBuilder>? configure)
+    {
+        _ = new GraphQLAotBuilder(services, configure);
+        return services;
+    }
+
+    /// <summary>
     /// Registers <typeparamref name="TSchema"/> within the dependency injection framework. <see cref="ISchema"/> is also
     /// registered if it is not already registered within the dependency injection framework. Services required by
     /// <typeparamref name="TSchema"/> are instantiated directly if not registered within the dependency injection framework.
