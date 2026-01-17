@@ -336,7 +336,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
         // validate default value
         if (field.DefaultValue is GraphQLValue value)
         {
-            field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, value, new(), null, schema.ValueConverter).Value;
+            field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, value, schema.ValueConverter).Value;
         }
         else if (field.DefaultValue != null && !field.ResolvedType!.IsValidDefault(field.DefaultValue))
         {
@@ -460,7 +460,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
         // validate default
         if (argument.DefaultValue is GraphQLValue value)
         {
-            argument.DefaultValue = Execution.ExecutionHelper.CoerceValue(argument.ResolvedType!, value, new(), null, schema.ValueConverter).Value;
+            argument.DefaultValue = Execution.ExecutionHelper.CoerceValue(argument.ResolvedType!, value, schema.ValueConverter).Value;
         }
         else if (argument.DefaultValue != null && !argument.ResolvedType!.IsValidDefault(argument.DefaultValue))
         {
@@ -472,7 +472,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     {
         if (argument.DefaultValue is GraphQLValue value)
         {
-            argument.DefaultValue = Execution.ExecutionHelper.CoerceValue(argument.ResolvedType!, value, new(), null, valueConverter).Value;
+            argument.DefaultValue = Execution.ExecutionHelper.CoerceValue(argument.ResolvedType!, value, valueConverter).Value;
         }
         else if (argument.DefaultValue != null && !argument.ResolvedType!.IsValidDefault(argument.DefaultValue))
         {

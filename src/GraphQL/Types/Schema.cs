@@ -599,7 +599,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
                     var baseType = field.ResolvedType!.GetNamedType();
                     if (baseType is IInputObjectGraphType inputFieldType)
                         ExamineType(inputFieldType, completed, inProcess);
-                    field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, value, new(), null, ValueConverter).Value;
+                    field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, value, ValueConverter).Value;
                 }
             }
             inProcess.Pop();

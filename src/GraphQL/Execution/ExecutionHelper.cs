@@ -82,7 +82,8 @@ public static class ExecutionHelper
                 Directive = directive,
                 ParentNode = fieldOrFragmentSpread,
                 Variables = variables,
-            }, arg.DefaultValue, valueConverter);
+                ValueConverter = valueConverter,
+            }, arg.DefaultValue);
 
             if (value != null) // if value is null, it's a default value (and argValue.Source == ArgumentSource.FieldDefault)
             {
@@ -132,7 +133,16 @@ public static class ExecutionHelper
         public GraphQLDirective? Directive { get; init; }
         public GraphQLArgument? Argument { get; init; }
         public Variables? Variables { get; init; }
+        public required IValueConverter ValueConverter { get; init; }
     }
+
+    /// <summary>
+    /// Coerces a literal value to a compatible .NET type for the variable's graph type.
+    /// Typically this is a value for a field argument or default value for a variable.
+    /// Exceptions thrown by scalars are passed through.
+    /// </summary>
+    public static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, IValueConverter valueConverter, Variables? variables = null, object? fieldDefault = null)
+        => CoerceValue(type, input, new CoerceValueContext { Variables = variables, ValueConverter = valueConverter }, fieldDefault);
 
     /// <summary>
     /// Coerces a literal value to a compatible .NET type for the variable's graph type.
@@ -140,7 +150,7 @@ public static class ExecutionHelper
     /// Exceptions thrown by scalars are wrapped in <see cref="InvalidLiteralError"/>
     /// if <see cref="CoerceValueContext.Document"/> and <see cref="CoerceValueContext.ParentNode"/> are set.
     /// </summary>
-    internal static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, CoerceValueContext context, object? fieldDefault, IValueConverter valueConverter)
+    internal static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, CoerceValueContext context, object? fieldDefault)
     {
         if (type == null)
             throw new ArgumentNullException(nameof(type));
@@ -149,7 +159,7 @@ public static class ExecutionHelper
         {
             // validation rules have verified that this is not null; if the validation rule was not executed, it
             // is assumed that the caller does not wish this check to be executed
-            return CoerceValue(nonNull.ResolvedType!, input, context, fieldDefault, valueConverter);
+            return CoerceValue(nonNull.ResolvedType!, input, context, fieldDefault);
         }
 
         if (input == null)
@@ -236,12 +246,12 @@ public static class ExecutionHelper
 
                 var values = new object?[count];
                 for (int i = 0; i < count; ++i)
-                    values[i] = CoerceValue(listItemType, list.Values![i], context, null, valueConverter).Value;
+                    values[i] = CoerceValue(listItemType, list.Values![i], context, null).Value;
                 return new ArgumentValue(values, ArgumentSource.Literal);
             }
             else
             {
-                return new ArgumentValue(new[] { CoerceValue(listItemType, input, context, null, valueConverter).Value }, ArgumentSource.Literal);
+                return new ArgumentValue(new[] { CoerceValue(listItemType, input, context, null).Value }, ArgumentSource.Literal);
             }
         }
 
@@ -283,7 +293,7 @@ public static class ExecutionHelper
                     // If the variable definition does not provide a default value, the input object field definition’s
                     // default value should be used.
 
-                    var value = CoerceValue(field.ResolvedType!, objectField.Value, context, field.DefaultValue, valueConverter);
+                    var value = CoerceValue(field.ResolvedType!, objectField.Value, context, field.DefaultValue);
                     // when a optional variable is specified for the input field, and the variable is not defined, and
                     //   when there is no default value specified for the input field, then do not add the entry to the
                     //   unordered map.
@@ -295,7 +305,7 @@ public static class ExecutionHelper
                             try
                             {
                                 if (field.Parser != null)
-                                    parsedValue = field.Parser(parsedValue, valueConverter);
+                                    parsedValue = field.Parser(parsedValue, context.ValueConverter);
                                 if (parsedValue != null && field.Validator != null)
                                     field.Validator(parsedValue);
                             }
@@ -354,7 +364,7 @@ public static class ExecutionHelper
 
             try
             {
-                return new ArgumentValue(inputObjectGraphType.ParseDictionary(obj, valueConverter), ArgumentSource.Literal);
+                return new ArgumentValue(inputObjectGraphType.ParseDictionary(obj, context.ValueConverter), ArgumentSource.Literal);
             }
             catch (Exception ex) when (context.Document != null && context.ParentNode != null)
             {

@@ -233,7 +233,8 @@ public partial class ValidationContext : IProvideUserContext
                         {
                             Document = Document,
                             ParentNode = variableDef,
-                        }, null, Schema.ValueConverter).Value;
+                            ValueConverter = Schema.ValueConverter,
+                        }, null).Value;
                     }
                     catch (ValidationError ex)
                     {
