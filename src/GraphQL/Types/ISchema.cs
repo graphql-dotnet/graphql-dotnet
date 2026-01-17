@@ -2,6 +2,7 @@ using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
+using GraphQL.Resolvers;
 using GraphQL.Utilities;
 
 namespace GraphQL.Types;
@@ -171,4 +172,10 @@ public interface ISchema : IMetadataReader, IMetadataWriter, IProvideDescription
     /// to all fields to populate the accessor.
     /// </summary>
     public IResolveFieldContextAccessor? ResolveFieldContextAccessor { get; set; }
+
+    /// <summary>
+    /// Gets or sets the default field resolver to use when a field does not have a resolver explicitly set.
+    /// Typically defaults to <see cref="NameFieldResolver.Instance"/>.
+    /// </summary>
+    public IFieldResolver? DefaultFieldResolver { get; set; }
 }

@@ -28,7 +28,9 @@ internal sealed class FieldMiddlewareVisitor : BaseSchemaNodeVisitor
         var middlewareTransform = field.Middleware;
         if (middlewareTransform != null)
         {
-            var inner = field.Resolver ?? (field.StreamResolver == null ? NameFieldResolver.Instance : SourceFieldResolver.Instance);
+            var inner = field.Resolver ?? (field.StreamResolver == null
+                ? (schema.DefaultFieldResolver ?? throw new InvalidOperationException($"Schema.DefaultFieldResolver is null for field '{field.Name}' on type '{type.Name}'."))
+                : SourceFieldResolver.Instance);
 
             // Apply the middleware transform to wrap the resolver
             FieldMiddlewareDelegate wrappedDelegate = middlewareTransform(_serviceProvider, inner.ResolveAsync);
