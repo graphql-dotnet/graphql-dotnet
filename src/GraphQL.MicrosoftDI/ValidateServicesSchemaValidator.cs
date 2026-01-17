@@ -1,4 +1,6 @@
+#if !NET8_0_OR_GREATER
 using System.Reflection;
+#endif
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -56,6 +58,12 @@ internal sealed class ValidateServicesSchemaValidator : BaseSchemaNodeVisitor
     /// </summary>
     internal static ValidateServicesSchemaValidator? TryCreate(IServiceProvider serviceProvider)
     {
+#if NET8_0_OR_GREATER
+        var isServiceProvider = serviceProvider.GetService<IServiceProviderIsService>();
+        if (isServiceProvider == null)
+            return null;
+        return new ValidateServicesSchemaValidator(isServiceProvider.IsService);
+#else
         try
         {
             var diProvider = serviceProvider.GetService<IServiceProvider>();
@@ -86,5 +94,6 @@ internal sealed class ValidateServicesSchemaValidator : BaseSchemaNodeVisitor
         {
             return null;
         }
+#endif
     }
 }
