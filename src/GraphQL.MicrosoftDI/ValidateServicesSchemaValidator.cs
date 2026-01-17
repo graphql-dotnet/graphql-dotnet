@@ -16,7 +16,7 @@ internal sealed class ValidateServicesSchemaValidator : BaseSchemaNodeVisitor
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidateServicesSchemaValidator"/> class.
     /// </summary>
-    internal ValidateServicesSchemaValidator(Func<Type, bool> isValidService)
+    private ValidateServicesSchemaValidator(Func<Type, bool> isValidService)
     {
         _isValidService = isValidService;
     }
