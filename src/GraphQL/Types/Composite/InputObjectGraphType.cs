@@ -46,7 +46,6 @@ public class InputObjectGraphType : InputObjectGraphType<object>
 public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TSourceType> : ComplexGraphType<TSourceType>, IInputObjectGraphType
 {
     private Func<IDictionary<string, object?>, IValueConverter, object>? _parseDictionary;
-    private ISchema? _schema;
 
     /// <summary>
     /// Initializes a new instance.
@@ -75,7 +74,6 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
     public override void Initialize(ISchema schema)
     {
         base.Initialize(schema);
-        _schema = schema;
 
         if (_parseDictionary == null) // when typeof(TSourceType) != typeof(object)
         {
