@@ -30,7 +30,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
         public INameConverter NameConverter => _schema.NameConverter;
 
-        public IValueConverter ValueConverter => _schema.ValueConverter;
+        public ValueConverterBase ValueConverter => _schema.ValueConverter;
 
         public IFieldMiddlewareBuilder FieldMiddleware => _schema.FieldMiddleware;
 
@@ -174,7 +174,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     /// <summary>
     /// Value converter for converting between different types; provides type conversions used throughout the schema.
     /// </summary>
-    public ValueConverter ValueConverter { get; set; } = new ValueConverter();
+    public ValueConverterBase ValueConverter { get; set; } = new ValueConverter();
 
     /// <inheritdoc/>
     public IFieldMiddlewareBuilder FieldMiddleware { get; internal set; } = new FieldMiddlewareBuilder();

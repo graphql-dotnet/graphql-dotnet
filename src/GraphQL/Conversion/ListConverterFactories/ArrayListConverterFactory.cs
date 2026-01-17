@@ -18,9 +18,7 @@ internal sealed class ArrayListConverterFactory : IListConverterFactory
     public static ArrayListConverterFactory Instance { get; } = new();
 
     [UnconditionalSuppressMessage("Trimming", "IL2072:Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.")]
-    public IListConverter Create(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
-        Type listType)
+    public IListConverter Create(Type listType)
     {
         if (listType == typeof(object[]))
         {

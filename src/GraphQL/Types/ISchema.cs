@@ -40,7 +40,7 @@ public interface ISchema : IMetadataReader, IMetadataWriter, IProvideDescription
     /// <summary>
     /// Value converter for converting between different types; provides type conversions used throughout the schema.
     /// </summary>
-    public ValueConverter ValueConverter { get; }
+    public ValueConverterBase ValueConverter { get; }
 
     /// <summary>
     /// Note that field middlewares from this property apply only to an uninitialized schema. If the schema is initialized

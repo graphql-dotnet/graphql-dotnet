@@ -955,15 +955,14 @@ namespace GraphQL
         [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
             " access otherwise can break functionality when trimming application code")]
         public ValueConverter() { }
-        public GraphQL.Conversion.IListConverterFactory? DefaultListConverterFactory { get; set; }
-        public override System.Func<object, object>? GetConversion(System.Type valueType, System.Type targetType) { }
-        public override GraphQL.Conversion.IListConverter GetListConverter(System.Type listType) { }
-        public override GraphQL.Conversion.IListConverterFactory GetListConverterFactory(System.Type listType) { }
-        public override void Register(System.Type valueType, System.Type targetType, System.Func<object, object>? conversion) { }
-        public override void Register<TSource, TTarget>(System.Func<TSource, TTarget>? conversion) { }
-        public override void RegisterListConverter<TListType, TElementType>(System.Func<System.Collections.Generic.IEnumerable<TElementType>, TListType>? conversion)
-            where TListType : System.Collections.Generic.IEnumerable<TElementType> { }
-        public override void RegisterListConverterFactory(System.Type listType, GraphQL.Conversion.IListConverterFactory? converter) { }
+        protected override GraphQL.Conversion.IListConverterFactory? GetDefaultListConverterFactory() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(@"For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors or other members, which can cause runtime failures.")]
+        public override void RegisterListConverterFactory(System.Type listType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type implementationType) { }
+        public override object ToObject(System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IInputObjectGraphType inputGraphType) { }
+    }
+    public class ValueConverterAot : GraphQL.ValueConverterBase
+    {
+        public ValueConverterAot() { }
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(@"For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors or other members, which can cause runtime failures.")]
         public override void RegisterListConverterFactory(System.Type listType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type implementationType) { }
         public override object ToObject(System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IInputObjectGraphType inputGraphType) { }
@@ -971,14 +970,18 @@ namespace GraphQL
     public abstract class ValueConverterBase : GraphQL.IValueConverter
     {
         protected ValueConverterBase() { }
-        public abstract System.Func<object, object>? GetConversion(System.Type valueType, System.Type targetType);
-        public abstract GraphQL.Conversion.IListConverter GetListConverter(System.Type listType);
-        public abstract GraphQL.Conversion.IListConverterFactory GetListConverterFactory(System.Type listType);
-        public abstract void Register(System.Type valueType, System.Type targetType, System.Func<object, object>? conversion);
-        public abstract void Register<TSource, TTarget>(System.Func<TSource, TTarget>? conversion);
-        public abstract void RegisterListConverter<TListType, TElementType>(System.Func<System.Collections.Generic.IEnumerable<TElementType>, TListType>? conversion)
-            where TListType : System.Collections.Generic.IEnumerable<TElementType>;
-        public abstract void RegisterListConverterFactory(System.Type listType, GraphQL.Conversion.IListConverterFactory? converter);
+        protected System.Collections.Generic.Dictionary<System.Type, GraphQL.Conversion.IListConverterFactory> ListConverterFactories { get; }
+        protected System.Collections.Generic.Dictionary<System.ValueTuple<System.Type, System.Type>, System.Func<object, object>> ValueConversions { get; }
+        public virtual System.Func<object, object>? GetConversion(System.Type valueType, System.Type targetType) { }
+        protected virtual GraphQL.Conversion.IListConverterFactory? GetDefaultListConverterFactory() { }
+        public GraphQL.Conversion.IListConverter GetListConverter(System.Type listType) { }
+        public virtual GraphQL.Conversion.IListConverterFactory GetListConverterFactory(System.Type listType) { }
+        public virtual void Register(System.Type valueType, System.Type targetType, System.Func<object, object>? conversion) { }
+        public virtual void Register<TSource, TTarget>(System.Func<TSource, TTarget>? conversion) { }
+        protected void RegisterBasics() { }
+        public virtual void RegisterListConverter<TListType, TElementType>(System.Func<System.Collections.Generic.IEnumerable<TElementType>, TListType>? conversion)
+            where TListType : System.Collections.Generic.IEnumerable<TElementType> { }
+        public virtual void RegisterListConverterFactory(System.Type listType, GraphQL.Conversion.IListConverterFactory? converter) { }
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(@"For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors or other members, which can cause runtime failures.")]
         public abstract void RegisterListConverterFactory(System.Type listType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type implementationType);
         public abstract object ToObject(System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IInputObjectGraphType inputGraphType);
@@ -2782,7 +2785,7 @@ namespace GraphQL.Types
         System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeMappings { get; }
         GraphQL.Types.FieldType TypeMetaFieldType { get; }
         GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
-        GraphQL.ValueConverter ValueConverter { get; }
+        GraphQL.ValueConverterBase ValueConverter { get; }
         void Initialize();
         void RegisterType(GraphQL.Types.IGraphType type);
         void RegisterType([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type);
@@ -3038,7 +3041,7 @@ namespace GraphQL.Types
         public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeMappings { get; }
         public GraphQL.Types.FieldType TypeMetaFieldType { get; }
         public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
-        public GraphQL.ValueConverter ValueConverter { get; set; }
+        public GraphQL.ValueConverterBase ValueConverter { get; set; }
         protected virtual void CoerceInputTypeDefaultValues() { }
         protected virtual GraphQL.Types.SchemaTypesBase CreateSchemaTypes() { }
         public void Dispose() { }
