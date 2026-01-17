@@ -150,7 +150,7 @@ public static class ExecutionHelper
     /// Exceptions thrown by scalars are wrapped in <see cref="InvalidLiteralError"/>
     /// if <see cref="CoerceValueContext.Document"/> and <see cref="CoerceValueContext.ParentNode"/> are set.
     /// </summary>
-    internal static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, CoerceValueContext context, object? fieldDefault)
+    internal static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, CoerceValueContext context, object? fieldDefault = null)
     {
         if (type == null)
             throw new ArgumentNullException(nameof(type));
@@ -246,12 +246,12 @@ public static class ExecutionHelper
 
                 var values = new object?[count];
                 for (int i = 0; i < count; ++i)
-                    values[i] = CoerceValue(listItemType, list.Values![i], context, null).Value;
+                    values[i] = CoerceValue(listItemType, list.Values![i], context).Value;
                 return new ArgumentValue(values, ArgumentSource.Literal);
             }
             else
             {
-                return new ArgumentValue(new[] { CoerceValue(listItemType, input, context, null).Value }, ArgumentSource.Literal);
+                return new ArgumentValue(new[] { CoerceValue(listItemType, input, context).Value }, ArgumentSource.Literal);
             }
         }
 
