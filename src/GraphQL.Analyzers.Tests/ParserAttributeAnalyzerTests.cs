@@ -22,6 +22,8 @@ public class ParserAttributeAnalyzerTests
     [InlineData(7, "[Parser(NestingType.Constants.ParserName)]")]
     [InlineData(8, "[Parser(typeof(ParserClass))]")]
     [InlineData(9, "[Parser(typeof(ParserClass), nameof(ParserClass.ParseValue))]")]
+    [InlineData(10, "[Parser(typeof(ParserClass), nameof(ParserClass.ParseWithConverter))]")]
+    [InlineData(11, "[Parser(nameof(PrivateParserWithConverter))]")]
     public async Task ValidParserMethods_NoDiagnostics(int idx, string attribute)
     {
         _ = idx;
@@ -40,6 +42,7 @@ public class ParserAttributeAnalyzerTests
                   public string Hello { get; set; }
 
                   private static object PrivateParser(object value) => value;
+                  private static object PrivateParserWithConverter(object value, IValueConverter converter) => value;
               }
 
               public class Constants
@@ -60,6 +63,7 @@ public class ParserAttributeAnalyzerTests
                   public static object Parse(object value) => value;
                   public static object ParseValue(object value) => value;
                   public static object ParseValue(string value) => value; // invalid overload
+                  public static object ParseWithConverter(object value, IValueConverter converter) => value;
               }
               """;
 
@@ -72,6 +76,9 @@ public class ParserAttributeAnalyzerTests
     [InlineData(3, "Parse3")]
     [InlineData(4, "Parse4")]
     [InlineData(5, "Parse5")]
+    [InlineData(6, "Parse6")]
+    [InlineData(7, "Parse7")]
+    [InlineData(8, "Parse8")]
     public async Task NoType_InvalidParserMethodSignature_GQL018(int idx, string methodName)
     {
         _ = idx;
@@ -89,8 +96,11 @@ public class ParserAttributeAnalyzerTests
                   private object Parse1(object value) => value; // not static
                   private static string Parse2(object value) => "value"; // wrong return type
                   private static object Parse3(string value) => value; // wrong parameter type
-                  private static object Parse4(object value1, object value2) => value1; // too many parameters
+                  private static object Parse4(object value1, object value2) => value1; // wrong second parameter type
                   private static object Parse5() => "value"; // no parameters
+                  private static object Parse6(object value, string converter) => value; // wrong second parameter type
+                  private static object Parse7(string value, IValueConverter converter) => value; // wrong first parameter type
+                  private static object Parse8(object value, IValueConverter converter, object extra) => value; // too many parameters
               }
               """;
 
