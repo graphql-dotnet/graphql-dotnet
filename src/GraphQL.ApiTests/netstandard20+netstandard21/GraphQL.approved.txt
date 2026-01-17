@@ -905,7 +905,7 @@ namespace GraphQL
     public class ValueConverter : GraphQL.ValueConverterBase
     {
         public ValueConverter() { }
-        protected override GraphQL.Conversion.IListConverterFactory? GetDefaultListConverterFactory() { }
+        protected override GraphQL.Conversion.IListConverterFactory? DefaultListConverterFactory { get; }
         public override void RegisterListConverterFactory(System.Type listType, System.Type implementationType) { }
         public override object ToObject(System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IInputObjectGraphType inputGraphType) { }
     }
@@ -918,10 +918,10 @@ namespace GraphQL
     public abstract class ValueConverterBase : GraphQL.IValueConverter
     {
         protected ValueConverterBase() { }
+        protected virtual GraphQL.Conversion.IListConverterFactory? DefaultListConverterFactory { get; }
         protected System.Collections.Generic.Dictionary<System.Type, GraphQL.Conversion.IListConverterFactory> ListConverterFactories { get; }
         protected System.Collections.Generic.Dictionary<System.ValueTuple<System.Type, System.Type>, System.Func<object, object>> ValueConversions { get; }
         public virtual System.Func<object, object>? GetConversion(System.Type valueType, System.Type targetType) { }
-        protected virtual GraphQL.Conversion.IListConverterFactory? GetDefaultListConverterFactory() { }
         public GraphQL.Conversion.IListConverter GetListConverter(System.Type listType) { }
         public virtual GraphQL.Conversion.IListConverterFactory GetListConverterFactory(System.Type listType) { }
         public virtual void Register(System.Type valueType, System.Type targetType, System.Func<object, object>? conversion) { }

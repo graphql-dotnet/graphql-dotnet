@@ -181,7 +181,7 @@ public abstract class ValueConverterBase : IValueConverter
             || !ListConverterFactories.TryGetValue(listType.GetGenericTypeDefinition(), out converter)))
         {
             // then use the default list converter factory
-            converter = GetDefaultListConverterFactory();
+            converter = DefaultListConverterFactory;
         }
 
         // but if the default list converter factory is not set, throw an exception
@@ -194,7 +194,7 @@ public abstract class ValueConverterBase : IValueConverter
     /// Returns <see langword="null"/> by default, which will cause an exception to be thrown
     /// when attempting to convert a list type that is not explicitly registered.
     /// </summary>
-    protected virtual IListConverterFactory? GetDefaultListConverterFactory() => null;
+    protected virtual IListConverterFactory? DefaultListConverterFactory => null;
 
     /// <summary>
     /// Allows you to register your own conversion delegate from one type to another.

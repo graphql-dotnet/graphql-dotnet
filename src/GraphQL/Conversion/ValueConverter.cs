@@ -92,7 +92,7 @@ public class ValueConverter : ValueConverterBase
     }
 
     /// <inheritdoc/>
-    protected override IListConverterFactory? GetDefaultListConverterFactory() => CustomListConverterFactory.DefaultInstance;
+    protected override IListConverterFactory? DefaultListConverterFactory => CustomListConverterFactory.DefaultInstance;
 
     /// <inheritdoc/>
     public override object ToObject(IDictionary<string, object?> source, Type type, IInputObjectGraphType inputGraphType)
