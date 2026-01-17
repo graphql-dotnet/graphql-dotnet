@@ -25,4 +25,5 @@ public static class DiagnosticIds
     public const string NULLABLE_REFERENCE_TYPE_ARGUMENT_SHOULD_SPECIFY_NULLABLE = "GQL021";
 
     public const string KEY_FIELD_DOES_NOT_EXIST = "GQLFED001";
+    public const string KEY_MUST_NOT_BE_NULL_OR_EMPTY = "GQLFED002";
 }

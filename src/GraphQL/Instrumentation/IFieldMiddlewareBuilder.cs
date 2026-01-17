@@ -8,7 +8,7 @@ namespace GraphQL.Instrumentation;
 public interface IFieldMiddlewareBuilder
 {
     /// <summary>
-    /// Adds the specified delegate to the list of delegates that will be applied to all field resolvers when invoking <see cref="SchemaTypesExtensions.ApplyMiddleware(SchemaTypesBase, IFieldMiddlewareBuilder)"/>.
+    /// Adds the specified delegate to the list of delegates that will be applied to all field resolvers when invoking <see cref="SchemaTypesExtensions.ApplyMiddleware(SchemaTypesBase, IFieldMiddlewareBuilder, ISchema)"/>.
     /// <br/><br/>
     /// The delegate is used to unify the different ways of specifying middleware. See additional methods in <see cref="FieldMiddlewareBuilderExtensions"/>.
     /// </summary>

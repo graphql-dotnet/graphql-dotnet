@@ -19,8 +19,17 @@ public class KeyAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.KEY_FIELD_DOES_NOT_EXIST);
 
+    public static readonly DiagnosticDescriptor KeyMustNotBeNullOrEmpty = new(
+        id: DiagnosticIds.KEY_MUST_NOT_BE_NULL_OR_EMPTY,
+        title: "Key must not be null or empty",
+        messageFormat: "Key must not be null or empty on type '{0}'",
+        category: DiagnosticCategories.FEDERATION,
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        helpLinkUri: HelpLinks.KEY_MUST_NOT_BE_NULL_OR_EMPTY);
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(KeyFieldDoesNotExist);
+        ImmutableArray.Create(KeyFieldDoesNotExist, KeyMustNotBeNullOrEmpty);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -33,14 +42,10 @@ public class KeyAnalyzer : DiagnosticAnalyzer
     {
         var federationKeys = graphType.FederationKeys;
         if (federationKeys == null || federationKeys.Count == 0)
-        {
             return;
-        }
 
         foreach (var key in federationKeys)
-        {
             ValidateKeyFields(context, graphType, key);
-        }
     }
 
     private static void ValidateKeyFields(
@@ -48,11 +53,20 @@ public class KeyAnalyzer : DiagnosticAnalyzer
         GraphQLGraphType graphType,
         FederationKey key)
     {
-        var selectionSet = key.Fields;
-        if (selectionSet == null)
+        // Check if the key is empty or whitespace
+        if (string.IsNullOrWhiteSpace(key.FieldsString))
         {
+            var diagnostic = Diagnostic.Create(
+                KeyMustNotBeNullOrEmpty,
+                key.Location,
+                graphType.Name);
+            context.ReportDiagnostic(diagnostic);
             return;
         }
+
+        var selectionSet = key.Fields;
+        if (selectionSet == null)
+            return;
 
         ValidateSelectionSet(context, graphType, key, selectionSet, graphType.Name);
     }
@@ -71,13 +85,20 @@ public class KeyAnalyzer : DiagnosticAnalyzer
 
             if (graphTypeField == null)
             {
-                var fieldLocation = key.GetFieldLocation(fieldName);
+                var fieldLocation = key.GetFieldLocation(fieldName, field.Location.Start);
                 var diagnostic = Diagnostic.Create(
                     KeyFieldDoesNotExist,
                     fieldLocation,
                     fieldName,
                     typeName);
                 context.ReportDiagnostic(diagnostic);
+            }
+            else if (field.SelectionSet != null)
+            {
+                // Validate nested selection set
+                var nestedGraphType = graphTypeField.GraphType?.GetUnwrappedType();
+                if (nestedGraphType != null)
+                    ValidateSelectionSet(context, nestedGraphType, key, field.SelectionSet, nestedGraphType.Name);
             }
         }
     }

@@ -892,8 +892,8 @@ namespace GraphQL
     }
     public static class SchemaTypesExtensions
     {
-        public static void ApplyMiddleware(this GraphQL.Types.SchemaTypesBase schemaTypes, GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
-        public static void ApplyMiddleware(this GraphQL.Types.SchemaTypesBase schemaTypes, System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
+        public static void ApplyMiddleware(this GraphQL.Types.SchemaTypesBase schemaTypes, GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder, GraphQL.Types.ISchema schema) { }
+        public static void ApplyMiddleware(this GraphQL.Types.SchemaTypesBase schemaTypes, System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform, GraphQL.Types.ISchema schema) { }
     }
     public static class StringExtensions
     {
@@ -2188,13 +2188,15 @@ namespace GraphQL.Resolvers
         protected virtual System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<object?>> BuildFieldResolver(System.Linq.Expressions.ParameterExpression resolveFieldContextParameter, System.Linq.Expressions.Expression bodyExpression) { }
         public virtual System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context) { }
     }
-    public class NameFieldResolver : GraphQL.Resolvers.IFieldResolver
+    public class NameFieldResolver : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IRequiresResolveFieldContextAccessor
     {
+        public bool RequiresResolveFieldContextAccessor { get; }
         public static GraphQL.Resolvers.NameFieldResolver Instance { get; }
         public System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context) { }
     }
-    public sealed class SourceFieldResolver : GraphQL.Resolvers.IFieldResolver
+    public sealed class SourceFieldResolver : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IRequiresResolveFieldContextAccessor
     {
+        public bool RequiresResolveFieldContextAccessor { get; }
         public static GraphQL.Resolvers.SourceFieldResolver Instance { get; }
         public System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context) { }
     }
@@ -2768,6 +2770,7 @@ namespace GraphQL.Types
                 "graphType"})]
         System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> BuiltInTypeMappings { get; }
         GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
+        GraphQL.Resolvers.IFieldResolver? DefaultFieldResolver { get; set; }
         GraphQL.Types.SchemaDirectives Directives { get; }
         GraphQL.ExperimentalFeatures Features { get; set; }
         GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; }
@@ -3023,6 +3026,7 @@ namespace GraphQL.Types
                 "graphType"})]
         public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> BuiltInTypeMappings { get; }
         public GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
+        public GraphQL.Resolvers.IFieldResolver? DefaultFieldResolver { get; set; }
         public string? Description { get; set; }
         public GraphQL.Types.SchemaDirectives Directives { get; }
         public GraphQL.ExperimentalFeatures Features { get; set; }

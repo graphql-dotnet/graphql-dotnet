@@ -13,7 +13,7 @@ namespace GraphQL.Resolvers;
 /// Call <see cref="Instance"/> to retrieve an instance of this class.
 /// </para>
 /// </summary>
-public class NameFieldResolver : IFieldResolver
+public class NameFieldResolver : IFieldResolver, IRequiresResolveFieldContextAccessor
 {
     private static readonly ConcurrentDictionary<(Type targetType, string name), IFieldResolver> _resolvers = new();
 
@@ -23,6 +23,9 @@ public class NameFieldResolver : IFieldResolver
     /// Returns the static instance of the <see cref="NameFieldResolver"/> class.
     /// </summary>
     public static NameFieldResolver Instance { get; } = new();
+
+    /// <inheritdoc/>
+    public bool RequiresResolveFieldContextAccessor => false;
 
     /// <inheritdoc/>
     public ValueTask<object?> ResolveAsync(IResolveFieldContext context) => Resolve(context, context.FieldDefinition.Name);

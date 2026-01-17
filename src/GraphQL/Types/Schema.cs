@@ -5,6 +5,7 @@ using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
+using GraphQL.Resolvers;
 using GraphQL.Utilities;
 using GraphQL.Utilities.Visitors;
 using GraphQLParser.AST;
@@ -181,6 +182,9 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
     /// <inheritdoc/>
     public IResolveFieldContextAccessor? ResolveFieldContextAccessor { get; set; }
+
+    /// <inheritdoc/>
+    public IFieldResolver? DefaultFieldResolver { get; set; } = NameFieldResolver.Instance;
 
     /// <inheritdoc/>
     public bool Initialized { get; private set; }
@@ -490,7 +494,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
             new FieldMiddlewareVisitor(_services).Run(this);
 
             // Apply schema-wide middleware
-            _allTypes.ApplyMiddleware(FieldMiddleware);
+            _allTypes.ApplyMiddleware(FieldMiddleware, this);
 
             foreach (var visitor in GetVisitors())
                 visitor.Run(this);
