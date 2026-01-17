@@ -3,7 +3,7 @@ namespace GraphQL.Resolvers;
 /// <summary>
 /// Returns value of <see cref="IResolveFieldContext.Source"/>.
 /// </summary>
-public sealed class SourceFieldResolver : IFieldResolver
+public sealed class SourceFieldResolver : IFieldResolver, IRequiresResolveFieldContextAccessor
 {
     private SourceFieldResolver() { }
 
@@ -11,6 +11,9 @@ public sealed class SourceFieldResolver : IFieldResolver
     /// Returns the static instance of the <see cref="SourceFieldResolver"/> class.
     /// </summary>
     public static SourceFieldResolver Instance { get; } = new();
+
+    /// <inheritdoc/>
+    public bool RequiresResolveFieldContextAccessor => false;
 
     /// <inheritdoc/>
     public ValueTask<object?> ResolveAsync(IResolveFieldContext context) => new(context.Source);

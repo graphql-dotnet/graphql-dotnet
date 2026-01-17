@@ -317,3 +317,7 @@ These providers are automatically prepended to the list of custom mapping provid
 Most users will not need to make any changes, as the schema initialization process automatically includes these providers. However, if you have custom schema initialization logic or override `CreateSchemaTypes()`, be aware that the built-in providers are now prepended automatically via the `PrependBuiltInProviders` method.
 
 Please note that since the built-in providers are prepended to the list of custom providers, custom mapping providers will receive the suggested mapping from the built-in providers in the `preferredType` parameter of their `GetGraphTypeFromClrType` method. If your custom provider should override built-in mappings, ensure it ignores the `preferredType` parameter for those specific CLR types. Otherwise, return `preferredType` if it's not null to respect the built-in mappings. If you are using the `LegacySchemaTypes` class as described above, it will continue to function as it did in v8 with no changes to your mapping providers.
+
+### 16. `ISchema.DefaultFieldResolver` property and `SchemaTypesExtensions.ApplyMiddleware` parameter added
+
+The `DefaultFieldResolver` property has been added to `ISchema` and `Schema`, which defaults to `NameFieldResolver.Instance`. The `ApplyMiddleware` extension methods on `SchemaTypesBase` now require an `ISchema` parameter. Custom implementations of `ISchema` must implement the new property, and any direct calls to `ApplyMiddleware` must include the schema parameter.
