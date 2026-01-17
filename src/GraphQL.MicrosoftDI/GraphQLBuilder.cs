@@ -35,8 +35,8 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
     {
         ServiceCollection = services ?? throw new ArgumentNullException(nameof(services));
         configure?.Invoke(this);
-        RegisterDefaultServices();
         _registerDefaultServices = base.RegisterDefaultServices;
+        RegisterDefaultServices();
     }
 
     internal GraphQLBuilder(IServiceCollection services, Action<IGraphQLBuilder>? configure, bool skipDefaultServices)
@@ -55,6 +55,7 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
             Services.TryRegister<IExecutionStrategySelector, DefaultExecutionStrategySelector>(ServiceLifetime.Singleton);
             Services.Configure<ErrorInfoProviderOptions>();
         };
+        RegisterDefaultServices();
     }
 
     private readonly Action _registerDefaultServices;
