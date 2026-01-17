@@ -137,14 +137,6 @@ public static class ExecutionHelper
     /// <summary>
     /// Coerces a literal value to a compatible .NET type for the variable's graph type.
     /// Typically this is a value for a field argument or default value for a variable.
-    /// Exceptions thrown by scalars are passed through.
-    /// </summary>
-    public static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, Variables? variables = null, object? fieldDefault = null)
-        => CoerceValue(type, input, new CoerceValueContext { Variables = variables }, fieldDefault, new ValueConverter());
-
-    /// <summary>
-    /// Coerces a literal value to a compatible .NET type for the variable's graph type.
-    /// Typically this is a value for a field argument or default value for a variable.
     /// Exceptions thrown by scalars are wrapped in <see cref="InvalidLiteralError"/>
     /// if <see cref="CoerceValueContext.Document"/> and <see cref="CoerceValueContext.ParentNode"/> are set.
     /// </summary>

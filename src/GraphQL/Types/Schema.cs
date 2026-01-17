@@ -585,7 +585,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
                 ExamineType(inputType, completed, inProcess);
         }
 
-        static void ExamineType(IInputObjectGraphType inputType, HashSet<IInputObjectGraphType> completed, Stack<IInputObjectGraphType> inProcess)
+        void ExamineType(IInputObjectGraphType inputType, HashSet<IInputObjectGraphType> completed, Stack<IInputObjectGraphType> inProcess)
         {
             if (completed.Contains(inputType))
                 return;
@@ -599,7 +599,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
                     var baseType = field.ResolvedType!.GetNamedType();
                     if (baseType is IInputObjectGraphType inputFieldType)
                         ExamineType(inputFieldType, completed, inProcess);
-                    field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, value).Value;
+                    field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, value, new(), null, ValueConverter).Value;
                 }
             }
             inProcess.Pop();
