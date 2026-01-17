@@ -16,7 +16,7 @@ internal sealed class ValidateServicesSchemaValidator : BaseSchemaNodeVisitor
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidateServicesSchemaValidator"/> class.
     /// </summary>
-    private ValidateServicesSchemaValidator(Func<Type, bool> isValidService)
+    internal ValidateServicesSchemaValidator(Func<Type, bool> isValidService)
     {
         _isValidService = isValidService;
     }
@@ -56,6 +56,12 @@ internal sealed class ValidateServicesSchemaValidator : BaseSchemaNodeVisitor
     /// </summary>
     internal static ValidateServicesSchemaValidator? TryCreate(IServiceProvider serviceProvider)
     {
+#if NET8_0_OR_GREATER
+        var isServiceProvider = serviceProvider.GetService<IServiceProviderIsService>();
+        if (isServiceProvider == null)
+            return null;
+        return new ValidateServicesSchemaValidator(isServiceProvider.IsService);
+#else
         try
         {
             var diProvider = serviceProvider.GetService<IServiceProvider>();
@@ -86,5 +92,6 @@ internal sealed class ValidateServicesSchemaValidator : BaseSchemaNodeVisitor
         {
             return null;
         }
+#endif
     }
 }
