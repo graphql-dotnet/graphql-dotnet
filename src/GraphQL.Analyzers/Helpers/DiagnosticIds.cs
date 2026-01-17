@@ -26,4 +26,5 @@ public static class DiagnosticIds
 
     public const string KEY_FIELD_DOES_NOT_EXIST = "GQLFED001";
     public const string KEY_MUST_NOT_BE_NULL_OR_EMPTY = "GQLFED002";
+    public const string DUPLICATE_KEY = "GQLFED003";
 }

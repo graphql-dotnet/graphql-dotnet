@@ -26,4 +26,5 @@ public static class HelpLinks
 
     public const string KEY_FIELD_DOES_NOT_EXIST = $"{DOCS_URL}/gqlfed001";
     public const string KEY_MUST_NOT_BE_NULL_OR_EMPTY = $"{DOCS_URL}/gqlfed002";
+    public const string DUPLICATE_KEY = $"{DOCS_URL}/gqlfed003";
 }
