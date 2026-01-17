@@ -127,10 +127,10 @@ public class KeyAnalyzer : DiagnosticAnalyzer
             if (string.IsNullOrWhiteSpace(key.FieldsString))
                 continue;
 
-            if(key.Fields == null)
+            if (key.Fields == null)
                 continue;
 
-            var normalizedKey = NormalizeSelectionSet(key.Fields!);
+            var normalizedKey = NormalizeSelectionSet(key.Fields);
             if (!normalizedKeys.TryGetValue(normalizedKey, out var duplicates))
             {
                 duplicates = [];
@@ -140,9 +140,8 @@ public class KeyAnalyzer : DiagnosticAnalyzer
             duplicates.Add(key);
         }
 
-        foreach (var kvp in normalizedKeys)
+        foreach (var duplicates in normalizedKeys.Values)
         {
-            var duplicates = kvp.Value;
             if (duplicates.Count <= 1)
                 continue;
 
