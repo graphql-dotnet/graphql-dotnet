@@ -18,6 +18,7 @@ public class ToObjectBenchmark : IBenchmark
     private Dictionary<string, object?> _companyData = null!;
     private Dictionary<string, object?> _employeeData = null!;
     private Dictionary<string, object?> _salaryData = null!;
+    private IValueConverter _valueConverter = null!;
 
     [GlobalSetup]
     public void GlobalSetup()
@@ -29,6 +30,7 @@ public class ToObjectBenchmark : IBenchmark
         var provider = services.BuildServiceProvider();
         var schema = provider.GetRequiredService<ISchema>();
         schema.Initialize();
+        _valueConverter = schema.ValueConverter;
         _personType = (IInputObjectGraphType)schema.AllTypes[nameof(Person)]!;
         _companyType = (IInputObjectGraphType)schema.AllTypes[nameof(Company)]!;
         _employeeType = (IInputObjectGraphType)schema.AllTypes[nameof(Employee)]!;
@@ -91,49 +93,49 @@ public class ToObjectBenchmark : IBenchmark
     [Benchmark]
     public void Person_Populated()
     {
-        _ = (Person)_personType.ParseDictionary(_personData);
+        _ = (Person)_personType.ParseDictionary(_personData, _valueConverter);
     }
 
     [Benchmark]
     public void Person_Undefined()
     {
-        _ = (Person)_personType.ParseDictionary(_noData);
+        _ = (Person)_personType.ParseDictionary(_noData, _valueConverter);
     }
 
     [Benchmark]
     public void Company_Populated()
     {
-        _ = (Company)_companyType.ParseDictionary(_companyData);
+        _ = (Company)_companyType.ParseDictionary(_companyData, _valueConverter);
     }
 
     [Benchmark]
     public void Company_Undefined()
     {
-        _ = (Company)_companyType.ParseDictionary(_noData);
+        _ = (Company)_companyType.ParseDictionary(_noData, _valueConverter);
     }
 
     [Benchmark]
     public void Employee_Populated()
     {
-        _ = (Employee)_employeeType.ParseDictionary(_employeeData);
+        _ = (Employee)_employeeType.ParseDictionary(_employeeData, _valueConverter);
     }
 
     [Benchmark]
     public void Employee_Undefined()
     {
-        _ = (Employee)_employeeType.ParseDictionary(_noData);
+        _ = (Employee)_employeeType.ParseDictionary(_noData, _valueConverter);
     }
 
     [Benchmark]
     public void Salary_Populated()
     {
-        _ = (SalaryInfo)_salaryType.ParseDictionary(_salaryData);
+        _ = (SalaryInfo)_salaryType.ParseDictionary(_salaryData, _valueConverter);
     }
 
     [Benchmark]
     public void Salary_Undefined()
     {
-        _ = (SalaryInfo)_salaryType.ParseDictionary(_noData);
+        _ = (SalaryInfo)_salaryType.ParseDictionary(_noData, _valueConverter);
     }
 
     [Params(true, false)]

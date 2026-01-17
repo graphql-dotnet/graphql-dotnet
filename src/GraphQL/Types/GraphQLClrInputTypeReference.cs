@@ -29,6 +29,6 @@ public sealed class GraphQLClrInputTypeReference<[NotAGraphType] T> : IInputObje
     bool IProvideMetadata.HasMetadata(string key) => throw new NotImplementedException();
     void IGraphType.Initialize(ISchema schema) => throw new NotImplementedException();
     bool IInputObjectGraphType.IsValidDefault(object value) => throw new NotImplementedException();
-    object IInputObjectGraphType.ParseDictionary(IDictionary<string, object?> value) => throw new NotImplementedException();
+    object IInputObjectGraphType.ParseDictionary(IDictionary<string, object?> value, IValueConverter valueConverter) => throw new NotImplementedException();
     GraphQLValue IInputObjectGraphType.ToAST(object value) => throw new NotImplementedException();
 }

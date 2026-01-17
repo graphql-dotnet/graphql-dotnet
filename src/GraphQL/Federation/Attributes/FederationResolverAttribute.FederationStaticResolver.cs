@@ -71,7 +71,7 @@ public partial class FederationResolverAttribute
                 if (matched)
                 {
                     // deserialize the value based on the argument's graph type
-                    value = Deserialize(arg.ResolvedType!, arg.Name, value);
+                    value = Deserialize(arg.ResolvedType!, arg.Name, value, valueConverter);
                     // coerce the value based on the argument's parser, useful for coercing ID strings to integers, etc
                     if (arg.Parser != null && value != null)
                         value = arg.Parser(value, valueConverter);

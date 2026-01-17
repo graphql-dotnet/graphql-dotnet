@@ -1040,6 +1040,7 @@ public partial class InputGraphTypeAnalyzerTests
     {
         const string source =
             """
+            using GraphQL;
             using GraphQL.Types;
             using System.Collections.Generic;
 
@@ -1055,8 +1056,8 @@ public partial class InputGraphTypeAnalyzerTests
 
             public class BaseInputObjectGraphType<TSourceType> : InputObjectGraphType<TSourceType>
             {
-                public override object ParseDictionary(IDictionary<string, object> value) =>
-                    base.ParseDictionary(value);
+                public override object ParseDictionary(IDictionary<string, object> value, IValueConverter valueConverter) =>
+                    base.ParseDictionary(value, valueConverter);
             }
 
             public class MySource
@@ -1073,6 +1074,7 @@ public partial class InputGraphTypeAnalyzerTests
     {
         const string source =
             """
+            using GraphQL;
             using GraphQL.Types;
             using System.Collections.Generic;
 
@@ -1089,15 +1091,15 @@ public partial class InputGraphTypeAnalyzerTests
 
             public class BaseInputObjectGraphType<TSourceType> : BaseBaseInputObjectGraphType<TSourceType>
             {
-                public override object ParseDictionary(IDictionary<string, object> value) =>
-                    base.ParseDictionary(value);
+                public override object ParseDictionary(IDictionary<string, object> value, IValueConverter valueConverter) =>
+                    base.ParseDictionary(value, valueConverter);
             }
 
             public class BaseBaseInputObjectGraphType<TSourceType> : InputObjectGraphType<TSourceType>
             {
                 // hide the original method
-                public new virtual object ParseDictionary(IDictionary<string, object> value) =>
-                    base.ParseDictionary(value);
+                public new virtual object ParseDictionary(IDictionary<string, object> value, IValueConverter valueConverter) =>
+                    base.ParseDictionary(value, valueConverter);
             }
 
             public class MySource
@@ -1118,6 +1120,7 @@ public partial class InputGraphTypeAnalyzerTests
     {
         const string source =
             """
+            using GraphQL;
             using GraphQL.Types;
             using System.Collections.Generic;
 
@@ -1134,14 +1137,14 @@ public partial class InputGraphTypeAnalyzerTests
 
             public class BaseInputObjectGraphType<TSourceType> : BaseInputObjectGraphType2<TSourceType>
             {
-                public override object ParseDictionary(IDictionary<string, object> value) =>
-                    base.ParseDictionary(value);
+                public override object ParseDictionary(IDictionary<string, object> value, IValueConverter valueConverter) =>
+                    base.ParseDictionary(value, valueConverter);
             }
 
             public class BaseInputObjectGraphType2<TSourceType> : InputObjectGraphType<TSourceType>
             {
-                public override object ParseDictionary(IDictionary<string, object> value) =>
-                    base.ParseDictionary(value);
+                public override object ParseDictionary(IDictionary<string, object> value, IValueConverter valueConverter) =>
+                    base.ParseDictionary(value, valueConverter);
             }
 
             public class MySource

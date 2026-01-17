@@ -14,7 +14,7 @@ public interface IInputObjectGraphType : IComplexGraphType
     /// much like a field resolver does for output objects. For example, you can set some 'computed'
     /// properties for your input object which were not passed in the GraphQL request.
     /// </summary>
-    public object ParseDictionary(IDictionary<string, object?> value);
+    public object ParseDictionary(IDictionary<string, object?> value, IValueConverter valueConverter);
 
     /// <summary>
     /// Returns a boolean indicating if the provided value is valid as a default value for a
@@ -45,7 +45,7 @@ public class InputObjectGraphType : InputObjectGraphType<object>
 /// <inheritdoc cref="IInputObjectGraphType"/>
 public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TSourceType> : ComplexGraphType<TSourceType>, IInputObjectGraphType
 {
-    private Func<IDictionary<string, object?>, object>? _parseDictionary;
+    private Func<IDictionary<string, object?>, IValueConverter, object>? _parseDictionary;
     private ISchema? _schema;
 
     /// <summary>
@@ -64,7 +64,7 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
         if (typeof(TSourceType) == typeof(object))
         {
             // for InputObjectGraphType just return the dictionary
-            _parseDictionary = static x => x;
+            _parseDictionary = static (x, _) => x;
         }
     }
 
@@ -83,12 +83,12 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
             var conv = schema.ValueConverter.GetConversion(typeof(IDictionary<string, object?>), typeof(TSourceType));
             if (conv != null)
             {
-                _parseDictionary = conv;
+                _parseDictionary = (val, _) => conv(val);
             }
             else if (GlobalSwitches.DynamicallyCompileToObject)
             {
                 // check if the user has overridden ParseDictionary
-                if (GetType().GetMethod(nameof(ParseDictionary), [typeof(IDictionary<string, object?>)])!.DeclaringType == typeof(InputObjectGraphType<TSourceType>))
+                if (GetType().GetMethod(nameof(ParseDictionary), [typeof(IDictionary<string, object?>), typeof(IValueConverter)])!.DeclaringType == typeof(InputObjectGraphType<TSourceType>))
                 {
                     // if the user has not, validate and compile the conversion from dictionary to object immediately
                     _parseDictionary = ObjectExtensions.CompileToObject(typeof(TSourceType), this, schema.ValueConverter);
@@ -96,7 +96,7 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
                 else
                 {
                     // if they have, validate and compile upon first use (if any)
-                    _parseDictionary = data => (_parseDictionary = ObjectExtensions.CompileToObject(typeof(TSourceType), this, schema.ValueConverter))(data);
+                    _parseDictionary = (data, valueConverter) => (_parseDictionary = ObjectExtensions.CompileToObject(typeof(TSourceType), this, schema.ValueConverter))(data, valueConverter);
                 }
             }
             else
@@ -117,24 +117,20 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
     /// much like a field resolver does for output objects. For example, you can set some 'computed'
     /// properties for your input object which were not passed in the GraphQL request.
     /// </summary>
-    public virtual object ParseDictionary(IDictionary<string, object?> value)
+    public virtual object ParseDictionary(IDictionary<string, object?> value, IValueConverter valueConverter)
     {
         if (value == null)
             return null!;
 
         if (_parseDictionary != null)
-            return _parseDictionary(value);
+            return _parseDictionary(value, valueConverter);
 
         // remainder of this method should not occur unless the user has overridden Initialize
-        return ParseDictionaryViaReflection(value);
+        return ParseDictionaryViaReflection(value, valueConverter);
     }
 
-    private object ParseDictionaryViaReflection(IDictionary<string, object?> value)
-    {
-        if (_schema == null)
-            throw new InvalidOperationException($"The '{GetType().Name}' type has not been initialized. Ensure that the '{nameof(Initialize)}' method has been called with a valid schema before using this type.");
-        return _schema!.ValueConverter.ToObject(value, typeof(TSourceType), this);
-    }
+    private object ParseDictionaryViaReflection(IDictionary<string, object?> value, IValueConverter valueConverter)
+        => valueConverter.ToObject(value, typeof(TSourceType), this);
 
     /// <inheritdoc/>
     public virtual bool IsValidDefault(object value)

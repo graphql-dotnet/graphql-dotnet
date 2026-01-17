@@ -16,7 +16,7 @@ public static class FieldExtensions
     /// This extension method sets a specific metadata flag on the field (using the keys defined on <see cref="InputObjectGraphType"/>)
     /// to indicate that the field should not be automatically bound to a property on the corresponding CLR type.
     /// This is particularly useful when the input type defines a field that is computed or otherwise does not have a matching
-    /// CLR property. In such cases, developers typically override <see cref="InputObjectGraphType{TSourceType}.ParseDictionary(IDictionary{string, object?})"/>
+    /// CLR property. In such cases, developers typically override <see cref="InputObjectGraphType{TSourceType}.ParseDictionary(IDictionary{string, object?}, IValueConverter)"/>
     /// to handle the conversion between the input and CLR object.
     /// </remarks>
     [AllowedOn<IInputObjectGraphType>]

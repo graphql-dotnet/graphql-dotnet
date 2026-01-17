@@ -607,7 +607,8 @@ public class AutoRegisteringInputObjectGraphTypeTests
                     s.RegisterTypeMapping<object, AnyScalarGraphType>();
                 }))
             .BuildServiceProvider();
-        provider.GetRequiredService<ISchema>().Initialize();
-        return graphType.ParseDictionary(dictionary).ShouldBeOfType<T>();
+        var schema = provider.GetRequiredService<ISchema>();
+        schema.Initialize();
+        return graphType.ParseDictionary(dictionary, schema.ValueConverter).ShouldBeOfType<T>();
     }
 }

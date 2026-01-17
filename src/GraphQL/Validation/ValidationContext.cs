@@ -214,7 +214,7 @@ public partial class ValidationContext : IProvideUserContext
                     // parse the variable via ParseValue (for scalars) and ParseDictionary (for objects) as applicable
                     try
                     {
-                        variable.Value = await GetVariableValueAsync(graphType, variableDef, variableValue, visitor).ConfigureAwait(false);
+                        variable.Value = await GetVariableValueAsync(graphType, variableDef, variableValue, visitor, Schema.ValueConverter).ConfigureAwait(false);
                     }
                     catch (ValidationError error)
                     {
@@ -264,14 +264,14 @@ public partial class ValidationContext : IProvideUserContext
     /// <br/><br/>
     /// Validates and parses the supplied input object according to the variable's type, and converts the object
     /// with <see cref="ScalarGraphType.ParseValue(object)"/> and
-    /// <see cref="IInputObjectGraphType.ParseDictionary(IDictionary{string, object})"/> as applicable.
+    /// <see cref="IInputObjectGraphType.ParseDictionary(IDictionary{string, object}, IValueConverter)"/> as applicable.
     /// <br/><br/>
     /// Since v3.3, returns null for variables set to null rather than the variable's default value.
     /// </summary>
     /// <remarks>
-    /// Also see <see cref="Federation.FederationResolverAttribute.FederationStaticResolver.Deserialize(IGraphType, string, object?)"/>.
+    /// Also see <see cref="Federation.FederationResolverAttribute.FederationStaticResolver.Deserialize(IGraphType, string, object?, IValueConverter)"/>.
     /// </remarks>
-    private ValueTask<object?> GetVariableValueAsync(IGraphType graphType, GraphQLVariableDefinition variableDef, object? input, IVariableVisitor? visitor)
+    private ValueTask<object?> GetVariableValueAsync(IGraphType graphType, GraphQLVariableDefinition variableDef, object? input, IVariableVisitor? visitor, IValueConverter valueConverter)
     {
         return ParseValueAsync(graphType, variableDef, variableDef.Variable.Name.StringValue, input, visitor); //ISSUE:allocation
 
@@ -486,7 +486,7 @@ public partial class ValidationContext : IProvideUserContext
                 throw new InvalidVariableError(this, variableDef, variableName, $"Unrecognized input fields {string.Join(", ", unknownFields.Select(k => $"'{k}'"))} for type '{graphType.Name}'.");
             }
 
-            return graphType.ParseDictionary(newDictionary);
+            return graphType.ParseDictionary(newDictionary, valueConverter);
         }
     }
 

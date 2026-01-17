@@ -50,7 +50,7 @@ public class InputObjectGraphTypeTests
         try
         {
             schema.Initialize();
-            inputType.ParseDictionary(new Dictionary<string, object?>()).ShouldBeOfType<MyInput2>();
+            inputType.ParseDictionary(new Dictionary<string, object?>(), schema.ValueConverter).ShouldBeOfType<MyInput2>();
         }
         finally
         {
@@ -67,7 +67,7 @@ public class InputObjectGraphTypeTests
         var inputType = new MyInputCustomParseDictionaryType();
         schema.RegisterType(inputType);
         schema.Initialize();
-        inputType.ParseDictionary(new Dictionary<string, object?>()).ShouldBeOfType<MyInput2>();
+        inputType.ParseDictionary(new Dictionary<string, object?>(), schema.ValueConverter).ShouldBeOfType<MyInput2>();
     }
 
     public abstract class MyInput
@@ -94,7 +94,7 @@ public class InputObjectGraphTypeTests
             Field(x => x.Name);
         }
 
-        public override object ParseDictionary(IDictionary<string, object?> value) => new MyInput2();
+        public override object ParseDictionary(IDictionary<string, object?> value, IValueConverter valueConverter) => new MyInput2();
     }
 
     public class MyInput3
@@ -315,7 +315,7 @@ public class InputObjectGraphTypeTests
         inputType.Initialize(new Schema());
 
         // Act: Parse the input dictionary into a CLR object.
-        var result = inputType.ParseDictionary(inputData) as TestInput;
+        var result = inputType.ParseDictionary(inputData, new ValueConverter()) as TestInput;
 
         // Assert
         result.ShouldNotBeNull();

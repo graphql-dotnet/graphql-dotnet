@@ -13,7 +13,7 @@ public static partial class ObjectExtensions
     /// The compiled function assumes the passed dictionary object is not <see langword="null"/>.
     /// </summary>
     [RequiresDynamicCode("This method uses expression trees to compile code at runtime.")]
-    public static Func<IDictionary<string, object?>, object> CompileToObject(
+    public static Func<IDictionary<string, object?>, IValueConverter, object> CompileToObject(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
         Type sourceType,
         IInputObjectGraphType graphType,
@@ -21,7 +21,7 @@ public static partial class ObjectExtensions
     {
         var conv = valueConverter.GetConversion(typeof(IDictionary<string, object?>), sourceType);
         if (conv != null)
-            return conv;
+            return (value, _) => conv(value);
 
         var info = GetReflectionInformation(sourceType, graphType);
         try
@@ -38,7 +38,7 @@ public static partial class ObjectExtensions
     /// Compiles a function to convert a dictionary to an object based on a specified <see cref="ReflectionInfo"/> instance.
     /// </summary>
     [RequiresDynamicCode("This method uses expression trees to compile code at runtime.")]
-    private static Func<IDictionary<string, object?>, object> CompileToObject(ReflectionInfo info, IValueConverter valueConverter)
+    private static Func<IDictionary<string, object?>, IValueConverter, object> CompileToObject(ReflectionInfo info, IValueConverter valueConverter)
     {
         var bestConstructor = info.Constructor;
         var ctorFields = info.CtorFields;
@@ -71,9 +71,10 @@ public static partial class ObjectExtensions
         var block = Expression.Block(new[] { objParam }, expressions);
 
         // build the lambda
-        var lambda = Expression.Lambda<Func<IDictionary<string, object?>, object>>(
+        var lambda = Expression.Lambda<Func<IDictionary<string, object?>, IValueConverter, object>>(
             Expression.Convert(block, typeof(object)),
-            _dictionaryParam);
+            _dictionaryParam,
+            _valueConverterParam);
 
         // compile the lambda and return it
         return lambda.Compile();
@@ -234,7 +235,7 @@ public static partial class ObjectExtensions
                 return ret;
             }
 
-            var ret2 = Expression.Call(_getPropertyValueMethod, Expression.Constant(type), expr, Expression.Constant(graphType), Expression.Constant(valueConverter));
+            var ret2 = Expression.Call(_getPropertyValueMethod, Expression.Constant(type), expr, Expression.Constant(graphType), _valueConverterParam);
             return !asObject ? Expression.Convert(ret2, type) : ret2;
         }
     }
@@ -308,6 +309,7 @@ public static partial class ObjectExtensions
     }
 
     private static readonly ParameterExpression _dictionaryParam = Expression.Parameter(typeof(IDictionary<string, object?>), "dic");
+    private static readonly ParameterExpression _valueConverterParam = Expression.Parameter(typeof(IValueConverter), "valueConverter");
 
     private static readonly MethodInfo _getOrDefaultMethod = typeof(ObjectExtensions).GetMethod(nameof(GetOrDefaultImplementation), BindingFlags.NonPublic | BindingFlags.Static)!;
     private static ValueTuple<object?, bool> GetOrDefaultImplementation(IDictionary<string, object?> obj, string key)

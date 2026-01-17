@@ -97,7 +97,7 @@ public class LiteralValuesTests
             Field<StringGraphType>("str");
         }
 
-        public override object ParseDictionary(IDictionary<string, object?> value)
+        public override object ParseDictionary(IDictionary<string, object?> value, IValueConverter valueConverter)
             => throw new InvalidOperationException("Error parsing dictionary");
     }
 }

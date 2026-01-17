@@ -544,7 +544,7 @@ public class ObjectExtensionsTests
         object value;
         if (compile)
         {
-            value = GraphQL.ObjectExtensions.CompileToObject(typeof(MyInput12), inputType, _converter)(inputs);
+            value = GraphQL.ObjectExtensions.CompileToObject(typeof(MyInput12), inputType, _converter)(inputs, _converter);
         }
         else
         {
@@ -586,7 +586,7 @@ public class ObjectExtensionsTests
             try
             {
                 schema.Initialize();
-                Should.Throw<InvalidOperationException>(() => inputType.ParseDictionary("""{ "name": [1,2,3] }""".ToInputs()));
+                Should.Throw<InvalidOperationException>(() => inputType.ParseDictionary("""{ "name": [1,2,3] }""".ToInputs(), schema.ValueConverter));
             }
             finally
             {
@@ -622,7 +622,7 @@ public class ObjectExtensionsTests
         object value;
         if (compile)
         {
-            value = GraphQL.ObjectExtensions.CompileToObject(typeof(MyInput14), inputType, _converter)(inputs);
+            value = GraphQL.ObjectExtensions.CompileToObject(typeof(MyInput14), inputType, _converter)(inputs, schema.ValueConverter);
         }
         else
         {
@@ -689,7 +689,7 @@ public class ObjectExtensionsTests
             var inputs = new Dictionary<string, object?> { { "Values", new object?[] { 1, 2, 3 } } };
 
             // test compiled
-            Validate(GraphQL.ObjectExtensions.CompileToObject(classToTest, inputType, _converter)(inputs));
+            Validate(GraphQL.ObjectExtensions.CompileToObject(classToTest, inputType, _converter)(inputs, _converter));
 
             // test via reflection
             Validate(_converter.ToObject(inputs, classToTest, inputType));

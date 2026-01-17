@@ -110,7 +110,7 @@ public static class GlobalSwitches
 
     /// <summary>
     /// Enables or disables the use of dynamic compliation to compile the conversion of dictionaries to objects for
-    /// <see cref="GraphQL.Types.InputObjectGraphType{TSourceType}.ParseDictionary(IDictionary{string, object?})">InputObjectGraphType&lt;T&gt;.ParseDictionary</see>
+    /// <see cref="GraphQL.Types.InputObjectGraphType{TSourceType}.ParseDictionary(IDictionary{string, object?}, IValueConverter)">InputObjectGraphType&lt;T&gt;.ParseDictionary</see>
     /// at runtime. Compiled code is cached in memory for the lifetime of the input object graph type.
     /// <br/><br/>
     /// By default enabled for runtimes that support dynamic compilation (i.e. not AOT).

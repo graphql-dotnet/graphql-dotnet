@@ -707,7 +707,7 @@ namespace GraphQL
     public static class ObjectExtensions
     {
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This method uses expression trees to compile code at runtime.")]
-        public static System.Func<System.Collections.Generic.IDictionary<string, object?>, object> CompileToObject([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] System.Type sourceType, GraphQL.Types.IInputObjectGraphType graphType, GraphQL.IValueConverter valueConverter) { }
+        public static System.Func<System.Collections.Generic.IDictionary<string, object?>, GraphQL.IValueConverter, object> CompileToObject([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] System.Type sourceType, GraphQL.Types.IInputObjectGraphType graphType, GraphQL.IValueConverter valueConverter) { }
         public static object ToObjectReflection(System.Collections.Generic.IDictionary<string, object?> source, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] System.Type type, GraphQL.Types.IInputObjectGraphType inputGraphType, GraphQL.IValueConverter valueConverter) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class)]
@@ -2720,7 +2720,7 @@ namespace GraphQL.Types
     {
         bool IsOneOf { get; set; }
         bool IsValidDefault(object value);
-        object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value);
+        object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value, GraphQL.IValueConverter valueConverter);
         GraphQLParser.AST.GraphQLValue ToAST(object value);
     }
     public interface IInterfaceGraphType : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
@@ -2817,7 +2817,7 @@ namespace GraphQL.Types
         public bool IsOneOf { get; set; }
         public override void Initialize(GraphQL.Types.ISchema schema) { }
         public virtual bool IsValidDefault(object value) { }
-        public virtual object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value) { }
+        public virtual object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value, GraphQL.IValueConverter valueConverter) { }
         public virtual GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class IntGraphType : GraphQL.Types.ScalarGraphType

@@ -362,7 +362,7 @@ public static class ExecutionHelper
 
             try
             {
-                return new ArgumentValue(inputObjectGraphType.ParseDictionary(obj), ArgumentSource.Literal);
+                return new ArgumentValue(inputObjectGraphType.ParseDictionary(obj, valueConverter), ArgumentSource.Literal);
             }
             catch (Exception ex) when (context.Document != null && context.ParentNode != null)
             {
