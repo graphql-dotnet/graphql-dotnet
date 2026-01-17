@@ -229,8 +229,13 @@ public sealed class FederationKey
     /// Returns the location of the entire key expression if the specific field location cannot be determined.
     /// </summary>
     /// <param name="fieldName">The name of the field to locate.</param>
+    /// <param name="graphQLPosition">
+    /// The position of the field in the GraphQL string that was parsed (0-based), or -1 to find the first occurrence.
+    /// This string includes the wrapping braces added by <see cref="ParseFields"/>, and the implementation adjusts the
+    /// position to account for the opening brace that was added during parsing.
+    /// </param>
     /// <returns>The location of the field name in the source code.</returns>
-    public Location GetFieldLocation(string fieldName)
+    public Location GetFieldLocation(string fieldName, int graphQLPosition = -1)
     {
         var fieldsArg = _fieldsArgument.Value;
         if (fieldsArg == null)
@@ -239,10 +244,10 @@ public sealed class FederationKey
         }
 
         // Fall back to the entire key expression
-        return GetFieldLocation(fieldsArg, fieldName) ?? Location;
+        return GetFieldLocation(fieldsArg, fieldName, graphQLPosition) ?? Location;
     }
 
-    private Location? GetFieldLocation(ExpressionSyntax fieldsArg, string fieldName)
+    private Location? GetFieldLocation(ExpressionSyntax fieldsArg, string fieldName, int graphQLPosition)
     {
         switch (fieldsArg)
         {
@@ -308,8 +313,10 @@ public sealed class FederationKey
             var token = expression.Token;
             var literalValue = token.ValueText;
 
-            // Find the field name within the string literal
-            var fieldIndex = FindFieldInString(literalValue, fieldName);
+            // Find the field name within the string literal; when the same field name appears multiple
+            // times in the key expression, the GraphQL position hint is used to select the occurrence
+            // whose position is closest to the specified GraphQL location.
+            var fieldIndex = FindFieldInString(literalValue, fieldName, graphQLPosition - 1);
             if (fieldIndex >= 0)
             {
                 // Calculate position within the string literal (accounting for opening quote)
@@ -353,7 +360,7 @@ public sealed class FederationKey
                         return true;
                     // Check for trimmed text match. Required when a literal located between string interpolations: $"{nameof(A)} B {C}}"
                     case InterpolatedStringTextSyntax textSyntax:
-                        var fieldIndex = FindFieldInString(textSyntax.TextToken.ValueText, fieldName);
+                        var fieldIndex = FindFieldInString(textSyntax.TextToken.ValueText, fieldName, graphQLPosition);
                         if (fieldIndex >= 0)
                         {
                             // Calculate position within the string
@@ -364,7 +371,7 @@ public sealed class FederationKey
                         }
                         break;
                     case InterpolationSyntax interpolation:
-                        location = GetFieldLocation(interpolation.Expression, fieldName);
+                        location = GetFieldLocation(interpolation.Expression, fieldName, graphQLPosition);
                         if (location != null)
                             return true;
 
@@ -380,7 +387,7 @@ public sealed class FederationKey
         {
             foreach (var element in elements)
             {
-                location = GetFieldLocation(element, fieldName);
+                location = GetFieldLocation(element, fieldName, graphQLPosition);
                 if (location != null)
                     return true;
             }
@@ -390,26 +397,70 @@ public sealed class FederationKey
         }
     }
 
-    private static int FindFieldInString(string literalValue, string fieldName)
+    private static int FindFieldInString(string literalValue, string fieldName, int graphQLPosition)
     {
         // fast track
         if (string.Equals(literalValue, fieldName, StringComparison.OrdinalIgnoreCase))
             return 0;
 
-        // Split by spaces to find individual field names
-        var fields = literalValue.Split([' '], StringSplitOptions.RemoveEmptyEntries);
         int currentPosition = 0;
+        int previousMatch = -1;
 
-        foreach (var field in fields)
+        while (currentPosition < literalValue.Length)
         {
-            var fieldPosition = literalValue.IndexOf(field, currentPosition, StringComparison.OrdinalIgnoreCase);
-            if (fieldPosition >= 0 && string.Equals(field, fieldName, StringComparison.OrdinalIgnoreCase))
-                return fieldPosition;
+            // Skip whitespace and structural characters
+            while (currentPosition < literalValue.Length &&
+                   (char.IsWhiteSpace(literalValue[currentPosition]) ||
+                    literalValue[currentPosition] == '{' ||
+                    literalValue[currentPosition] == '}'))
+            {
+                currentPosition++;
+            }
 
-            currentPosition = fieldPosition + field.Length;
+            if (currentPosition >= literalValue.Length)
+                break;
+
+            // Find the end of the current word
+            int wordStart = currentPosition;
+            while (currentPosition < literalValue.Length &&
+                   !char.IsWhiteSpace(literalValue[currentPosition]) &&
+                   literalValue[currentPosition] != '{' &&
+                   literalValue[currentPosition] != '}')
+            {
+                currentPosition++;
+            }
+
+            int wordLength = currentPosition - wordStart;
+
+            // Check if this word matches the field name
+            if (wordLength == fieldName.Length &&
+                literalValue.AsSpan(wordStart, wordLength).Equals(fieldName.AsSpan(), StringComparison.OrdinalIgnoreCase))
+            {
+                // No position hint - return first match
+                if (graphQLPosition < 0)
+                    return wordStart;
+
+                // If this match is at or past the target position
+                if (wordStart >= graphQLPosition)
+                {
+                    // Compare with previous match if we have one
+                    if (previousMatch >= 0)
+                    {
+                        // Return whichever is closer to the target
+                        return (graphQLPosition - previousMatch) <= (wordStart - graphQLPosition)
+                            ? previousMatch
+                            : wordStart;
+                    }
+                    return wordStart;
+                }
+
+                // This match is before the target, remember it and continue
+                previousMatch = wordStart;
+            }
         }
 
-        return -1;
+        // Only matches before target were found, return the last one
+        return previousMatch;
     }
 
     /// <summary>
