@@ -229,7 +229,11 @@ public sealed class FederationKey
     /// Returns the location of the entire key expression if the specific field location cannot be determined.
     /// </summary>
     /// <param name="fieldName">The name of the field to locate.</param>
-    /// <param name="graphQLPosition">The position of the field in the parsed GraphQL string (0-based), or -1 to find the first occurrence.</param>
+    /// <param name="graphQLPosition">
+    /// The position of the field in the GraphQL string that was parsed (0-based), or -1 to find the first occurrence.
+    /// This string includes the wrapping braces added by <see cref="ParseFields"/>, and the implementation adjusts the
+    /// position to account for the opening brace that was added during parsing.
+    /// </param>
     /// <returns>The location of the field name in the source code.</returns>
     public Location GetFieldLocation(string fieldName, int graphQLPosition = -1)
     {
