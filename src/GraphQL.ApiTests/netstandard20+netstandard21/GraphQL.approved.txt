@@ -2478,7 +2478,7 @@ namespace GraphQL.Types
         public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class EnumerationGraphType<TEnum> : GraphQL.Types.EnumerationGraphType
-        where TEnum : System.Enum
+        where TEnum :  struct, System.Enum
     {
         public EnumerationGraphType() { }
         public override bool CanParseValue(object? value) { }

@@ -120,8 +120,8 @@ public class EnumerationGraphType : ScalarGraphType
 /// Also it can get descriptions for enum fields from the XML comments.
 /// </summary>
 /// <typeparam name="TEnum">The enum to take values from.</typeparam>
-public class EnumerationGraphType<TEnum> : EnumerationGraphType
-    where TEnum : Enum
+public class EnumerationGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] TEnum> : EnumerationGraphType
+    where TEnum : struct, Enum
 {
     private static readonly EnumCaseAttribute? _caseAttr = typeof(TEnum).GetCustomAttribute<EnumCaseAttribute>();
 
@@ -132,6 +132,20 @@ public class EnumerationGraphType<TEnum> : EnumerationGraphType
     {
         var type = typeof(TEnum);
         string[] names = Enum.GetNames(type);
+#if NET6_0_OR_GREATER
+        var values = Enum.GetValues<TEnum>();
+        var enumGraphData = names.Zip(values, (name, value) =>
+        {
+            var field = type.GetField(name) ?? throw new InvalidOperationException($"Enum field '{name}' not found on enum type '{type.GetFriendlyName()}'.");
+            return (
+                name: ChangeEnumCase(name),
+                value: value,
+                description: field.Description(),
+                deprecation: field.ObsoleteMessage(),
+                member: field
+            );
+        });
+#else
         var enumMembers = names.Select(n => (name: n, member: type
                 .GetMember(n, BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
                 .First()));
@@ -142,6 +156,7 @@ public class EnumerationGraphType<TEnum> : EnumerationGraphType
             deprecation: e.member.ObsoleteMessage(),
             member: e.member
         ));
+#endif
 
         Name = type.Name.ToPascalCase();
         Description ??= typeof(TEnum).Description();
