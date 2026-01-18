@@ -46,15 +46,15 @@ public class InputObjectGraphTypeTests
         var schema = new Schema() { Query = queryObject };
         var inputType = new MyInputType();
         schema.RegisterType(inputType);
-        ValueConverter.Register<MyInput>(_ => new MyInput2());
+        schema.ValueConverter.Register<MyInput>(_ => new MyInput2());
         try
         {
             schema.Initialize();
-            inputType.ParseDictionary(new Dictionary<string, object?>()).ShouldBeOfType<MyInput2>();
+            inputType.ParseDictionary(new Dictionary<string, object?>(), schema.ValueConverter).ShouldBeOfType<MyInput2>();
         }
         finally
         {
-            ValueConverter.Register<MyInput>(null);
+            schema.ValueConverter.Register<MyInput>(null);
         }
     }
 
@@ -67,7 +67,7 @@ public class InputObjectGraphTypeTests
         var inputType = new MyInputCustomParseDictionaryType();
         schema.RegisterType(inputType);
         schema.Initialize();
-        inputType.ParseDictionary(new Dictionary<string, object?>()).ShouldBeOfType<MyInput2>();
+        inputType.ParseDictionary(new Dictionary<string, object?>(), schema.ValueConverter).ShouldBeOfType<MyInput2>();
     }
 
     public abstract class MyInput
@@ -94,34 +94,12 @@ public class InputObjectGraphTypeTests
             Field(x => x.Name);
         }
 
-        public override object ParseDictionary(IDictionary<string, object?> value) => new MyInput2();
-    }
-
-    [Fact]
-    public void overriding_initialize_still_works()
-    {
-        var queryObject = new ObjectGraphType() { Name = "Query" };
-        queryObject.Field<StringGraphType>("dummy");
-        var schema = new Schema() { Query = queryObject };
-        var inputType = new MyInput3Type();
-        schema.RegisterType(inputType);
-        schema.Initialize();
-        inputType.ParseDictionary(new Dictionary<string, object?>()).ShouldBeOfType<MyInput3>();
+        public override object ParseDictionary(IDictionary<string, object?> value, IValueConverter valueConverter) => new MyInput2();
     }
 
     public class MyInput3
     {
         public string? Name { get; set; }
-    }
-
-    public class MyInput3Type : InputObjectGraphType<MyInput3>
-    {
-        public MyInput3Type()
-        {
-            Field(x => x.Name);
-        }
-
-        public override void Initialize(ISchema schema) { }
     }
 
     [Fact]
@@ -263,7 +241,7 @@ public class InputObjectGraphTypeTests
                 return value;
             })
             .FieldType;
-        fieldDef.Parser.ShouldNotBeNull().Invoke("123").ShouldBeOfType<string>().ShouldBe("789");
+        fieldDef.Parser.ShouldNotBeNull().Invoke("123", new ValueConverter()).ShouldBeOfType<string>().ShouldBe("789");
     }
 
     [Fact]
@@ -277,9 +255,9 @@ public class InputObjectGraphTypeTests
         var schema = new Schema { Query = queryType };
         schema.Initialize();
         // verify that during input coercion, the value is converted to an integer
-        inputType.Fields.First().Parser.ShouldNotBeNull().Invoke("123").ShouldBe(123);
+        inputType.Fields.First().Parser.ShouldNotBeNull().Invoke("123", schema.ValueConverter).ShouldBe(123);
         // verify that during input coercion, parsing errors throw an exception
-        Should.Throw<FormatException>(() => inputType.Fields.First().Parser.ShouldNotBeNull().Invoke("abc"));
+        Should.Throw<FormatException>(() => inputType.Fields.First().Parser.ShouldNotBeNull().Invoke("abc", schema.ValueConverter));
     }
 
     private class Class3
@@ -324,10 +302,8 @@ public class InputObjectGraphTypeTests
     /// Verifies that when both a mapped field and a no-CLR-mapping field are present in the input,
     /// only the mapped field is used to populate the CLR object.
     /// </summary>
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void ParseDictionary_PopulatesMappedFieldAndSkipsNoClrMappingField(bool compiled)
+    [Fact]
+    public void ParseDictionary_PopulatesMappedFieldAndSkipsNoClrMappingField()
     {
         // Arrange
         var inputData = new Dictionary<string, object?>
@@ -336,11 +312,10 @@ public class InputObjectGraphTypeTests
             { "skipped", "skippedValue" }
         };
         var inputType = new TestInputGraphType();
-        if (compiled)
-            inputType.Initialize(null!);
+        inputType.Initialize(new Schema());
 
         // Act: Parse the input dictionary into a CLR object.
-        var result = inputType.ParseDictionary(inputData) as TestInput;
+        var result = inputType.ParseDictionary(inputData, new ValueConverter()) as TestInput;
 
         // Assert
         result.ShouldNotBeNull();

@@ -12,19 +12,21 @@ public static partial class ObjectExtensions
     /// Compiles a function to convert a dictionary to an object based on a specified <see cref="IInputObjectGraphType"/> instance.
     /// The compiled function assumes the passed dictionary object is not <see langword="null"/>.
     /// </summary>
-    public static Func<IDictionary<string, object?>, object> CompileToObject(
+    [RequiresDynamicCode("This method uses expression trees to compile code at runtime.")]
+    public static Func<IDictionary<string, object?>, IValueConverter, object> CompileToObject(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
         Type sourceType,
-        IInputObjectGraphType graphType)
+        IInputObjectGraphType graphType,
+        IValueConverter valueConverter)
     {
-        var conv = ValueConverter.GetConversion(typeof(IDictionary<string, object?>), sourceType);
+        var conv = valueConverter.GetConversion(typeof(IDictionary<string, object?>), sourceType);
         if (conv != null)
-            return conv;
+            return (value, _) => conv(value);
 
         var info = GetReflectionInformation(sourceType, graphType);
         try
         {
-            return CompileToObject(info);
+            return CompileToObject(info, valueConverter);
         }
         catch (Exception ex)
         {
@@ -35,7 +37,8 @@ public static partial class ObjectExtensions
     /// <summary>
     /// Compiles a function to convert a dictionary to an object based on a specified <see cref="ReflectionInfo"/> instance.
     /// </summary>
-    private static Func<IDictionary<string, object?>, object> CompileToObject(ReflectionInfo info)
+    [RequiresDynamicCode("This method uses expression trees to compile code at runtime.")]
+    private static Func<IDictionary<string, object?>, IValueConverter, object> CompileToObject(ReflectionInfo info, IValueConverter valueConverter)
     {
         var bestConstructor = info.Constructor;
         var ctorFields = info.CtorFields;
@@ -68,14 +71,15 @@ public static partial class ObjectExtensions
         var block = Expression.Block(new[] { objParam }, expressions);
 
         // build the lambda
-        var lambda = Expression.Lambda<Func<IDictionary<string, object?>, object>>(
+        var lambda = Expression.Lambda<Func<IDictionary<string, object?>, IValueConverter, object>>(
             Expression.Convert(block, typeof(object)),
-            _dictionaryParam);
+            _dictionaryParam,
+            _valueConverterParam);
 
         // compile the lambda and return it
         return lambda.Compile();
 
-        static Expression GetExpressionForCtorParameter(ReflectionInfo.CtorParameterInfo member)
+        Expression GetExpressionForCtorParameter(ReflectionInfo.CtorParameterInfo member)
         {
             if (member.Key == null)
                 return Expression.Constant(member.ParameterInfo.DefaultValue, member.ParameterInfo.ParameterType);
@@ -87,7 +91,7 @@ public static partial class ObjectExtensions
                 member.ParameterInfo.Name!);
         }
 
-        static MemberAssignment GetBindingForMember(ReflectionInfo.MemberFieldInfo member)
+        MemberAssignment GetBindingForMember(ReflectionInfo.MemberFieldInfo member)
         {
             var type = member.Member is PropertyInfo propertyInfo ? propertyInfo.PropertyType : ((FieldInfo)member.Member).FieldType;
 
@@ -96,7 +100,7 @@ public static partial class ObjectExtensions
                 GetCoerceOrDefault(member.Key, type, member.GraphType, member.Member.Name));
         }
 
-        static Expression GetCoerceOrDefault(string key, Type type, IGraphType graphType, string fieldName)
+        Expression GetCoerceOrDefault(string key, Type type, IGraphType graphType, string fieldName)
         {
             /*
              * ValueTuple<object?, bool> value;
@@ -135,7 +139,7 @@ public static partial class ObjectExtensions
                 ret);
         }
 
-        static Expression ConditionallySetMember(ParameterExpression objParam, ReflectionInfo.MemberFieldInfo member)
+        Expression ConditionallySetMember(ParameterExpression objParam, ReflectionInfo.MemberFieldInfo member)
         {
             var type = member.Member is PropertyInfo propertyInfo ? propertyInfo.PropertyType : ((FieldInfo)member.Member).FieldType;
 
@@ -167,7 +171,7 @@ public static partial class ObjectExtensions
                             member.Member.Name))));
         }
 
-        static Expression CoerceExpression(Expression expr, Type type, IGraphType graphType, bool asObject, string fieldName)
+        Expression CoerceExpression(Expression expr, Type type, IGraphType graphType, bool asObject, string fieldName)
         {
             // if requested type is object, return the expression as is
             if (type == typeof(object))
@@ -189,7 +193,7 @@ public static partial class ObjectExtensions
                         CoerceExpressionInternal(param, type, graphType, asObject, fieldName))));
         }
 
-        static Expression CoerceExpressionInternal(Expression expr, Type type, IGraphType graphType, bool asObject, string fieldName)
+        Expression CoerceExpressionInternal(Expression expr, Type type, IGraphType graphType, bool asObject, string fieldName)
         {
             // unwrap non-null graph type
             graphType = graphType is NonNullGraphType nonNullGraphType
@@ -210,7 +214,7 @@ public static partial class ObjectExtensions
                 IListConverter listConverter;
                 try
                 {
-                    listConverter = ValueConverter.GetListConverter(type);
+                    listConverter = valueConverter.GetListConverter(type);
                 }
                 catch (Exception ex)
                 {
@@ -231,9 +235,8 @@ public static partial class ObjectExtensions
                 return ret;
             }
 
-            return !asObject
-                ? Expression.Call(_getPropertyValueTypedMethod.MakeGenericMethod(type), expr, Expression.Constant(graphType))
-                : Expression.Call(_getPropertyValueUntypedMethod, Expression.Constant(type), expr, Expression.Constant(graphType));
+            var ret2 = Expression.Call(_getPropertyValueMethod, Expression.Constant(type), expr, Expression.Constant(graphType), _valueConverterParam);
+            return !asObject ? Expression.Convert(ret2, type) : ret2;
         }
     }
 
@@ -246,10 +249,10 @@ public static partial class ObjectExtensions
         throw new InvalidOperationException($"Cannot coerce collection of type '{list?.GetType().GetFriendlyName()}' to IEnumerable.");
     }
 
-    private static readonly MethodInfo _getPropertyValueUntypedMethod = typeof(ObjectExtensions).GetMethod(nameof(GetPropertyValueUntyped), BindingFlags.NonPublic | BindingFlags.Static)!;
-    private static object? GetPropertyValueUntyped(
+    private static readonly MethodInfo _getPropertyValueMethod = typeof(ObjectExtensions).GetMethod(nameof(GetPropertyValue), BindingFlags.NonPublic | BindingFlags.Static)!;
+    private static object? GetPropertyValue(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields)]
-        Type returnType, object? value, IGraphType mappedType)
+        Type returnType, object? value, IGraphType mappedType, IValueConverter valueConverter)
     {
         // CoerceExpression already contains short-circuit logic for null and type compatibility
 
@@ -266,36 +269,12 @@ public static partial class ObjectExtensions
         if (value is IDictionary<string, object?> dictionary && mappedType is IInputObjectGraphType inputObjectGraphType)
         {
             // note that ToObject checks the ValueConverter before parsing the dictionary
-            return ToObject(dictionary, returnType, inputObjectGraphType);
+            return valueConverter.ToObject(dictionary, returnType, inputObjectGraphType);
         }
 
-        return ValueConverter.ConvertTo(value, returnType);
+        return valueConverter.ConvertTo(value, returnType);
     }
 
-    private static readonly MethodInfo _getPropertyValueTypedMethod = typeof(ObjectExtensions).GetMethod(nameof(GetPropertyValueTyped), BindingFlags.NonPublic | BindingFlags.Static)!;
-    private static T? GetPropertyValueTyped<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields)] T>(
-        object? value, IGraphType mappedType)
-    {
-        // CoerceExpression already contains short-circuit logic for null and type compatibility
-
-        // in the rare circumstance that the value is not a compatible type,
-        //   use the reflection-based converter for object types, and
-        //   the value converter for value types
-
-        // note that during literal/variable parsing, input object graph types
-        //   are typically already converted to the correct type, as ParseDictionary
-        //   is called during parsing, so this code path would not normally be hit.
-
-        // matches only when mappedType is an input object graph type AND the value is a
-        //   dictionary (not yet parsed from a dictionary into an object)
-        if (value is IDictionary<string, object?> dictionary && mappedType is IInputObjectGraphType inputObjectGraphType)
-        {
-            // note that ToObject checks the ValueConverter before parsing the dictionary
-            return (T)ToObject(dictionary, typeof(T), inputObjectGraphType);
-        }
-
-        return ValueConverter.ConvertTo<T>(value);
-    }
 
     private static Expression UpdateArray(ParameterExpression objectArray, Func<ParameterExpression, Expression> loopContent)
     {
@@ -330,6 +309,7 @@ public static partial class ObjectExtensions
     }
 
     private static readonly ParameterExpression _dictionaryParam = Expression.Parameter(typeof(IDictionary<string, object?>), "dic");
+    private static readonly ParameterExpression _valueConverterParam = Expression.Parameter(typeof(IValueConverter), "valueConverter");
 
     private static readonly MethodInfo _getOrDefaultMethod = typeof(ObjectExtensions).GetMethod(nameof(GetOrDefaultImplementation), BindingFlags.NonPublic | BindingFlags.Static)!;
     private static ValueTuple<object?, bool> GetOrDefaultImplementation(IDictionary<string, object?> obj, string key)

@@ -138,7 +138,7 @@ public partial class DocumentValidator
             {
                 try
                 {
-                    var arguments = ExecutionHelper.GetArguments(fieldDefinition.Arguments, field.Arguments, context.Variables, context.ValidationContext.Document, field, null);
+                    var arguments = ExecutionHelper.GetArguments(fieldDefinition.Arguments, field.Arguments, context.Variables, context.ValidationContext.Document, field, null, context.Schema.ValueConverter);
                     if (arguments != null)
                     {
                         (context.ArgumentValues ??= new()).TryAdd(field, arguments);

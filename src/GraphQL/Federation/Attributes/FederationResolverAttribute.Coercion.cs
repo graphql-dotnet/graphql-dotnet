@@ -16,19 +16,19 @@ public partial class FederationResolverAttribute
         /// <remarks>
         /// Also see <see cref="ValidationContext.GetVariableValueAsync"/>.
         /// </remarks>
-        private static object? Deserialize(IGraphType type, string name, object? value)
+        private static object? Deserialize(IGraphType type, string name, object? value, IValueConverter valueConverter)
         {
             // parse recursively based on the type of the graph type
-            return ParseValue(type, name, value);
+            return ParseValue(type, name, value, valueConverter);
 
-            static object? ParseValue(IGraphType type, VariableName name, object? value)
+            static object? ParseValue(IGraphType type, VariableName name, object? value, IValueConverter valueConverter)
             {
                 // validate non-null types and values first
                 if (type is NonNullGraphType nonNullGraphType)
                 {
                     return value == null
                         ? ThrowValueIsNullException(name)
-                        : ParseValue(nonNullGraphType.ResolvedType!, name, value);
+                        : ParseValue(nonNullGraphType.ResolvedType!, name, value, valueConverter);
                 }
                 else if (value == null)
                     return null;
@@ -41,13 +41,13 @@ public partial class FederationResolverAttribute
 
                     // input object types need to parse each field first, then call ParseDictionary
                     IInputObjectGraphType inputObjectGraphType => value is IDictionary<string, object?> dic
-                        ? ParseValueObject(inputObjectGraphType, name, dic)
+                        ? ParseValueObject(inputObjectGraphType, name, dic, valueConverter)
                         : ThrowNotDictionaryException(name),
 
                     // list types need to parse each item in the list
                     ListGraphType listGraphType => value is IList list && value is not string
-                        ? ParseValueList(listGraphType, name, list)
-                        : new object?[] { ParseValue(listGraphType.ResolvedType!, name, value) },
+                        ? ParseValueList(listGraphType, name, list, valueConverter)
+                        : new object?[] { ParseValue(listGraphType.ResolvedType!, name, value, valueConverter) },
 
                     // there should not be any other types remaining
                     _ => ThrowNotInputTypeException(name),
@@ -55,19 +55,19 @@ public partial class FederationResolverAttribute
             }
 
             // parse a list of values, returning an array of parsed objects
-            static object? ParseValueList(ListGraphType listGraphType, VariableName name, IList list)
+            static object? ParseValueList(ListGraphType listGraphType, VariableName name, IList list, IValueConverter valueConverter)
             {
                 var itemType = listGraphType.ResolvedType!;
                 var ret = new object?[list.Count];
                 for (var i = 0; i < list.Count; i++)
                 {
-                    ret[i] = ParseValue(itemType, new(name, i), list[i]);
+                    ret[i] = ParseValue(itemType, new(name, i), list[i], valueConverter);
                 }
                 return ret;
             }
 
             // parse a dictionary of values, returning a parsed object
-            static object? ParseValueObject(IInputObjectGraphType inputObjectGraphType, VariableName name, IDictionary<string, object?> dic)
+            static object? ParseValueObject(IInputObjectGraphType inputObjectGraphType, VariableName name, IDictionary<string, object?> dic, IValueConverter valueConverter)
             {
                 bool anyNull = false;
                 int fieldCount = 0;
@@ -80,7 +80,7 @@ public partial class FederationResolverAttribute
                     var key = field.Name;
                     if (dic.TryGetValue(key, out var value))
                     {
-                        ret[key] = ParseValue(field.ResolvedType!, new(name, key), value);
+                        ret[key] = ParseValue(field.ResolvedType!, new(name, key), value, valueConverter);
                         fieldCount += 1;
                         anyNull |= value == null;
                     }
@@ -118,7 +118,7 @@ public partial class FederationResolverAttribute
                 }
 
                 // parse the dictionary into a CLR object and return it
-                return inputObjectGraphType.ParseDictionary(ret);
+                return inputObjectGraphType.ParseDictionary(ret, valueConverter);
             }
 
             [StackTraceHidden]

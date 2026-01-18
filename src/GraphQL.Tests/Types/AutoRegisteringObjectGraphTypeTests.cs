@@ -320,6 +320,7 @@ public class AutoRegisteringObjectGraphTypeTests
             Source = new ArgumentTests(),
             FieldDefinition = fieldType,
             RequestServices = provider,
+            Schema = provider.GetRequiredService<ISchema>(),
         };
         if (arg1Name != null)
         {
@@ -577,9 +578,9 @@ public class AutoRegisteringObjectGraphTypeTests
         var fieldType = queryType.Fields.First();
         var argument = fieldType.Arguments.ShouldNotBeNull().First();
         argument.ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<IdGraphType>();
-        argument.Parser.ShouldNotBeNull().Invoke("123").ShouldBe(123);
+        argument.Parser.ShouldNotBeNull().Invoke("123", schema.ValueConverter).ShouldBe(123);
         // verify that during input coercion, parsing errors throw an exception
-        Should.Throw<FormatException>(() => argument.Parser("abc"));
+        Should.Throw<FormatException>(() => argument.Parser.ShouldNotBeNull().Invoke("abc", schema.ValueConverter));
         // perform end-to-end test for bad argument
         var result = await new DocumentExecuter().ExecuteAsync(o =>
         {

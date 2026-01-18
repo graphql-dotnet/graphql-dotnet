@@ -14,7 +14,7 @@ public class MyPseudoFederatedResolver<T> : IFederationResolver
 {
     public bool MatchKeys(IDictionary<string, object?> representation) => true;
 
-    public object ParseRepresentation(IComplexGraphType graphType, IDictionary<string, object?> representation)
+    public object ParseRepresentation(IComplexGraphType graphType, IDictionary<string, object?> representation, IValueConverter valueConverter)
         => (int)Convert.ChangeType(representation["id"], typeof(int), CultureInfo.InvariantCulture)!;
 
     public ValueTask<object?> ResolveAsync(IResolveFieldContext context, IComplexGraphType graphType, object parsedRepresentation)

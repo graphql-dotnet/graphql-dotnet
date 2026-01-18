@@ -19,16 +19,17 @@ public interface IFederationResolver
     /// </summary>
     /// <param name="graphType">The object or interface graph type associated with the entity being resolved.</param>
     /// <param name="representation">The source representation provided by the Apollo Router.</param>
-    public object ParseRepresentation(IComplexGraphType graphType, IDictionary<string, object?> representation);
+    /// <param name="valueConverter">The value converter instance to use for type conversions.</param>
+    public object ParseRepresentation(IComplexGraphType graphType, IDictionary<string, object?> representation, IValueConverter valueConverter);
 
     /// <summary>
     /// Asynchronously resolves an object based on the given context and source representation.
-    /// The source representation is parsed by <see cref="ParseRepresentation(IComplexGraphType, IDictionary{string, object?})"/>
+    /// The source representation is parsed by <see cref="ParseRepresentation(IComplexGraphType, IDictionary{string, object?}, IValueConverter)"/>
     /// during the validation phase before being passed to this method's <paramref name="parsedRepresentation"/> argument.
     /// </summary>
     /// <param name="context">The context of the field being resolved, providing access to various aspects of the GraphQL execution.</param>
     /// <param name="graphType">The object graph type associated with the entity being resolved.</param>
-    /// <param name="parsedRepresentation">The source representation, parsed by <see cref="ParseRepresentation(IComplexGraphType, IDictionary{string, object?})"/>.</param>
+    /// <param name="parsedRepresentation">The source representation, parsed by <see cref="ParseRepresentation(IComplexGraphType, IDictionary{string, object?}, IValueConverter)"/>.</param>
     /// <returns>A task that represents the asynchronous resolve operation. The task result contains the resolved object.</returns>
     public ValueTask<object?> ResolveAsync(IResolveFieldContext context, IComplexGraphType graphType, object parsedRepresentation);
 }

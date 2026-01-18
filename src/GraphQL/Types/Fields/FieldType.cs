@@ -107,7 +107,7 @@ public class FieldType : MetadataProvider, IFieldType
     /// Throw an exception if necessary to indicate a problem.
     /// Only applicable to fields of input graph types.
     /// </summary>
-    public Func<object, object>? Parser { get; set; }
+    public Func<object, IValueConverter, object>? Parser { get; set; }
 
     /// <summary>
     /// Validates the value received from the client when the value is not <see langword="null"/>.

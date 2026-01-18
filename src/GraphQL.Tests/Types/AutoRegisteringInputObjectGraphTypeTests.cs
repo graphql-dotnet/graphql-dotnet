@@ -371,9 +371,9 @@ public class AutoRegisteringInputObjectGraphTypeTests
         schema.Initialize();
         // verify that during input coercion, the value is converted to an integer
         inputType.Fields.First().ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<IdGraphType>();
-        inputType.Fields.First().Parser.ShouldNotBeNull().Invoke("123").ShouldBe(123);
+        inputType.Fields.First().Parser.ShouldNotBeNull().Invoke("123", schema.ValueConverter).ShouldBe(123);
         // verify that during input coercion, parsing errors throw an exception
-        Should.Throw<FormatException>(() => inputType.Fields.First().Parser.ShouldNotBeNull().Invoke("abc"));
+        Should.Throw<FormatException>(() => inputType.Fields.First().Parser.ShouldNotBeNull().Invoke("abc", schema.ValueConverter));
     }
 
     private class Class3
@@ -607,7 +607,8 @@ public class AutoRegisteringInputObjectGraphTypeTests
                     s.RegisterTypeMapping<object, AnyScalarGraphType>();
                 }))
             .BuildServiceProvider();
-        provider.GetRequiredService<ISchema>().Initialize();
-        return graphType.ParseDictionary(dictionary).ShouldBeOfType<T>();
+        var schema = provider.GetRequiredService<ISchema>();
+        schema.Initialize();
+        return graphType.ParseDictionary(dictionary, schema.ValueConverter).ShouldBeOfType<T>();
     }
 }

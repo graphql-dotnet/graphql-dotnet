@@ -7,14 +7,17 @@ namespace GraphQL.Execution;
 /// </summary>
 public class DirectiveInfo
 {
+    private readonly ISchema _schema;
+
     /// <summary>
     /// Creates an instance of <see cref="DirectiveInfo"/> with the specified
-    /// directive definition and directive arguments.
+    /// directive definition, directive arguments, and schema.
     /// </summary>
-    public DirectiveInfo(Directive directive, IDictionary<string, ArgumentValue> arguments)
+    public DirectiveInfo(Directive directive, IDictionary<string, ArgumentValue> arguments, ISchema schema)
     {
         Directive = directive;
         Arguments = arguments;
+        _schema = schema;
     }
 
     /// <summary>
@@ -60,19 +63,7 @@ public class DirectiveInfo
         var resolvedType = Directive.Arguments?.Find(name)?.ResolvedType
             ?? throw new InvalidOperationException($"Could not obtain graph type instance for argument '{name}'");
 
-        if (arg.Value is IDictionary<string, object?> inputObject)
-        {
-            if (argumentType == typeof(object))
-            {
-                result = arg.Value;
-                return true;
-            }
-
-            result = inputObject.ToObject(argumentType, resolvedType);
-            return true;
-        }
-
-        result = arg.Value.GetPropertyValue(argumentType, resolvedType);
+        result = _schema.ValueConverter.GetPropertyValue(arg.Value, argumentType, resolvedType);
         return true;
     }
 }

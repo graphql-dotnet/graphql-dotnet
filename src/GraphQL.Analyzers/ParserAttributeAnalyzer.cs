@@ -17,7 +17,7 @@ public class ParserAttributeAnalyzer : ParserValidatorAttributeAnalyzer
     public static readonly DiagnosticDescriptor ParserMethodMustBeValid = new(
         id: DiagnosticIds.PARSER_METHOD_MUST_BE_VALID,
         title: "Parser method must be valid",
-        messageFormat: "Parser method '{0}' signature must be '{1}static object {0}(object value)'",
+        messageFormat: "Parser method '{0}' signature must be '{1}static object {0}(object value)' or '{1}static object {0}(object value, IValueConverter converter)'",
         category: DiagnosticCategories.USAGE,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
@@ -73,6 +73,9 @@ public class ParserAttributeAnalyzer : ParserValidatorAttributeAnalyzer
             return;
         }
 
+        // Get the IValueConverter type from the compilation
+        var valueConverterType = context.Compilation.GetTypeByMetadataName($"{Constants.GraphQL}.{Constants.Types.IValueConverter}");
+
         bool hasValidMethod = false;
         bool hasParserMethods = false;
         foreach (var method in parserType.GetMembers(parserMethodName).OfType<IMethodSymbol>())
@@ -81,17 +84,37 @@ public class ParserAttributeAnalyzer : ParserValidatorAttributeAnalyzer
             if (!method.IsStatic)
                 continue;
 
-            if (method.Parameters.Length != 1 || method.Parameters[0].Type.SpecialType != SpecialType.System_Object)
-                continue;
-
+            // Check return type
             if (method.ReturnType.SpecialType != SpecialType.System_Object)
                 continue;
 
+            // Check accessibility
             if (!allowNonPublicMethods && method.DeclaredAccessibility != Accessibility.Public)
                 continue;
 
-            hasValidMethod = true;
-            break;
+            // Valid signatures:
+            // 1. static object MethodName(object value)
+            // 2. static object MethodName(object value, IValueConverter converter)
+            if (method.Parameters.Length == 1)
+            {
+                // Check for Func<object, object> signature
+                if (method.Parameters[0].Type.SpecialType == SpecialType.System_Object)
+                {
+                    hasValidMethod = true;
+                    break;
+                }
+            }
+            else if (method.Parameters.Length == 2)
+            {
+                // Check for Func<object, IValueConverter, object> signature
+                if (method.Parameters[0].Type.SpecialType == SpecialType.System_Object &&
+                    valueConverterType != null &&
+                    SymbolEqualityComparer.Default.Equals(method.Parameters[1].Type, valueConverterType))
+                {
+                    hasValidMethod = true;
+                    break;
+                }
+            }
         }
 
         if (hasValidMethod)

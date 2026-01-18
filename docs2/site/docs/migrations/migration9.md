@@ -354,3 +354,31 @@ Please note that since the built-in providers are prepended to the list of custo
 ### 16. `ISchema.DefaultFieldResolver` property and `SchemaTypesExtensions.ApplyMiddleware` parameter added
 
 The `DefaultFieldResolver` property has been added to `ISchema` and `Schema`, which defaults to `NameFieldResolver.Instance`. The `ApplyMiddleware` extension methods on `SchemaTypesBase` now require an `ISchema` parameter. Custom implementations of `ISchema` must implement the new property, and any direct calls to `ApplyMiddleware` must include the schema parameter.
+
+### 17. `ValueConverter` is now an instance class
+
+`ValueConverter` has been changed from a static class to a non-static class. Each `ISchema` instance now has its own `ValueConverter` property, enabling per-schema value conversion customization.
+
+If you were using `ValueConverter.Register()` or other static methods, you must now use the schema's `ValueConverter` property instead.
+
+```csharp
+// v8
+ValueConverter.Register<string, int>(value => int.Parse(value));
+var result = ValueConverter.ConvertTo("123", typeof(int));
+
+// v9
+schema.ValueConverter.Register<string, int>(value => int.Parse(value));
+var result = schema.ValueConverter.ConvertTo("123", typeof(int));
+```
+
+Related changes:
+
+- `ToObject`, `GetPropertyValue`, and `CompileToObject` extension methods now require an `IValueConverter` parameter
+- `Parser` delegate signature changed from `Func<object, object>?` to `Func<object, IValueConverter, object>?`
+- `InputObjectGraphType.ParseDictionary` now requires an `IValueConverter` parameter
+- `IFederationResolver.ParseRepresentation` now includes an `IValueConverter valueConverter` parameter
+- `ExecutionHelper.GetArguments` and `CoerceValue` now include an `IValueConverter valueConverter` parameter
+
+Overloads are provided in `FieldBuilder.ParseValue()` and `QueryArgumentExtensions.ParseValue()` that accept the old `Func<object, object>` signature. The `[Parser]` attribute now supports both old `(object)` and new `(object, IValueConverter)` parser method signatures.
+
+This change enables different schemas to have different conversion rules, improves testability with isolated converters, eliminates shared static state, and provides better thread-safety.

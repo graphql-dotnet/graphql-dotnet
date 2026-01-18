@@ -5,11 +5,13 @@ namespace GraphQL.Tests;
 
 public class ValueConverterFacts
 {
+    private readonly ValueConverter _converter = new();
+
     [Theory]
     [InlineData(1234L, 1234.0)]
     public void LongConversions(long source, object expected)
     {
-        object? actual = ValueConverter.ConvertTo(source, expected.GetType());
+        object? actual = _converter.ConvertTo(source, expected.GetType());
 
         actual.ShouldBeOfType(expected.GetType());
         actual.ShouldBe(expected);
@@ -19,7 +21,7 @@ public class ValueConverterFacts
     [InlineData(12.5f, 12.5)]
     public void FloatConversions(float source, object expected)
     {
-        object? actual = ValueConverter.ConvertTo(source, expected.GetType());
+        object? actual = _converter.ConvertTo(source, expected.GetType());
 
         actual.ShouldBeOfType(expected.GetType());
         actual.ShouldBe(expected);
@@ -30,7 +32,7 @@ public class ValueConverterFacts
     [InlineData(12.5f, 12.5)]
     public void ToDecimalConversions(object source, object expected)
     {
-        object? actual = ValueConverter.ConvertTo(source, typeof(decimal));
+        object? actual = _converter.ConvertTo(source, typeof(decimal));
 
         actual.ShouldBeOfType(typeof(decimal));
         actual.ShouldBe(new decimal((double)expected));
@@ -44,7 +46,7 @@ public class ValueConverterFacts
     [InlineData("100.1", 100.1d)]
     public void StringConversions(string source, object expected)
     {
-        object? actual = ValueConverter.ConvertTo(source, expected.GetType());
+        object? actual = _converter.ConvertTo(source, expected.GetType());
 
         actual.ShouldNotBeNull();
         actual.ShouldBeOfType(expected.GetType());
@@ -56,7 +58,7 @@ public class ValueConverterFacts
     {
         const string source = "100.1";
         const decimal expected = 100.1m;
-        object? actual = ValueConverter.ConvertTo(source, expected.GetType());
+        object? actual = _converter.ConvertTo(source, expected.GetType());
 
         actual.ShouldNotBeNull();
         actual.ShouldBeOfType(expected.GetType());
@@ -69,7 +71,7 @@ public class ValueConverterFacts
         var utcNow = DateTime.UtcNow;
         string source = utcNow.ToString("O", DateTimeFormatInfo.InvariantInfo);
         DateTime expected = utcNow;
-        object? actual = ValueConverter.ConvertTo(source, expected.GetType());
+        object? actual = _converter.ConvertTo(source, expected.GetType());
 
         actual.ShouldNotBeNull();
         actual.ShouldBeOfType(expected.GetType());
@@ -83,7 +85,7 @@ public class ValueConverterFacts
     {
         var date = new DateOnly(2000, 10, 10);
         string source = date.ToString("O", DateTimeFormatInfo.InvariantInfo);
-        var actual = ValueConverter.ConvertTo(source, typeof(DateOnly));
+        var actual = _converter.ConvertTo(source, typeof(DateOnly));
 
         actual.ShouldNotBeNull();
         actual.ShouldBeOfType<DateOnly>();
@@ -95,7 +97,7 @@ public class ValueConverterFacts
     {
         var time = new TimeOnly(1, 10, 10);
         string source = time.ToString("O", DateTimeFormatInfo.InvariantInfo);
-        var actual = ValueConverter.ConvertTo(source, typeof(TimeOnly));
+        var actual = _converter.ConvertTo(source, typeof(TimeOnly));
 
         actual.ShouldNotBeNull();
         actual.ShouldBeOfType<TimeOnly>();
@@ -110,7 +112,7 @@ public class ValueConverterFacts
         var utcNow = DateTimeOffset.UtcNow;
         string source = utcNow.ToString("O", DateTimeFormatInfo.InvariantInfo);
         DateTimeOffset expected = utcNow;
-        object? actual = ValueConverter.ConvertTo(source, expected.GetType());
+        object? actual = _converter.ConvertTo(source, expected.GetType());
 
         actual.ShouldNotBeNull();
         actual.ShouldBeOfType(expected.GetType());
@@ -212,7 +214,7 @@ public class ValueConverterFacts
     [InlineData(typeof(decimal), typeof(double))]
     public void ConverterExistence(Type valueType, Type targetType)
     {
-        var actual = ValueConverter.GetConversion(valueType, targetType);
+        var actual = _converter.GetConversion(valueType, targetType);
 
         actual.ShouldNotBeNull();
     }

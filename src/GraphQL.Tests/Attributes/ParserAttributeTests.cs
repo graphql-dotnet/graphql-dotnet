@@ -15,9 +15,9 @@ public class ParserAttributeTests
     }
 
     [Theory]
-    [InlineData(typeof(Class1), "Could not find method 'InvalidMethod' on CLR type 'Class1' while initializing argument 'value'. The method must have a single parameter of type object.")]
-    [InlineData(typeof(Class2), "Could not find method 'Parse' on CLR type 'Dummy' while initializing argument 'value'. The method must have a single parameter of type object.")]
-    [InlineData(typeof(Class3), "Could not find method 'InvalidMethod' on CLR type 'Dummy' while initializing argument 'value'. The method must have a single parameter of type object.")]
+    [InlineData(typeof(Class1), "Could not find method 'InvalidMethod' on CLR type 'Class1' while initializing argument 'value'. The method must have a single parameter of type object, or two parameters of type object and IValueConverter.")]
+    [InlineData(typeof(Class2), "Could not find method 'Parse' on CLR type 'Dummy' while initializing argument 'value'. The method must have a single parameter of type object, or two parameters of type object and IValueConverter.")]
+    [InlineData(typeof(Class3), "Could not find method 'InvalidMethod' on CLR type 'Dummy' while initializing argument 'value'. The method must have a single parameter of type object, or two parameters of type object and IValueConverter.")]
     [InlineData(typeof(Class4), "Method 'InvalidMethod' on CLR type 'Class4' must have a return type of object.")]
     [InlineData(typeof(Class5), "Method 'Parse' on CLR type 'Dummy2' must have a return type of object.")]
     [InlineData(typeof(Class6), "Method 'InvalidMethod' on CLR type 'Dummy2' must have a return type of object.")]
@@ -64,9 +64,9 @@ public class ParserAttributeTests
     }
 
     [Theory]
-    [InlineData(typeof(Class1b), "Could not find method 'InvalidMethod' on CLR type 'Class1b' while initializing 'Class1b.Hello'. The method must have a single parameter of type object.")]
-    [InlineData(typeof(Class2b), "Could not find method 'Parse' on CLR type 'Dummy' while initializing 'Class2b.Hello'. The method must have a single parameter of type object.")]
-    [InlineData(typeof(Class3b), "Could not find method 'InvalidMethod' on CLR type 'Dummy' while initializing 'Class3b.Hello'. The method must have a single parameter of type object.")]
+    [InlineData(typeof(Class1b), "Could not find method 'InvalidMethod' on CLR type 'Class1b' while initializing 'Class1b.Hello'. The method must have a single parameter of type object, or two parameters of type object and IValueConverter.")]
+    [InlineData(typeof(Class2b), "Could not find method 'Parse' on CLR type 'Dummy' while initializing 'Class2b.Hello'. The method must have a single parameter of type object, or two parameters of type object and IValueConverter.")]
+    [InlineData(typeof(Class3b), "Could not find method 'InvalidMethod' on CLR type 'Dummy' while initializing 'Class3b.Hello'. The method must have a single parameter of type object, or two parameters of type object and IValueConverter.")]
     [InlineData(typeof(Class4b), "Method 'InvalidMethod' on CLR type 'Class4b' must have a return type of object.")]
     [InlineData(typeof(Class5b), "Method 'Parse' on CLR type 'Dummy2' must have a return type of object.")]
     [InlineData(typeof(Class6b), "Method 'InvalidMethod' on CLR type 'Dummy2' must have a return type of object.")]

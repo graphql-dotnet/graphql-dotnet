@@ -31,6 +31,8 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
         public INameConverter NameConverter => _schema.NameConverter;
 
+        public ValueConverterBase ValueConverter => _schema.ValueConverter;
+
         public IFieldMiddlewareBuilder FieldMiddleware => _schema.FieldMiddleware;
 
         public bool Initialized => _schema.Initialized;
@@ -169,6 +171,9 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
     /// <inheritdoc/>
     public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
+
+    /// <inheritdoc/>
+    public ValueConverterBase ValueConverter { get; set; } = new ValueConverter();
 
     /// <inheritdoc/>
     public IFieldMiddlewareBuilder FieldMiddleware { get; internal set; } = new FieldMiddlewareBuilder();
@@ -582,7 +587,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
                 ExamineType(inputType, completed, inProcess);
         }
 
-        static void ExamineType(IInputObjectGraphType inputType, HashSet<IInputObjectGraphType> completed, Stack<IInputObjectGraphType> inProcess)
+        void ExamineType(IInputObjectGraphType inputType, HashSet<IInputObjectGraphType> completed, Stack<IInputObjectGraphType> inProcess)
         {
             if (completed.Contains(inputType))
                 return;
@@ -596,7 +601,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
                     var baseType = field.ResolvedType!.GetNamedType();
                     if (baseType is IInputObjectGraphType inputFieldType)
                         ExamineType(inputFieldType, completed, inProcess);
-                    field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, value).Value;
+                    field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, value, ValueConverter).Value;
                 }
             }
             inProcess.Pop();

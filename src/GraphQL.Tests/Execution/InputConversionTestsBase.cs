@@ -1,6 +1,5 @@
 namespace GraphQL.Tests.Execution;
 
-[Collection("StaticTests")] // due to tests with ValueConverter
 public abstract class InputConversionTestsBase
 {
     #region Input Types
@@ -342,17 +341,18 @@ public abstract class InputConversionTestsBase
         person1.Name.ShouldBe("tom");
         person1.Age.ShouldBe(10);
 
-        ValueConverter.Register(v => new Person { Name = (string)v["name"] + "sample", Age = (int)v["age"] + 2 });
+        var converter = new ValueConverter();
+        converter.Register(v => new Person { Name = (string)v["name"]! + "sample", Age = (int)v["age"]! + 2 });
 
         // after registering custom converter
-        var person2 = inputs.ToObject<Person>()!;
+        var person2 = inputs.ToObject<Person>(valueConverter: converter)!;
         person2.Name.ShouldBe("tomsample");
         person2.Age.ShouldBe(12);
 
         // after unregistering custom converter
-        ValueConverter.Register<Person>(null);
+        converter.Register<Person>(null);
 
-        var person3 = inputs.ToObject<Person>()!;
+        var person3 = inputs.ToObject<Person>(valueConverter: converter)!;
         person3.Name.ShouldBe("tom");
         person3.Age.ShouldBe(10);
     }

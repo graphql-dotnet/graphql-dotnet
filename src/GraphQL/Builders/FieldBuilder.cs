@@ -105,13 +105,26 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     [AllowedOn<IInputObjectGraphType>]
     public virtual FieldBuilder<TSourceType, TReturnType> ParseValue(Func<object, object> parseValue)
     {
+        FieldType.Parser = (value, _) => parseValue(value);
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the input coercion for the field, replacing any existing coercion function.
+    /// Runs before any validation defined via <see cref="Validate"/>.
+    /// Null values are not passed to this function.
+    /// Applies only to input fields.
+    /// </summary>
+    [AllowedOn<IInputObjectGraphType>]
+    public virtual FieldBuilder<TSourceType, TReturnType> ParseValue(Func<object, IValueConverter, object> parseValue)
+    {
         FieldType.Parser = parseValue;
         return this;
     }
 
     /// <summary>
     /// Adds validation to the field, appending it to any existing validation function.
-    /// Runs after any coercion defined via <see cref="ParseValue"/>.
+    /// Runs after any coercion defined via <see cref="ParseValue(Func{object, object})"/>.
     /// Null values are not passed to this function.
     /// Applies only to input fields.
     /// </summary>

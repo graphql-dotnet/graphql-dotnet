@@ -214,7 +214,8 @@ public class Issue4060
                     _executionContext.Variables,
                     _executionContext.Document,
                     key,
-                    null
+                    null,
+                    _executionContext.Schema.ValueConverter
                 );
 
                 value = value2 ?? ImmutableDictionary<string, ArgumentValue>.Empty;

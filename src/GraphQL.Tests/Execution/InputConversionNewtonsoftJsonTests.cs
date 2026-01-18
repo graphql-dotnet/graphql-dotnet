@@ -1,6 +1,5 @@
 namespace GraphQL.Tests.Execution;
 
-[Collection("StaticTests")]
 public class InputConversionNewtonsoftJsonTests : InputConversionTestsBase
 {
     private static readonly IGraphQLTextSerializer _serializer = new NewtonsoftJson.GraphQLSerializer(indent: true);

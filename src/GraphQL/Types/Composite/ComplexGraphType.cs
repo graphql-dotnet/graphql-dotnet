@@ -299,7 +299,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
 
         if (this is IInputObjectGraphType)
         {
-            builder.ParseValue(value => value is TProperty ? value : value.GetPropertyValue(typeof(TProperty), builder.FieldType.ResolvedType!)!);
+            builder.ParseValue((value, vc) => value is TProperty ? value : vc.GetPropertyValue(value, typeof(TProperty), builder.FieldType.ResolvedType!)!);
         }
 
         if (this is IObjectGraphType)

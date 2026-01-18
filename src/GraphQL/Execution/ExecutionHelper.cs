@@ -41,7 +41,8 @@ public static class ExecutionHelper
 
             (directives ??= [])[dirDefinition.Name] = new DirectiveInfo(
                 dirDefinition,
-                GetArguments(dirDefinition.Arguments, dir.Arguments, variables, document, (ASTNode)node, dir) ?? _emptyDirectiveArguments);
+                GetArguments(dirDefinition.Arguments, dir.Arguments, variables, document, (ASTNode)node, dir, schema.ValueConverter) ?? _emptyDirectiveArguments,
+                schema);
         }
 
         return directives;
@@ -51,7 +52,7 @@ public static class ExecutionHelper
     /// Returns a dictionary of arguments and their values for a field or directive.
     /// Values will be retrieved from literals or variables as specified by the document.
     /// </summary>
-    public static Dictionary<string, ArgumentValue>? GetArguments(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables, GraphQLDocument document, ASTNode fieldOrFragmentSpread, GraphQLDirective? directive)
+    public static Dictionary<string, ArgumentValue>? GetArguments(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables, GraphQLDocument document, ASTNode fieldOrFragmentSpread, GraphQLDirective? directive, IValueConverter valueConverter)
     {
         if (definitionArguments == null || definitionArguments.Count == 0)
             return null;
@@ -81,6 +82,7 @@ public static class ExecutionHelper
                 Directive = directive,
                 ParentNode = fieldOrFragmentSpread,
                 Variables = variables,
+                ValueConverter = valueConverter,
             }, arg.DefaultValue);
 
             if (value != null) // if value is null, it's a default value (and argValue.Source == ArgumentSource.FieldDefault)
@@ -91,7 +93,7 @@ public static class ExecutionHelper
                     try
                     {
                         if (arg.Parser != null)
-                            parsedValue = arg.Parser(parsedValue);
+                            parsedValue = arg.Parser(parsedValue, valueConverter);
                         if (parsedValue != null && arg.Validator != null)
                             arg.Validator(parsedValue);
                     }
@@ -131,6 +133,7 @@ public static class ExecutionHelper
         public GraphQLDirective? Directive { get; init; }
         public GraphQLArgument? Argument { get; init; }
         public Variables? Variables { get; init; }
+        public required IValueConverter ValueConverter { get; init; }
     }
 
     /// <summary>
@@ -138,8 +141,8 @@ public static class ExecutionHelper
     /// Typically this is a value for a field argument or default value for a variable.
     /// Exceptions thrown by scalars are passed through.
     /// </summary>
-    public static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, Variables? variables = null, object? fieldDefault = null)
-        => CoerceValue(type, input, new CoerceValueContext { Variables = variables }, fieldDefault);
+    public static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, IValueConverter valueConverter, Variables? variables = null, object? fieldDefault = null)
+        => CoerceValue(type, input, new CoerceValueContext { Variables = variables, ValueConverter = valueConverter }, fieldDefault);
 
     /// <summary>
     /// Coerces a literal value to a compatible .NET type for the variable's graph type.
@@ -302,7 +305,7 @@ public static class ExecutionHelper
                             try
                             {
                                 if (field.Parser != null)
-                                    parsedValue = field.Parser(parsedValue);
+                                    parsedValue = field.Parser(parsedValue, context.ValueConverter);
                                 if (parsedValue != null && field.Validator != null)
                                     field.Validator(parsedValue);
                             }
@@ -361,7 +364,7 @@ public static class ExecutionHelper
 
             try
             {
-                return new ArgumentValue(inputObjectGraphType.ParseDictionary(obj), ArgumentSource.Literal);
+                return new ArgumentValue(inputObjectGraphType.ParseDictionary(obj, context.ValueConverter), ArgumentSource.Literal);
             }
             catch (Exception ex) when (context.Document != null && context.ParentNode != null)
             {
