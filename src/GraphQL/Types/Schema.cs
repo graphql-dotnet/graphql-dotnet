@@ -89,6 +89,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
     private List<Type>? _visitorTypes;
     private List<ISchemaNodeVisitor>? _visitors;
+    private readonly IGraphTypeMappingProvider[] _builtInMappingProviders;
 
     /// <summary>
     /// Create an instance of <see cref="Schema"/> with the <see cref="DefaultServiceProvider"/>, which
@@ -128,17 +129,28 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     /// Executes the specified <see cref="IConfigureSchema"/> instances on the schema, if any.
     /// </summary>
     public Schema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations)
+        : this(services, configurations, NameFieldResolver.Instance, new ValueConverter(), [new BuiltInScalarMappingProvider(), new EnumGraphTypeMappingProvider()])
+    {
+    }
+
+    internal Schema(IServiceProvider services, IEnumerable<IConfigureSchema>? configurations, IFieldResolver? defaultFieldResolver, ValueConverterBase valueConverter, IGraphTypeMappingProvider[] builtInMappingProviders)
     {
         _services = services;
+        _builtInMappingProviders = builtInMappingProviders;
+        DefaultFieldResolver = defaultFieldResolver;
+        ValueConverter = valueConverter;
 
         Directives = new SchemaDirectives();
         Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
 
         // OrderBy here performs a stable sort; that is, if the sort order of two elements are equal,
         // the order of the elements are preserved.
-        foreach (var configuration in configurations?.OrderBy(x => x.SortOrder) ?? Enumerable.Empty<IConfigureSchema>())
+        if (configurations != null)
         {
-            configuration.Configure(this, services);
+            foreach (var configuration in configurations.OrderBy(x => x.SortOrder))
+            {
+                configuration.Configure(this, services);
+            }
         }
     }
 
@@ -173,7 +185,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
 
     /// <inheritdoc/>
-    public ValueConverterBase ValueConverter { get; set; } = new ValueConverter();
+    public ValueConverterBase ValueConverter { get; set; }
 
     /// <inheritdoc/>
     public IFieldMiddlewareBuilder FieldMiddleware { get; internal set; } = new FieldMiddlewareBuilder();
@@ -397,7 +409,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     public IEnumerable<(Type clrType, Type graphType)> TypeMappings => _clrToGraphTypeMappings ?? Enumerable.Empty<(Type, Type)>();
 
     /// <inheritdoc/>
-    public IEnumerable<(Type clrType, Type graphType)> BuiltInTypeMappings
+    public virtual IEnumerable<(Type clrType, Type graphType)> BuiltInTypeMappings
     {
         get
         {
@@ -516,24 +528,8 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     protected virtual SchemaTypesBase CreateSchemaTypes()
     {
         var graphTypeMappingProviders = (IEnumerable<IGraphTypeMappingProvider>?)_services.GetService(typeof(IEnumerable<IGraphTypeMappingProvider>));
-        return new SchemaTypes(this, _services, PrependBuiltInProviders(graphTypeMappingProviders), OnBeforeInitializeType);
-    }
-
-    /// <summary>
-    /// Prepends built-in mapping providers (for built-in scalars and enums) to the provided list of providers.
-    /// </summary>
-    /// <param name="graphTypeMappings">Custom CLR-to-GraphQL type mappings, or null.</param>
-    /// <returns>A new enumerable with built-in providers prepended.</returns>
-    private static IEnumerable<IGraphTypeMappingProvider> PrependBuiltInProviders(IEnumerable<IGraphTypeMappingProvider>? graphTypeMappings)
-    {
-        yield return new BuiltInScalarMappingProvider();
-        yield return new EnumGraphTypeMappingProvider();
-
-        if (graphTypeMappings != null)
-        {
-            foreach (var provider in graphTypeMappings)
-                yield return provider;
-        }
+        graphTypeMappingProviders = graphTypeMappingProviders != null ? _builtInMappingProviders.Concat(graphTypeMappingProviders) : _builtInMappingProviders;
+        return new SchemaTypes(this, _services, graphTypeMappingProviders, OnBeforeInitializeType);
     }
 
     /// <summary>
