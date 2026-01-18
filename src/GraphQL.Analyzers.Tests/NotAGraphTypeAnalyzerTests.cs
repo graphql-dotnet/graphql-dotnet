@@ -298,4 +298,28 @@ public class NotAGraphTypeAnalyzerTests
             : DiagnosticResult.EmptyDiagnosticResults;
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
+
+    [Fact]
+    public async Task AotInputTypeAttribute_GraphTypeArgument_GQL011()
+    {
+        const string source =
+            """
+            using System;
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            [AotInputType<{|#0:StringGraphType|}>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+                protected override void Configure(IServiceProvider services) { }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic().WithLocation(0)
+            .WithArguments("StringGraphType", "T", "AotInputType<T>");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
 }

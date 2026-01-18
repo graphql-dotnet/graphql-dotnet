@@ -61,6 +61,7 @@ For more information about analyzers configuration see
 | [GQL019](../gql019) | `Validator` method must be valid                                                                  |
 | [GQL020](../gql020) | `ValidateArguments` method must be valid                                                          |
 | [GQL021](../gql021) | Nullable reference type argument should specify nullable parameter                                |
+| [GQL022](../gql022) | AOT schema attributes must be applied to classes deriving from `AotSchema`                        |
 
 ## Federation Analyzers
 

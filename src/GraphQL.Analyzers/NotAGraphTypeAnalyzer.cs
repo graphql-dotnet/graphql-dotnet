@@ -28,6 +28,78 @@ public class NotAGraphTypeAnalyzer : DiagnosticAnalyzer
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.RegisterSyntaxNodeAction(AnalyzeGenericName, SyntaxKind.GenericName);
+        context.RegisterSyntaxNodeAction(AnalyzeAttribute, SyntaxKind.Attribute);
+    }
+
+    private void AnalyzeAttribute(SyntaxNodeAnalysisContext context)
+    {
+        var attribute = (AttributeSyntax)context.Node;
+
+        // Get the attribute's name (which may be generic)
+        if (attribute.Name is not GenericNameSyntax genericName)
+        {
+            return;
+        }
+
+        var attributeSymbol = context.SemanticModel.GetSymbolInfo(attribute).Symbol;
+        if (attributeSymbol is not IMethodSymbol { MethodKind: MethodKind.Constructor, ContainingType: var attributeType })
+        {
+            return;
+        }
+
+        if (!attributeType.IsGraphQLSymbol())
+        {
+            return;
+        }
+
+        var typeParameters = attributeType.TypeParameters;
+        var typeArguments = attributeType.TypeArguments;
+
+        INamedTypeSymbol? graphTypeInterface = null;
+        string? genericNameString = null;
+
+        for (int i = 0; i < typeParameters.Length; i++)
+        {
+            var typeParam = typeParameters[i];
+            var typeArg = typeArguments[i];
+
+            if (HasNotAGraphTypeAttribute(typeParam) && IsGraphType(typeArg))
+            {
+                var location = genericName.TypeArgumentList.Arguments[i].GetLocation();
+                context.ReportDiagnostic(Diagnostic.Create(
+                    MustNotBeConvertibleToGraphType,
+                    location,
+                    typeArg.Name,
+                    typeParam.Name,
+                    genericNameString ??= GetGenericNameString(typeParameters, genericName)));
+            }
+        }
+
+        bool HasNotAGraphTypeAttribute(ISymbol typeParam)
+        {
+            return typeParam.GetAttributes()
+                .Any(data => data.AttributeClass?.MetadataName == Constants.MetadataNames.NotAGraphTypeAttribute);
+        }
+
+        bool IsGraphType(ITypeSymbol typeArg)
+        {
+            graphTypeInterface ??= context.Compilation.GetTypeByMetadataName(Constants.MetadataNames.IGraphType);
+            if (SymbolEqualityComparer.Default.Equals(typeArg, graphTypeInterface))
+            {
+                return true;
+            }
+
+            return typeArg is ITypeParameterSymbol typeParam
+                ? typeParam.ConstraintTypes.Any(IsGraphType)
+                : typeArg.AllInterfaces
+                    .Any(@interface => SymbolEqualityComparer.Default.Equals(@interface, graphTypeInterface));
+        }
+
+        string GetGenericNameString(ImmutableArray<ITypeParameterSymbol> typeParams, SimpleNameSyntax name)
+        {
+            string argList = string.Join(", ", typeParams.Select(p => p.Name));
+            return $"{name.Identifier.Text}<{argList}>";
+        }
     }
 
     private void AnalyzeGenericName(SyntaxNodeAnalysisContext context)
