@@ -146,6 +146,8 @@
             file: gqlfed004.md
           - title: GQLFED005
             file: gqlfed005.md
+          - title: GQLFED006
+            file: gqlfed006.md
       - title: Migration Guides
         dir: migrations
         items:

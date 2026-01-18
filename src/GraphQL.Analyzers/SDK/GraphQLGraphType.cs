@@ -14,6 +14,8 @@ public sealed class GraphQLGraphType
     private readonly Lazy<IReadOnlyList<GraphQLFieldInvocation>> _fields;
     private readonly Lazy<bool> _isInputType;
     private readonly Lazy<bool> _isOutputType;
+    private readonly Lazy<bool> _isInterfaceType;
+    private readonly Lazy<bool> _isUnionType;
     private readonly Lazy<Location> _location;
     private readonly Lazy<IReadOnlyList<FederationKey>?> _federationKeys;
 
@@ -28,6 +30,8 @@ public sealed class GraphQLGraphType
         _fields = new Lazy<IReadOnlyList<GraphQLFieldInvocation>>(GetFields);
         _isInputType = new Lazy<bool>(CheckIsInputType);
         _isOutputType = new Lazy<bool>(CheckIsOutputType);
+        _isInterfaceType = new Lazy<bool>(CheckIsInterfaceType);
+        _isUnionType = new Lazy<bool>(CheckIsUnionType);
         _location = new Lazy<Location>(classDeclaration.Identifier.GetLocation);
         _federationKeys = new Lazy<IReadOnlyList<FederationKey>?>(GetFederationKeys);
     }
@@ -84,6 +88,16 @@ public sealed class GraphQLGraphType
     /// Gets whether this is an output graph type (IObjectGraphType, IInterfaceGraphType).
     /// </summary>
     public bool IsOutputType => _isOutputType.Value;
+
+    /// <summary>
+    /// Gets whether this is an interface graph type (IInterfaceGraphType).
+    /// </summary>
+    public bool IsInterfaceType => _isInterfaceType.Value;
+
+    /// <summary>
+    /// Gets whether this is a union graph type (UnionGraphType).
+    /// </summary>
+    public bool IsUnionType => _isUnionType.Value;
 
     /// <summary>
     /// Gets the location of the graph type declaration in source code.
@@ -187,6 +201,34 @@ public sealed class GraphQLGraphType
     {
         var typeSymbol = _typeSymbol.Value;
         return typeSymbol?.AllInterfaces.Any(i => i.Name is "IObjectGraphType" or "IInterfaceGraphType") == true;
+    }
+
+    private bool CheckIsInterfaceType()
+    {
+        var typeSymbol = _typeSymbol.Value;
+        return typeSymbol?.AllInterfaces.Any(i => i.Name == "IInterfaceGraphType") == true;
+    }
+
+    private bool CheckIsUnionType()
+    {
+        var typeSymbol = _typeSymbol.Value;
+        if (typeSymbol == null)
+        {
+            return false;
+        }
+
+        // Check base type hierarchy for UnionGraphType
+        var baseType = typeSymbol.BaseType;
+        while (baseType != null)
+        {
+            if (baseType.Name.Contains("UnionGraphType"))
+            {
+                return true;
+            }
+            baseType = baseType.BaseType;
+        }
+
+        return false;
     }
 
     /// <summary>
