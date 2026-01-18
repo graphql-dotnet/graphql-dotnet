@@ -132,6 +132,12 @@ Notably, the AOT builder does **not** register open generic types such as `AutoR
 
 Additional services needed for your application should be registered explicitly through the builder's configuration delegate. This approach gives you full control over which services are included, ensuring compatibility with Native AOT constraints.
 
+### 5. AotSchema Base Class for AOT-Compatible Schemas
+
+A new `AotSchema` abstract base class has been added to support creating AOT-compatible schemas without relying on runtime reflection or dependency injection for graph type resolution. This class is designed to work with source generators that can produce AOT-friendly schema definitions.
+
+Please see the documentation located (todo) for creating AOT-friendly schemas.
+
 ## Breaking Changes
 
 ### 1. Removal of Obsolete Members

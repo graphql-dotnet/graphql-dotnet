@@ -12,10 +12,14 @@ public abstract class AotSchema : Schema, IServiceProvider
     /// <summary>
     /// Initializes a new instance of the <see cref="AotSchema"/> class.
     /// </summary>
-    protected AotSchema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations) : base(services, configurations, null, new ValueConverterAot(), [])
+    protected AotSchema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations) : base(services, null, null, new ValueConverterAot(), [])
     {
         _services = services;
         OnPreConfigure(services);
+        foreach (var configuration in configurations.OrderBy(x => x.SortOrder))
+        {
+            configuration.Configure(this, services);
+        }
         Configure(services);
         OnPostConfigure(services);
     }
