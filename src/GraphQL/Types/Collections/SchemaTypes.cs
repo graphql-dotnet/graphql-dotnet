@@ -870,6 +870,9 @@ public sealed partial class SchemaTypes : SchemaTypesBase
         /// </summary>
         private Type GetGraphTypeFromClrType(Type clrType, bool isInputType)
         {
+            if (Nullable.GetUnderlyingType(clrType) != null)
+                throw new InvalidOperationException("Graph type mappings cannot be nullable value types.");
+
             // Check cache first, which includes mappings within schema.TypeMappings
             var cache = isInputType ? _inputClrTypeMappingCache : _outputClrTypeMappingCache;
             if (cache.TryGetValue(clrType, out var cachedType))
