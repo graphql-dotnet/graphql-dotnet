@@ -486,7 +486,8 @@ public abstract class ExecutionStrategy : IExecutionStrategy
     /// <see cref="NameFieldResolver.Instance"/> for all other cases.
     /// </summary>
     protected virtual IFieldResolver SelectResolver(ExecutionNode node, ExecutionContext context)
-        => node.FieldDefinition.Resolver ?? (node.Parent is RootExecutionNode && context.Operation.Operation == OperationType.Subscription ? SourceFieldResolver.Instance : NameFieldResolver.Instance);
+        => node.FieldDefinition.Resolver ?? (node.Parent is RootExecutionNode && context.Operation.Operation == OperationType.Subscription ? SourceFieldResolver.Instance
+        : context.Schema.DefaultFieldResolver ?? throw new InvalidOperationException("No default field resolver configured for this schema"));
 
     [ThreadStatic]
     private static ReadonlyResolveFieldContext? _readonlyResolveFieldContext;
