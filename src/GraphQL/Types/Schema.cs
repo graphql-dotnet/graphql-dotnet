@@ -172,9 +172,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     /// <inheritdoc/>
     public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
 
-    /// <summary>
-    /// Value converter for converting between different types; provides type conversions used throughout the schema.
-    /// </summary>
+    /// <inheritdoc/>
     public ValueConverterBase ValueConverter { get; set; } = new ValueConverter();
 
     /// <inheritdoc/>
