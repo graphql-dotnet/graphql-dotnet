@@ -15,7 +15,9 @@ public abstract class AotSchema : Schema, IServiceProvider
     protected AotSchema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations) : base(services, configurations, null, new ValueConverterAot(), [])
     {
         _services = services;
+        OnPreConfigure(services);
         Configure(services);
+        OnPostConfigure(services);
     }
 
     /// <summary>
@@ -42,9 +44,23 @@ public abstract class AotSchema : Schema, IServiceProvider
     }
 
     /// <summary>
+    /// Called before <see cref="Configure"/> to allow custom initialization.
+    /// </summary>
+    protected virtual void OnPreConfigure(IServiceProvider services)
+    {
+    }
+
+    /// <summary>
     /// Configures the schema; for use by generated code.
     /// </summary>
     protected abstract void Configure(IServiceProvider services);
+
+    /// <summary>
+    /// Called after <see cref="Configure"/> to allow custom post-configuration.
+    /// </summary>
+    protected virtual void OnPostConfigure(IServiceProvider services)
+    {
+    }
 
     private static readonly (Type, Type)[] _builtInTypeMappings = [
         (typeof(int), typeof(IntGraphType)),

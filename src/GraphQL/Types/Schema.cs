@@ -133,7 +133,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     {
     }
 
-    internal Schema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations, IFieldResolver? defaultFieldResolver, ValueConverterBase valueConverter, IGraphTypeMappingProvider[] builtInMappingProviders)
+    internal Schema(IServiceProvider services, IEnumerable<IConfigureSchema>? configurations, IFieldResolver? defaultFieldResolver, ValueConverterBase valueConverter, IGraphTypeMappingProvider[] builtInMappingProviders)
     {
         _services = services;
         _builtInMappingProviders = builtInMappingProviders;
@@ -145,9 +145,12 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
         // OrderBy here performs a stable sort; that is, if the sort order of two elements are equal,
         // the order of the elements are preserved.
-        foreach (var configuration in configurations?.OrderBy(x => x.SortOrder) ?? Enumerable.Empty<IConfigureSchema>())
+        if (configurations != null)
         {
-            configuration.Configure(this, services);
+            foreach (var configuration in configurations.OrderBy(x => x.SortOrder))
+            {
+                configuration.Configure(this, services);
+            }
         }
     }
 
