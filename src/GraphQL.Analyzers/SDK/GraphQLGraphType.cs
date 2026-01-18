@@ -221,7 +221,7 @@ public sealed class GraphQLGraphType
         var baseType = typeSymbol.BaseType;
         while (baseType != null)
         {
-            if (baseType.Name.Contains("UnionGraphType"))
+            if (baseType.Name == "UnionGraphType")
             {
                 return true;
             }
