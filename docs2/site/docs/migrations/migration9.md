@@ -99,6 +99,39 @@ services.AddGraphQL(b => b
 );
 ```
 
+### 4. GraphQLAotBuilder for AOT-Compatible Service Registration
+
+A new `GraphQLAotBuilder` class and `AddGraphQLAot` extension method have been added to support AOT (Ahead-of-Time) compilation scenarios. This builder registers only the minimal set of services required for basic GraphQL functionality, avoiding services that may cause issues with Native AOT compilation.
+
+The `AddGraphQLAot` method works similarly to `AddGraphQL` but uses the AOT-compatible builder:
+
+```csharp
+// Standard GraphQL registration (includes all default services)
+services.AddGraphQL(b => b
+    .AddSchema<MySchema>()
+    .AddSystemTextJson()
+);
+
+// AOT-compatible registration (minimal service set)
+services.AddGraphQLAot(b => b
+    .AddSchema<MySchema>()
+    .AddSystemTextJsonAot()
+);
+```
+
+The AOT builder registers only these essential services:
+
+- `IDocumentExecuter` → `DocumentExecuter`
+- `IDocumentBuilder` → `GraphQLDocumentBuilder`
+- `IDocumentValidator` → `DocumentValidator`
+- `IErrorInfoProvider` → `ErrorInfoProvider`
+- `IExecutionStrategySelector` → `DefaultExecutionStrategySelector`
+- `ErrorInfoProviderOptions` configuration
+
+Notably, the AOT builder does **not** register open generic types such as `AutoRegisteringObjectGraphType<>`, `AutoRegisteringInputObjectGraphType<>`, or `EnumerationGraphType<>`, as these require runtime code generation that is incompatible with Native AOT. Instead, you should explicitly register concrete graph types for your schema.
+
+Additional services needed for your application should be registered explicitly through the builder's configuration delegate. This approach gives you full control over which services are included, ensuring compatibility with Native AOT constraints.
+
 ## Breaking Changes
 
 ### 1. Removal of Obsolete Members

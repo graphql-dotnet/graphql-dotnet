@@ -85,6 +85,10 @@ namespace GraphQL.MicrosoftDI
         public GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, T5, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
         public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithScope() { }
     }
+    public class GraphQLAotBuilder : GraphQL.MicrosoftDI.GraphQLBuilder
+    {
+        public GraphQLAotBuilder(Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<GraphQL.DI.IGraphQLBuilder>? configure) { }
+    }
     public class GraphQLBuilder : GraphQL.DI.GraphQLBuilderBase, GraphQL.DI.IServiceRegister, Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Collections.Generic.ICollection<Microsoft.Extensions.DependencyInjection.ServiceDescriptor>, System.Collections.Generic.IEnumerable<Microsoft.Extensions.DependencyInjection.ServiceDescriptor>, System.Collections.Generic.IList<Microsoft.Extensions.DependencyInjection.ServiceDescriptor>, System.Collections.IEnumerable
     {
         public GraphQLBuilder(Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<GraphQL.DI.IGraphQLBuilder>? configure) { }
@@ -256,6 +260,7 @@ namespace GraphQL
     public static class MicrosoftDIGraphQLBuilderExtensions
     {
         public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddGraphQL(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<GraphQL.DI.IGraphQLBuilder>? configure) { }
+        public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddGraphQLAot(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<GraphQL.DI.IGraphQLBuilder>? configure) { }
         public static GraphQL.DI.IGraphQLBuilder AddScopedSubscriptionExecutionStrategy(this GraphQL.DI.IGraphQLBuilder builder, bool serialExecution = true) { }
         public static GraphQL.DI.IGraphQLBuilder AddSelfActivatingSchema<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
