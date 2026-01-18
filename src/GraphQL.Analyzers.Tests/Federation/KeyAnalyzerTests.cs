@@ -1625,7 +1625,3 @@ public class KeyAnalyzerTests
         await VerifyCS.VerifyAnalyzerAsync(source);
     }
 }
-
-
-
-
