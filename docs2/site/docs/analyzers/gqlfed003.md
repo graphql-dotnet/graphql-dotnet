@@ -11,17 +11,24 @@
 
 ## Cause
 
-Multiple `@key` directives with identical field specifications are defined on the same GraphQL type.
+Multiple `@key` directives with identical field specifications are defined on
+the same GraphQL type.
 
 ## Rule description
 
-The `@key` directive designates an object type as an entity and specifies its key fields. While a type can have multiple keys to support different identification patterns, defining the same key multiple times is redundant and likely a mistake.
+The `@key` directive designates an object type as an entity and specifies its
+key fields. While a type can have multiple keys to support different
+identification patterns, defining the same key multiple times is redundant and
+likely a mistake.
 
-This analyzer detects duplicate keys by normalizing field names (case-insensitive) and field order. For example, `"id name"` and `"name id"` are considered duplicates because they specify the same set of fields.
+This analyzer detects duplicate keys by normalizing field names
+(case-insensitive) and field order. For example, `"id name"` and `"name id"` are
+considered duplicates because they specify the same set of fields.
 
 ## How to fix violations
 
-Remove the duplicate `.Key()` method calls, keeping only one instance of each unique key.
+Remove the duplicate `.Key()` method calls, keeping only one instance of each
+unique key.
 
 ## Example of a violation
 
@@ -34,7 +41,7 @@ public class UserGraphType : ObjectGraphType<User>
     {
         this.Key("id");
         this.Key("id");  // Duplicate
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<StringGraphType>>(x => x.Name);
     }
@@ -50,7 +57,7 @@ public class UserGraphType : ObjectGraphType<User>
     {
         this.Key("id name");
         this.Key("name id");  // Duplicate (same fields, different order)
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<StringGraphType>>(x => x.Name);
     }
@@ -66,7 +73,7 @@ public class UserGraphType : ObjectGraphType<User>
     {
         this.Key("organization { id name }");
         this.Key("organization { name id }");  // Duplicate (nested fields, different order)
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<OrganizationGraphType>>("organization");
     }
@@ -83,7 +90,7 @@ public class UserGraphType : ObjectGraphType<User>
     public UserGraphType()
     {
         this.Key("id");
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<StringGraphType>>(x => x.Name);
     }
@@ -98,7 +105,7 @@ public class UserGraphType : ObjectGraphType<User>
     public UserGraphType()
     {
         this.Key("id name");
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<StringGraphType>>(x => x.Name);
     }
@@ -115,7 +122,7 @@ public class UserGraphType : ObjectGraphType<User>
         this.Key("id");                      // First key: by id alone
         this.Key("email");                   // Second key: by email alone
         this.Key("organization { id } name"); // Third key: by org id and name
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<StringGraphType>>(x => x.Name);
         Field<NonNullGraphType<StringGraphType>>(x => x.Email);

@@ -10,11 +10,11 @@ using Microsoft.CodeAnalysis.Editing;
 namespace GraphQL.Analyzers.Federation;
 
 [Shared]
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DuplicateKeyCodeFixProvider))]
-public class DuplicateKeyCodeFixProvider : CodeFixProvider
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(KeyAnalyzerCodeFixProvider))]
+public class KeyAnalyzerCodeFixProvider : CodeFixProvider
 {
     public override ImmutableArray<string> FixableDiagnosticIds { get; } =
-        ImmutableArray.Create(DiagnosticIds.DUPLICATE_KEY);
+        ImmutableArray.Create(DiagnosticIds.DUPLICATE_KEY, DiagnosticIds.REDUNDANT_KEY);
 
     public sealed override FixAllProvider GetFixAllProvider() =>
         WellKnownFixAllProviders.BatchFixer;
@@ -29,18 +29,21 @@ public class DuplicateKeyCodeFixProvider : CodeFixProvider
             if (root!.FindNode(diagnosticSpan) is not InvocationExpressionSyntax invocationExpression)
                 continue;
 
-            const string codeFixTitle = "Remove duplicate key";
+            var codeFixTitle = diagnostic.Id == DiagnosticIds.DUPLICATE_KEY
+                ? "Remove duplicate key"
+                : "Remove redundant key";
+
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title: codeFixTitle,
                     createChangedDocument: ct =>
-                        RemoveDuplicateKeyAsync(context.Document, invocationExpression, ct),
+                        RemoveKeyAsync(context.Document, invocationExpression, ct),
                     equivalenceKey: codeFixTitle),
                 diagnostic);
         }
     }
 
-    private static async Task<Document> RemoveDuplicateKeyAsync(
+    private static async Task<Document> RemoveKeyAsync(
         Document document,
         InvocationExpressionSyntax invocationExpression,
         CancellationToken cancellationToken)
