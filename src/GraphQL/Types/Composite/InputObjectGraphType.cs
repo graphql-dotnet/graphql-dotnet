@@ -71,6 +71,7 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
     public bool IsOneOf { get; set; }
 
     /// <inheritdoc/>
+    [RequiresDynamicCode("This method uses dynamic code generation to compile object conversion logic.")]
     public override void Initialize(ISchema schema)
     {
         base.Initialize(schema);

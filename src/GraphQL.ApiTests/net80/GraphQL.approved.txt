@@ -2786,6 +2786,7 @@ namespace GraphQL.Types
     {
         public InputObjectGraphType() { }
         public bool IsOneOf { get; set; }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This method uses dynamic code generation to compile object conversion logic.")]
         public override void Initialize(GraphQL.Types.ISchema schema) { }
         public virtual bool IsValidDefault(object value) { }
         public virtual object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value) { }
