@@ -61,6 +61,7 @@
     <File Path="docs2/site/docs/analyzers/gqlfed002.md" />
     <File Path="docs2/site/docs/analyzers/gqlfed003.md" />
     <File Path="docs2/site/docs/analyzers/gqlfed004.md" />
+    <File Path="docs2/site/docs/analyzers/gqlfed005.md" />
     <File Path="docs2/site/docs/analyzers/overview.md" />
   </Folder>
   <Folder Name="/Docs/getting-started/">

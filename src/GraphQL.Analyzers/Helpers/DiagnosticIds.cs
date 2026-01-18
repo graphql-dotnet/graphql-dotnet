@@ -28,4 +28,5 @@ public static class DiagnosticIds
     public const string KEY_MUST_NOT_BE_NULL_OR_EMPTY = "GQLFED002";
     public const string DUPLICATE_KEY = "GQLFED003";
     public const string REDUNDANT_KEY = "GQLFED004";
+    public const string KEY_FIELD_MUST_NOT_HAVE_ARGUMENTS = "GQLFED005";
 }

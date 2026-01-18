@@ -1508,5 +1508,124 @@ public class KeyAnalyzerTests
 
         await VerifyCS.VerifyCodeFixAsync(source, expected, fixedSource);
     }
+
+    [Fact]
+    public async Task KeyFieldWithArguments_ReportsError()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("{|#0:name|}");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name")
+                        .Argument<IntGraphType>("first");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldMustNotHaveArguments)
+            .WithLocation(0)
+            .WithArguments("name", "UserGraphType");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task KeyFieldWithArguments_NestedField_ReportsError()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("organization { {|#0:name|} }");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<OrganizationGraphType>>("organization");
+                }
+            }
+
+            public class OrganizationGraphType : ObjectGraphType<Organization>
+            {
+                public OrganizationGraphType()
+                {
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name")
+                        .Argument<IntGraphType>("first");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public Organization Organization { get; set; }
+            }
+
+            public class Organization
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldMustNotHaveArguments)
+            .WithLocation(0)
+            .WithArguments("name", "OrganizationGraphType");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task KeyFieldWithoutArguments_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id name");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
 }
+
+
+
 
