@@ -69,3 +69,4 @@ For more information about analyzers configuration see
 | [GQLFED001](../gqlfed001) | Key field does not exist          |
 | [GQLFED002](../gqlfed002) | Key must not be null or empty     |
 | [GQLFED003](../gqlfed003) | Duplicate key                     |
+| [GQLFED004](../gqlfed004) | Redundant key                     |

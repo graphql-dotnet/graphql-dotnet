@@ -38,8 +38,21 @@ public class KeyAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.DUPLICATE_KEY);
 
+    public static readonly DiagnosticDescriptor RedundantKey = new(
+        id: DiagnosticIds.REDUNDANT_KEY,
+        title: "Redundant key",
+        messageFormat: "Key '{0}' is redundant because key '{1}' already exists on type '{2}'",
+        category: DiagnosticCategories.FEDERATION,
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true,
+        helpLinkUri: HelpLinks.REDUNDANT_KEY);
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(KeyFieldDoesNotExist, KeyMustNotBeNullOrEmpty, DuplicateKey);
+        ImmutableArray.Create(
+            KeyFieldDoesNotExist,
+            KeyMustNotBeNullOrEmpty,
+            DuplicateKey,
+            RedundantKey);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -58,6 +71,7 @@ public class KeyAnalyzer : DiagnosticAnalyzer
             ValidateKeyFields(context, graphType, key);
 
         DetectDuplicateKeys(context, graphType, federationKeys);
+        DetectRedundantKeys(context, graphType, federationKeys);
     }
 
     private static void ValidateKeyFields(
@@ -189,5 +203,76 @@ public class KeyAnalyzer : DiagnosticAnalyzer
                 sb.Append(" }");
             }
         }
+    }
+
+    private static void DetectRedundantKeys(
+        SyntaxNodeAnalysisContext context,
+        GraphQLGraphType graphType,
+        IReadOnlyList<FederationKey> keys)
+    {
+        var keyFieldPaths = new List<(FederationKey Key, HashSet<string> FieldPaths)>();
+
+        foreach (var key in keys)
+        {
+            if (string.IsNullOrWhiteSpace(key.FieldsString))
+                continue;
+
+            if (key.Fields == null)
+                continue;
+
+            var fieldPaths = ExtractFieldPaths(key.Fields);
+            keyFieldPaths.Add((key, fieldPaths));
+        }
+
+        // Check for redundant keys
+        for (int i = 0; i < keyFieldPaths.Count; i++)
+        {
+            for (int j = 0; j < keyFieldPaths.Count; j++)
+            {
+                if (i == j)
+                    continue;
+
+                var (keyI, pathsI) = keyFieldPaths[i];
+                var (keyJ, pathsJ) = keyFieldPaths[j];
+
+                // Check if keyI is a superset of keyJ (meaning keyI is redundant)
+                if (pathsJ.IsSubsetOf(pathsI) && !pathsI.SetEquals(pathsJ))
+                {
+                    var diagnostic = Diagnostic.Create(
+                        RedundantKey,
+                        keyI.Location,
+                        keyI.FieldsString,
+                        keyJ.FieldsString,
+                        graphType.Name);
+                    context.ReportDiagnostic(diagnostic);
+                    break; // Only report once per key
+                }
+            }
+        }
+    }
+
+    private static HashSet<string> ExtractFieldPaths(GraphQLSelectionSet selectionSet, string prefix = "")
+    {
+        var fieldPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var field in selectionSet.Selections.OfType<GraphQLField>())
+        {
+            var fieldName = field.Name.StringValue;
+            var fullPath = string.IsNullOrEmpty(prefix) ? fieldName : $"{prefix}.{fieldName}";
+
+            if (field.SelectionSet != null)
+            {
+                // For nested fields, recursively extract paths
+                var nestedPaths = ExtractFieldPaths(field.SelectionSet, fullPath);
+                foreach (var path in nestedPaths)
+                    fieldPaths.Add(path);
+            }
+            else
+            {
+                fieldPaths.Add(fullPath);
+            }
+        }
+
+        return fieldPaths;
     }
 }
