@@ -210,7 +210,7 @@ public class KeyAnalyzer : DiagnosticAnalyzer
         GraphQLGraphType graphType,
         IReadOnlyList<FederationKey> keys)
     {
-        var keyFieldPaths = new List<(FederationKey Key, HashSet<string> FieldPaths)>();
+        var keyFieldPaths = new List<(FederationKey Key, HashSet<string> FieldPaths)>(keys.Count);
 
         foreach (var key in keys)
         {
