@@ -11,17 +11,24 @@
 
 ## Cause
 
-A key specified in a `@key` directive is redundant because another key with fewer fields already exists that can uniquely identify the entity.
+A key specified in a `@key` directive is redundant because another key with
+fewer fields already exists that can uniquely identify the entity.
 
 ## Rule description
 
-In Apollo Federation, a key is a set of fields that uniquely identifies an instance of an entity. When multiple keys are defined on a type, each key should provide a distinct way to identify the entity. A key is considered redundant if it contains all the fields of another key plus additional fields, because the smaller key is already sufficient for unique identification.
+In Apollo Federation, a key is a set of fields that uniquely identifies an
+instance of an entity. When multiple keys are defined on a type, each key should
+provide a distinct way to identify the entity. A key is considered redundant if
+it contains all the fields of another key plus additional fields, because the
+smaller key is already sufficient for unique identification.
 
-This analyzer detects when a key is a superset of another key (contains all fields of another key plus more), which makes it redundant and unnecessary.
+This analyzer detects when a key is a superset of another key (contains all
+fields of another key plus more), which makes it redundant and unnecessary.
 
 ## How to fix violations
 
-Remove the redundant key declaration. The smaller, more efficient key is sufficient for entity resolution.
+Remove the redundant key declaration. The smaller, more efficient key is
+sufficient for entity resolution.
 
 ## Example of a violation
 
@@ -32,14 +39,16 @@ public class UserGraphType : ObjectGraphType<User>
     {
         this.Key("id");
         this.Key("id name"); // Redundant: "id" alone is sufficient
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<StringGraphType>>(x => x.Name);
     }
 }
 ```
 
-In this example, the key `"id name"` is redundant because the key `"id"` already uniquely identifies the user. The additional `name` field doesn't add value for entity resolution.
+In this example, the key `"id name"` is redundant because the key `"id"` already
+uniquely identifies the user. The additional `name` field doesn't add value for
+entity resolution.
 
 ## Example of how to fix
 
@@ -51,7 +60,7 @@ public class UserGraphType : ObjectGraphType<User>
     public UserGraphType()
     {
         this.Key("id");
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<StringGraphType>>(x => x.Name);
     }
@@ -70,7 +79,7 @@ public class UserGraphType : ObjectGraphType<User>
     {
         this.Key("organization { id }");
         this.Key("organization { id name }"); // Redundant
-        
+
         Field<NonNullGraphType<IdGraphType>>("id");
         Field<NonNullGraphType<OrganizationGraphType>>("organization");
     }
@@ -82,7 +91,7 @@ public class UserGraphType : ObjectGraphType<User>
     public UserGraphType()
     {
         this.Key("organization { id }");
-        
+
         Field<NonNullGraphType<IdGraphType>>("id");
         Field<NonNullGraphType<OrganizationGraphType>>("organization");
     }
@@ -100,7 +109,7 @@ public class UserGraphType : ObjectGraphType<User>
         this.Key("id");
         this.Key("id name");     // Redundant
         this.Key("id name email"); // Redundant
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<StringGraphType>>(x => x.Name);
         Field<NonNullGraphType<StringGraphType>>(x => x.Email);
@@ -113,7 +122,7 @@ public class UserGraphType : ObjectGraphType<User>
     public UserGraphType()
     {
         this.Key("id");
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<StringGraphType>>(x => x.Name);
         Field<NonNullGraphType<StringGraphType>>(x => x.Email);
@@ -133,7 +142,7 @@ public class UserGraphType : ObjectGraphType<User>
         this.Key("id");        // Can look up by ID
         this.Key("email");     // Can also look up by email
         this.Key("username");  // Can also look up by username
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<StringGraphType>>(x => x.Email);
         Field<NonNullGraphType<StringGraphType>>(x => x.Username);
@@ -150,9 +159,9 @@ public class UserGraphType : ObjectGraphType<User>
     {
         this.Key("id name");   // Composite key: ID + name
         this.Key("id email");  // Composite key: ID + email
-        
+
         // These are different composite keys, neither is a subset of the other
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<StringGraphType>>(x => x.Name);
         Field<NonNullGraphType<StringGraphType>>(x => x.Email);

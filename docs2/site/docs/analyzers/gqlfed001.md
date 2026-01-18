@@ -15,13 +15,18 @@ A field specified in a `@key` directive does not exist on the GraphQL type.
 
 ## Rule description
 
-The `@key` directive designates an object type as an entity and specifies its key fields. Key fields are a set of fields that a subgraph can use to uniquely identify any instance of the entity. All field names specified in the `fields` argument must exist on the type.
+The `@key` directive designates an object type as an entity and specifies its
+key fields. Key fields are a set of fields that a subgraph can use to uniquely
+identify any instance of the entity. All field names specified in the `fields`
+argument must exist on the type.
 
-This analyzer validates that all fields referenced in `.Key()` method calls exist on the GraphQL type.
+This analyzer validates that all fields referenced in `.Key()` method calls
+exist on the GraphQL type.
 
 ## How to fix violations
 
-Either add the missing field to the type or correct the field name in the `.Key()` method call.
+Either add the missing field to the type or correct the field name in the
+`.Key()` method call.
 
 ## Example of a violation
 
@@ -31,7 +36,7 @@ public class UserGraphType : ObjectGraphType<User>
     public UserGraphType()
     {
         this.Key("id nickname");
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<StringGraphType>>(x => x.Name);
     }
@@ -48,7 +53,7 @@ public class UserGraphType : ObjectGraphType<User>
     public UserGraphType()
     {
         this.Key("id name");
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<StringGraphType>>(x => x.Name);
     }
@@ -63,7 +68,7 @@ public class UserGraphType : ObjectGraphType<User>
     public UserGraphType()
     {
         this.Key("id nickname");
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<StringGraphType>>(x => x.Name);
         Field<NonNullGraphType<StringGraphType>>("nickname");

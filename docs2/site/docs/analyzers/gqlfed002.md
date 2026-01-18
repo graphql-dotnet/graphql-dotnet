@@ -15,9 +15,13 @@ A `@key` directive has been specified with a null or empty `fields` argument.
 
 ## Rule description
 
-The `@key` directive designates an object type as an entity and specifies its key fields. The `fields` argument is required and must contain at least one field name. An empty or whitespace-only key is not valid and will not properly identify the entity.
+The `@key` directive designates an object type as an entity and specifies its
+key fields. The `fields` argument is required and must contain at least one
+field name. An empty or whitespace-only key is not valid and will not properly
+identify the entity.
 
-This analyzer validates that all `.Key()` method calls have a non-empty `fields` argument.
+This analyzer validates that all `.Key()` method calls have a non-empty `fields`
+argument.
 
 ## How to fix violations
 
@@ -31,7 +35,7 @@ public class UserGraphType : ObjectGraphType<User>
     public UserGraphType()
     {
         this.Key("");
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<StringGraphType>>(x => x.Name);
     }
@@ -46,7 +50,7 @@ public class UserGraphType : ObjectGraphType<User>
     public UserGraphType()
     {
         this.Key("id");
-        
+
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
         Field<NonNullGraphType<StringGraphType>>(x => x.Name);
     }
