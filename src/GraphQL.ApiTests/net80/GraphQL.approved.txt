@@ -2274,6 +2274,18 @@ namespace GraphQL.Types
         public static GraphQL.Types.IObjectGraphType? GetObjectType(this GraphQL.Types.IAbstractGraphType abstractType, object value, GraphQL.Types.ISchema schema) { }
         public static bool IsPossibleType(this GraphQL.Types.IAbstractGraphType abstractType, GraphQL.Types.IGraphType type) { }
     }
+    public abstract class AotSchema : GraphQL.Types.Schema, System.IServiceProvider
+    {
+        protected AotSchema(System.IServiceProvider services, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureSchema> configurations) { }
+        protected System.Collections.Generic.Dictionary<System.Type, System.Func<object>> AotTypes { get; }
+        [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "clrType",
+                "graphType"})]
+        public override System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> BuiltInTypeMappings { get; }
+        protected void AddAotType<TGraphType>()
+            where TGraphType : GraphQL.Types.IGraphType, new () { }
+        protected abstract void Configure(System.IServiceProvider services);
+    }
     public class AppliedDirective : GraphQL.Utilities.MetadataProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveArgument>, System.Collections.IEnumerable
     {
         public AppliedDirective(string name) { }
@@ -3024,7 +3036,7 @@ namespace GraphQL.Types
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "clrType",
                 "graphType"})]
-        public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> BuiltInTypeMappings { get; }
+        public virtual System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> BuiltInTypeMappings { get; }
         public GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         public GraphQL.Resolvers.IFieldResolver? DefaultFieldResolver { get; set; }
         public string? Description { get; set; }
