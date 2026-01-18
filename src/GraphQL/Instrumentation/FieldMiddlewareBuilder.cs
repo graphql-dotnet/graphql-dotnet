@@ -1,5 +1,3 @@
-using GraphQL.Resolvers;
-
 namespace GraphQL.Instrumentation;
 
 /// <summary>
@@ -28,14 +26,12 @@ public class FieldMiddlewareBuilder : IFieldMiddlewareBuilder
         return this;
     }
 
-    private static readonly FieldMiddlewareDelegate _defaultDelegate = context => NameFieldResolver.Instance.ResolveAsync(context);
-
     /// <inheritdoc/>
     public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>? Build()
     {
         if (_middleware == null)
             return null;
 
-        return start => _middleware(start ?? _defaultDelegate);
+        return start => _middleware(start);
     }
 }
