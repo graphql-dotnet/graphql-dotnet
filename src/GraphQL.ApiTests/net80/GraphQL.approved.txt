@@ -2285,6 +2285,8 @@ namespace GraphQL.Types
         protected void AddAotType<TGraphType>()
             where TGraphType : GraphQL.Types.IGraphType, new () { }
         protected abstract void Configure(System.IServiceProvider services);
+        protected virtual void OnPostConfigure(System.IServiceProvider services) { }
+        protected virtual void OnPreConfigure(System.IServiceProvider services) { }
     }
     public class AppliedDirective : GraphQL.Utilities.MetadataProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveArgument>, System.Collections.IEnumerable
     {
