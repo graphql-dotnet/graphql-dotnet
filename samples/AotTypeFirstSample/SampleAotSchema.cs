@@ -1,9 +1,11 @@
+using GraphQL;
+using GraphQL.StarWars.TypeFirst.Types;
 using GraphQL.Types;
 
 namespace AotSample;
 
-//[AotQueryType(typeof(StarWarsQuery))] // will discover all related type-first types
-// other attributes available: [AotMutationType], [AotSubscriptionType], [AotOutputType], [AotInputType], [AotGraphType], [AotInterfaceType], [AotUnionType], [AotTypeMapping]
+[AotQueryType<StarWarsQuery>] // will discover related types
+// other attributes available: [AotMutationType], [AotSubscriptionType], [AotOutputType], [AotInputType], [AotGraphType], [AotTypeMapping]
 public partial class SampleAotSchema : AotSchema
 {
 }
