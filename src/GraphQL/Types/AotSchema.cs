@@ -38,6 +38,16 @@ public abstract class AotSchema : Schema, IServiceProvider
         AotTypes.Add(typeof(TGraphType), () => new TGraphType());
     }
 
+    /// <summary>
+    /// Registers an AOT graph type.
+    /// </summary>
+    protected void AddAotType<TGraphType, TGraphTypeImplementation>()
+        where TGraphType : IGraphType, new()
+        where TGraphTypeImplementation : IGraphType, new()
+    {
+        AotTypes.Add(typeof(TGraphType), () => new TGraphTypeImplementation());
+    }
+
     object? IServiceProvider.GetService(Type serviceType)
     {
         if (AotTypes.TryGetValue(serviceType, out var factory))
