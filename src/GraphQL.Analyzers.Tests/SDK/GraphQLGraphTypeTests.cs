@@ -714,4 +714,130 @@ public class GraphQLGraphTypeTests
             member.ShouldBeNull($"Member should not exist due to accessibility: {memberDeclaration}");
         }
     }
+
+    [Fact]
+    public async Task IsInterfaceType_InterfaceGraphType_ReturnsTrue()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class MyInterfaceType : InterfaceGraphType
+            {
+                public MyInterfaceType()
+                {
+                    Field<StringGraphType>("name");
+                }
+            }
+            """);
+
+        var classDeclaration = context.Root.DescendantNodes()
+            .OfType<ClassDeclarationSyntax>()
+            .First();
+
+        var graphType = GraphQLGraphType.TryCreate(classDeclaration, context.SemanticModel);
+
+        graphType.ShouldNotBeNull();
+        graphType.IsInterfaceType.ShouldBeTrue();
+        graphType.IsOutputType.ShouldBeTrue(); // InterfaceGraphType is also an output type
+        graphType.IsInputType.ShouldBeFalse();
+        graphType.IsUnionType.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task IsInterfaceType_GenericInterfaceGraphType_ReturnsTrue()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public interface IEntity
+            {
+                string Id { get; set; }
+            }
+
+            public class EntityInterfaceType : InterfaceGraphType<IEntity>
+            {
+                public EntityInterfaceType()
+                {
+                    Field(x => x.Id);
+                }
+            }
+            """);
+
+        var classDeclaration = context.Root.DescendantNodes()
+            .OfType<ClassDeclarationSyntax>()
+            .First(c => c.Identifier.Text == "EntityInterfaceType");
+
+        var graphType = GraphQLGraphType.TryCreate(classDeclaration, context.SemanticModel);
+
+        graphType.ShouldNotBeNull();
+        graphType.IsInterfaceType.ShouldBeTrue();
+        graphType.IsOutputType.ShouldBeTrue();
+        graphType.IsUnionType.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task IsUnionType_UnionGraphType_ReturnsTrue()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class MyUnionType : UnionGraphType
+            {
+                public MyUnionType()
+                {
+                }
+            }
+            """);
+
+        var classDeclaration = context.Root.DescendantNodes()
+            .OfType<ClassDeclarationSyntax>()
+            .First();
+
+        var graphType = GraphQLGraphType.TryCreate(classDeclaration, context.SemanticModel);
+
+        graphType.ShouldNotBeNull();
+        graphType.IsUnionType.ShouldBeTrue();
+        graphType.IsInterfaceType.ShouldBeFalse();
+        graphType.IsInputType.ShouldBeFalse();
+        graphType.IsOutputType.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task IsInterfaceTypeOrIsUnionType_ObjectGraphType_ReturnsFalse()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class MyType : ObjectGraphType
+            {
+                public MyType()
+                {
+                    Field<StringGraphType>("name");
+                }
+            }
+            """);
+
+        var classDeclaration = context.Root.DescendantNodes()
+            .OfType<ClassDeclarationSyntax>()
+            .First();
+
+        var graphType = GraphQLGraphType.TryCreate(classDeclaration, context.SemanticModel);
+
+        graphType.ShouldNotBeNull();
+        graphType.IsInterfaceType.ShouldBeFalse();
+        graphType.IsUnionType.ShouldBeFalse();
+        graphType.IsOutputType.ShouldBeTrue();
+    }
 }

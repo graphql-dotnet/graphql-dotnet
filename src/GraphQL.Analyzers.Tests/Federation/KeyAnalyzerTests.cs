@@ -1,6 +1,7 @@
 using GraphQL.Analyzers.Federation;
-using VerifyCS = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpAnalyzerVerifier<
-    GraphQL.Analyzers.Federation.KeyAnalyzer>;
+using VerifyCS = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpCodeFixVerifier<
+    GraphQL.Analyzers.Federation.KeyAnalyzer,
+    GraphQL.Analyzers.Federation.KeyAnalyzerCodeFixProvider>;
 
 namespace GraphQL.Analyzers.Tests.Federation;
 
@@ -616,5 +617,1280 @@ public class KeyAnalyzerTests
             .WithLocation(0)
             .WithArguments("UserGraphType");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Theory]
+    [InlineData(1, "\"id\"", "[\"id\"]", "id")]
+    [InlineData(2, "\"id\"", "new[] { \"id\" }", "id")]
+    [InlineData(3, "\"id\"", "new string[] { \"id\" }", "id")]
+    [InlineData(4, "\"id name\"", "[\"id\", \"name\"]", "id name")]
+    [InlineData(5, "\"id name\"", "new[] { \"id\", \"name\" }", "id name")]
+    [InlineData(6, "\"name id\"", "[\"id\", \"name\"]", "id name")]
+    [InlineData(7, "$\"{nameof(User.Id)}\"", "nameof(User.Id)", "Id")]
+    [InlineData(8, "ConstFieldName", "\"id\"", "id")]
+    public async Task DuplicateKey_DifferentSyntaxSameValue_ReportsWarning(int idx, string firstKey, string secondKey, string expectedFieldsString)
+    {
+        _ = idx;
+
+        string source =
+            $$"""
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                private const string ConstFieldName = "id";
+
+                public UserGraphType()
+                {
+                    this.Key({{firstKey}});
+                    {|#0:this.Key({{secondKey}})|};
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                    Field(x => x.Name, type: typeof(NonNullGraphType<StringGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.DuplicateKey)
+            .WithLocation(0)
+            .WithArguments(expectedFieldsString, "UserGraphType");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task DuplicateKey_CaseInsensitive_ReportsWarning()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id");
+                    {|#0:this.Key("Id")|};
+                    {|#1:this.Key("ID")|};
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+            }
+            """;
+
+        var expectedDiagnostics = new[]
+        {
+            VerifyCS.Diagnostic(KeyAnalyzer.DuplicateKey)
+                .WithLocation(0)
+                .WithArguments("Id", "UserGraphType"),
+            VerifyCS.Diagnostic(KeyAnalyzer.DuplicateKey)
+                .WithLocation(1)
+                .WithArguments("ID", "UserGraphType")
+        };
+
+        await VerifyCS.VerifyAnalyzerAsync(source, expectedDiagnostics);
+    }
+
+    [Fact]
+    public async Task RemoveDuplicateKey_ExactDuplicate()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id");
+                    {|#0:this.Key("id")|};
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+            }
+            """;
+
+        const string fixedSource =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id");
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.DuplicateKey)
+            .WithLocation(0)
+            .WithArguments("id", "UserGraphType");
+
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fixedSource);
+    }
+
+    [Fact]
+    public async Task RemoveDuplicateKey_DifferentOrder()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id name");
+                    {|#0:this.Key("name id")|};
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                    Field(x => x.Name, type: typeof(NonNullGraphType<StringGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        const string fixedSource =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id name");
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                    Field(x => x.Name, type: typeof(NonNullGraphType<StringGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.DuplicateKey)
+            .WithLocation(0)
+            .WithArguments("name id", "UserGraphType");
+
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fixedSource);
+    }
+
+    [Fact]
+    public async Task RemoveDuplicateKey_MultipleDuplicates_FixesAll()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id");
+                    {|#0:this.Key("id")|};
+                    {|#1:this.Key("id")|};
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+            }
+            """;
+
+        const string fixedSource =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id");
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+            }
+            """;
+
+        var expectedDiagnostics = new[]
+        {
+            VerifyCS.Diagnostic(KeyAnalyzer.DuplicateKey)
+                .WithLocation(0)
+                .WithArguments("id", "UserGraphType"),
+            VerifyCS.Diagnostic(KeyAnalyzer.DuplicateKey)
+                .WithLocation(1)
+                .WithArguments("id", "UserGraphType")
+        };
+
+        await VerifyCS.VerifyCodeFixAsync(source, expectedDiagnostics, fixedSource);
+    }
+
+    [Fact]
+    public async Task RemoveDuplicateKey_KeepsOtherKeys()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id");
+                    this.Key("name");
+                    {|#0:this.Key("id")|};
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                    Field(x => x.Name, type: typeof(NonNullGraphType<StringGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        const string fixedSource =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id");
+                    this.Key("name");
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                    Field(x => x.Name, type: typeof(NonNullGraphType<StringGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.DuplicateKey)
+            .WithLocation(0)
+            .WithArguments("id", "UserGraphType");
+
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fixedSource);
+    }
+
+    [Fact]
+    public async Task RemoveDuplicateKey_NestedFields()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("organization { id name }");
+                    {|#0:this.Key("organization { name id }")|};
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<OrganizationGraphType>>("organization");
+                }
+            }
+
+            public class OrganizationGraphType : ObjectGraphType<Organization>
+            {
+                public OrganizationGraphType()
+                {
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public Organization Organization { get; set; }
+            }
+
+            public class Organization
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        const string fixedSource =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("organization { id name }");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<OrganizationGraphType>>("organization");
+                }
+            }
+
+            public class OrganizationGraphType : ObjectGraphType<Organization>
+            {
+                public OrganizationGraphType()
+                {
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public Organization Organization { get; set; }
+            }
+
+            public class Organization
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.DuplicateKey)
+            .WithLocation(0)
+            .WithArguments("organization { name id }", "UserGraphType");
+
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fixedSource);
+    }
+
+    [Fact]
+    public async Task RemoveDuplicateKey_WithComments()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    // Primary key
+                    this.Key("id");
+                    // Duplicate key
+                    {|#0:this.Key("id")|};
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+            }
+            """;
+
+        const string fixedSource =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    // Primary key
+                    this.Key("id");
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.DuplicateKey)
+            .WithLocation(0)
+            .WithArguments("id", "UserGraphType");
+
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fixedSource);
+    }
+
+    [Theory]
+    [InlineData(1, "id", "id name")]
+    [InlineData(2, "id", "name id")]
+    [InlineData(3, "Id", "id Name")]
+    [InlineData(4, "id Name", "id name email")]
+    [InlineData(5, "organization { id }", "organization { id name }")]
+    [InlineData(6, "id organization { name }", "id name organization { name }")]
+    [InlineData(7, "organization { address { city } }", "organization { address { city state } }")]
+    public async Task RedundantKey_ReportsWarningWithCodeFix(int idx, string firstKey, string secondKey)
+    {
+        _ = idx;
+
+        string source =
+            $$"""
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("{{firstKey}}");
+                    {|#0:this.Key("{{secondKey}}")|};
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name");
+                    Field<NonNullGraphType<StringGraphType>>("email");
+                    Field<NonNullGraphType<OrganizationGraphType>>("organization");
+                }
+            }
+
+            public class OrganizationGraphType : ObjectGraphType<Organization>
+            {
+                public OrganizationGraphType()
+                {
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name");
+                    Field<NonNullGraphType<AddressGraphType>>("address");
+                }
+            }
+
+            public class AddressGraphType : ObjectGraphType<Address>
+            {
+                public AddressGraphType()
+                {
+                    Field<NonNullGraphType<StringGraphType>>("city");
+                    Field<NonNullGraphType<StringGraphType>>("state");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public string Email { get; set; }
+            }
+
+            public class Organization
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+
+            public class Address
+            {
+                public string City { get; set; }
+                public string State { get; set; }
+            }
+            """;
+
+        string fixedSource =
+            $$"""
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("{{firstKey}}");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name");
+                    Field<NonNullGraphType<StringGraphType>>("email");
+                    Field<NonNullGraphType<OrganizationGraphType>>("organization");
+                }
+            }
+
+            public class OrganizationGraphType : ObjectGraphType<Organization>
+            {
+                public OrganizationGraphType()
+                {
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name");
+                    Field<NonNullGraphType<AddressGraphType>>("address");
+                }
+            }
+
+            public class AddressGraphType : ObjectGraphType<Address>
+            {
+                public AddressGraphType()
+                {
+                    Field<NonNullGraphType<StringGraphType>>("city");
+                    Field<NonNullGraphType<StringGraphType>>("state");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public string Email { get; set; }
+            }
+
+            public class Organization
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+
+            public class Address
+            {
+                public string City { get; set; }
+                public string State { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.RedundantKey)
+            .WithLocation(0)
+            .WithArguments(secondKey, firstKey, "UserGraphType");
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fixedSource);
+    }
+
+    [Fact]
+    public async Task RedundantKey_MultipleRedundant_ReportsAllWarningsWithCodeFix()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id");
+                    {|#0:this.Key("id name")|};
+                    {|#1:this.Key("id name email")|};
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                    Field(x => x.Name, type: typeof(NonNullGraphType<StringGraphType>));
+                    Field(x => x.Email, type: typeof(NonNullGraphType<StringGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public string Email { get; set; }
+            }
+            """;
+
+        const string fixedSource =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id");
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                    Field(x => x.Name, type: typeof(NonNullGraphType<StringGraphType>));
+                    Field(x => x.Email, type: typeof(NonNullGraphType<StringGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public string Email { get; set; }
+            }
+            """;
+
+        var expectedDiagnostics = new[]
+        {
+            VerifyCS.Diagnostic(KeyAnalyzer.RedundantKey)
+                .WithLocation(0)
+                .WithArguments("id name", "id", "UserGraphType"),
+            VerifyCS.Diagnostic(KeyAnalyzer.RedundantKey)
+                .WithLocation(1)
+                .WithArguments("id name email", "id", "UserGraphType")
+        };
+
+        await VerifyCS.VerifyCodeFixAsync(source, expectedDiagnostics, fixedSource);
+    }
+
+    [Fact]
+    public async Task RedundantKey_NoRedundancy_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id");
+                    this.Key("email");
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                    Field(x => x.Email, type: typeof(NonNullGraphType<StringGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Email { get; set; }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Fact]
+    public async Task RedundantKey_PartialOverlap_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id name");
+                    this.Key("id email");
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                    Field(x => x.Name, type: typeof(NonNullGraphType<StringGraphType>));
+                    Field(x => x.Email, type: typeof(NonNullGraphType<StringGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public string Email { get; set; }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Fact]
+    public async Task RedundantKey_KeepsNonRedundantKeys_WithCodeFix()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id");
+                    this.Key("email");
+                    {|#0:this.Key("id name")|};
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                    Field(x => x.Name, type: typeof(NonNullGraphType<StringGraphType>));
+                    Field(x => x.Email, type: typeof(NonNullGraphType<StringGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public string Email { get; set; }
+            }
+            """;
+
+        const string fixedSource =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id");
+                    this.Key("email");
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                    Field(x => x.Name, type: typeof(NonNullGraphType<StringGraphType>));
+                    Field(x => x.Email, type: typeof(NonNullGraphType<StringGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public string Email { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.RedundantKey)
+            .WithLocation(0)
+            .WithArguments("id name", "id", "UserGraphType");
+
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fixedSource);
+    }
+
+    [Fact]
+    public async Task RedundantKey_WithComments_CodeFix()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    // Primary key
+                    this.Key("id");
+                    // Redundant key with extra field
+                    {|#0:this.Key("id name")|};
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                    Field(x => x.Name, type: typeof(NonNullGraphType<StringGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        const string fixedSource =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    // Primary key
+                    this.Key("id");
+
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                    Field(x => x.Name, type: typeof(NonNullGraphType<StringGraphType>));
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.RedundantKey)
+            .WithLocation(0)
+            .WithArguments("id name", "id", "UserGraphType");
+
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fixedSource);
+    }
+
+    [Fact]
+    public async Task KeyFieldWithArguments_ReportsError()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("{|#0:name|}");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name")
+                        .Argument<IntGraphType>("first");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldMustNotHaveArguments)
+            .WithLocation(0)
+            .WithArguments("name", "UserGraphType");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task KeyFieldWithArguments_NestedField_ReportsError()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("organization { {|#0:name|} }");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<OrganizationGraphType>>("organization");
+                }
+            }
+
+            public class OrganizationGraphType : ObjectGraphType<Organization>
+            {
+                public OrganizationGraphType()
+                {
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name")
+                        .Argument<IntGraphType>("first");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public Organization Organization { get; set; }
+            }
+
+            public class Organization
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldMustNotHaveArguments)
+            .WithLocation(0)
+            .WithArguments("name", "OrganizationGraphType");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task KeyFieldWithoutArguments_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("id name");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<StringGraphType>>("name");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Fact]
+    public async Task KeyFieldInterfaceType_ReportsError()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("{|#0:profile|}");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<ProfileInterfaceType>>("profile");
+                }
+            }
+
+            public class ProfileInterfaceType : InterfaceGraphType<IProfile>
+            {
+                public ProfileInterfaceType()
+                {
+                    Field<NonNullGraphType<StringGraphType>>("displayName");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public IProfile Profile { get; set; }
+            }
+
+            public interface IProfile
+            {
+                string DisplayName { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldMustNotBeInterfaceOrUnion)
+            .WithLocation(0)
+            .WithArguments("profile", "UserGraphType", "an interface", "ProfileInterfaceType");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task KeyFieldUnionType_ReportsError()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("{|#0:searchResult|}");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<SearchResultUnion>>("searchResult");
+                }
+            }
+
+            public class SearchResultUnion : UnionGraphType
+            {
+                public SearchResultUnion()
+                {
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public object SearchResult { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldMustNotBeInterfaceOrUnion)
+            .WithLocation(0)
+            .WithArguments("searchResult", "UserGraphType", "a union", "SearchResultUnion");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task KeyFieldNestedInterfaceType_ReportsError()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("organization { {|#0:profile|} }");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<OrganizationGraphType>>("organization");
+                }
+            }
+
+            public class OrganizationGraphType : ObjectGraphType<Organization>
+            {
+                public OrganizationGraphType()
+                {
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<ProfileInterfaceType>>("profile");
+                }
+            }
+
+            public class ProfileInterfaceType : InterfaceGraphType<IProfile>
+            {
+                public ProfileInterfaceType()
+                {
+                    Field<NonNullGraphType<StringGraphType>>("displayName");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public Organization Organization { get; set; }
+            }
+
+            public class Organization
+            {
+                public int Id { get; set; }
+                public IProfile Profile { get; set; }
+            }
+
+            public interface IProfile
+            {
+                string DisplayName { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldMustNotBeInterfaceOrUnion)
+            .WithLocation(0)
+            .WithArguments("profile", "OrganizationGraphType", "an interface", "ProfileInterfaceType");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task KeyFieldNestedUnionType_ReportsError()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("organization { {|#0:result|} }");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<OrganizationGraphType>>("organization");
+                }
+            }
+
+            public class OrganizationGraphType : ObjectGraphType<Organization>
+            {
+                public OrganizationGraphType()
+                {
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<SearchResultUnion>>("result");
+                }
+            }
+
+            public class SearchResultUnion : UnionGraphType
+            {
+                public SearchResultUnion()
+                {
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public Organization Organization { get; set; }
+            }
+
+            public class Organization
+            {
+                public int Id { get; set; }
+                public object Result { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldMustNotBeInterfaceOrUnion)
+            .WithLocation(0)
+            .WithArguments("result", "OrganizationGraphType", "a union", "SearchResultUnion");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task KeyFieldMultipleInterfaceAndUnion_ReportsMultipleErrors()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("{|#0:profile|} {|#1:searchResult|}");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<ProfileInterfaceType>>("profile");
+                    Field<NonNullGraphType<SearchResultUnion>>("searchResult");
+                }
+            }
+
+            public class ProfileInterfaceType : InterfaceGraphType<IProfile>
+            {
+                public ProfileInterfaceType()
+                {
+                    Field<NonNullGraphType<StringGraphType>>("displayName");
+                }
+            }
+
+            public class SearchResultUnion : UnionGraphType
+            {
+                public SearchResultUnion()
+                {
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public IProfile Profile { get; set; }
+                public object SearchResult { get; set; }
+            }
+
+            public interface IProfile
+            {
+                string DisplayName { get; set; }
+            }
+            """;
+
+        var expectedDiagnostics = new[]
+        {
+            VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldMustNotBeInterfaceOrUnion)
+                .WithLocation(0)
+                .WithArguments("profile", "UserGraphType", "an interface", "ProfileInterfaceType"),
+            VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldMustNotBeInterfaceOrUnion)
+                .WithLocation(1)
+                .WithArguments("searchResult", "UserGraphType", "a union", "SearchResultUnion")
+        };
+
+        await VerifyCS.VerifyAnalyzerAsync(source, expectedDiagnostics);
     }
 }

@@ -7,6 +7,56 @@ namespace GraphQL
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=true, Inherited=true)]
+    public sealed class AotGraphTypeAttribute<TGraphType> : GraphQL.AotSchemaAttribute
+        where TGraphType : GraphQL.Types.IGraphType
+    {
+        public AotGraphTypeAttribute() { }
+        public bool AutoRegisterClrMapping { get; set; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=true, Inherited=false)]
+    public sealed class AotInputTypeAttribute<T> : GraphQL.AotSchemaAttribute
+    {
+        public AotInputTypeAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=false)]
+    public sealed class AotMutationTypeAttribute<T> : GraphQL.AotSchemaAttribute
+    {
+        public AotMutationTypeAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=true, Inherited=false)]
+    public sealed class AotOutputTypeAttribute<T> : GraphQL.AotSchemaAttribute
+    {
+        public AotOutputTypeAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=false)]
+    public sealed class AotQueryTypeAttribute<T> : GraphQL.AotSchemaAttribute
+    {
+        public AotQueryTypeAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=true, Inherited=false)]
+    public sealed class AotRemapTypeAttribute<TGraphType, TGraphTypeImplementation> : GraphQL.AotSchemaAttribute
+        where TGraphType : GraphQL.Types.IGraphType
+        where TGraphTypeImplementation : GraphQL.Types.IGraphType
+    {
+        public AotRemapTypeAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=true, Inherited=false)]
+    public abstract class AotSchemaAttribute : System.Attribute
+    {
+        protected AotSchemaAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=false)]
+    public sealed class AotSubscriptionTypeAttribute<T> : GraphQL.AotSchemaAttribute
+    {
+        public AotSubscriptionTypeAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=true, Inherited=false)]
+    public sealed class AotTypeMappingAttribute<TClrType, TGraphType> : GraphQL.AotSchemaAttribute
+        where TGraphType : GraphQL.Types.IGraphType
+    {
+        public AotTypeMappingAttribute() { }
+    }
     public static class AuthorizationExtensions
     {
         public const string ANONYMOUS_KEY = "Authorization__AllowAnonymous";
@@ -2280,6 +2330,9 @@ namespace GraphQL.Types
         public override System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> BuiltInTypeMappings { get; }
         protected void AddAotType<TGraphType>()
             where TGraphType : GraphQL.Types.IGraphType, new () { }
+        protected void AddAotType<TGraphType, TGraphTypeImplementation>()
+            where TGraphType : GraphQL.Types.IGraphType, new ()
+            where TGraphTypeImplementation : GraphQL.Types.IGraphType, new () { }
         protected abstract void Configure(System.IServiceProvider services);
         protected virtual void OnPostConfigure(System.IServiceProvider services) { }
         protected virtual void OnPreConfigure(System.IServiceProvider services) { }
