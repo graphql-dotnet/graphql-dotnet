@@ -56,13 +56,23 @@ public class KeyAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.KEY_FIELD_MUST_NOT_HAVE_ARGUMENTS);
 
+    public static readonly DiagnosticDescriptor KeyFieldMustNotBeInterfaceOrUnion = new(
+        id: DiagnosticIds.KEY_FIELD_MUST_NOT_BE_INTERFACE_OR_UNION,
+        title: "Key field must not be an interface or union type",
+        messageFormat: "Key field '{0}' on type '{1}' returns {2} type '{3}' which is not allowed in key fields",
+        category: DiagnosticCategories.FEDERATION,
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        helpLinkUri: HelpLinks.KEY_FIELD_MUST_NOT_BE_INTERFACE_OR_UNION);
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(
             KeyFieldDoesNotExist,
             KeyMustNotBeNullOrEmpty,
             DuplicateKey,
             RedundantKey,
-            KeyFieldMustNotHaveArguments);
+            KeyFieldMustNotHaveArguments,
+            KeyFieldMustNotBeInterfaceOrUnion);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -140,6 +150,22 @@ public class KeyAnalyzer : DiagnosticAnalyzer
                         fieldLocation,
                         fieldName,
                         typeName);
+                    context.ReportDiagnostic(diagnostic);
+                }
+
+                // Check if the field type is an interface or union
+                var fieldGraphType = graphTypeField.GraphType?.GetUnwrappedType();
+                if (fieldGraphType != null && (fieldGraphType.IsInterfaceType || fieldGraphType.IsUnionType))
+                {
+                    var fieldLocation = key.GetFieldLocation(fieldName, field.Location.Start);
+                    var typeKind = fieldGraphType.IsInterfaceType ? "an interface" : "a union";
+                    var diagnostic = Diagnostic.Create(
+                        KeyFieldMustNotBeInterfaceOrUnion,
+                        fieldLocation,
+                        fieldName,
+                        typeName,
+                        typeKind,
+                        fieldGraphType.Name);
                     context.ReportDiagnostic(diagnostic);
                 }
 

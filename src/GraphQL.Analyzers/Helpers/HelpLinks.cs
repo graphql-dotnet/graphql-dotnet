@@ -29,4 +29,5 @@ public static class HelpLinks
     public const string DUPLICATE_KEY = $"{DOCS_URL}/gqlfed003";
     public const string REDUNDANT_KEY = $"{DOCS_URL}/gqlfed004";
     public const string KEY_FIELD_MUST_NOT_HAVE_ARGUMENTS = $"{DOCS_URL}/gqlfed005";
+    public const string KEY_FIELD_MUST_NOT_BE_INTERFACE_OR_UNION = $"{DOCS_URL}/gqlfed006";
 }

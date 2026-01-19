@@ -1624,4 +1624,273 @@ public class KeyAnalyzerTests
 
         await VerifyCS.VerifyAnalyzerAsync(source);
     }
+
+    [Fact]
+    public async Task KeyFieldInterfaceType_ReportsError()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("{|#0:profile|}");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<ProfileInterfaceType>>("profile");
+                }
+            }
+
+            public class ProfileInterfaceType : InterfaceGraphType<IProfile>
+            {
+                public ProfileInterfaceType()
+                {
+                    Field<NonNullGraphType<StringGraphType>>("displayName");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public IProfile Profile { get; set; }
+            }
+
+            public interface IProfile
+            {
+                string DisplayName { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldMustNotBeInterfaceOrUnion)
+            .WithLocation(0)
+            .WithArguments("profile", "UserGraphType", "an interface", "ProfileInterfaceType");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task KeyFieldUnionType_ReportsError()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("{|#0:searchResult|}");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<SearchResultUnion>>("searchResult");
+                }
+            }
+
+            public class SearchResultUnion : UnionGraphType
+            {
+                public SearchResultUnion()
+                {
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public object SearchResult { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldMustNotBeInterfaceOrUnion)
+            .WithLocation(0)
+            .WithArguments("searchResult", "UserGraphType", "a union", "SearchResultUnion");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task KeyFieldNestedInterfaceType_ReportsError()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("organization { {|#0:profile|} }");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<OrganizationGraphType>>("organization");
+                }
+            }
+
+            public class OrganizationGraphType : ObjectGraphType<Organization>
+            {
+                public OrganizationGraphType()
+                {
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<ProfileInterfaceType>>("profile");
+                }
+            }
+
+            public class ProfileInterfaceType : InterfaceGraphType<IProfile>
+            {
+                public ProfileInterfaceType()
+                {
+                    Field<NonNullGraphType<StringGraphType>>("displayName");
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public Organization Organization { get; set; }
+            }
+
+            public class Organization
+            {
+                public int Id { get; set; }
+                public IProfile Profile { get; set; }
+            }
+
+            public interface IProfile
+            {
+                string DisplayName { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldMustNotBeInterfaceOrUnion)
+            .WithLocation(0)
+            .WithArguments("profile", "OrganizationGraphType", "an interface", "ProfileInterfaceType");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task KeyFieldNestedUnionType_ReportsError()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("organization { {|#0:result|} }");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<OrganizationGraphType>>("organization");
+                }
+            }
+
+            public class OrganizationGraphType : ObjectGraphType<Organization>
+            {
+                public OrganizationGraphType()
+                {
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<SearchResultUnion>>("result");
+                }
+            }
+
+            public class SearchResultUnion : UnionGraphType
+            {
+                public SearchResultUnion()
+                {
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public Organization Organization { get; set; }
+            }
+
+            public class Organization
+            {
+                public int Id { get; set; }
+                public object Result { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldMustNotBeInterfaceOrUnion)
+            .WithLocation(0)
+            .WithArguments("result", "OrganizationGraphType", "a union", "SearchResultUnion");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task KeyFieldMultipleInterfaceAndUnion_ReportsMultipleErrors()
+    {
+        const string source =
+            """
+            using GraphQL.Federation;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class UserGraphType : ObjectGraphType<User>
+            {
+                public UserGraphType()
+                {
+                    this.Key("{|#0:profile|} {|#1:searchResult|}");
+
+                    Field<NonNullGraphType<IdGraphType>>("id");
+                    Field<NonNullGraphType<ProfileInterfaceType>>("profile");
+                    Field<NonNullGraphType<SearchResultUnion>>("searchResult");
+                }
+            }
+
+            public class ProfileInterfaceType : InterfaceGraphType<IProfile>
+            {
+                public ProfileInterfaceType()
+                {
+                    Field<NonNullGraphType<StringGraphType>>("displayName");
+                }
+            }
+
+            public class SearchResultUnion : UnionGraphType
+            {
+                public SearchResultUnion()
+                {
+                }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                public IProfile Profile { get; set; }
+                public object SearchResult { get; set; }
+            }
+
+            public interface IProfile
+            {
+                string DisplayName { get; set; }
+            }
+            """;
+
+        var expectedDiagnostics = new[]
+        {
+            VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldMustNotBeInterfaceOrUnion)
+                .WithLocation(0)
+                .WithArguments("profile", "UserGraphType", "an interface", "ProfileInterfaceType"),
+            VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldMustNotBeInterfaceOrUnion)
+                .WithLocation(1)
+                .WithArguments("searchResult", "UserGraphType", "a union", "SearchResultUnion")
+        };
+
+        await VerifyCS.VerifyAnalyzerAsync(source, expectedDiagnostics);
+    }
 }
