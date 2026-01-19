@@ -47,12 +47,22 @@ public class KeyAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.REDUNDANT_KEY);
 
+    public static readonly DiagnosticDescriptor KeyFieldMustNotHaveArguments = new(
+        id: DiagnosticIds.KEY_FIELD_MUST_NOT_HAVE_ARGUMENTS,
+        title: "Key field must not have arguments",
+        messageFormat: "Key field '{0}' must not have arguments on type '{1}'",
+        category: DiagnosticCategories.FEDERATION,
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        helpLinkUri: HelpLinks.KEY_FIELD_MUST_NOT_HAVE_ARGUMENTS);
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(
             KeyFieldDoesNotExist,
             KeyMustNotBeNullOrEmpty,
             DuplicateKey,
-            RedundantKey);
+            RedundantKey,
+            KeyFieldMustNotHaveArguments);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -119,12 +129,27 @@ public class KeyAnalyzer : DiagnosticAnalyzer
                     typeName);
                 context.ReportDiagnostic(diagnostic);
             }
-            else if (field.SelectionSet != null)
+            else
             {
+                // Check if the field has arguments in the GraphType definition
+                if (graphTypeField.Arguments.Count > 0)
+                {
+                    var fieldLocation = key.GetFieldLocation(fieldName, field.Location.Start);
+                    var diagnostic = Diagnostic.Create(
+                        KeyFieldMustNotHaveArguments,
+                        fieldLocation,
+                        fieldName,
+                        typeName);
+                    context.ReportDiagnostic(diagnostic);
+                }
+
                 // Validate nested selection set
-                var nestedGraphType = graphTypeField.GraphType?.GetUnwrappedType();
-                if (nestedGraphType != null)
-                    ValidateSelectionSet(context, nestedGraphType, key, field.SelectionSet, nestedGraphType.Name);
+                if (field.SelectionSet != null)
+                {
+                    var nestedGraphType = graphTypeField.GraphType?.GetUnwrappedType();
+                    if (nestedGraphType != null)
+                        ValidateSelectionSet(context, nestedGraphType, key, field.SelectionSet, nestedGraphType.Name);
+                }
             }
         }
     }
