@@ -608,6 +608,20 @@ public static class TypeExtensions
     }
 
     /// <summary>
+    /// Returns the set of <see cref="ParameterAttribute"/>s applied to the specified parameter or its
+    /// owning module or assembly, or are listed within <see cref="GlobalSwitches.GlobalParameterAttributes"/>.
+    /// </summary>
+    public static IEnumerable<ParameterAttribute> GetParameterAttributes(this ParameterInfo parameterInfo)
+    {
+        var module = parameterInfo.Member.Module;
+        var assembly = module.Assembly;
+        return parameterInfo.GetCustomAttributes<ParameterAttribute>()
+            .Concat(module.GetCustomAttributes<ParameterAttribute>())
+            .Concat(assembly.GetCustomAttributes<ParameterAttribute>())
+            .Concat(GlobalSwitches.GlobalParameterAttributes);
+    }
+
+    /// <summary>
     /// Identifies a property or field on the specified type that matches the specified name.
     /// Search is performed case-insensitively. The property or field must be public and writable/settable.
     /// </summary>

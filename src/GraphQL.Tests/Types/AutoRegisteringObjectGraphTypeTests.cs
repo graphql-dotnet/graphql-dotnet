@@ -668,10 +668,10 @@ public class AutoRegisteringObjectGraphTypeTests
         public string FieldWithHardcodedValue([HardcodedValue] int value) => value.ToString();
     }
 
-    private class HardcodedValueAttribute : GraphQLAttribute
+    private class HardcodedValueAttribute : ParameterAttribute<int>
     {
-        public override void Modify(ArgumentInformation argumentInformation)
-            => argumentInformation.SetDelegate(context => 85);
+        public override Func<IResolveFieldContext, int> GetResolver(ArgumentInformation argumentInformation)
+            => context => 85;
     }
 
     private class NoDefaultConstructorTest

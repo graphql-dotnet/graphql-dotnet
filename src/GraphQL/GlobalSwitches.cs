@@ -97,6 +97,20 @@ public static class GlobalSwitches
     public static ICollection<GraphQLAttribute> GlobalAttributes { get; } = [];
 
     /// <summary>
+    /// A collection of global <see cref="ParameterAttribute{TParameterType}"/> instances which are applied while
+    /// <see cref="Types.AutoRegisteringObjectGraphType{TSourceType}">AutoRegisteringObjectGraphType</see>,
+    /// <see cref="Types.AutoRegisteringInputObjectGraphType{TSourceType}">AutoRegisteringInputObjectGraphType</see>,
+    /// <see cref="Types.AutoRegisteringInterfaceGraphType{TSourceType}">AutoRegisteringInterfaceGraphType</see>,
+    /// or <see cref="Builders.FieldBuilder{TSourceType, TReturnType}.ResolveDelegate(Delegate?)">ResolveDelegate</see>
+    /// is building method parameter resolvers.
+    /// <br/><br/>
+    /// The collection is not thread-safe; instances should be added prior to schema initialization.
+    /// </summary>
+#pragma warning disable CS0618 // Type or member is obsolete -- intentional as TypedParameterAttribute is marked as obsolete to prevent developers from attempting to inherit from it
+    public static ICollection<TypedParameterAttribute> GlobalParameterAttributes { get; } = [];
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <summary>
     /// Enables caching of reflection metadata and resolvers from <see cref="Types.AutoRegisteringObjectGraphType{TSourceType}">AutoRegisteringObjectGraphType</see>;
     /// useful for scoped schemas.
     /// <br/><br/>

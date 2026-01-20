@@ -28,6 +28,7 @@ namespace GraphQL
     public sealed class AotOutputTypeAttribute<T> : GraphQL.AotSchemaAttribute
     {
         public AotOutputTypeAttribute() { }
+        public bool? IsInterface { get; set; }
     }
     [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=false)]
     public sealed class AotQueryTypeAttribute<T> : GraphQL.AotSchemaAttribute
@@ -314,23 +315,23 @@ namespace GraphQL
             where TMetadataWriter : GraphQL.Types.IFieldMetadataWriter { }
     }
     [System.AttributeUsage(System.AttributeTargets.Parameter)]
-    public class FromServicesAttribute : GraphQL.GraphQLAttribute
+    public class FromServicesAttribute : GraphQL.ParameterAttribute
     {
         public const string REQUIRED_SERVICES_METADATA = "__RequiredServices__";
         public FromServicesAttribute() { }
-        public override void Modify(GraphQL.Types.ArgumentInformation argumentInformation) { }
+        public override System.Func<GraphQL.IResolveFieldContext, T> GetResolver<T>(GraphQL.Types.ArgumentInformation argumentInformation) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Parameter)]
-    public class FromSourceAttribute : GraphQL.GraphQLAttribute
+    public class FromSourceAttribute : GraphQL.ParameterAttribute
     {
         public FromSourceAttribute() { }
-        public override void Modify(GraphQL.Types.ArgumentInformation argumentInformation) { }
+        public override System.Func<GraphQL.IResolveFieldContext, T> GetResolver<T>(GraphQL.Types.ArgumentInformation argumentInformation) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Parameter)]
-    public class FromUserContextAttribute : GraphQL.GraphQLAttribute
+    public class FromUserContextAttribute : GraphQL.ParameterAttribute
     {
         public FromUserContextAttribute() { }
-        public override void Modify(GraphQL.Types.ArgumentInformation argumentInformation) { }
+        public override System.Func<GraphQL.IResolveFieldContext, T> GetResolver<T>(GraphQL.Types.ArgumentInformation argumentInformation) { }
     }
     public sealed class FuncServiceProvider : System.IServiceProvider
     {
@@ -347,6 +348,7 @@ namespace GraphQL
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
         public static bool EnableReflectionCaching { get; set; }
         public static System.Collections.Generic.ICollection<GraphQL.GraphQLAttribute> GlobalAttributes { get; }
+        public static System.Collections.Generic.ICollection<GraphQL.TypedParameterAttribute> GlobalParameterAttributes { get; }
         public static bool InferFieldNullabilityFromNRTAnnotations { get; set; }
         [System.Obsolete("This switch is only applicable to LegacySchemaTypes, which is not used by default" +
             ".")]
@@ -787,6 +789,18 @@ namespace GraphQL
     {
         public OutputTypeAttribute() { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Parameter)]
+    public abstract class ParameterAttribute : System.Attribute
+    {
+        protected ParameterAttribute() { }
+        public abstract System.Func<GraphQL.IResolveFieldContext, T> GetResolver<T>(GraphQL.Types.ArgumentInformation argumentInformation);
+    }
+    public abstract class ParameterAttribute<TParameterType> : GraphQL.TypedParameterAttribute
+    {
+        protected ParameterAttribute() { }
+        public new abstract System.Func<GraphQL.IResolveFieldContext, TParameterType> GetResolver(GraphQL.Types.ArgumentInformation argumentInformation);
+        public override sealed System.Func<GraphQL.IResolveFieldContext, T> GetResolver<T>(GraphQL.Types.ArgumentInformation argumentInformation) { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter)]
     public sealed class ParserAttribute : GraphQL.GraphQLAttribute
     {
@@ -966,6 +980,7 @@ namespace GraphQL
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable, GraphQL.TypeMappingMode mode) { }
         [return: System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable, bool isInputType) { }
+        public static System.Collections.Generic.IEnumerable<GraphQL.ParameterAttribute> GetParameterAttributes(this System.Reflection.ParameterInfo parameterInfo) { }
         public static string GraphQLName(this System.Type type) { }
         public static bool ImplementsGenericType(this System.Type type, System.Type genericType) { }
         public static bool IsGraphType(this System.Type type) { }
@@ -978,6 +993,12 @@ namespace GraphQL
         UseBuiltInScalarMappings = 0,
         InputType = 1,
         OutputType = 2,
+    }
+    [System.Obsolete("This class for internal usage by GraphQL.NET. Derive from ParameterAttribute or P" +
+        "arameterAttribute<T>.")]
+    public abstract class TypedParameterAttribute : GraphQL.ParameterAttribute
+    {
+        protected TypedParameterAttribute() { }
     }
     [System.AttributeUsage(System.AttributeTargets.Method)]
     public sealed class ValidateArgumentsAttribute : GraphQL.GraphQLAttribute
@@ -2337,9 +2358,6 @@ namespace GraphQL.Types
         protected void AddAotType<TGraphType, TGraphTypeImplementation>()
             where TGraphType : GraphQL.Types.IGraphType, new ()
             where TGraphTypeImplementation : GraphQL.Types.IGraphType, new () { }
-        protected abstract void Configure(System.IServiceProvider services);
-        protected virtual void OnPostConfigure(System.IServiceProvider services) { }
-        protected virtual void OnPreConfigure(System.IServiceProvider services) { }
     }
     public class AppliedDirective : GraphQL.Utilities.MetadataProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveArgument>, System.Collections.IEnumerable
     {
@@ -2363,22 +2381,12 @@ namespace GraphQL.Types
     public class ArgumentInformation
     {
         public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, GraphQL.Types.TypeInformation typeInformation) { }
-        public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, GraphQL.Types.TypeInformation typeInformation, System.Linq.Expressions.LambdaExpression? expression) { }
-        [set: System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Uses Expression.Lambda which requires dynamic code generation.")]
-        public System.Linq.Expressions.LambdaExpression? Expression { get; set; }
         public GraphQL.Types.FieldType? FieldType { get; }
         public System.Reflection.ParameterInfo ParameterInfo { get; }
         public System.Type? SourceType { get; }
         public GraphQL.Types.TypeInformation TypeInformation { get; }
         public virtual void ApplyAttributes() { }
-        [return: System.Runtime.CompilerServices.TupleElementNames(new string?[]?[] {
-                "QueryArgument",
-                "Expression"})]
-        public virtual System.ValueTuple<GraphQL.Types.QueryArgument?, System.Linq.Expressions.LambdaExpression?> ConstructQueryArgument() { }
-        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Please use the SetDelegateWithCast method when using with AOT compilation")]
-        public void SetDelegate<TParameterType>(System.Func<GraphQL.IResolveFieldContext, TParameterType?> argumentDelegate) { }
-        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Uses Expression.Lambda which requires dynamic code generation.")]
-        public void SetDelegateWithCast(System.Func<GraphQL.IResolveFieldContext, object?> argumentDelegate) { }
+        public virtual GraphQL.Types.QueryArgument ConstructQueryArgument() { }
     }
     public class AsIsCaseAttribute : GraphQL.Types.EnumCaseAttribute
     {
@@ -2422,6 +2430,7 @@ namespace GraphQL.Types
         protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.ArgumentInformation GetArgumentInformation<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
+        protected virtual System.Func<GraphQL.IResolveFieldContext, TParameterType>? GetParameterResolver<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.ParameterInfo parameterInfo) { }
@@ -2437,6 +2446,7 @@ namespace GraphQL.Types
         protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.ArgumentInformation GetArgumentInformation<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
+        protected virtual System.Func<GraphQL.IResolveFieldContext, TParameterType>? GetParameterResolver<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.ParameterInfo parameterInfo) { }

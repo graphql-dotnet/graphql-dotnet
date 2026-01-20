@@ -388,3 +388,119 @@ Related changes:
 Overloads are provided in `FieldBuilder.ParseValue()` and `QueryArgumentExtensions.ParseValue()` that accept the old `Func<object, object>` signature. The `[Parser]` attribute now supports both old `(object)` and new `(object, IValueConverter)` parser method signatures.
 
 This change enables different schemas to have different conversion rules, improves testability with isolated converters, eliminates shared static state, and provides better thread-safety.
+
+### 18. Parameter attributes now derive from `ParameterAttribute` and use `GetResolver<T>()` method
+
+The parameter modification API for custom attributes has been redesigned to improve AOT compatibility and type safety. Parameter attributes (`FromServicesAttribute`, `FromSourceAttribute`, `FromUserContextAttribute`) now derive from a new `ParameterAttribute` base class instead of `GraphQLAttribute`.
+
+The key changes are:
+
+- Parameter attributes must now implement `GetResolver<T>()` method instead of `Modify()`
+- The method returns a `Func<IResolveFieldContext, T>` resolver function instead of setting an expression on `ArgumentInformation`
+- `ArgumentInformation.Expression`, `SetDelegate<T>()`, and `SetDelegateWithCast()` properties and methods have been removed
+- A new `GlobalSwitches.GlobalParameterAttributes` collection is available for global parameter attribute registration
+
+This change eliminates the need for runtime expression tree generation when possible, improving AOT compilation support and providing better type safety.
+
+There are two ways to create custom parameter attributes in v9:
+
+1. **Generic `ParameterAttribute<T>` (recommended for most use cases)**: Derive from `ParameterAttribute<T>` where `T` is the specific parameter type your attribute targets (e.g., `MyUserContext`). This approach provides compile-time type safety and is ideal for attributes that will be registered globally using `GlobalSwitches.GlobalParameterAttributes` or applied to specific parameter types. The generic constraint ensures the attribute only affects parameters of the specified type.
+
+2. **Non-generic `ParameterAttribute`**: Derive from the non-generic `ParameterAttribute` base class when your attribute needs to work with any parameter type and will be applied directly to individual parameters using `[AttributeName]` syntax. This approach cannot be used for global registration because it would affect every parameter in your schema. Use this when you need runtime flexibility to inspect the actual parameter type and provide different behavior based on that type.
+
+#### Global parameter attributes
+
+If you were registering global attributes that modify parameters in v8, you should now use the new `GlobalSwitches.GlobalParameterAttributes` collection instead of `GlobalSwitches.GlobalAttributes`:
+
+```csharp
+// v8 - parameter attributes mixed with field/type attributes
+GlobalSwitches.GlobalAttributes.Add(new MyUserContextAttribute());
+
+// v9 - parameter attributes have their own collection
+GlobalSwitches.GlobalParameterAttributes.Add(new MyUserContextAttribute());
+```
+
+#### Migration example using `ParameterAttribute<T>` (recommended)
+
+When creating a custom parameter attribute that applies to a specific parameter type, derive from `ParameterAttribute<T>`. This approach provides strong typing and clearer intent. Here's an example of a global attribute that identifies `MyUserContext` parameter types and pulls user context from `IResolveFieldContext`:
+
+**Before (v8):**
+```csharp
+// Define the attribute
+[AttributeUsage(AttributeTargets.Parameter)]
+public class MyUserContextAttribute : GraphQLAttribute
+{
+    public override void Modify(ArgumentInformation argumentInformation)
+    {
+        if (argumentInformation.ParameterInfo.ParameterType == typeof(MyUserContext))
+        {
+            // Set an expression that extracts UserContext and casts it
+            argumentInformation.SetDelegateWithCast(context => context.UserContext);
+        }
+    }
+}
+
+// Register as global attribute
+GlobalSwitches.GlobalAttributes.Add(new MyUserContextAttribute());
+
+// Use in resolver
+public string GetUserName(MyUserContext userContext)
+{
+    return userContext.UserName;
+}
+```
+
+**After (v9):**
+```csharp
+// Define the attribute with strong typing
+[AttributeUsage(AttributeTargets.Parameter)]
+public class MyUserContextAttribute : ParameterAttribute<MyUserContext>
+{
+    public override Func<IResolveFieldContext, MyUserContext> GetResolver(ArgumentInformation argumentInformation)
+    {
+        // Return a strongly-typed resolver function - no casting needed
+        return context => (MyUserContext)context.UserContext!;
+    }
+}
+
+// Register in the new GlobalParameterAttributes collection
+GlobalSwitches.GlobalParameterAttributes.Add(new MyUserContextAttribute());
+
+// Use in resolver (no changes)
+public string GetUserName(MyUserContext userContext)
+{
+    return userContext.UserName;
+}
+```
+
+The `ParameterAttribute<T>` base class is recommended when your attribute applies to a specific parameter type (like `MyUserContext` in this example) because:
+
+- It provides compile-time type safety by enforcing the parameter type
+- The intent is clearer - readers know this attribute is specifically for `MyUserContext` parameters
+- You don't need to check the parameter type at runtime
+- The generic constraint ensures the resolver function returns the correct type
+
+#### Migration example using `ParameterAttribute` (non-generic)
+
+When creating a parameter attribute that works with multiple parameter types or needs to be more flexible, derive from the non-generic `ParameterAttribute` base class. This approach can only be used when the attribute is applied directly to parameters rather than registered globally:
+
+**After (v9) - non-generic approach:**
+```csharp
+// Define the attribute without type constraint
+[AttributeUsage(AttributeTargets.Parameter)]
+public class MyUserContextAttribute : ParameterAttribute
+{
+    public override Func<IResolveFieldContext, T> GetResolver<T>(ArgumentInformation argumentInformation)
+    {
+        // Return a resolver function with generic type parameter
+        // Must cast to T since we don't know the exact type at compile time
+        return context => (T)(object)context.UserContext;
+    }
+}
+
+// Apply directly to parameters (not registered globally)
+public string GetUserName([MyUserContext] MyUserContext userContext)
+{
+    return userContext.UserName;
+}
+```

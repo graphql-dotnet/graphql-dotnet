@@ -12,16 +12,9 @@ public abstract class AotSchema : Schema, IServiceProvider
     /// <summary>
     /// Initializes a new instance of the <see cref="AotSchema"/> class.
     /// </summary>
-    protected AotSchema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations) : base(services, null, null, new ValueConverterAot(), [])
+    protected AotSchema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations) : base(services, configurations, null, new ValueConverterAot(), [])
     {
         _services = services;
-        OnPreConfigure(services);
-        foreach (var configuration in configurations.OrderBy(x => x.SortOrder))
-        {
-            configuration.Configure(this, services);
-        }
-        Configure(services);
-        OnPostConfigure(services);
     }
 
     /// <summary>
@@ -55,25 +48,6 @@ public abstract class AotSchema : Schema, IServiceProvider
             return factory();
         }
         return _services.GetService(serviceType);
-    }
-
-    /// <summary>
-    /// Called before <see cref="Configure"/> to allow custom initialization.
-    /// </summary>
-    protected virtual void OnPreConfigure(IServiceProvider services)
-    {
-    }
-
-    /// <summary>
-    /// Configures the schema; for use by generated code.
-    /// </summary>
-    protected abstract void Configure(IServiceProvider services);
-
-    /// <summary>
-    /// Called after <see cref="Configure"/> to allow custom post-configuration.
-    /// </summary>
-    protected virtual void OnPostConfigure(IServiceProvider services)
-    {
     }
 
     private static readonly (Type, Type)[] _builtInTypeMappings = [
