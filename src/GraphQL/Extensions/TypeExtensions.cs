@@ -194,6 +194,7 @@ public static class TypeExtensions
     /// </remarks>
     [Obsolete("Use TypeExtensions.GetGraphTypeFromType(Type, bool, bool) overload instead. This method will be removed in v10.")]
     [RequiresDynamicCode("This method uses reflection to create types at runtime which is not compatible with trimming and AOT.")]
+    [RequiresUnreferencedCode("This method uses reflection to create types at runtime which is not compatible with trimming and AOT.")]
     public static Type GetGraphTypeFromType(this Type type, bool isNullable, TypeMappingMode mode)
     {
         if (mode == TypeMappingMode.InputType || mode == TypeMappingMode.OutputType)

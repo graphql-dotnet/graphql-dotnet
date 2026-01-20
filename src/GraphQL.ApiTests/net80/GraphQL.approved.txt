@@ -975,6 +975,8 @@ namespace GraphQL
         public static System.Collections.Generic.IEnumerable<GraphQL.GraphQLAttribute> GetGraphQLAttributes(this System.Reflection.ParameterInfo parameterInfo) { }
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This method uses reflection to create types at runtime which is not compatible wi" +
             "th trimming and AOT.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses reflection to create types at runtime which is not compatible wi" +
+            "th trimming and AOT.")]
         [System.Obsolete("Use TypeExtensions.GetGraphTypeFromType(Type, bool, bool) overload instead. This " +
             "method will be removed in v10.")]
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable, GraphQL.TypeMappingMode mode) { }
