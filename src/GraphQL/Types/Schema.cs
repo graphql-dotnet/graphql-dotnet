@@ -540,7 +540,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     {
         var graphTypeMappingProviders = (IEnumerable<IGraphTypeMappingProvider>?)_services.GetService(typeof(IEnumerable<IGraphTypeMappingProvider>));
         graphTypeMappingProviders = graphTypeMappingProviders != null ? _builtInMappingProviders.Concat(graphTypeMappingProviders) : _builtInMappingProviders;
-        return new SchemaTypes(this, _services, graphTypeMappingProviders, OnBeforeInitializeType);
+        return new SchemaTypes(this, this, graphTypeMappingProviders, OnBeforeInitializeType);
     }
 
     /// <summary>

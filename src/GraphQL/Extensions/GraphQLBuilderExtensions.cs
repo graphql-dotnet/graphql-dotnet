@@ -200,6 +200,9 @@ public static class GraphQLBuilderExtensions // TODO: split
         }
 #endif
 
+        // Register a document executer for the schema
+        builder.Services.TryRegister<IDocumentExecuter<TSchema>, DocumentExecuter<TSchema>>(ServiceLifetime.Singleton);
+
         return builder;
     }
 
@@ -216,6 +219,9 @@ public static class GraphQLBuilderExtensions // TODO: split
         // Register the service with the DI provider as TSchema, overwriting any existing registration
         // Also register the service as ISchema if not already registered.
         builder.Services.TryRegisterAsBoth<ISchema, TSchema>(schema);
+
+        // Register a document executer for the schema
+        builder.Services.TryRegister<IDocumentExecuter<TSchema>, DocumentExecuter<TSchema>>(ServiceLifetime.Singleton);
 
         return builder;
     }
@@ -248,6 +254,9 @@ public static class GraphQLBuilderExtensions // TODO: split
             GlobalSwitches.DynamicallyCompileToObject = false;
         }
 #endif
+
+        // Register a document executer for the schema
+        builder.Services.TryRegister<IDocumentExecuter<TSchema>, DocumentExecuter<TSchema>>(ServiceLifetime.Singleton);
 
         return builder;
     }

@@ -14,16 +14,36 @@ namespace GraphQL.DI;
 public abstract class GraphQLBuilderBase : IGraphQLBuilder
 {
     /// <summary>
+    /// Register the basic services required by GraphQL if they have not already been registered,
+    /// excluding graph types required for connection builders (GraphQL Relay) and generic graph types
+    /// such as <see cref="EnumerationGraphType{TEnum}"/> and <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>.
+    /// <br/><br/>
+    /// Does not include <see cref="IGraphQLSerializer"/>.
+    /// </summary>
+    protected virtual void RegisterBasicServices()
+    {
+        Services.TryRegister<IDocumentExecuter, DocumentExecuter>(ServiceLifetime.Singleton);
+        Services.TryRegister<IDocumentExecuter<ISchema>, DocumentExecuter<ISchema>>(ServiceLifetime.Singleton);
+        Services.TryRegister<IDocumentBuilder, GraphQLDocumentBuilder>(ServiceLifetime.Singleton);
+        Services.TryRegister<IDocumentValidator, DocumentValidator>(ServiceLifetime.Singleton);
+        Services.TryRegister<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
+        Services.TryRegister<IExecutionStrategySelector, DefaultExecutionStrategySelector>(ServiceLifetime.Singleton);
+        Services.Configure<ErrorInfoProviderOptions>();
+    }
+
+    /// <summary>
     /// Register the default services required by GraphQL if they have not already been registered.
     /// Includes graph types required for connection builders (GraphQL Relay) and generic graph types
     /// such as <see cref="EnumerationGraphType{TEnum}"/> and <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>.
     /// <br/><br/>
-    /// Does not include <see cref="IGraphQLSerializer"/>, and the default <see cref="IDocumentExecuter"/>
-    /// implementation does not support subscriptions.
+    /// Does not include <see cref="IGraphQLSerializer"/>.
     /// </summary>
+    [RequiresUnreferencedCode("Public constructors for requested generic types may not be statically referenced.")]
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(ErrorInfoProviderOptions))] // TODO: this should be preserved by the call to Configure<ErrorInfoProviderOptions>(), but it is not
     protected virtual void RegisterDefaultServices()
     {
+        RegisterBasicServices();
+
         // configure an error to be displayed when no IGraphQLSerializer is registered
         Services.TryRegister<IGraphQLSerializer>(_ =>
         {

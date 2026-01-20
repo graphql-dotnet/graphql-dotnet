@@ -1,7 +1,5 @@
 using System.Collections;
 using GraphQL.DI;
-using GraphQL.Execution;
-using GraphQL.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -31,11 +29,11 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
     /// Registers various default services via <see cref="GraphQLBuilderBase.RegisterDefaultServices"/>
     /// after executing the configuration delegate.
     /// </remarks>
+    [RequiresUnreferencedCode("Public constructors for requested generic types may not be statically referenced.")]
     public GraphQLBuilder(IServiceCollection services, Action<IGraphQLBuilder>? configure)
     {
         ServiceCollection = services ?? throw new ArgumentNullException(nameof(services));
         configure?.Invoke(this);
-        _registerDefaultServices = base.RegisterDefaultServices;
         RegisterDefaultServices();
     }
 
@@ -45,25 +43,7 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
         configure?.Invoke(this);
         if (!skipDefaultServices)
             throw new InvalidOperationException("This constructor is only for use by AotGraphQLBuilder which skips default service registration.");
-        _registerDefaultServices = () =>
-        {
-            // only basic services
-            Services.TryRegister<IDocumentExecuter, DocumentExecuter>(ServiceLifetime.Singleton);
-            Services.TryRegister<IDocumentBuilder, GraphQLDocumentBuilder>(ServiceLifetime.Singleton);
-            Services.TryRegister<IDocumentValidator, DocumentValidator>(ServiceLifetime.Singleton);
-            Services.TryRegister<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
-            Services.TryRegister<IExecutionStrategySelector, DefaultExecutionStrategySelector>(ServiceLifetime.Singleton);
-            Services.Configure<ErrorInfoProviderOptions>();
-        };
-        RegisterDefaultServices();
-    }
-
-    private readonly Action _registerDefaultServices;
-    /// <inheritdoc/>
-    protected override void RegisterDefaultServices()
-    {
-        ServiceCollection.AddOptions();
-        _registerDefaultServices();
+        RegisterBasicServices();
     }
 
     private static MSServiceLifetime TranslateLifetime(ServiceLifetime serviceLifetime)

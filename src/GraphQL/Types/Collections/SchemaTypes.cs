@@ -780,13 +780,10 @@ public sealed partial class SchemaTypes : SchemaTypesBase
 
             // Unable to resolve from DI; check if it's a built-in scalar
             if (BuiltInScalars.TryGetValue(type, out var scalar))
-            {
                 return scalar;
-            }
 
-            // Throw if we couldn't resolve to a concrete type
             throw new InvalidOperationException(
-                $"Cannot resolve type '{type.GetFriendlyName()}' to a concrete GraphQL type. Ensure the type is registered in the service provider or is a built-in scalar type.");
+                $"Cannot resolve graph type '{type.GetFriendlyName()}'. Ensure the type is registered in the service provider or is a built-in scalar type.");
         }
 
         /// <summary>
