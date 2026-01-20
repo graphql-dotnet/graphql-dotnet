@@ -314,7 +314,6 @@ public class NotAGraphTypeAnalyzerTests
             public partial class MySchema : AotSchema
             {
                 public MySchema() : base(null!, null!) { }
-                protected override void Configure(IServiceProvider services) { }
             }
             """;
 

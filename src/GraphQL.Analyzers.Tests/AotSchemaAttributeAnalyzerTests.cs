@@ -36,7 +36,6 @@ public class AotSchemaAttributeAnalyzerTests
             public partial class MySchema : AotSchema
             {
                 public MySchema() : base(null!, null!) { }
-                protected override void Configure(IServiceProvider services) { }
             }
             """;
 
@@ -71,7 +70,6 @@ public class AotSchemaAttributeAnalyzerTests
             public partial class MySchema : AotSchema
             {
                 public MySchema() : base(null!, null!) { }
-                protected override void Configure(IServiceProvider services) { }
             }
             """;
 
@@ -209,7 +207,6 @@ public class AotSchemaAttributeAnalyzerTests
             public abstract partial class MyBaseSchema : AotSchema
             {
                 protected MyBaseSchema() : base(null!, null!) { }
-                protected override void Configure(IServiceProvider services) { }
             }
             """;
 
@@ -235,7 +232,6 @@ public class AotSchemaAttributeAnalyzerTests
             public abstract partial class MyBaseSchema : AotSchema
             {
                 protected MyBaseSchema() : base(null!, null!) { }
-                protected override void Configure(IServiceProvider services) { }
             }
 
             [AotInputType<MyModel>]
