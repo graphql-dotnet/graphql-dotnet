@@ -12,9 +12,10 @@ public partial class SampleAotSchema : AotSchema
     // source-generated constructor (when the developer does not provide one)
     public SampleAotSchema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations) : base(services, configurations)
     {
+        Configure();
     }
 
-    protected override void Configure(IServiceProvider services)
+    private void Configure()
     {
         // register constructors for:
         //   1. all source-generated types, including those found during source generation of other types
