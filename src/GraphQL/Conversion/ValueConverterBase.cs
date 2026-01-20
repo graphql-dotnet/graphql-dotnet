@@ -171,8 +171,8 @@ public abstract class ValueConverterBase : IValueConverter
     /// </summary>
     public virtual IListConverterFactory GetListConverterFactory(Type listType)
     {
-        if (listType.IsArray)
-            return ArrayListConverterFactory.Instance;
+        if (listType.IsArray && ArrayListConverterFactory != null)
+            return ArrayListConverterFactory;
 
         // if the list type is not explicitly registered
         if (!ListConverterFactories.TryGetValue(listType, out var converter)
@@ -195,6 +195,11 @@ public abstract class ValueConverterBase : IValueConverter
     /// when attempting to convert a list type that is not explicitly registered.
     /// </summary>
     protected virtual IListConverterFactory? DefaultListConverterFactory => null;
+
+    /// <summary>
+    /// Gets the array list converter factory for array types.
+    /// </summary>
+    protected virtual IListConverterFactory? ArrayListConverterFactory => null;
 
     /// <summary>
     /// Allows you to register your own conversion delegate from one type to another.
@@ -268,6 +273,7 @@ public abstract class ValueConverterBase : IValueConverter
         "For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. " +
         "If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors " +
         "or other members, which can cause runtime failures.")]
+    [RequiresDynamicCode("Compiles code at runtime to populate the specified type.")]
     public abstract void RegisterListConverterFactory(Type listType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
         Type implementationType);
 

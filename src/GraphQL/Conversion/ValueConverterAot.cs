@@ -24,6 +24,7 @@ public class ValueConverterAot : ValueConverterBase
         "For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. " +
         "If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors " +
         "or other members, which can cause runtime failures.")]
+    [RequiresDynamicCode("Compiles code at runtime to populate the specified type.")]
     public override void RegisterListConverterFactory(Type listType,
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
         Type implementationType)

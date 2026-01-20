@@ -18,7 +18,8 @@ public class ValueConverter : ValueConverterBase
     /// <summary>
     /// Register built-in conversions. This list is expected to grow over time.
     /// </summary>
-    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
+    [RequiresUnreferencedCode("Creates list and array types dynamically as needed.")]
+    [RequiresDynamicCode("Creates list and array types dynamically as needed.")]
     public ValueConverter()
     {
         RegisterScalarConversions();
@@ -31,15 +32,15 @@ public class ValueConverter : ValueConverterBase
             System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
 #endif
 
-        // types that return an array (fully supported by AOT, if the array type is not trimmed)
-        RegisterListConverterFactory(typeof(ICollection), ArrayListConverterFactory.Instance);
-        RegisterListConverterFactory(typeof(IEnumerable), ArrayListConverterFactory.Instance);
-        RegisterListConverterFactory(typeof(IList), ArrayListConverterFactory.Instance);
-        RegisterListConverterFactory(typeof(IList<>), ArrayListConverterFactory.Instance);
-        RegisterListConverterFactory(typeof(IEnumerable<>), ArrayListConverterFactory.Instance);
-        RegisterListConverterFactory(typeof(ICollection<>), ArrayListConverterFactory.Instance);
-        RegisterListConverterFactory(typeof(IReadOnlyList<>), ArrayListConverterFactory.Instance);
-        RegisterListConverterFactory(typeof(IReadOnlyCollection<>), ArrayListConverterFactory.Instance);
+        // types that return an array
+        RegisterListConverterFactory(typeof(ICollection), Conversion.ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IEnumerable), Conversion.ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IList), Conversion.ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IList<>), Conversion.ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IEnumerable<>), Conversion.ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(ICollection<>), Conversion.ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IReadOnlyList<>), Conversion.ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IReadOnlyCollection<>), Conversion.ArrayListConverterFactory.Instance);
 
         if (dynamicCodeCompiled)
         {
@@ -73,6 +74,7 @@ public class ValueConverter : ValueConverterBase
         "For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. " +
         "If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors " +
         "or other members, which can cause runtime failures.")]
+    [RequiresDynamicCode("Compiles code at runtime to populate the specified type.")]
     public override void RegisterListConverterFactory(Type listType,
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
         Type implementationType)
@@ -92,7 +94,22 @@ public class ValueConverter : ValueConverterBase
     }
 
     /// <inheritdoc/>
-    protected override IListConverterFactory? DefaultListConverterFactory => CustomListConverterFactory.DefaultInstance;
+    protected override IListConverterFactory? DefaultListConverterFactory
+    {
+        [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+            Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
+        [UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with 'RequiresUnreferencedCodeAttribute' may break functionality when trimming application code.",
+            Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+        get => CustomListConverterFactory.DefaultInstance;
+    }
+
+    /// <inheritdoc/>
+    protected override IListConverterFactory? ArrayListConverterFactory
+    {
+        [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+            Justification = "The constructor is marked with RequiresDynamicCode.")]
+        get => Conversion.ArrayListConverterFactory.Instance;
+    }
 
     /// <inheritdoc/>
     public override object ToObject(IDictionary<string, object?> source, Type type, IInputObjectGraphType inputGraphType)
@@ -101,6 +118,15 @@ public class ValueConverter : ValueConverterBase
         if (conversion != null)
             return conversion(source);
 
-        return ObjectExtensions.ToObjectReflection(source, type, inputGraphType, this);
+        return ToObjectImpl(source, type, inputGraphType);
     }
+
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with 'RequiresUnreferencedCodeAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2067:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+    private object ToObjectImpl(IDictionary<string, object?> source, Type type, IInputObjectGraphType inputGraphType)
+        => ObjectExtensions.ToObjectReflection(source, type, inputGraphType, this);
 }
