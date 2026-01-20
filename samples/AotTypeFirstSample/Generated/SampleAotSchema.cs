@@ -24,16 +24,16 @@ public partial class SampleAotSchema : AotSchema
         //   4. Any graph types generated via [AotInputType] or similar attributes
         //   5. Any graph types generated or referenced via [AotQueryType] or similar attributes, that have only a default constructor
         //   6. Any graph types referenced via [AotTypeMapping] or [AotRemapType] attributes, that have only a default constructor
-        AddAotType<AutoRegisteringObjectGraphType<StarWarsQuery>>(); // source-generated type specified for root Query type
-        AddAotType<AutoRegisteringInterfaceGraphType<IStarWarsCharacter>>(); // source-generated type referenced by StarWarsQuery
+        AddAotType<AutoOutputGraphType_StarWarsQuery>(); // source-generated type specified for root Query type
+        AddAotType<AutoOutputGraphType_IStarWarsCharacter>(); // source-generated type referenced by StarWarsQuery
         AddAotType<EnumerationGraphType<Episodes>>(); // source-generated type referenced by IStarWarsCharacter
-        AddAotType<AutoRegisteringObjectGraphType<Connection<IStarWarsCharacter>>>(); // source-generated type referenced by IStarWarsCharacter
-        AddAotType<AutoRegisteringObjectGraphType<Edge<IStarWarsCharacter>>>(); // source-generated type referenced by CharacterConnection
-        AddAotType<AutoRegisteringObjectGraphType<PageInfo>>(); // source-generated type referenced by CharacterConnection
-        AddAotType<AutoRegisteringObjectGraphType<Droid>>(); // source-generated type referenced by StarWarsQuery
-        AddAotType<AutoRegisteringObjectGraphType<Human>>(); // source-generated type referenced by StarWarsQuery
-        AddAotType<AutoRegisteringObjectGraphType<StarWarsMutation>>(); // source-generated type specified for root Mutation type
-        AddAotType<AutoRegisteringInputObjectGraphType<HumanInput>>(); // source-generated input type referenced by StarWarsMutation
+        AddAotType<AutoOutputGraphType_Connection_IStarWarsCharacter>(); // source-generated type referenced by IStarWarsCharacter
+        AddAotType<AutoOutputGraphType_Edge_IStarWarsCharacter>(); // source-generated type referenced by CharacterConnection
+        AddAotType<AutoOutputGraphType_PageInfo>(); // source-generated type referenced by CharacterConnection
+        AddAotType<AutoOutputGraphType_Droid>(); // source-generated type referenced by StarWarsQuery
+        AddAotType<AutoOutputGraphType_Human>(); // source-generated type referenced by StarWarsQuery
+        AddAotType<AutoOutputGraphType_StarWarsMutation>(); // source-generated type specified for root Mutation type
+        AddAotType<AutoInputGraphType_HumanInput>(); // source-generated input type referenced by StarWarsMutation
         AddAotType<IntGraphType>(); // built-in type
         AddAotType<StringGraphType>(); // built-in type
         AddAotType<BooleanGraphType>(); // built-in type
@@ -47,16 +47,16 @@ public partial class SampleAotSchema : AotSchema
         //   4. Any graph types generated via [AotInputType] or similar attributes
         //   5. Any graph types generated or referenced via [AotQueryType] or similar attributes
         //   6. Any graph types referenced via [AotTypeMapping] or [AotRemapType] attributes
-        this.RegisterType<AutoRegisteringObjectGraphType<StarWarsQuery>>();
-        this.RegisterType<AutoRegisteringInterfaceGraphType<IStarWarsCharacter>>();
+        this.RegisterType<AutoOutputGraphType_StarWarsQuery>();
+        this.RegisterType<AutoOutputGraphType_IStarWarsCharacter>();
         this.RegisterType<EnumerationGraphType<Episodes>>();
-        this.RegisterType<AutoRegisteringObjectGraphType<Connection<IStarWarsCharacter>>>();
-        this.RegisterType<AutoRegisteringObjectGraphType<Edge<IStarWarsCharacter>>>();
-        this.RegisterType<AutoRegisteringObjectGraphType<PageInfo>>();
-        this.RegisterType<AutoRegisteringObjectGraphType<Droid>>();
-        this.RegisterType<AutoRegisteringObjectGraphType<Human>>();
-        this.RegisterType<AutoRegisteringObjectGraphType<StarWarsMutation>>();
-        this.RegisterType<AutoRegisteringInputObjectGraphType<HumanInput>>();
+        this.RegisterType<AutoOutputGraphType_Connection_IStarWarsCharacter>();
+        this.RegisterType<AutoOutputGraphType_Edge_IStarWarsCharacter>();
+        this.RegisterType<AutoOutputGraphType_PageInfo>();
+        this.RegisterType<AutoOutputGraphType_Droid>();
+        this.RegisterType<AutoOutputGraphType_Human>();
+        this.RegisterType<AutoOutputGraphType_StarWarsMutation>();
+        this.RegisterType<AutoInputGraphType_HumanInput>();
         this.RegisterType<IntGraphType>();
         this.RegisterType<StringGraphType>();
         this.RegisterType<BooleanGraphType>();
@@ -67,14 +67,14 @@ public partial class SampleAotSchema : AotSchema
         //   1. all source-generated types excluding root types, including those found during source generation of other types
         //   2. Any explicitly mapped types
         //   3. Built-in type mappings
-        this.RegisterTypeMapping<IStarWarsCharacter, AutoRegisteringInterfaceGraphType<IStarWarsCharacter>>();
+        this.RegisterTypeMapping<IStarWarsCharacter, AutoOutputGraphType_IStarWarsCharacter>();
         this.RegisterTypeMapping<Episodes, EnumerationGraphType<Episodes>>(); // uses AOT-safe reflection during initialization only
-        this.RegisterTypeMapping<Connection<IStarWarsCharacter>, AutoRegisteringObjectGraphType<Connection<IStarWarsCharacter>>>();
-        this.RegisterTypeMapping<Edge<IStarWarsCharacter>, AutoRegisteringObjectGraphType<Edge<IStarWarsCharacter>>>();
-        this.RegisterTypeMapping<PageInfo, AutoRegisteringObjectGraphType<PageInfo>>();
-        this.RegisterTypeMapping<Droid, AutoRegisteringObjectGraphType<Droid>>();
-        this.RegisterTypeMapping<Human, AutoRegisteringObjectGraphType<Human>>();
-        this.RegisterTypeMapping<HumanInput, AutoRegisteringInputObjectGraphType<HumanInput>>();
+        this.RegisterTypeMapping<Connection<IStarWarsCharacter>, AutoOutputGraphType_Connection_IStarWarsCharacter>();
+        this.RegisterTypeMapping<Edge<IStarWarsCharacter>, AutoOutputGraphType_Edge_IStarWarsCharacter>();
+        this.RegisterTypeMapping<PageInfo, AutoOutputGraphType_PageInfo>();
+        this.RegisterTypeMapping<Droid, AutoOutputGraphType_Droid>();
+        this.RegisterTypeMapping<Human, AutoOutputGraphType_Human>();
+        this.RegisterTypeMapping<HumanInput, AutoInputGraphType_HumanInput>();
         this.RegisterTypeMapping<int, IntGraphType>();
         this.RegisterTypeMapping<string, StringGraphType>();
         this.RegisterTypeMapping<bool, BooleanGraphType>();
@@ -86,6 +86,6 @@ public partial class SampleAotSchema : AotSchema
         // (none in this sample)
 
         // configure root types when specified via [AotQueryType] or similar attributes
-        Query = this.GetRequiredService<AutoRegisteringObjectGraphType<StarWarsQuery>>();
+        Query = this.GetRequiredService<AutoOutputGraphType_StarWarsQuery>();
     }
 }

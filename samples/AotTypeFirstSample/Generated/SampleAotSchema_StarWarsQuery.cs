@@ -107,7 +107,6 @@ public partial class SampleAotSchema : AotSchema
                 var arg2_attr1 = new IdAttribute();
                 arg2_attr1.Modify(typeInformation);
                 arg2_attr1.Modify(argInfo);
-                arg2_attr1.Modify<string>(argInfo);
 
                 var queryArgument = argInfo.ConstructQueryArgument();
                 arg2_attr1.Modify(queryArgument);
@@ -165,7 +164,6 @@ public partial class SampleAotSchema : AotSchema
                 var arg2_attr1 = new IdAttribute();
                 arg2_attr1.Modify(typeInformation);
                 arg2_attr1.Modify(argInfo);
-                arg2_attr1.Modify<string>(argInfo);
 
                 var queryArgument = argInfo.ConstructQueryArgument();
                 arg2_attr1.Modify(queryArgument);
