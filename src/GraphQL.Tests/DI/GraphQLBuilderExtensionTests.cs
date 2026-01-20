@@ -845,7 +845,7 @@ public class GraphQLBuilderExtensionTests
             .ConfigureSchema<TestConfigureSchema>()
             .ConfigureSchema<TestConfigureSchema>());
         var provider = services.BuildServiceProvider();
-        var configurations = provider.GetService(typeof(IEnumerable<IConfigureSchema>)).ShouldBeOfType<IEnumerable<IConfigureSchema>>().ShouldNotBeNull();
+        var configurations = provider.GetService(typeof(IEnumerable<IConfigureSchema>)).ShouldBeAssignableTo<IEnumerable<IConfigureSchema>>().ShouldNotBeNull();
         configurations.Count().ShouldBe(1);
     }
 
@@ -921,7 +921,7 @@ public class GraphQLBuilderExtensionTests
             .ConfigureExecution<TestConfigureExecution>()
             .ConfigureExecution<TestConfigureExecution>());
         var provider = services.BuildServiceProvider();
-        var configurations = provider.GetService(typeof(IEnumerable<IConfigureExecution>)).ShouldBeOfType<IEnumerable<IConfigureExecution>>().ShouldNotBeNull();
+        var configurations = provider.GetService(typeof(IEnumerable<IConfigureExecution>)).ShouldBeAssignableTo<IEnumerable<IConfigureExecution>>().ShouldNotBeNull();
         configurations.Where(x => x.GetType() == typeof(TestConfigureExecution)).Count().ShouldBe(1);
     }
 
