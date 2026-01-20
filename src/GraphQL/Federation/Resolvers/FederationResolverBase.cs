@@ -9,7 +9,7 @@ public abstract class FederationResolverBase<
 {
     /// <inheritdoc cref="FederationResolverBase.FederationResolverBase"/>
     [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
-    public FederationResolverBase()
+    protected FederationResolverBase()
     {
     }
 
@@ -34,7 +34,7 @@ public abstract class FederationResolverBase : IFederationResolver
     /// Initializes a new instance of <see cref="FederationResolverBase"/>.
     /// </summary>
     [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
-    public FederationResolverBase()
+    protected FederationResolverBase()
     {
     }
 
