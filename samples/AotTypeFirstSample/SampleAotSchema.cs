@@ -5,7 +5,8 @@ using GraphQL.Types;
 namespace AotSample;
 
 [AotQueryType<StarWarsQuery>] // will discover related types
-// other attributes available: [AotMutationType], [AotSubscriptionType], [AotOutputType], [AotInputType], [AotGraphType], [AotTypeMapping]
+[AotMutationType<StarWarsMutation>]
+// other attributes available: [AotSubscriptionType], [AotOutputType], [AotInputType], [AotGraphType], [AotTypeMapping]
 public partial class SampleAotSchema : AotSchema
 {
 }

@@ -87,5 +87,6 @@ public partial class SampleAotSchema : AotSchema
 
         // configure root types when specified via [AotQueryType] or similar attributes
         Query = this.GetRequiredService<AutoOutputGraphType_StarWarsQuery>();
+        Mutation = this.GetRequiredService<AutoOutputGraphType_StarWarsMutation>();
     }
 }
