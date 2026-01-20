@@ -324,8 +324,8 @@ public sealed partial class SchemaTypes : SchemaTypesBase
             // 4. Register type references from AdditionalTypes without processing
             foreach (var type in _schema.AdditionalTypes)
             {
-                var (graphType, type2) = ResolveType(type);
-                AddType(graphType, type2, skipProcessing: true);
+                var graphType = ResolveGraphType(type);
+                AddType(graphType, type, skipProcessing: true);
             }
         }
 
@@ -740,7 +740,7 @@ public sealed partial class SchemaTypes : SchemaTypesBase
         /// <see cref="GraphQLClrOutputTypeReference{T}"/> or <see cref="GraphQLClrInputTypeReference{T}"/> was used.
         /// Be sure to pass the returned CLR type to <see cref="AddType(IGraphType, Type?, bool)"/> when registering the resolved instance.
         /// </summary>
-        private (IGraphType Instance, Type Type) ResolveType(Type type)
+        private (IGraphType Instance, Type Type) ResolveClrType(Type type)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
@@ -754,27 +754,39 @@ public sealed partial class SchemaTypes : SchemaTypesBase
             // Resolve any CLR type references within the type
             type = ResolveClrTypeReferences(type);
 
-            // Check if already registered
-            if (_typeDictionary.TryGetValue(type, out var existing))
-                return (existing, type);
-
-            // Try to get from service provider
-            if (_serviceProvider.GetService(type) is not IGraphType instance)
-            {
-                // Unable to resolve from DI; check if it's a built-in scalar
-                if (BuiltInScalars.TryGetValue(type, out var scalar))
-                {
-                    instance = scalar;
-                }
-                else
-                {
-                    // Throw if we couldn't resolve to a concrete type
-                    throw new InvalidOperationException(
-                        $"Cannot resolve type '{type.GetFriendlyName()}' to a concrete GraphQL type. Ensure the type is registered in the service provider or is a built-in scalar type.");
-                }
-            }
+            var instance = ResolveGraphType(type);
 
             return (instance, type);
+        }
+
+        private IGraphType ResolveGraphType(Type type)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            if (typeof(NonNullGraphType).IsAssignableFrom(type) || typeof(ListGraphType).IsAssignableFrom(type))
+            {
+                throw new InvalidOperationException(
+                    "Cannot resolve NonNullGraphType or ListGraphType directly. These are created automatically.");
+            }
+
+            // Check if already registered
+            if (_typeDictionary.TryGetValue(type, out var existing))
+                return existing;
+
+            // Try to get from service provider
+            if (_serviceProvider.GetService(type) is IGraphType instance)
+                return instance;
+
+            // Unable to resolve from DI; check if it's a built-in scalar
+            if (BuiltInScalars.TryGetValue(type, out var scalar))
+            {
+                return scalar;
+            }
+
+            // Throw if we couldn't resolve to a concrete type
+            throw new InvalidOperationException(
+                $"Cannot resolve type '{type.GetFriendlyName()}' to a concrete GraphQL type. Ensure the type is registered in the service provider or is a built-in scalar type.");
         }
 
         /// <summary>
@@ -860,7 +872,7 @@ public sealed partial class SchemaTypes : SchemaTypesBase
             }
 
             // Resolve as a regular graph type
-            var (resolved, type2) = ResolveType(type);
+            var (resolved, type2) = ResolveClrType(type);
             AddType(resolved, type2);
             return resolved;
         }
