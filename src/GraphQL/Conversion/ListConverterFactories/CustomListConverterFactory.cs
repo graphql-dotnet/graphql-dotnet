@@ -42,6 +42,7 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
         "For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. " +
         "If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors " +
         "or other members, which can cause runtime failures.")]
+    [RequiresDynamicCode("Uses MakeGenericType which requires dynamic code generation.")]
     public CustomListConverterFactory(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
         Type implementationType)
@@ -59,20 +60,30 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
     /// Returns a <see cref="CustomListConverterFactory"/> which will work for any
     /// compatible list type.
     /// </summary>
-    public static CustomListConverterFactory DefaultInstance { get; } = new();
+    public static CustomListConverterFactory DefaultInstance
+    {
+        [RequiresUnreferencedCode(
+            "For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. " +
+            "If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors " +
+            "or other members, which can cause runtime failures.")]
+        [RequiresDynamicCode("Uses MakeGenericType which requires dynamic code generation.")]
+        get;
+    } = new();
 
-    public IListConverter Create(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
-        Type listType)
+    public IListConverter Create(Type listType)
     {
         return CreateImpl(listType);
     }
 
-    [UnconditionalSuppressMessage("Trimming", "IL2055:Either the type on which the MakeGenericType is called can't be statically determined, or the type parameters to be used for generic arguments can't be statically determined.")]
-    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
-    private IListConverter CreateImpl(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
-        Type listType)
+    [UnconditionalSuppressMessage("AOT", "IL2070:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2055:Either the type on which the MakeGenericType is called can't be statically determined, or the type parameters to be used for generic arguments can't be statically determined.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT",
+        Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2067:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+    private IListConverter CreateImpl(Type listType)
     {
         var elementType = listType.IsGenericType
             ? listType.GetGenericArguments()[0]
@@ -139,7 +150,8 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
     /// <summary>
     /// Finds an 'Add' method that can be used to add items to the list.
     /// </summary>
-    [UnconditionalSuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     private static MethodInfo? GetAddMethod(Type listType, Type elementType)
     {
         var addMethod = listType.GetMethod("Add", [elementType]);
@@ -184,6 +196,8 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
     /// Creates a delegate that calls the specified <paramref name="constructor"/> after casting
     /// the delegate's parameter to <see cref="IEnumerable{T}"/> of the <paramref name="elementType"/>.
     /// </summary>
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
     private static Func<object?[], object> CreateLambdaViaConstructor(Type elementType, ConstructorInfo constructor)
     {
         var methodInfo = _castMethodInfo.MakeGenericMethod(elementType);

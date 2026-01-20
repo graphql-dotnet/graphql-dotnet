@@ -13,6 +13,7 @@ public abstract class ListConverterFactoryBase : IListConverterFactory
     /// Initializes a new instance of the <see cref="ListConverterFactoryBase"/> class.
     /// </summary>
     [RequiresUnreferencedCode("Uses reflection to access generic method information which may be trimmed.")]
+    [RequiresDynamicCode("Uses reflection to create generic method signatures.")]
     protected ListConverterFactoryBase()
     {
         Expression<Func<object>> expression = () => Create<string>();
@@ -20,9 +21,9 @@ public abstract class ListConverterFactoryBase : IListConverterFactory
     }
 
     /// <inheritdoc/>
-    public virtual IListConverter Create(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
-        Type listType)
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "The constructor is marked with RequiresDynamicCode.")]
+    public virtual IListConverter Create(Type listType)
     {
         var elementType = GetElementType(listType);
 

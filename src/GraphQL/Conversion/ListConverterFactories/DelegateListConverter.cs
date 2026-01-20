@@ -14,7 +14,7 @@ internal class DelegateListConverter<TListType, TElementType> : IListConverter, 
 
     public DelegateListConverter(Func<IEnumerable<TElementType>, TListType> converter)
     {
-        _converter = arr => converter(CastOrDefault<TElementType>(arr));
+        _converter = arr => converter(CastOrDefault(arr));
     }
 
     public Type ElementType { get; } = typeof(TElementType);
@@ -26,12 +26,12 @@ internal class DelegateListConverter<TListType, TElementType> : IListConverter, 
     /// <summary>
     /// Casts each item in the array to the specified type, returning the default value for null items.
     /// </summary>
-    private static IEnumerable<T> CastOrDefault<T>(object?[] source)
+    private static IEnumerable<TElementType> CastOrDefault(object?[] source)
     {
         for (var i = 0; i < source.Length; i++)
         {
             var value = source[i];
-            yield return value == null ? default! : (T)value;
+            yield return value == null ? default! : (TElementType)value;
         }
     }
 }
