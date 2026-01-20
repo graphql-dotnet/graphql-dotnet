@@ -91,6 +91,7 @@ namespace GraphQL.MicrosoftDI
     }
     public class GraphQLBuilder : GraphQL.DI.GraphQLBuilderBase, GraphQL.DI.IServiceRegister, Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Collections.Generic.ICollection<Microsoft.Extensions.DependencyInjection.ServiceDescriptor>, System.Collections.Generic.IEnumerable<Microsoft.Extensions.DependencyInjection.ServiceDescriptor>, System.Collections.Generic.IList<Microsoft.Extensions.DependencyInjection.ServiceDescriptor>, System.Collections.IEnumerable
     {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Public constructors for requested generic types may not be statically referenced.")]
         public GraphQLBuilder(Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<GraphQL.DI.IGraphQLBuilder>? configure) { }
         public Microsoft.Extensions.DependencyInjection.IServiceCollection ServiceCollection { get; }
         public override GraphQL.DI.IServiceRegister Services { get; }
@@ -99,7 +100,6 @@ namespace GraphQL.MicrosoftDI
         public GraphQL.DI.IServiceRegister Register(System.Type serviceType, object implementationInstance, bool replace = false) { }
         public GraphQL.DI.IServiceRegister Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false) { }
         public GraphQL.DI.IServiceRegister Register(System.Type serviceType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false) { }
-        protected override void RegisterDefaultServices() { }
         public GraphQL.DI.IServiceRegister TryRegister(System.Type serviceType, object implementationInstance, GraphQL.DI.RegistrationCompareMode mode = 0) { }
         public GraphQL.DI.IServiceRegister TryRegister(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, GraphQL.DI.RegistrationCompareMode mode = 0) { }
         public GraphQL.DI.IServiceRegister TryRegister(System.Type serviceType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime, GraphQL.DI.RegistrationCompareMode mode = 0) { }
@@ -251,7 +251,10 @@ namespace GraphQL.MicrosoftDI
     }
     public class SelfActivatingServiceProvider : System.IServiceProvider
     {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Public constructors for requested types may not be statically referenced.")]
         public SelfActivatingServiceProvider(System.IServiceProvider serviceProvider) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2067:Calling members with arguments having \'DynamicallyAccessedMembersAttribute" +
+            "\' may break functionality when trimming application code.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
         public object? GetService(System.Type serviceType) { }
     }
 }
@@ -259,9 +262,11 @@ namespace GraphQL
 {
     public static class MicrosoftDIGraphQLBuilderExtensions
     {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Public constructors for requested generic types may not be statically referenced.")]
         public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddGraphQL(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<GraphQL.DI.IGraphQLBuilder>? configure) { }
         public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddGraphQLAot(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<GraphQL.DI.IGraphQLBuilder>? configure) { }
         public static GraphQL.DI.IGraphQLBuilder AddScopedSubscriptionExecutionStrategy(this GraphQL.DI.IGraphQLBuilder builder, bool serialExecution = true) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Public constructors for requested types may not be statically referenced.")]
         public static GraphQL.DI.IGraphQLBuilder AddSelfActivatingSchema<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
         public static GraphQL.DI.IGraphQLBuilder ValidateServices(this GraphQL.DI.IGraphQLBuilder builder, bool enabled = true) { }

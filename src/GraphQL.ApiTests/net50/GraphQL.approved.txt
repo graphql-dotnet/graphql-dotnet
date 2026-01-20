@@ -1290,7 +1290,9 @@ namespace GraphQL.DI
     {
         protected GraphQLBuilderBase() { }
         public abstract GraphQL.DI.IServiceRegister Services { get; }
+        protected virtual void RegisterBasicServices() { }
         [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(GraphQL.Execution.ErrorInfoProviderOptions))]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Public constructors for requested generic types may not be statically referenced.")]
         protected virtual void RegisterDefaultServices() { }
     }
     public interface IConfigureExecution
