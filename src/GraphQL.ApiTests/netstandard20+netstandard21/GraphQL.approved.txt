@@ -1800,7 +1800,7 @@ namespace GraphQL.Federation.Resolvers
     }
     public abstract class FederationResolverBase : GraphQL.Federation.Resolvers.IFederationResolver
     {
-        protected FederationResolverBase() { }
+        public FederationResolverBase() { }
         public abstract System.Type SourceType { get; }
         public virtual bool MatchKeys(System.Collections.Generic.IDictionary<string, object?> representation) { }
         public object ParseRepresentation(GraphQL.Types.IComplexGraphType graphType, System.Collections.Generic.IDictionary<string, object?> representation, GraphQL.IValueConverter valueConverter) { }
@@ -1808,7 +1808,7 @@ namespace GraphQL.Federation.Resolvers
     }
     public abstract class FederationResolverBase<TParsedType> : GraphQL.Federation.Resolvers.FederationResolverBase
     {
-        protected FederationResolverBase() { }
+        public FederationResolverBase() { }
         public override System.Type SourceType { get; }
         public abstract System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, TParsedType parsedRepresentation);
         public override System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, object parsedRepresentation) { }

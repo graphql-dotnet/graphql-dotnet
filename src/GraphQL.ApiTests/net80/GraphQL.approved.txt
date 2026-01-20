@@ -1741,24 +1741,36 @@ namespace GraphQL.Federation
     public static class FederationGraphTypeExtensions
     {
         public static void ResolveReference<TSourceType>(this GraphQL.Types.IInterfaceGraphType<TSourceType> graphType, GraphQL.Federation.Resolvers.IFederationResolver resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Types.IInterfaceGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TSourceType?>> resolver)
             where TSourceType : new() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Types.IInterfaceGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TSourceType?>> resolver)
             where TSourceType : new() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Types.IInterfaceGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType?> resolver)
             where TSourceType : new() { }
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, GraphQL.Federation.Resolvers.IFederationResolver resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TSourceType?>> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TSourceType?>> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType?> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.IInterfaceGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType?>> resolver)
             where TSourceType : new() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.IInterfaceGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolver)
             where TSourceType : new() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.IInterfaceGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolver)
             where TSourceType : new() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType?>> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolver) { }
     }
     public static class FederationInterfaceMetadataExtensions
@@ -1838,11 +1850,17 @@ namespace GraphQL.Federation
     public static class TypeConfigExtensions
     {
         public static void ResolveReference(this GraphQL.Utilities.TypeConfig config, GraphQL.Federation.Resolvers.IFederationResolver resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TSourceType?>> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TSourceType?>> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType?> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType?>> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolver) { }
     }
 }
@@ -1856,29 +1874,37 @@ namespace GraphQL.Federation.Resolvers
     }
     public abstract class FederationResolverBase : GraphQL.Federation.Resolvers.IFederationResolver
     {
-        protected FederationResolverBase() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
+        public FederationResolverBase() { }
         public abstract System.Type SourceType { get; }
         public virtual bool MatchKeys(System.Collections.Generic.IDictionary<string, object?> representation) { }
         public object ParseRepresentation(GraphQL.Types.IComplexGraphType graphType, System.Collections.Generic.IDictionary<string, object?> representation, GraphQL.IValueConverter valueConverter) { }
         public abstract System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, object parsedRepresentation);
     }
-    public abstract class FederationResolverBase<TParsedType> : GraphQL.Federation.Resolvers.FederationResolverBase
+    public abstract class FederationResolverBase<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TParsedType> : GraphQL.Federation.Resolvers.FederationResolverBase
     {
-        protected FederationResolverBase() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
+        public FederationResolverBase() { }
         public override System.Type SourceType { get; }
         public abstract System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, TParsedType parsedRepresentation);
         public override System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, object parsedRepresentation) { }
     }
-    public class FederationResolver<TClrType> : GraphQL.Federation.Resolvers.FederationResolver<TClrType, TClrType>
+    public class FederationResolver<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TClrType> : GraphQL.Federation.Resolvers.FederationResolver<TClrType, TClrType>
     {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TClrType, GraphQL.DataLoader.IDataLoaderResult<TClrType?>> resolveFunc) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TClrType, System.Threading.Tasks.Task<TClrType?>> resolveFunc) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TClrType, TClrType?> resolveFunc) { }
     }
-    public class FederationResolver<TSourceType, TReturnType> : GraphQL.Federation.Resolvers.FederationResolverBase<TSourceType>
+    public class FederationResolver<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType, TReturnType> : GraphQL.Federation.Resolvers.FederationResolverBase<TSourceType>
     {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType?>> resolveFunc) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolveFunc) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolveFunc) { }
         public override System.Type SourceType { get; }
         public override System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, TSourceType source) { }

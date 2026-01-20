@@ -8,13 +8,15 @@ namespace GraphQL.Federation.Resolvers;
 /// This class simplifies the resolution process when the source and return types are the same.
 /// </summary>
 /// <typeparam name="TClrType">The CLR type of the source and return representation that this resolver handles.</typeparam>
-public class FederationResolver<TClrType> : FederationResolver<TClrType, TClrType>
+public class FederationResolver<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)] TClrType>
+    : FederationResolver<TClrType, TClrType>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="FederationResolver{TClrType}"/> class
     /// using a synchronous resolve function.
     /// </summary>
     /// <param name="resolveFunc">The function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public FederationResolver(Func<IResolveFieldContext, TClrType, TClrType?> resolveFunc)
         : base(resolveFunc)
     {
@@ -25,6 +27,7 @@ public class FederationResolver<TClrType> : FederationResolver<TClrType, TClrTyp
     /// using an asynchronous resolve function.
     /// </summary>
     /// <param name="resolveFunc">The function used to asynchronously resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public FederationResolver(Func<IResolveFieldContext, TClrType, Task<TClrType?>> resolveFunc)
         : base(resolveFunc)
     {
@@ -35,6 +38,7 @@ public class FederationResolver<TClrType> : FederationResolver<TClrType, TClrTyp
     /// using a data loader resolve function.
     /// </summary>
     /// <param name="resolveFunc">The function used to resolve the source representation using a data loader.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public FederationResolver(Func<IResolveFieldContext, TClrType, IDataLoaderResult<TClrType?>> resolveFunc)
         : base(resolveFunc)
     {
@@ -47,7 +51,10 @@ public class FederationResolver<TClrType> : FederationResolver<TClrType, TClrTyp
 /// </summary>
 /// <typeparam name="TSourceType">The CLR type of the source representation that this resolver handles.</typeparam>
 /// <typeparam name="TReturnType">The CLR type of the resolved object returned by this resolver.</typeparam>
-public class FederationResolver<TSourceType, TReturnType> : FederationResolverBase<TSourceType>
+public class FederationResolver<
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)] TSourceType,
+    TReturnType>
+    : FederationResolverBase<TSourceType>
 {
     internal readonly Func<IResolveFieldContext, TSourceType, ValueTask<object?>> _resolveFunc;
 
@@ -59,6 +66,7 @@ public class FederationResolver<TSourceType, TReturnType> : FederationResolverBa
     /// using a synchronous resolve function.
     /// </summary>
     /// <param name="resolveFunc">The function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public FederationResolver(Func<IResolveFieldContext, TSourceType, TReturnType?> resolveFunc)
     {
         _resolveFunc = (ctx, source) => new(resolveFunc(ctx, source));
@@ -69,6 +77,7 @@ public class FederationResolver<TSourceType, TReturnType> : FederationResolverBa
     /// using an asynchronous resolve function.
     /// </summary>
     /// <param name="resolveFunc">The function used to asynchronously resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public FederationResolver(Func<IResolveFieldContext, TSourceType, Task<TReturnType?>> resolveFunc)
     {
         _resolveFunc = async (ctx, source) => (await resolveFunc(ctx, source).ConfigureAwait(false))!;
@@ -79,6 +88,7 @@ public class FederationResolver<TSourceType, TReturnType> : FederationResolverBa
     /// using a data loader resolve function.
     /// </summary>
     /// <param name="resolveFunc">The function used to resolve the source representation using a data loader.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public FederationResolver(Func<IResolveFieldContext, TSourceType, IDataLoaderResult<TReturnType?>> resolveFunc)
     {
         _resolveFunc = (ctx, source) => new(resolveFunc(ctx, source));
