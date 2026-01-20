@@ -106,7 +106,7 @@ public static class GlobalSwitches
     /// <br/><br/>
     /// The collection is not thread-safe; instances should be added prior to schema initialization.
     /// </summary>
-#pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete -- intentional as TypedParameterAttribute is marked as obsolete to prevent developers from attempting to inherit from it
     public static ICollection<TypedParameterAttribute> GlobalParameterAttributes { get; } = [];
 #pragma warning restore CS0618 // Type or member is obsolete
 
