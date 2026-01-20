@@ -3508,15 +3508,24 @@ namespace GraphQL.Utilities
     public class SchemaBuilder
     {
         protected readonly System.Collections.Generic.Dictionary<string, GraphQL.Types.IGraphType> _types;
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses DefaultServiceProvider which does not statically reference graph type constr" +
+            "uctors.")]
         public SchemaBuilder() { }
         public bool AllowUnknownFields { get; set; }
         public bool AllowUnknownTypes { get; set; }
         public bool IgnoreComments { get; set; }
         public bool IgnoreLocations { get; set; }
         public bool RunConfigurations { get; set; }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with \'RequiresUnreferencedCodeAttribute\' may bre" +
+            "ak functionality when trimming application code.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
         public System.IServiceProvider ServiceProvider { get; set; }
         public GraphQL.Utilities.TypeSettings Types { get; }
         public virtual GraphQL.Types.Schema Build(string typeDefinitions) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with \'RequiresUnreferencedCodeAttribute\' may bre" +
+            "ak functionality when trimming application code.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with \'RequiresDynamicCodeAttribute\' may break fu" +
+            "nctionality when AOT compiling.", Justification="The constructor is marked with RequiresDynamicCodeAttribute.")]
         protected virtual GraphQL.Types.Schema CreateSchema() { }
         protected virtual GraphQL.Types.IGraphType? GetType(string name) { }
         protected virtual void PreConfigure(GraphQL.Types.Schema schema) { }

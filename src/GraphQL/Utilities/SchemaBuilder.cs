@@ -17,6 +17,13 @@ public class SchemaBuilder
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     private GraphQLSchemaDefinition? _schemaDef;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="SchemaBuilder"/>.
+    /// </summary>
+    [RequiresUnreferencedCode("Uses DefaultServiceProvider which does not statically reference graph type constructors.")]
+    [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
+    public SchemaBuilder() { }
+
     private IgnoreOptions CreateIgnoreOptions()
     {
         var options = IgnoreOptions.None;
@@ -32,6 +39,8 @@ public class SchemaBuilder
     /// <br/><br/>
     /// By default equals to <see cref="DefaultServiceProvider"/>.
     /// </summary>
+    [UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with 'RequiresUnreferencedCodeAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     public IServiceProvider ServiceProvider { get; set; } = new DefaultServiceProvider();
 
     /// <summary>
@@ -101,6 +110,10 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
     /// <summary>
     /// Returns a new <see cref="Schema"/> instance.
     /// </summary>
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with 'RequiresUnreferencedCodeAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     protected virtual Schema CreateSchema() => new(ServiceProvider, runConfigurations: RunConfigurations);
 
     private Schema BuildSchemaFrom(GraphQLDocument document)
@@ -310,6 +323,10 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         return type;
     }
 
+    [UnconditionalSuppressMessage("AOT", "IL2067:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     private void InitializeField(FieldConfig config, Type? parentType)
     {
         config.ResolverAccessor ??= parentType.ToAccessor(config.Name, ResolverType.Resolver);
@@ -331,6 +348,10 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         }
     }
 
+    [UnconditionalSuppressMessage("AOT", "IL2067:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     private void InitializeSubscriptionField(FieldConfig config, Type? parentType)
     {
         config.ResolverAccessor ??= parentType.ToAccessor(config.Name, ResolverType.Resolver);
