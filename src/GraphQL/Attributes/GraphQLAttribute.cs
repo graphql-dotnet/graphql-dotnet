@@ -87,19 +87,6 @@ public abstract class GraphQLAttribute : Attribute
     /// </summary>
     public virtual void Modify(ArgumentInformation argumentInformation)
     {
-        var typedMethod = _typedModifyMethods.GetOrAdd(
-            argumentInformation.ParameterInfo.ParameterType,
-            type => _modifyMethod.MakeGenericMethod(type));
-        var func = (Action<ArgumentInformation>)typedMethod.CreateDelegate(typeof(Action<ArgumentInformation>), this);
-        func(argumentInformation);
-    }
-
-    /// <summary>
-    /// Updates the properties of the specified <see cref="ArgumentInformation"/> as necessary.
-    /// <typeparamref name="TParameterType"/> represents the return type of the parameter.
-    /// </summary>
-    public virtual void Modify<TParameterType>(ArgumentInformation argumentInformation)
-    {
     }
 
     /// <summary>

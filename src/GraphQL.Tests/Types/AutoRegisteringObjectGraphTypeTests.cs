@@ -899,7 +899,7 @@ public class AutoRegisteringObjectGraphTypeTests
 
     private class TestExceptionBubblingAttribute : GraphQLAttribute
     {
-        public override void Modify<TParameterType>(ArgumentInformation argumentInformation)
+        public override void Modify(ArgumentInformation argumentInformation)
         {
             throw new Exception("Test");
         }
