@@ -296,6 +296,7 @@ public class GraphQLBuilderExtensionTests
     {
         _builderMock.Setup(b => b.Register(typeof(TestSchema), typeof(TestSchema), ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
         _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+        _builderMock.Setup(b => b.TryRegister(typeof(IDocumentExecuter<TestSchema>), typeof(DocumentExecuter<TestSchema>), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
         _builder.AddSchema<TestSchema>();
         Verify();
     }
@@ -312,6 +313,7 @@ public class GraphQLBuilderExtensionTests
     {
         _builderMock.Setup(b => b.Register(typeof(TestSchema), typeof(TestSchema), ServiceLifetime.Scoped, false)).Returns(_builder).Verifiable();
         _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Scoped, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+        _builderMock.Setup(b => b.TryRegister(typeof(IDocumentExecuter<TestSchema>), typeof(DocumentExecuter<TestSchema>), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
         _builder.AddSchema<TestSchema>(ServiceLifetime.Scoped);
         Verify();
     }
@@ -322,6 +324,7 @@ public class GraphQLBuilderExtensionTests
         Func<IServiceProvider, TestSchema> factory = _ => null!;
         _builderMock.Setup(b => b.Register(typeof(TestSchema), factory, ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
         _builderMock.Setup(b => b.TryRegister(typeof(ISchema), factory, ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+        _builderMock.Setup(b => b.TryRegister(typeof(IDocumentExecuter<TestSchema>), typeof(DocumentExecuter<TestSchema>), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
         _builder.AddSchema(factory);
         Verify();
     }
@@ -332,6 +335,7 @@ public class GraphQLBuilderExtensionTests
         var schema = new TestSchema();
         _builderMock.Setup(b => b.Register(typeof(TestSchema), schema, false)).Returns(_builder).Verifiable();
         _builderMock.Setup(b => b.TryRegister(typeof(ISchema), schema, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+        _builderMock.Setup(b => b.TryRegister(typeof(IDocumentExecuter<TestSchema>), typeof(DocumentExecuter<TestSchema>), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
         _builder.AddSchema(schema);
         Verify();
     }

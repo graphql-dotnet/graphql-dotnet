@@ -34,7 +34,6 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
     {
         ServiceCollection = services ?? throw new ArgumentNullException(nameof(services));
         configure?.Invoke(this);
-        ServiceCollection.AddOptions();
         RegisterDefaultServices();
     }
 
@@ -44,8 +43,14 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
         configure?.Invoke(this);
         if (!skipDefaultServices)
             throw new InvalidOperationException("This constructor is only for use by AotGraphQLBuilder which skips default service registration.");
-        ServiceCollection.AddOptions();
         RegisterBasicServices();
+    }
+
+    /// <inheritdoc/>
+    protected override void RegisterBasicServices()
+    {
+        ServiceCollection.AddOptions();
+        base.RegisterBasicServices();
     }
 
     private static MSServiceLifetime TranslateLifetime(ServiceLifetime serviceLifetime)

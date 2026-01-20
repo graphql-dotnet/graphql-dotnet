@@ -64,12 +64,7 @@ public abstract class GraphQLBuilderBase : IGraphQLBuilder
         }, ServiceLifetime.Transient);
 
         // configure service implementations to use the configured default services when not overridden by a user
-        Services.TryRegister<IDocumentExecuter, DocumentExecuter>(ServiceLifetime.Singleton);
         Services.TryRegister(typeof(IDocumentExecuter<>), typeof(DocumentExecuter<>), ServiceLifetime.Singleton);
-        Services.TryRegister<IDocumentBuilder, GraphQLDocumentBuilder>(ServiceLifetime.Singleton);
-        Services.TryRegister<IDocumentValidator, DocumentValidator>(ServiceLifetime.Singleton);
-        Services.TryRegister<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
-        Services.TryRegister<IExecutionStrategySelector, DefaultExecutionStrategySelector>(ServiceLifetime.Singleton);
 
         // configure relay graph types
         Services.TryRegister(typeof(EdgeType<>), typeof(EdgeType<>), ServiceLifetime.Transient);
@@ -92,9 +87,6 @@ public abstract class GraphQLBuilderBase : IGraphQLBuilder
                 options.Schema = options.RequestServices.GetService(typeof(ISchema)) as ISchema;
             }
         });
-
-        // configure mapping for IOptions<ErrorInfoProviderOptions>
-        Services.Configure<ErrorInfoProviderOptions>();
 
 #if NET5_0_OR_GREATER
         if (OpenTelemetry.AutoInstrumentation.Initializer.Enabled)
