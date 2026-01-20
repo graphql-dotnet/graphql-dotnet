@@ -2448,6 +2448,7 @@ namespace GraphQL.Types
     }
     public class AutoSchema<TQueryClrType> : GraphQL.Types.Schema
     {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
         public AutoSchema(System.IServiceProvider serviceProvider) { }
     }
     public class BigIntGraphType : GraphQL.Types.ScalarGraphType
@@ -3082,11 +3083,13 @@ namespace GraphQL.Types
     [System.Diagnostics.DebuggerTypeProxy(typeof(GraphQL.Types.Schema.SchemaDebugView))]
     public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.ISchema, System.IDisposable, System.IServiceProvider
     {
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This class uses Activator.CreateInstance which requires access to the target type" +
-            "\'s constructor.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
         public Schema() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
         public Schema(System.IServiceProvider services) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
         public Schema(System.IServiceProvider services, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureSchema> configurations) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
         public Schema(System.IServiceProvider services, bool runConfigurations = true) { }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AdditionalTypeInstances { get; }
         public System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
@@ -3125,10 +3128,14 @@ namespace GraphQL.Types
         public void RegisterType(GraphQL.Types.IGraphType type) { }
         public void RegisterType([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
         public void RegisterTypeMapping(System.Type clrType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type graphType) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2072:Calling members with arguments having \'DynamicallyAccessedMembersAttribute" +
+            "\' may break functionality when trimming application code.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
         public void RegisterTypes(params System.Type[] types) { }
         public void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor) { }
         public void RegisterVisitor(System.Type type) { }
         protected virtual void Validate() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses DefaultServiceProvider which does not statically reference graph type constr" +
+            "uctors.")]
         public static GraphQL.Types.Schema For(string typeDefinitions, System.Action<GraphQL.Utilities.SchemaBuilder>? configure = null) { }
         public static GraphQL.Types.Schema For<TSchemaBuilder>(string typeDefinitions, System.Action<TSchemaBuilder>? configure = null)
             where TSchemaBuilder : GraphQL.Utilities.SchemaBuilder, new () { }

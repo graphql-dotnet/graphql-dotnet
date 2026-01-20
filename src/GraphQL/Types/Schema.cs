@@ -95,7 +95,8 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     /// Create an instance of <see cref="Schema"/> with the <see cref="DefaultServiceProvider"/>, which
     /// uses <see cref="Activator.CreateInstance(Type)"/> to create required objects.
     /// </summary>
-    [RequiresUnreferencedCode("This class uses Activator.CreateInstance which requires access to the target type's constructor.")]
+    [RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
+    [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
     public Schema()
         : this(new DefaultServiceProvider())
     {
@@ -107,6 +108,8 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     /// Pulls registered <see cref="IConfigureSchema"/> instances from <paramref name="services"/> and
     /// executes them.
     /// </summary>
+    [RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
+    [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
     public Schema(IServiceProvider services)
         : this(services, true)
     {
@@ -118,6 +121,8 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     /// If <paramref name="runConfigurations"/> is <see langword="true"/>, pulls registered
     /// <see cref="IConfigureSchema"/> instances from <paramref name="services"/> and executes them.
     /// </summary>
+    [RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
+    [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
     public Schema(IServiceProvider services, bool runConfigurations = true)
         : this(services, (runConfigurations ? services.GetService(typeof(IEnumerable<IConfigureSchema>)) as IEnumerable<IConfigureSchema> : null)!)
     {
@@ -128,6 +133,8 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     /// to create required objects.
     /// Executes the specified <see cref="IConfigureSchema"/> instances on the schema, if any.
     /// </summary>
+    [RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
+    [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
     public Schema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations)
         : this(services, configurations, NameFieldResolver.Instance, new ValueConverter(), [new BuiltInScalarMappingProvider(), new EnumGraphTypeMappingProvider()])
     {
@@ -160,6 +167,8 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     /// <param name="typeDefinitions">A textual description of the schema in SDL (Schema Definition Language) format.</param>
     /// <param name="configure">Optional configuration delegate to setup <see cref="SchemaBuilder"/>.</param>
     /// <returns>Created schema.</returns>
+    [RequiresUnreferencedCode("Uses DefaultServiceProvider which does not statically reference graph type constructors.")]
+    [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
     public static Schema For(string typeDefinitions, Action<SchemaBuilder>? configure = null)
         => For<SchemaBuilder>(typeDefinitions, configure);
 
@@ -194,7 +203,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     public IResolveFieldContextAccessor? ResolveFieldContextAccessor { get; set; }
 
     /// <inheritdoc/>
-    public IFieldResolver? DefaultFieldResolver { get; set; } = NameFieldResolver.Instance;
+    public IFieldResolver? DefaultFieldResolver { get; set; }
 
     /// <inheritdoc/>
     public bool Initialized { get; private set; }
@@ -361,6 +370,8 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     }
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("AOT", "IL2072:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     public void RegisterTypes(params Type[] types)
     {
         CheckDisposed();
@@ -471,7 +482,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
             if (_visitorTypes != null)
             {
                 foreach (var type in _visitorTypes)
-                    yield return (ISchemaNodeVisitor)_services.GetRequiredService(type);
+                    yield return (ISchemaNodeVisitor)this.GetRequiredService(type);
             }
         }
 
@@ -501,7 +512,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
             }
 
             // Apply field-specific middleware before schema-wide middleware (so it runs after schema-wide middleware)
-            new FieldMiddlewareVisitor(_services).Run(this);
+            new FieldMiddlewareVisitor(this).Run(this);
 
             // Apply schema-wide middleware
             _allTypes.ApplyMiddleware(FieldMiddleware, this);
@@ -527,9 +538,9 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     /// </remarks>
     protected virtual SchemaTypesBase CreateSchemaTypes()
     {
-        var graphTypeMappingProviders = (IEnumerable<IGraphTypeMappingProvider>?)_services.GetService(typeof(IEnumerable<IGraphTypeMappingProvider>));
+        var graphTypeMappingProviders = this.GetService<IEnumerable<IGraphTypeMappingProvider>>();
         graphTypeMappingProviders = graphTypeMappingProviders != null ? _builtInMappingProviders.Concat(graphTypeMappingProviders) : _builtInMappingProviders;
-        return new SchemaTypes(this, _services, graphTypeMappingProviders, OnBeforeInitializeType);
+        return new SchemaTypes(this, this, graphTypeMappingProviders, OnBeforeInitializeType);
     }
 
     /// <summary>
