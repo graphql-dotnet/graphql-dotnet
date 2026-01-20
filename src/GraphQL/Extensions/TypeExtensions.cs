@@ -194,6 +194,7 @@ public static class TypeExtensions
     /// </remarks>
     [Obsolete("Use TypeExtensions.GetGraphTypeFromType(Type, bool, bool) overload instead. This method will be removed in v10.")]
     [RequiresDynamicCode("This method uses reflection to create types at runtime which is not compatible with trimming and AOT.")]
+    [RequiresUnreferencedCode("This method uses reflection to create types at runtime which is not compatible with trimming and AOT.")]
     public static Type GetGraphTypeFromType(this Type type, bool isNullable, TypeMappingMode mode)
     {
         if (mode == TypeMappingMode.InputType || mode == TypeMappingMode.OutputType)
@@ -468,35 +469,6 @@ public static class TypeExtensions
 
         elementType = type.GetGenericArguments()[0];
         return true;
-    }
-
-    /// <summary>
-    /// Returns whether or not the given <paramref name="type"/> implements <paramref name="genericType"/>
-    /// by testing itself, and then recursively up it's base types hierarchy.
-    /// </summary>
-    /// <param name="type">Type to test.</param>
-    /// <param name="genericType">Type to test for.</param>
-    /// <returns>
-    ///   <see langword="true"/> if the indicated type implements <paramref name="genericType"/>; otherwise, <see langword="false"/>.
-    /// </returns>
-    public static bool ImplementsGenericType(this Type type, Type genericType)
-    {
-        if (type.IsGenericType && type.GetGenericTypeDefinition() == genericType)
-        {
-            return true;
-        }
-
-        var interfaceTypes = type.GetInterfaces();
-        foreach (var it in interfaceTypes)
-        {
-            if (it.IsGenericType && it.GetGenericTypeDefinition() == genericType)
-            {
-                return true;
-            }
-        }
-
-        var baseType = type.BaseType;
-        return baseType != null && ImplementsGenericType(baseType, genericType);
     }
 
     /// <summary>

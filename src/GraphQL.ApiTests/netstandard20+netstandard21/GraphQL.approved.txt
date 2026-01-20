@@ -368,7 +368,6 @@ namespace GraphQL
         public virtual void Modify(GraphQL.Types.IGraphType graphType, System.Type sourceType) { }
         public virtual void Modify(GraphQL.Types.QueryArgument queryArgument, System.Reflection.ParameterInfo parameterInfo) { }
         public virtual void Modify(GraphQL.Types.FieldType fieldType, bool isInputType, GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, ref bool ignore) { }
-        public virtual void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
         public virtual bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool? isInputType) { }
     }
     public static class GraphQLBuilderExtensions
@@ -938,7 +937,6 @@ namespace GraphQL
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable, bool isInputType) { }
         public static System.Collections.Generic.IEnumerable<GraphQL.ParameterAttribute> GetParameterAttributes(this System.Reflection.ParameterInfo parameterInfo) { }
         public static string GraphQLName(this System.Type type) { }
-        public static bool ImplementsGenericType(this System.Type type, System.Type genericType) { }
         public static bool IsGraphType(this System.Type type) { }
         public static string? ObsoleteMessage(this System.Reflection.MemberInfo memberInfo) { }
     }
@@ -976,6 +974,7 @@ namespace GraphQL
     public class ValueConverter : GraphQL.ValueConverterBase
     {
         public ValueConverter() { }
+        protected override GraphQL.Conversion.IListConverterFactory? ArrayListConverterFactory { get; }
         protected override GraphQL.Conversion.IListConverterFactory? DefaultListConverterFactory { get; }
         public override void RegisterListConverterFactory(System.Type listType, System.Type implementationType) { }
         public override object ToObject(System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IInputObjectGraphType inputGraphType) { }
@@ -989,6 +988,7 @@ namespace GraphQL
     public abstract class ValueConverterBase : GraphQL.IValueConverter
     {
         protected ValueConverterBase() { }
+        protected virtual GraphQL.Conversion.IListConverterFactory? ArrayListConverterFactory { get; }
         protected virtual GraphQL.Conversion.IListConverterFactory? DefaultListConverterFactory { get; }
         protected System.Collections.Generic.Dictionary<System.Type, GraphQL.Conversion.IListConverterFactory> ListConverterFactories { get; }
         protected System.Collections.Generic.Dictionary<System.ValueTuple<System.Type, System.Type>, System.Func<object, object>> ValueConversions { get; }
@@ -1800,7 +1800,7 @@ namespace GraphQL.Federation.Resolvers
     }
     public abstract class FederationResolverBase : GraphQL.Federation.Resolvers.IFederationResolver
     {
-        protected FederationResolverBase() { }
+        public FederationResolverBase() { }
         public abstract System.Type SourceType { get; }
         public virtual bool MatchKeys(System.Collections.Generic.IDictionary<string, object?> representation) { }
         public object ParseRepresentation(GraphQL.Types.IComplexGraphType graphType, System.Collections.Generic.IDictionary<string, object?> representation, GraphQL.IValueConverter valueConverter) { }
@@ -1808,7 +1808,7 @@ namespace GraphQL.Federation.Resolvers
     }
     public abstract class FederationResolverBase<TParsedType> : GraphQL.Federation.Resolvers.FederationResolverBase
     {
-        protected FederationResolverBase() { }
+        public FederationResolverBase() { }
         public override System.Type SourceType { get; }
         public abstract System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, TParsedType parsedRepresentation);
         public override System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, object parsedRepresentation) { }

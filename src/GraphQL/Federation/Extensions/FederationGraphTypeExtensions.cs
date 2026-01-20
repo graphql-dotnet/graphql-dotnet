@@ -17,6 +17,7 @@ public static class FederationGraphTypeExtensions
     /// <typeparam name="TReturnType">The CLR type of the resolved object returned by the resolver.</typeparam>
     /// <param name="graphType">The graph type to apply the resolver to.</param>
     /// <param name="resolver">The function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType, TReturnType>(this ObjectGraphType<TReturnType> graphType, Func<IResolveFieldContext, TSourceType, TReturnType?> resolver)
     {
         graphType.Metadata[RESOLVER_METADATA] = new FederationResolver<TSourceType, TReturnType>(resolver);
@@ -29,6 +30,7 @@ public static class FederationGraphTypeExtensions
     /// <typeparam name="TReturnType">The CLR type of the resolved object returned by the resolver.</typeparam>
     /// <param name="graphType">The graph type to apply the resolver to.</param>
     /// <param name="resolver">The asynchronous function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType, TReturnType>(this ObjectGraphType<TReturnType> graphType, Func<IResolveFieldContext, TSourceType, Task<TReturnType?>> resolver)
     {
         graphType.Metadata[RESOLVER_METADATA] = new FederationResolver<TSourceType, TReturnType>(resolver);
@@ -41,6 +43,7 @@ public static class FederationGraphTypeExtensions
     /// <typeparam name="TReturnType">The CLR type of the resolved object returned by the resolver.</typeparam>
     /// <param name="graphType">The graph type to apply the resolver to.</param>
     /// <param name="resolver">The data loader function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType, TReturnType>(this ObjectGraphType<TReturnType> graphType, Func<IResolveFieldContext, TSourceType, IDataLoaderResult<TReturnType?>> resolver)
     {
         graphType.Metadata[RESOLVER_METADATA] = new FederationResolver<TSourceType, TReturnType>(resolver);
@@ -52,6 +55,7 @@ public static class FederationGraphTypeExtensions
     /// <typeparam name="TSourceType">The CLR type of the entity type, populated by the representation.</typeparam>
     /// <param name="graphType">The graph type to apply the resolver to.</param>
     /// <param name="resolver">The function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType>(this ObjectGraphType<TSourceType> graphType, Func<IResolveFieldContext, TSourceType, TSourceType?> resolver)
     {
         graphType.Metadata[RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
@@ -63,6 +67,7 @@ public static class FederationGraphTypeExtensions
     /// <typeparam name="TSourceType">The CLR type of the entity type, populated by the representation.</typeparam>
     /// <param name="graphType">The graph type to apply the resolver to.</param>
     /// <param name="resolver">The asynchronous function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType>(this ObjectGraphType<TSourceType> graphType, Func<IResolveFieldContext, TSourceType, Task<TSourceType?>> resolver)
     {
         graphType.Metadata[RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
@@ -74,6 +79,7 @@ public static class FederationGraphTypeExtensions
     /// <typeparam name="TSourceType">The CLR type of the entity type, populated by the representation.</typeparam>
     /// <param name="graphType">The graph type to apply the resolver to.</param>
     /// <param name="resolver">The data loader function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType>(this ObjectGraphType<TSourceType> graphType, Func<IResolveFieldContext, TSourceType, IDataLoaderResult<TSourceType?>> resolver)
     {
         graphType.Metadata[RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
@@ -97,6 +103,7 @@ public static class FederationGraphTypeExtensions
     /// <typeparam name="TReturnType">The CLR type of the resolved object returned by the resolver.</typeparam>
     /// <param name="graphType">The graph type to apply the resolver to.</param>
     /// <param name="resolver">The function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType, TReturnType>(this IInterfaceGraphType<TReturnType> graphType, Func<IResolveFieldContext, TSourceType, TReturnType?> resolver)
         where TSourceType : new()
     {
@@ -110,6 +117,7 @@ public static class FederationGraphTypeExtensions
     /// <typeparam name="TReturnType">The CLR type of the resolved object returned by the resolver.</typeparam>
     /// <param name="graphType">The graph type to apply the resolver to.</param>
     /// <param name="resolver">The asynchronous function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType, TReturnType>(this IInterfaceGraphType<TReturnType> graphType, Func<IResolveFieldContext, TSourceType, Task<TReturnType?>> resolver)
         where TSourceType : new()
     {
@@ -123,6 +131,7 @@ public static class FederationGraphTypeExtensions
     /// <typeparam name="TReturnType">The CLR type of the resolved object returned by the resolver.</typeparam>
     /// <param name="graphType">The graph type to apply the resolver to.</param>
     /// <param name="resolver">The data loader function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType, TReturnType>(this IInterfaceGraphType<TReturnType> graphType, Func<IResolveFieldContext, TSourceType, IDataLoaderResult<TReturnType?>> resolver)
         where TSourceType : new()
     {
@@ -135,6 +144,7 @@ public static class FederationGraphTypeExtensions
     /// <typeparam name="TSourceType">The CLR type of the entity type, populated by the representation.</typeparam>
     /// <param name="graphType">The graph type to apply the resolver to.</param>
     /// <param name="resolver">The function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType>(this IInterfaceGraphType<TSourceType> graphType, Func<IResolveFieldContext, TSourceType, TSourceType?> resolver)
         where TSourceType : new()
     {
@@ -147,6 +157,7 @@ public static class FederationGraphTypeExtensions
     /// <typeparam name="TSourceType">The CLR type of the entity type, populated by the representation.</typeparam>
     /// <param name="graphType">The graph type to apply the resolver to.</param>
     /// <param name="resolver">The asynchronous function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType>(this IInterfaceGraphType<TSourceType> graphType, Func<IResolveFieldContext, TSourceType, Task<TSourceType?>> resolver)
         where TSourceType : new()
     {
@@ -159,6 +170,7 @@ public static class FederationGraphTypeExtensions
     /// <typeparam name="TSourceType">The CLR type of the entity type, populated by the representation.</typeparam>
     /// <param name="graphType">The graph type to apply the resolver to.</param>
     /// <param name="resolver">The data loader function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType>(this IInterfaceGraphType<TSourceType> graphType, Func<IResolveFieldContext, TSourceType, IDataLoaderResult<TSourceType?>> resolver)
         where TSourceType : new()
     {

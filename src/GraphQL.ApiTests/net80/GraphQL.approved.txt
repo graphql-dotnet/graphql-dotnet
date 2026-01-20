@@ -371,18 +371,18 @@ namespace GraphQL
         public virtual void Modify(GraphQL.Types.IGraphType graphType, System.Type sourceType) { }
         public virtual void Modify(GraphQL.Types.QueryArgument queryArgument, System.Reflection.ParameterInfo parameterInfo) { }
         public virtual void Modify(GraphQL.Types.FieldType fieldType, bool isInputType, GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, ref bool ignore) { }
-        public virtual void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
         public virtual bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool? isInputType) { }
     }
     public static class GraphQLBuilderExtensions
     {
         public const float SORT_ORDER_CONFIGURATION = 200F;
         public const float SORT_ORDER_OPTIONS = 100F;
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Creating generic types requires dynamic code.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the CLR types used by your schema are not trimmed by the compi" +
             "ler.")]
         public static GraphQL.DI.IGraphQLBuilder AddAutoClrMappings(this GraphQL.DI.IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true) { }
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the CLR types used by your schema are not trimmed by the compi" +
-            "ler.")]
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
         public static GraphQL.DI.IGraphQLBuilder AddAutoSchema<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TQueryClrType>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.IConfigureAutoSchema>? configure = null) { }
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are" +
             " not trimmed by the compiler.")]
@@ -430,7 +430,11 @@ namespace GraphQL
             where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypeMappingProvider<TGraphTypeMappingProvider>(this GraphQL.DI.IGraphQLBuilder builder, TGraphTypeMappingProvider instance)
             where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection to scan assemblies for IGraphType implementations. Types may be r" +
+            "emoved when trimming the application.")]
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection to scan assemblies for IGraphType implementations. Types may be r" +
+            "emoved when trimming the application.")]
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
         public static GraphQL.DI.IGraphQLBuilder AddResolveFieldContextAccessor(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
@@ -508,7 +512,7 @@ namespace GraphQL
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions>? action) { }
         public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions, System.IServiceProvider>? action) { }
-        public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments<TLoader>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions, System.IServiceProvider>? action)
+        public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TLoader>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions, System.IServiceProvider>? action)
             where TLoader :  class, GraphQL.PersistedDocuments.IPersistedDocumentLoader { }
         public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TLoader>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions>? action = null)
             where TLoader :  class, GraphQL.PersistedDocuments.IPersistedDocumentLoader { }
@@ -921,9 +925,15 @@ namespace GraphQL
     public static class SchemaExtensions
     {
         public static void AddLinkDirectiveSupport(this GraphQL.Types.ISchema schema, System.Action<GraphQL.Utilities.LinkConfiguration>? configuration = null) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Calls MakeGenericType to create AutoRegisteringObjectGraphType<T> and AutoRegiste" +
+            "ringInputObjectGraphType<T>. The native code for this instantiation might not be" +
+            " available at runtime.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the CLR type and the related auto-registering graph type are n" +
             "ot trimmed by the compiler.")]
         public static void AutoRegister(this GraphQL.Types.ISchema schema, System.Type clrType, GraphQL.AutoRegisteringMode mode = 3) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Scans the specified type for public methods and properties, which may not be stat" +
+            "ically referenced.")]
         public static void AutoRegister<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TClrType>(this GraphQL.Types.ISchema schema, GraphQL.AutoRegisteringMode mode = 3) { }
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
             where TSchema : GraphQL.Types.ISchema { }
@@ -975,6 +985,8 @@ namespace GraphQL
         public static System.Collections.Generic.IEnumerable<GraphQL.GraphQLAttribute> GetGraphQLAttributes(this System.Reflection.ParameterInfo parameterInfo) { }
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This method uses reflection to create types at runtime which is not compatible wi" +
             "th trimming and AOT.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses reflection to create types at runtime which is not compatible wi" +
+            "th trimming and AOT.")]
         [System.Obsolete("Use TypeExtensions.GetGraphTypeFromType(Type, bool, bool) overload instead. This " +
             "method will be removed in v10.")]
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable, GraphQL.TypeMappingMode mode) { }
@@ -982,7 +994,6 @@ namespace GraphQL
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable, bool isInputType) { }
         public static System.Collections.Generic.IEnumerable<GraphQL.ParameterAttribute> GetParameterAttributes(this System.Reflection.ParameterInfo parameterInfo) { }
         public static string GraphQLName(this System.Type type) { }
-        public static bool ImplementsGenericType(this System.Type type, System.Type genericType) { }
         public static bool IsGraphType(this System.Type type) { }
         public static string? ObsoleteMessage(this System.Reflection.MemberInfo memberInfo) { }
     }
@@ -1023,10 +1034,18 @@ namespace GraphQL
     }
     public class ValueConverter : GraphQL.ValueConverterBase
     {
-        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
-            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Creates list and array types dynamically as needed.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Creates list and array types dynamically as needed.")]
         public ValueConverter() { }
+        [get: System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with \'RequiresDynamicCodeAttribute\' may break fu" +
+            "nctionality when AOT compiling.", Justification="The constructor is marked with RequiresDynamicCode.")]
+        protected override GraphQL.Conversion.IListConverterFactory? ArrayListConverterFactory { get; }
+        [get: System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with \'RequiresUnreferencedCodeAttribute\' may bre" +
+            "ak functionality when trimming application code.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+        [get: System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with \'RequiresDynamicCodeAttribute\' may break fu" +
+            "nctionality when AOT compiling.", Justification="The constructor is marked with RequiresDynamicCodeAttribute.")]
         protected override GraphQL.Conversion.IListConverterFactory? DefaultListConverterFactory { get; }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Compiles code at runtime to populate the specified type.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(@"For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors or other members, which can cause runtime failures.")]
         public override void RegisterListConverterFactory(System.Type listType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type implementationType) { }
         public override object ToObject(System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IInputObjectGraphType inputGraphType) { }
@@ -1034,6 +1053,7 @@ namespace GraphQL
     public class ValueConverterAot : GraphQL.ValueConverterBase
     {
         public ValueConverterAot() { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Compiles code at runtime to populate the specified type.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(@"For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors or other members, which can cause runtime failures.")]
         public override void RegisterListConverterFactory(System.Type listType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type implementationType) { }
         public override object ToObject(System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IInputObjectGraphType inputGraphType) { }
@@ -1041,6 +1061,7 @@ namespace GraphQL
     public abstract class ValueConverterBase : GraphQL.IValueConverter
     {
         protected ValueConverterBase() { }
+        protected virtual GraphQL.Conversion.IListConverterFactory? ArrayListConverterFactory { get; }
         protected virtual GraphQL.Conversion.IListConverterFactory? DefaultListConverterFactory { get; }
         protected System.Collections.Generic.Dictionary<System.Type, GraphQL.Conversion.IListConverterFactory> ListConverterFactories { get; }
         protected System.Collections.Generic.Dictionary<System.ValueTuple<System.Type, System.Type>, System.Func<object, object>> ValueConversions { get; }
@@ -1052,6 +1073,7 @@ namespace GraphQL
         public virtual void RegisterListConverter<TListType, TElementType>(System.Func<System.Collections.Generic.IEnumerable<TElementType>, TListType>? conversion)
             where TListType : System.Collections.Generic.IEnumerable<TElementType> { }
         public virtual void RegisterListConverterFactory(System.Type listType, GraphQL.Conversion.IListConverterFactory? converter) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Compiles code at runtime to populate the specified type.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(@"For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors or other members, which can cause runtime failures.")]
         public abstract void RegisterListConverterFactory(System.Type listType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type implementationType);
         protected void RegisterScalarConversions() { }
@@ -1198,7 +1220,7 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ValidateArguments(System.Action<GraphQL.Validation.FieldArgumentsValidationContext> validation) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ValidateArguments(System.Func<GraphQL.Validation.FieldArgumentsValidationContext, System.Threading.Tasks.ValueTask> validation) { }
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(string name, GraphQL.Types.IGraphType type) { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(string name, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null) { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(string name, System.Type? type = null) { }
     }
     public interface IResolveConnectionContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
     {
@@ -1259,9 +1281,12 @@ namespace GraphQL.Conversion
     }
     public abstract class ListConverterFactoryBase : GraphQL.Conversion.IListConverterFactory
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Uses reflection to create generic method signatures.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection to access generic method information which may be trimmed.")]
         protected ListConverterFactoryBase() { }
-        public virtual GraphQL.Conversion.IListConverter Create([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type listType) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with \'RequiresDynamicCodeAttribute\' may break fu" +
+            "nctionality when AOT compiling.", Justification="The constructor is marked with RequiresDynamicCode.")]
+        public virtual GraphQL.Conversion.IListConverter Create(System.Type listType) { }
         public abstract System.Func<object?[], object> Create<T>();
         protected virtual System.Type GetElementType(System.Type listType) { }
     }
@@ -1741,24 +1766,36 @@ namespace GraphQL.Federation
     public static class FederationGraphTypeExtensions
     {
         public static void ResolveReference<TSourceType>(this GraphQL.Types.IInterfaceGraphType<TSourceType> graphType, GraphQL.Federation.Resolvers.IFederationResolver resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Types.IInterfaceGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TSourceType?>> resolver)
             where TSourceType : new() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Types.IInterfaceGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TSourceType?>> resolver)
             where TSourceType : new() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Types.IInterfaceGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType?> resolver)
             where TSourceType : new() { }
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, GraphQL.Federation.Resolvers.IFederationResolver resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TSourceType?>> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TSourceType?>> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType?> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.IInterfaceGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType?>> resolver)
             where TSourceType : new() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.IInterfaceGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolver)
             where TSourceType : new() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.IInterfaceGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolver)
             where TSourceType : new() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType?>> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolver) { }
     }
     public static class FederationInterfaceMetadataExtensions
@@ -1838,11 +1875,17 @@ namespace GraphQL.Federation
     public static class TypeConfigExtensions
     {
         public static void ResolveReference(this GraphQL.Utilities.TypeConfig config, GraphQL.Federation.Resolvers.IFederationResolver resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TSourceType?>> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TSourceType?>> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType?> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType?>> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolver) { }
     }
 }
@@ -1856,29 +1899,37 @@ namespace GraphQL.Federation.Resolvers
     }
     public abstract class FederationResolverBase : GraphQL.Federation.Resolvers.IFederationResolver
     {
-        protected FederationResolverBase() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
+        public FederationResolverBase() { }
         public abstract System.Type SourceType { get; }
         public virtual bool MatchKeys(System.Collections.Generic.IDictionary<string, object?> representation) { }
         public object ParseRepresentation(GraphQL.Types.IComplexGraphType graphType, System.Collections.Generic.IDictionary<string, object?> representation, GraphQL.IValueConverter valueConverter) { }
         public abstract System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, object parsedRepresentation);
     }
-    public abstract class FederationResolverBase<TParsedType> : GraphQL.Federation.Resolvers.FederationResolverBase
+    public abstract class FederationResolverBase<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TParsedType> : GraphQL.Federation.Resolvers.FederationResolverBase
     {
-        protected FederationResolverBase() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
+        public FederationResolverBase() { }
         public override System.Type SourceType { get; }
         public abstract System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, TParsedType parsedRepresentation);
         public override System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, object parsedRepresentation) { }
     }
-    public class FederationResolver<TClrType> : GraphQL.Federation.Resolvers.FederationResolver<TClrType, TClrType>
+    public class FederationResolver<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TClrType> : GraphQL.Federation.Resolvers.FederationResolver<TClrType, TClrType>
     {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TClrType, GraphQL.DataLoader.IDataLoaderResult<TClrType?>> resolveFunc) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TClrType, System.Threading.Tasks.Task<TClrType?>> resolveFunc) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TClrType, TClrType?> resolveFunc) { }
     }
-    public class FederationResolver<TSourceType, TReturnType> : GraphQL.Federation.Resolvers.FederationResolverBase<TSourceType>
+    public class FederationResolver<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType, TReturnType> : GraphQL.Federation.Resolvers.FederationResolverBase<TSourceType>
     {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType?>> resolveFunc) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolveFunc) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
         public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolveFunc) { }
         public override System.Type SourceType { get; }
         public override System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, TSourceType source) { }
@@ -2223,6 +2274,8 @@ namespace GraphQL.Resolvers
 {
     public class ExpressionFieldResolver<TSourceType, TProperty> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IRequiresResolveFieldContextAccessor
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Calls MemberResolver.BuildFieldResolverInternal which calls a generic method and " +
+            "compiles a lambda at runtime.")]
         public ExpressionFieldResolver(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> property) { }
         public bool RequiresResolveFieldContextAccessor { get; }
     }
@@ -2252,16 +2305,24 @@ namespace GraphQL.Resolvers
     }
     public class MemberResolver : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IRequiresResolveFieldContextAccessor
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
         public MemberResolver(System.Reflection.FieldInfo fieldInfo, System.Linq.Expressions.LambdaExpression? instanceExpression) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
         public MemberResolver(System.Reflection.PropertyInfo propertyInfo, System.Linq.Expressions.LambdaExpression? instanceExpression) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
         public MemberResolver(System.Reflection.MethodInfo methodInfo, System.Linq.Expressions.LambdaExpression? instanceExpression, System.Collections.Generic.IList<System.Linq.Expressions.LambdaExpression> methodArgumentExpressions) { }
         public bool RequiresResolveFieldContextAccessor { get; }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
         protected virtual System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<object?>> BuildFieldResolver(System.Linq.Expressions.ParameterExpression resolveFieldContextParameter, System.Linq.Expressions.Expression bodyExpression) { }
         public virtual System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context) { }
     }
     public class NameFieldResolver : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IRequiresResolveFieldContextAccessor
     {
         public bool RequiresResolveFieldContextAccessor { get; }
+        [get: System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Calls AutoRegisteringHelper.BuildFieldResolver which calls a generic method and c" +
+            "ompiles a lambda at runtime.")]
+        [get: System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Properties intended to be accessed by this resolver may be trimmed by the compile" +
+            "r.")]
         public static GraphQL.Resolvers.NameFieldResolver Instance { get; }
         public System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context) { }
     }
@@ -2273,8 +2334,14 @@ namespace GraphQL.Resolvers
     }
     public class SourceStreamMethodResolver : GraphQL.Resolvers.MemberResolver, GraphQL.Resolvers.ISourceStreamResolver
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Calls MemberResolver constructor which calls a generic method and compiles a lamb" +
+            "da at runtime.")]
         public SourceStreamMethodResolver(System.Reflection.MethodInfo methodInfo, System.Linq.Expressions.LambdaExpression instanceExpression, System.Collections.Generic.IList<System.Linq.Expressions.LambdaExpression> methodArgumentExpressions) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Calls MakeGenericMethod and MakeGenericType. The native code for this instantiati" +
+            "on might not be available at runtime.")]
         protected override System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<object?>> BuildFieldResolver(System.Linq.Expressions.ParameterExpression resolveFieldContextParameter, System.Linq.Expressions.Expression bodyExpression) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Calls MakeGenericMethod and MakeGenericType. The native code for this instantiati" +
+            "on might not be available at runtime.")]
         protected virtual System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<System.IObservable<object?>>> BuildSourceStreamResolver(System.Linq.Expressions.ParameterExpression resolveFieldContextParameter, System.Linq.Expressions.Expression bodyExpression) { }
         public System.Threading.Tasks.ValueTask<System.IObservable<object?>> ResolveStreamAsync(GraphQL.IResolveFieldContext context) { }
     }
@@ -2396,24 +2463,32 @@ namespace GraphQL.Types
     public class AutoRegisteringGraphTypeMappingProvider : GraphQL.Types.IGraphTypeMappingProvider
     {
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Creating generic types requires dynamic code.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Properties and methods of mapped CLR types are not statically referenced.")]
         public AutoRegisteringGraphTypeMappingProvider() { }
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Creating generic types requires dynamic code.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Properties and methods of mapped CLR types are not statically referenced.")]
         public AutoRegisteringGraphTypeMappingProvider(bool mapInputTypes, bool mapOutputTypes, bool mapInterfaceTypes = true) { }
         [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(GraphQL.Types.AutoRegisteringInputObjectGraphType<TSourceType?>?))]
         [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(GraphQL.Types.AutoRegisteringInterfaceGraphType<TSourceType?>?))]
         [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(GraphQL.Types.AutoRegisteringObjectGraphType<TSourceType?>?))]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2070:Calling members with arguments having \'DynamicallyAccessedMembersAttribute" +
+            "\' may break functionality when trimming application code.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
         [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
             "publishing as Native AOT")]
         public virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredType) { }
     }
     public static class AutoRegisteringHelper
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
         public static GraphQL.Resolvers.IFieldResolver BuildFieldResolver(System.Reflection.MemberInfo memberInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, System.Linq.Expressions.LambdaExpression instanceExpression) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
         public static GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver(System.Reflection.MethodInfo methodInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, System.Linq.Expressions.LambdaExpression instanceExpression) { }
     }
     public class AutoRegisteringInputObjectGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
         public AutoRegisteringInputObjectGraphType() { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
         public AutoRegisteringInputObjectGraphType(params System.Linq.Expressions.Expression<System.Func<TSourceType, object?>>[]? excludedProperties) { }
         protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
@@ -2421,16 +2496,26 @@ namespace GraphQL.Types
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
     }
-    public class AutoRegisteringInterfaceGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType> : GraphQL.Types.InterfaceGraphType<TSourceType>
+    public class AutoRegisteringInterfaceGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]  TSourceType> : GraphQL.Types.InterfaceGraphType<TSourceType>
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Scans the specified type for public methods and properties, which may not be stat" +
+            "ically referenced.")]
         public AutoRegisteringInterfaceGraphType() { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Scans the specified type for public methods and properties, which may not be stat" +
+            "ically referenced.")]
         public AutoRegisteringInterfaceGraphType(params System.Linq.Expressions.Expression<System.Func<TSourceType, object?>>[]? excludedProperties) { }
         protected virtual void ApplyArgumentAttributes(System.Reflection.ParameterInfo parameterInfo, GraphQL.Types.QueryArgument queryArgument) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with \'RequiresDynamicCodeAttribute\' may break fu" +
+            "nctionality when AOT compiling.", Justification="The constructor is marked with RequiresDynamicCodeAttribute.")]
         protected void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
         protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.ArgumentInformation GetArgumentInformation<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
         protected virtual System.Func<GraphQL.IResolveFieldContext, TParameterType>? GetParameterResolver<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with \'RequiresUnreferencedCodeAttribute\' may bre" +
+            "ak functionality when trimming application code.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.ParameterInfo parameterInfo) { }
@@ -2438,15 +2523,25 @@ namespace GraphQL.Types
     }
     public class AutoRegisteringObjectGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType> : GraphQL.Types.ObjectGraphType<TSourceType>
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Scans the specified type for public methods and properties, which may not be stat" +
+            "ically referenced.")]
         public AutoRegisteringObjectGraphType() { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Scans the specified type for public methods and properties, which may not be stat" +
+            "ically referenced.")]
         public AutoRegisteringObjectGraphType(params System.Linq.Expressions.Expression<System.Func<TSourceType, object?>>[]? excludedProperties) { }
         protected virtual void ApplyArgumentAttributes(System.Reflection.ParameterInfo parameterInfo, GraphQL.Types.QueryArgument queryArgument) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with \'RequiresDynamicCodeAttribute\' may break fu" +
+            "nctionality when AOT compiling.", Justification="The constructor is marked with RequiresDynamicCodeAttribute.")]
         protected void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
         protected virtual System.Linq.Expressions.LambdaExpression BuildMemberInstanceExpression(System.Reflection.MemberInfo memberInfo) { }
         protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.ArgumentInformation GetArgumentInformation<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
         protected virtual System.Func<GraphQL.IResolveFieldContext, TParameterType>? GetParameterResolver<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with \'RequiresUnreferencedCodeAttribute\' may bre" +
+            "ak functionality when trimming application code.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.ParameterInfo parameterInfo) { }
@@ -2454,6 +2549,8 @@ namespace GraphQL.Types
     }
     public class AutoSchema<TQueryClrType> : GraphQL.Types.Schema
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
         public AutoSchema(System.IServiceProvider serviceProvider) { }
     }
     public class BigIntGraphType : GraphQL.Types.ScalarGraphType
@@ -2508,17 +2605,23 @@ namespace GraphQL.Types
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
         protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(string name, GraphQL.Types.IGraphType type) { }
-        protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(string name, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
+        protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(string name, System.Type type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field(string name, GraphQL.Types.IGraphType type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field(string name, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(string name)
             where TGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, System.Type type) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TReturnType>(string name, bool nullable = false) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, System.Type type) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType, TReturnType>(string name)
             where TGraphType : GraphQL.Types.IGraphType { }
@@ -2615,7 +2718,8 @@ namespace GraphQL.Types
     }
     public sealed class EnumGraphTypeMappingProvider : GraphQL.Types.IGraphTypeMappingProvider
     {
-        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Creating generic types requires dynamic code.")]
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Creating generic enumeration types requires dynamic code.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Enumeration graph types to be created cannot be statically referenced.")]
         public EnumGraphTypeMappingProvider() { }
         public System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredType) { }
     }
@@ -2893,9 +2997,11 @@ namespace GraphQL.Types
     }
     public class InputObjectGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInputObjectGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
         public InputObjectGraphType() { }
         public bool IsOneOf { get; set; }
-        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This method uses dynamic code generation to compile object conversion logic.")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with \'RequiresDynamicCodeAttribute\' may break fu" +
+            "nctionality when AOT compiling.", Justification="The constructor is marked with RequiresDynamicCodeAttribute.")]
         public override void Initialize(GraphQL.Types.ISchema schema) { }
         public virtual bool IsValidDefault(object value) { }
         public virtual object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value, GraphQL.IValueConverter valueConverter) { }
@@ -2945,10 +3051,28 @@ namespace GraphQL.Types
     public class LegacySchemaTypes : GraphQL.Types.SchemaTypesBase
     {
         protected LegacySchemaTypes() { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Automatically builds graph types for enumerables which are not statically referen" +
+            "ced.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Automatically builds graph types for enumerables which are not statically referen" +
+            "ced.")]
         public LegacySchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Automatically builds graph types for enumerables which are not statically referen" +
+            "ced.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Automatically builds graph types for enumerables which are not statically referen" +
+            "ced.")]
         public LegacySchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Automatically builds graph types for enumerables which are not statically referen" +
+            "ced.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Automatically builds graph types for enumerables which are not statically referen" +
+            "ced.")]
         public LegacySchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings, System.Action<GraphQL.Types.IGraphType>? onBeforeInitialize) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2067:Calling members with arguments having \'DynamicallyAccessedMembersAttribute" +
+            "\' may break functionality when trimming application code.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
         protected virtual GraphQL.Types.IGraphType BuildGraphQLType(System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2070:Calling members with arguments having \'DynamicallyAccessedMembersAttribute" +
+            "\' may break functionality when trimming application code.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with \'RequiresDynamicCodeAttribute\' may break fu" +
+            "nctionality when AOT compiling.", Justification="The constructor is marked with RequiresDynamicCodeAttribute.")]
         protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? typeMappings) { }
         protected void Initialize(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings) { }
         protected virtual void OnBeforeInitialize(GraphQL.Types.IGraphType graphType) { }
@@ -3090,11 +3214,17 @@ namespace GraphQL.Types
     [System.Diagnostics.DebuggerTypeProxy(typeof(GraphQL.Types.Schema.SchemaDebugView))]
     public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.ISchema, System.IDisposable, System.IServiceProvider
     {
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This class uses Activator.CreateInstance which requires access to the target type" +
-            "\'s constructor.")]
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
         public Schema() { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
         public Schema(System.IServiceProvider services) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
         public Schema(System.IServiceProvider services, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureSchema> configurations) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
         public Schema(System.IServiceProvider services, bool runConfigurations = true) { }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AdditionalTypeInstances { get; }
         public System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
@@ -3133,10 +3263,15 @@ namespace GraphQL.Types
         public void RegisterType(GraphQL.Types.IGraphType type) { }
         public void RegisterType([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
         public void RegisterTypeMapping(System.Type clrType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type graphType) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2072:Calling members with arguments having \'DynamicallyAccessedMembersAttribute" +
+            "\' may break functionality when trimming application code.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
         public void RegisterTypes(params System.Type[] types) { }
         public void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor) { }
         public void RegisterVisitor(System.Type type) { }
         protected virtual void Validate() { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses DefaultServiceProvider which does not statically reference graph type constr" +
+            "uctors.")]
         public static GraphQL.Types.Schema For(string typeDefinitions, System.Action<GraphQL.Utilities.SchemaBuilder>? configure = null) { }
         public static GraphQL.Types.Schema For<TSchemaBuilder>(string typeDefinitions, System.Action<TSchemaBuilder>? configure = null)
             where TSchemaBuilder : GraphQL.Utilities.SchemaBuilder, new () { }
@@ -3508,15 +3643,24 @@ namespace GraphQL.Utilities
     public class SchemaBuilder
     {
         protected readonly System.Collections.Generic.Dictionary<string, GraphQL.Types.IGraphType> _types;
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses DefaultServiceProvider which does not statically reference graph type constr" +
+            "uctors.")]
         public SchemaBuilder() { }
         public bool AllowUnknownFields { get; set; }
         public bool AllowUnknownTypes { get; set; }
         public bool IgnoreComments { get; set; }
         public bool IgnoreLocations { get; set; }
         public bool RunConfigurations { get; set; }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with \'RequiresUnreferencedCodeAttribute\' may bre" +
+            "ak functionality when trimming application code.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
         public System.IServiceProvider ServiceProvider { get; set; }
         public GraphQL.Utilities.TypeSettings Types { get; }
         public virtual GraphQL.Types.Schema Build(string typeDefinitions) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with \'RequiresUnreferencedCodeAttribute\' may bre" +
+            "ak functionality when trimming application code.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with \'RequiresDynamicCodeAttribute\' may break fu" +
+            "nctionality when AOT compiling.", Justification="The constructor is marked with RequiresDynamicCodeAttribute.")]
         protected virtual GraphQL.Types.Schema CreateSchema() { }
         protected virtual GraphQL.Types.IGraphType? GetType(string name) { }
         protected virtual void PreConfigure(GraphQL.Types.Schema schema) { }

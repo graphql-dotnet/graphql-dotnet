@@ -16,7 +16,11 @@ internal static class AutoRegisteringInterfaceGraphType
 /// Supports <see cref="DescriptionAttribute"/>, <see cref="ObsoleteAttribute"/>, <see cref="DefaultValueAttribute"/> and <see cref="RequiredAttribute"/>.
 /// Also it can get descriptions for fields from the XML comments.
 /// </summary>
-public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicMethods)][NotAGraphType] TSourceType> : InterfaceGraphType<TSourceType>
+public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(
+#if NET6_0_OR_GREATER
+    DynamicallyAccessedMemberTypes.Interfaces |
+#endif
+    DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicMethods)][NotAGraphType] TSourceType> : InterfaceGraphType<TSourceType>
 {
     private readonly Expression<Func<TSourceType, object?>>[]? _excludedProperties;
 
@@ -28,12 +32,16 @@ public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(Dynam
     /// so that the instance will be cached with the customizations, except when using <see cref="InterfaceGraphType{TSource}.AddPossibleType(IObjectGraphType)">AddPossibleType</see>,
     /// <see cref="InterfaceGraphType{TSource}.PossibleTypes">PossibleTypes</see> or <see cref="InterfaceGraphType{TSource}.ResolveType">ResolveType</see> as these values cannot be cached.
     /// </summary>
+    [RequiresUnreferencedCode("Scans the specified type for public methods and properties, which may not be statically referenced.")]
+    [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
     public AutoRegisteringInterfaceGraphType() : this(null) { }
 
     /// <summary>
     /// Creates a GraphQL type from <typeparamref name="TSourceType"/> by specifying fields to exclude from registration.
     /// </summary>
     /// <param name="excludedProperties">Expressions for excluding fields, for example 'o => o.Age'.</param>
+    [RequiresUnreferencedCode("Scans the specified type for public methods and properties, which may not be statically referenced.")]
+    [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
     public AutoRegisteringInterfaceGraphType(params Expression<Func<TSourceType, object?>>[]? excludedProperties)
         : this(
             GlobalSwitches.EnableReflectionCaching && excludedProperties == null && AutoRegisteringInterfaceGraphType.ReflectionCache.TryGetValue(typeof(TSourceType), out var cacheEntry)
@@ -111,6 +119,8 @@ public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(Dynam
     }
 
     /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.BuildFieldType(FieldType, MemberInfo)"/>
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
     protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
     {
         Func<Type, Func<FieldType, ParameterInfo, ArgumentInformation>> getTypedArgumentInfoMethod =
@@ -173,6 +183,8 @@ public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(Dynam
         => AutoRegisteringOutputHelper.GetArgumentInformation<TSourceType>(GetTypeInformation(parameterInfo), fieldType, parameterInfo);
 
     /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.GetRegisteredMembers"/>
+    [UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with 'RequiresUnreferencedCodeAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     protected virtual IEnumerable<MemberInfo> GetRegisteredMembers()
         => AutoRegisteringOutputHelper.GetRegisteredMembers(_excludedProperties);
 

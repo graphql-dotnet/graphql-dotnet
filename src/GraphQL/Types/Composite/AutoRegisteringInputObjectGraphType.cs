@@ -28,12 +28,14 @@ public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(Dyn
     /// be sure to place any custom initialization code within <see cref="ConfigureGraph"/> or <see cref="ProvideFields"/>
     /// so that the instance will be cached with the customizations.
     /// </summary>
+    [RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
     public AutoRegisteringInputObjectGraphType() : this(null) { }
 
     /// <summary>
     /// Creates a GraphQL type from <typeparamref name="TSourceType"/> by specifying fields to exclude from registration.
     /// </summary>
     /// <param name="excludedProperties">Expressions for excluding fields, for example 'o => o.Age'.</param>
+    [RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
     public AutoRegisteringInputObjectGraphType(params Expression<Func<TSourceType, object?>>[]? excludedProperties)
         : this(
             GlobalSwitches.EnableReflectionCaching && excludedProperties == null && AutoRegisteringInputObjectGraphType.ReflectionCache.TryGetValue(typeof(TSourceType), out var cacheEntry)
@@ -44,6 +46,7 @@ public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(Dyn
     {
     }
 
+    [RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
     internal AutoRegisteringInputObjectGraphType(AutoRegisteringInputObjectGraphType<TSourceType>? cloneFrom, Expression<Func<TSourceType, object?>>[]? excludedProperties, bool cache)
         : base(cloneFrom)
     {

@@ -8,7 +8,8 @@ public sealed class EnumGraphTypeMappingProvider : IGraphTypeMappingProvider
     /// <summary>
     /// Initializes a new instance of the <see cref="EnumGraphTypeMappingProvider"/> class.
     /// </summary>
-    [RequiresDynamicCode("Creating generic types requires dynamic code.")]
+    [RequiresUnreferencedCode("Enumeration graph types to be created cannot be statically referenced.")]
+    [RequiresDynamicCode("Creating generic enumeration types requires dynamic code.")]
     public EnumGraphTypeMappingProvider()
     {
     }
@@ -26,7 +27,10 @@ public sealed class EnumGraphTypeMappingProvider : IGraphTypeMappingProvider
         return null;
     }
 
-    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT",
+        Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2070:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     private static Type CreateEnumerationGraphTypeNoWarn(Type enumType)
     {
         return typeof(EnumerationGraphType<>).MakeGenericType(enumType);

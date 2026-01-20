@@ -15,9 +15,14 @@ internal sealed class ArrayListConverterFactory : IListConverterFactory
     }
 
     /// <inheritdoc cref="ArrayListConverterFactory"/>
-    public static ArrayListConverterFactory Instance { get; } = new();
+    public static ArrayListConverterFactory Instance
+    {
+        [RequiresDynamicCode("Creates array types dynamically when the requested list type is not an array.")]
+        get;
+    } = new();
 
-    [UnconditionalSuppressMessage("Trimming", "IL2072:Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.")]
+    [SuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = $"{nameof(ArrayListConverterFactory)}.{nameof(Instance)} is marked with [RequiresDynamicCode].")]
     public IListConverter Create(Type listType)
     {
         if (listType == typeof(object[]))
@@ -40,7 +45,7 @@ internal sealed class ArrayListConverterFactory : IListConverterFactory
         }
 
         // for non-nullable value types, coerce null to default(T)
-        var elementDefault = Activator.CreateInstance(elementType);
+        var elementDefault = GetDefaultValueTypeElement(elementType);
 
         // then return a converter that coerces null to default(T)
         return new ListConverter(elementType, list =>
@@ -56,5 +61,12 @@ internal sealed class ArrayListConverterFactory : IListConverterFactory
             list.CopyTo(newArray, 0);
             return newArray;
         });
+    }
+
+    [UnconditionalSuppressMessage("Trimming", "IL2067:Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
+        Justification = "For value types, Activator.CreateInstance returns default(T) regardless of whether a constructor exists.")]
+    private object? GetDefaultValueTypeElement(Type type)
+    {
+        return Activator.CreateInstance(type);
     }
 }

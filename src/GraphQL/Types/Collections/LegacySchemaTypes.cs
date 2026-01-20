@@ -38,6 +38,8 @@ public class LegacySchemaTypes : SchemaTypesBase
     /// </summary>
     /// <param name="schema">A schema for which this instance is created.</param>
     /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
+    [RequiresUnreferencedCode("Automatically builds graph types for enumerables which are not statically referenced.")]
+    [RequiresDynamicCode("Automatically builds graph types for enumerables which are not statically referenced.")]
     public LegacySchemaTypes(ISchema schema, IServiceProvider serviceProvider)
         : this(schema, serviceProvider, (IEnumerable<IGraphTypeMappingProvider>?)serviceProvider.GetService(typeof(IEnumerable<IGraphTypeMappingProvider>)))
     {
@@ -50,6 +52,8 @@ public class LegacySchemaTypes : SchemaTypesBase
     /// <param name="schema">A schema for which this instance is created.</param>
     /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
     /// <param name="graphTypeMappings">A list of <see cref="IGraphTypeMappingProvider"/> instances used to map CLR types to graph types.</param>
+    [RequiresUnreferencedCode("Automatically builds graph types for enumerables which are not statically referenced.")]
+    [RequiresDynamicCode("Automatically builds graph types for enumerables which are not statically referenced.")]
     public LegacySchemaTypes(ISchema schema, IServiceProvider serviceProvider, IEnumerable<IGraphTypeMappingProvider>? graphTypeMappings)
         : this(schema, serviceProvider, graphTypeMappings, null)
     {
@@ -65,6 +69,8 @@ public class LegacySchemaTypes : SchemaTypesBase
     /// <param name="graphTypeMappings">A list of <see cref="IGraphTypeMappingProvider"/> instances used to map CLR types to graph types.</param>
     /// <param name="onBeforeInitialize">An optional delegate to call before initializing each graph type.</param>
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    [RequiresUnreferencedCode("Automatically builds graph types for enumerables which are not statically referenced.")]
+    [RequiresDynamicCode("Automatically builds graph types for enumerables which are not statically referenced.")]
     public LegacySchemaTypes(ISchema schema, IServiceProvider serviceProvider, IEnumerable<IGraphTypeMappingProvider>? graphTypeMappings, Action<IGraphType>? onBeforeInitialize)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
@@ -299,6 +305,8 @@ public class LegacySchemaTypes : SchemaTypesBase
     /// <see cref="IProvideResolvedType.ResolvedType"/> property is set to a new instance of
     /// the base (wrapped) type.
     /// </summary>
+    [UnconditionalSuppressMessage("AOT", "IL2067:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     protected internal virtual IGraphType BuildGraphQLType(Type type, Func<Type, IGraphType> resolve)
     {
         var local = resolve;
@@ -660,6 +668,10 @@ Make sure that your ServiceProvider is configured correctly.");
         }
     }
 
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2055:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     private object RebuildType(Type type, bool input, IEnumerable<IGraphTypeMappingProvider>? typeMappings)
     {
         if (!type.IsGenericType)
@@ -715,6 +727,10 @@ Make sure that your ServiceProvider is configured correctly.");
     /// These are handled within <see cref="GraphQL.TypeExtensions.GetGraphTypeFromType(Type, bool, bool)"/>,
     /// and should already have been wrapped around the type reference.
     /// </remarks>
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2070:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     protected virtual Type? GetGraphTypeFromClrType(Type clrType, bool isInputType, IEnumerable<IGraphTypeMappingProvider>? typeMappings)
     {
         Type? mappedType = null;
