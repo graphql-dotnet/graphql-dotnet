@@ -7,11 +7,11 @@ namespace GraphQL;
 /// Specifies that the method argument should be pulled from <see cref="IResolveFieldContext"/>.<see cref="IProvideUserContext.UserContext">UserContext</see>.
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter)]
-public class FromUserContextAttribute : GraphQLAttribute
+public class FromUserContextAttribute : ParameterAttribute
 {
     /// <inheritdoc/>
-    public override void Modify(ArgumentInformation argumentInformation)
+    public override Func<IResolveFieldContext, T> GetResolver<T>(ArgumentInformation argumentInformation)
     {
-        argumentInformation.SetDelegateWithCast(context => context.UserContext);
+        return context => (T)context.UserContext!;
     }
 }

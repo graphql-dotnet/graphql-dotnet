@@ -120,12 +120,44 @@ public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(Dynam
                 return (Func<FieldType, ParameterInfo, ArgumentInformation>)getArgumentInfoMethodInfo.CreateDelegate(typeof(Func<FieldType, ParameterInfo, ArgumentInformation>), this);
             };
 
+        Func<Type, Func<ArgumentInformation, LambdaExpression?>> getTypedParameterResolverMethod =
+            parameterType =>
+            {
+                var getParameterResolverMethodInfo = _getParameterResolverInternalMethodInfo.MakeGenericMethod(parameterType);
+                return (Func<ArgumentInformation, LambdaExpression?>)getParameterResolverMethodInfo.CreateDelegate(typeof(Func<ArgumentInformation, LambdaExpression?>), this);
+            };
+
         AutoRegisteringOutputHelper.BuildFieldType(
             memberInfo,
             fieldType,
             null,
             getTypedArgumentInfoMethod,
-            ApplyArgumentAttributes);
+            ApplyArgumentAttributes,
+            getTypedParameterResolverMethod);
+    }
+
+    /// <summary>
+    /// Returns a resolver function for the specified parameter using <see cref="ParameterAttribute"/> if present,
+    /// or returns a built-in resolver for <see cref="IResolveFieldContext"/> or <see cref="CancellationToken"/>.
+    /// Returns <see langword="null"/> if no parameter attribute is found and the parameter type is not a built-in type.
+    /// </summary>
+    /// <typeparam name="TParameterType">The CLR type of the method parameter.</typeparam>
+    /// <param name="argumentInformation">The argument information for the parameter.</param>
+    /// <returns>A function that resolves the parameter value, or <see langword="null"/> if no resolver is available.</returns>
+    protected virtual Func<IResolveFieldContext, TParameterType>? GetParameterResolver<TParameterType>(ArgumentInformation argumentInformation)
+        => AutoRegisteringHelper.GetParameterResolver<TParameterType>(argumentInformation);
+
+    private static readonly MethodInfo _getParameterResolverInternalMethodInfo = typeof(AutoRegisteringInterfaceGraphType<TSourceType>).GetMethod(nameof(GetParameterResolverInternal), BindingFlags.NonPublic | BindingFlags.Instance)!;
+    [RequiresDynamicCode("Uses Expression.Lambda which requires dynamic code generation.")]
+    private LambdaExpression? GetParameterResolverInternal<TParameterType>(ArgumentInformation argumentInformation)
+    {
+        var func = GetParameterResolver<TParameterType>(argumentInformation);
+        if (func == null)
+            return null;
+
+        // Convert the Func<IResolveFieldContext, TParameterType> to Expression<Func<IResolveFieldContext, TParameterType>>
+        Expression<Func<IResolveFieldContext, TParameterType>> expression = context => func(context);
+        return expression;
     }
 
     private static readonly MethodInfo _getArgumentInformationInternalMethodInfo = typeof(AutoRegisteringInterfaceGraphType<TSourceType>).GetMethod(nameof(GetArgumentInformationInternal), BindingFlags.NonPublic | BindingFlags.Instance)!;
