@@ -26,7 +26,8 @@ internal static class AutoRegisteringOutputHelper
         FieldType fieldType,
         Func<MemberInfo, LambdaExpression>? buildMemberInstanceExpressionFunc,
         Func<Type, Func<FieldType, ParameterInfo, ArgumentInformation>> getTypedArgumentInfoMethod,
-        Action<ParameterInfo, QueryArgument> applyArgumentAttributesFunc)
+        Action<ParameterInfo, QueryArgument> applyArgumentAttributesFunc,
+        Func<Type, Func<ArgumentInformation, LambdaExpression?>> getTypedParameterResolverMethod)
     {
         // Note: If buildMemberInstanceExpressionFunc is null, then it is assumed this is for
         // an interface graph type and the field resolver will be set to always throw an exception.
@@ -50,17 +51,32 @@ internal static class AutoRegisteringOutputHelper
             QueryArguments queryArguments = [];
             foreach (var parameterInfo in methodInfo.GetParameters())
             {
+                LambdaExpression? expression = null;
+
+                // Create ArgumentInformation for the parameter
                 var getArgumentInfoMethod = getTypedArgumentInfoMethod(parameterInfo.ParameterType);
                 var argumentInfo = getArgumentInfoMethod(fieldType, parameterInfo);
-                var (queryArgument, expression) = argumentInfo.ConstructQueryArgument();
-                if (queryArgument != null)
+
+                // Try to get a resolver from overridden method
+                var getParameterResolverMethod = getTypedParameterResolverMethod(parameterInfo.ParameterType);
+                if (getParameterResolverMethod != null)
                 {
-                    applyArgumentAttributesFunc(parameterInfo, queryArgument);
-                    queryArguments.Add(queryArgument);
+                    expression = getParameterResolverMethod(argumentInfo);
                 }
-                expression ??= AutoRegisteringHelper.GetParameterExpression(
-                    parameterInfo.ParameterType,
-                    queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
+
+                // If we have an expression, use it
+                if (expression != null)
+                {
+                    expressions.Add(expression);
+                    continue;
+                }
+
+                // Create query argument
+                var queryArgument = argumentInfo.ConstructQueryArgument();
+                applyArgumentAttributesFunc(parameterInfo, queryArgument);
+                queryArguments.Add(queryArgument);
+
+                expression = AutoRegisteringHelper.GetParameterExpression(parameterInfo.ParameterType, queryArgument);
                 expressions.Add(expression);
             }
             if (buildMemberInstanceExpressionFunc != null || methodInfo.IsStatic)

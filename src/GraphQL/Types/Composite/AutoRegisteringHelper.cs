@@ -60,25 +60,36 @@ public static class AutoRegisteringHelper
         List<LambdaExpression> expressions = [];
         foreach (var parameterInfo in methodInfo.GetParameters())
         {
+            LambdaExpression expression;
+
+            // Create ArgumentInformation for the parameter
             var typeInformation = new TypeInformation(parameterInfo);
             typeInformation.ApplyAttributes(); // typically this is unnecessary, since this is primarily used to control the graph type of generated query arguments
             var argumentInfo = new ArgumentInformation(parameterInfo, sourceType, fieldType, typeInformation);
-            argumentInfo.ApplyAttributes(); // necessary to allow [FromSource], [FromServices] and similar attributes to work
-            var (queryArgument, expression) = argumentInfo.ConstructQueryArgument();
-            if (queryArgument != null)
+            argumentInfo.ApplyAttributes(); // necessary to allow GraphQLAttribute-based attributes to work
+
+            // Try to get a resolver from ParameterAttribute or for IResolveFieldContext/CancellationToken
+            var resolver = GetParameterResolver(argumentInfo);
+            if (resolver != null)
             {
-                // even though the query argument is not used, it is necessary to apply attributes to the generated argument in case the name is overridden,
-                // as the generated query argument's name is used within the expression for the call to GetArgument
-                var attributes = parameterInfo.GetGraphQLAttributes();
-                foreach (var attr in attributes)
-                {
-                    attr.Modify(queryArgument);
-                    attr.Modify(queryArgument, parameterInfo);
-                }
+                expression = ConvertFuncToExpression(resolver, parameterInfo.ParameterType);
+                expressions.Add(expression);
+                continue;
             }
-            expression ??= GetParameterExpression(
-                parameterInfo.ParameterType,
-                queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
+
+            // Create query argument
+            var queryArgument = argumentInfo.ConstructQueryArgument();
+
+            // even though the query argument is not used, it is necessary to apply attributes to the generated argument in case the name is overridden,
+            // as the generated query argument's name is used within the expression for the call to GetArgument
+            var attributes = parameterInfo.GetGraphQLAttributes();
+            foreach (var attr in attributes)
+            {
+                attr.Modify(queryArgument);
+                attr.Modify(queryArgument, parameterInfo);
+            }
+
+            expression = GetParameterExpression(parameterInfo.ParameterType, queryArgument);
             expressions.Add(expression);
         }
         return expressions;
@@ -223,6 +234,97 @@ public static class AutoRegisteringHelper
             return m2.Member.Name;
 
         throw new NotSupportedException($"Unsupported type of expression: {expression.GetType().Name}");
+    }
+
+    /// <summary>
+    /// Gets a resolver function for the specified parameter using <see cref="ParameterAttribute"/> if present,
+    /// or returns a built-in resolver for <see cref="IResolveFieldContext"/> or <see cref="CancellationToken"/>.
+    /// Returns <see langword="null"/> if no parameter attribute is found and the parameter type is not a built-in type.
+    /// </summary>
+    /// <param name="argumentInformation">The argument information for the parameter.</param>
+    /// <returns>A function that resolves the parameter value, or <see langword="null"/> if no resolver is available.</returns>
+    [RequiresDynamicCode("Uses MakeGenericMethod which requires dynamic code generation.")]
+    internal static Delegate? GetParameterResolver(ArgumentInformation argumentInformation)
+    {
+        // Check for ParameterAttribute
+        var parameterAttribute = argumentInformation.ParameterInfo.GetParameterAttributes().FirstOrDefault();
+        if (parameterAttribute == null)
+        {
+            // Check for built-in parameter types
+            if (argumentInformation.ParameterInfo.ParameterType == typeof(IResolveFieldContext))
+            {
+                return (Func<IResolveFieldContext, IResolveFieldContext>)(context => context);
+            }
+            else if (argumentInformation.ParameterInfo.ParameterType == typeof(CancellationToken))
+            {
+                return (Func<IResolveFieldContext, CancellationToken>)(context => context.CancellationToken);
+            }
+            return null;
+        }
+
+#pragma warning disable CS0618 // Type or member is obsolete -- obsolete warning is for consumers not for GraphQL.NET
+        if (parameterAttribute is TypedParameterAttribute typedParameterAttribute)
+        {
+            if (typedParameterAttribute.ParameterType != argumentInformation.ParameterInfo.ParameterType)
+                return null;
+            return typedParameterAttribute.GetResolverDelegate(argumentInformation);
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        // Call the attribute's GetResolver method to get typed resolver
+        var getResolverMethod = typeof(ParameterAttribute).GetMethod(nameof(ParameterAttribute.GetResolver))!.MakeGenericMethod(argumentInformation.ParameterInfo.ParameterType);
+        try
+        {
+            return (Delegate)getResolverMethod.Invoke(parameterAttribute, new object[] { argumentInformation })!;
+        }
+        catch (TargetInvocationException ex)
+        {
+            // Unwrap and rethrow the inner exception to preserve the original stack trace
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException!).Throw();
+            throw; // This line will never be reached but is required for the compiler
+        }
+    }
+
+    /// <inheritdoc cref="GetParameterResolver(ArgumentInformation)"/>
+    internal static Func<IResolveFieldContext, T>? GetParameterResolver<T>(ArgumentInformation argumentInformation)
+    {
+        // Check for ParameterAttribute
+        var parameterAttribute = argumentInformation.ParameterInfo.GetParameterAttributes().FirstOrDefault();
+        if (parameterAttribute == null)
+        {
+            // Check for built-in parameter types
+            if (typeof(T) == typeof(IResolveFieldContext))
+            {
+                return (Func<IResolveFieldContext, T>)(Delegate)(Func<IResolveFieldContext, IResolveFieldContext>)(context => context);
+            }
+            else if (typeof(T) == typeof(CancellationToken))
+            {
+                return (Func<IResolveFieldContext, T>)(Delegate)(Func<IResolveFieldContext, CancellationToken>)(context => context.CancellationToken);
+            }
+            return null;
+        }
+        return parameterAttribute.GetResolver<T>(argumentInformation);
+    }
+
+    /// <summary>
+    /// Converts a <see cref="Delegate"/> (typically a <see cref="Func{IResolveFieldContext, T}"/>) to a <see cref="LambdaExpression"/>.
+    /// </summary>
+    /// <param name="func">The function to convert.</param>
+    /// <param name="parameterType">The CLR type of the parameter.</param>
+    /// <returns>A lambda expression that calls the function.</returns>
+    [RequiresDynamicCode("Uses Expression.Lambda which requires dynamic code generation.")]
+    internal static LambdaExpression ConvertFuncToExpression(Delegate func, Type parameterType)
+    {
+        var contextParam = Expression.Parameter(typeof(IResolveFieldContext), "context");
+        var funcConstant = Expression.Constant(func);
+        var invokeMethod = func.GetType().GetMethod("Invoke")!;
+        var callExpression = Expression.Call(funcConstant, invokeMethod, contextParam);
+
+        // The delegate should return the correct type
+        if (callExpression.Type != parameterType)
+            throw new InvalidOperationException($"Expected delegate to return {parameterType.Name} but it returns {callExpression.Type.Name}.");
+
+        return Expression.Lambda(callExpression, contextParam);
     }
 
     /// <summary>

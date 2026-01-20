@@ -1,49 +1,21 @@
-using System.Linq.Expressions;
 using System.Reflection;
 
 namespace GraphQL.Types;
 
 /// <summary>
-/// Contains information pertaining to a method parameter in preparation for building an
-/// expression or query argument for it.
-/// <br/><br/>
-/// If <see cref="Expression"/> is set, a query argument will not be added
-/// and the expression will be used to build the method resolver.
-/// <br/><br/>
-/// If not, a query argument will be generated and added to the field; the field resolver will
-/// use the argument's value to populate the method parameter.
+/// Contains information pertaining to a method parameter in preparation for building a query argument for it.
 /// </summary>
 public class ArgumentInformation
 {
     /// <summary>
     /// Initializes a new instance with the specified parameters.
     /// </summary>
-    public ArgumentInformation(ParameterInfo parameterInfo, Type? sourceType, FieldType? fieldType, TypeInformation typeInformation, LambdaExpression? expression)
+    public ArgumentInformation(ParameterInfo parameterInfo, Type? sourceType, FieldType? fieldType, TypeInformation typeInformation)
     {
         ParameterInfo = parameterInfo ?? throw new ArgumentNullException(nameof(parameterInfo));
         FieldType = fieldType; // ?? throw new ArgumentNullException(nameof(fieldType));
         SourceType = sourceType; // ?? throw new ArgumentNullException(nameof(sourceType));
         TypeInformation = typeInformation ?? throw new ArgumentNullException(nameof(typeInformation));
-        Expression = expression;
-    }
-
-    /// <summary>
-    /// Initializes a new instance with the specified parameters.
-    /// If the parameter type is <see cref="IResolveFieldContext"/> or <see cref="CancellationToken"/>,
-    /// an expression is generated for the parameter and set within <see cref="Expression"/>; otherwise
-    /// <see cref="Expression"/> is set to <see langword="null"/>.
-    /// </summary>
-    public ArgumentInformation(ParameterInfo parameterInfo, Type? sourceType, FieldType? fieldType, TypeInformation typeInformation)
-        : this(parameterInfo, sourceType, fieldType, typeInformation, null)
-    {
-        if (parameterInfo.ParameterType == typeof(IResolveFieldContext))
-        {
-            Expression = (IResolveFieldContext x) => x;
-        }
-        else if (parameterInfo.ParameterType == typeof(CancellationToken))
-        {
-            Expression = (IResolveFieldContext x) => x.CancellationToken;
-        }
     }
 
     /// <summary>
@@ -68,95 +40,6 @@ public class ArgumentInformation
     public TypeInformation TypeInformation { get; }
 
     /// <summary>
-    /// Gets or sets a delegate in the form of a <see cref="LambdaExpression"/> to be used to populate
-    /// this method argument while building the field resolver.
-    /// <br/><br/>
-    /// If not set, a query argument will be added to the field and the argument's value will be used
-    /// to populate the method argument while building the field resolver.
-    /// <br/><br/>
-    /// The delegate must be of the type
-    /// <see cref="Expression{TDelegate}">Expression</see>&lt;<see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, TParameterType&gt;&gt;
-    /// where TParameterType matches <see cref="ParameterInfo">ParameterInfo</see>.<see cref="ParameterInfo.ParameterType">ParameterType</see>.
-    /// </summary>
-    public LambdaExpression? Expression
-    {
-        get;
-        [RequiresDynamicCode("Uses Expression.Lambda which requires dynamic code generation.")]
-        set
-        {
-            if (value != null)
-            {
-                bool valid = value.Parameters.Count == 1 && value.Parameters[0].Type == typeof(IResolveFieldContext);
-                if (valid)
-                {
-                    if (value.ReturnType != ParameterInfo.ParameterType)
-                    {
-                        if (value.Body is UnaryExpression unaryExpression &&
-                            unaryExpression.NodeType == ExpressionType.Convert &&
-                            unaryExpression.Operand.Type == ParameterInfo.ParameterType)
-                        {
-                            value = System.Linq.Expressions.Expression.Lambda(
-                                unaryExpression.Operand,
-                                value.Parameters[0]);
-                        }
-                        else
-                        {
-                            valid = false;
-                        }
-                    }
-                }
-                if (!valid)
-                {
-                    throw new ArgumentException($"Value must be a lambda expression delegate of type Func<IResolveFieldContext, {ParameterInfo.ParameterType.Name}>.");
-                }
-            }
-            field = value;
-        }
-    }
-
-    /// <summary>
-    /// Sets a delegate to be used to populate this method argument while building the field resolver.
-    /// An expression is generated that calls <paramref name="argumentDelegate"/> and stored within <see cref="Expression"/>.
-    /// <br/><br/>
-    /// The delegate must be of the type
-    /// <see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, <typeparamref name="TParameterType"/>&gt;
-    /// where <typeparamref name="TParameterType"/> matches <see cref="ParameterInfo">ParameterInfo</see>.<see cref="ParameterInfo.ParameterType">ParameterType</see>.
-    /// <br/><br/>
-    /// As of .NET 7, this method cannot be used in AOT compilation scenarios.
-    /// </summary>
-    [RequiresDynamicCode("Please use the SetDelegateWithCast method when using with AOT compilation")]
-    public void SetDelegate<TParameterType>(Func<IResolveFieldContext, TParameterType?> argumentDelegate)
-    {
-        // TODO: Determine if this method can be used in AOT compilation scenarios with future versions of .NET.
-        if (argumentDelegate == null)
-            throw new ArgumentNullException(nameof(argumentDelegate));
-        if (typeof(TParameterType) != ParameterInfo.ParameterType)
-            throw new ArgumentException($"Delegate must be of type Func<IResolveFieldContext, {ParameterInfo.ParameterType.Name}>.", nameof(argumentDelegate));
-
-        Expression = (IResolveFieldContext context) => argumentDelegate(context);
-    }
-
-    /// <summary>
-    /// Sets a delegate to be used to populate this method argument while building the field resolver.
-    /// An expression is generated that calls <paramref name="argumentDelegate"/> and stored within <see cref="Expression"/>.
-    /// The result of the delegate is cast to the method parameter type.
-    /// <br/><br/>
-    /// See <see cref="SetDelegate{TParameterType}(Func{IResolveFieldContext, TParameterType})"/> for a
-    /// type-safe version of this method, recommended for use with <see cref="GraphQLAttribute.Modify{TParameterType}(ArgumentInformation)"/>.
-    /// </summary>
-    [RequiresDynamicCode("Uses Expression.Lambda which requires dynamic code generation.")]
-    public void SetDelegateWithCast(Func<IResolveFieldContext, object?> argumentDelegate)
-    {
-        if (argumentDelegate == null)
-            throw new ArgumentNullException(nameof(argumentDelegate));
-
-        Expression<Func<IResolveFieldContext, object?>> expr = (IResolveFieldContext context) => argumentDelegate(context);
-        Expression = System.Linq.Expressions.Expression.Lambda(
-            System.Linq.Expressions.Expression.Convert(expr.Body, ParameterInfo.ParameterType),
-            expr.Parameters[0]);
-    }
-
-    /// <summary>
     /// Applies <see cref="GraphQLAttribute"/> attributes pulled from the <see cref="ArgumentInformation.ParameterInfo">ParameterInfo</see> onto this instance.
     /// Also scans the parameter's owning module and assembly for globally-applied attributes.
     /// </summary>
@@ -170,23 +53,11 @@ public class ArgumentInformation
     }
 
     /// <summary>
-    /// Builds a query argument or expression from this instance.
-    /// <br/><br/>
-    /// If a query argument is returned, it will be added to the arguments list of the field type.
-    /// <br/><br/>
-    /// If an expression is returned, it will be used to populate the method argument within the field resolver;
-    /// if not, the query argument's value will be used to populate the method argument within the field resolver.
-    /// <br/><br/>
-    /// The default implementation will return either a <see cref="QueryArgument"/> or <see cref="LambdaExpression"/>
-    /// instance; not both. It is possible to return both, in which case the query argument will be added to the
-    /// field and the expression will be used to populate the method argument within the field resolver.
-    /// You cannot return <see langword="null"/> for both the query argument and expression.
+    /// Builds a query argument from this instance.
+    /// The query argument will be added to the arguments list of the field type.
     /// </summary>
-    public virtual (QueryArgument? QueryArgument, LambdaExpression? Expression) ConstructQueryArgument()
+    public virtual QueryArgument ConstructQueryArgument()
     {
-        if (Expression != null)
-            return (null, Expression);
-
         var type = TypeInformation.ConstructGraphType();
         var memberType = ParameterInfo.ParameterType;
         var argument = new QueryArgument(type)
@@ -196,6 +67,6 @@ public class ArgumentInformation
             DefaultValue = ParameterInfo.IsOptional ? ParameterInfo.DefaultValue : null,
         };
         argument.Parser = (value, vc) => memberType.IsInstanceOfType(value) ? value : vc.GetPropertyValue(value, memberType, argument.ResolvedType!)!;
-        return (argument, null);
+        return argument;
     }
 }
