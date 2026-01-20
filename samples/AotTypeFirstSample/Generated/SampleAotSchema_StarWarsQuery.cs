@@ -61,11 +61,7 @@ public partial class SampleAotSchema : AotSchema
                 var argInfo = new ArgumentInformation(parameter, typeof(StarWarsData), fieldType, typeInformation);
 
                 var arg1_attr1 = new FromServicesAttribute();
-                arg1_attr1.Modify(argInfo); // todo: remove base function that calls the generic version
-                arg1_attr1.Modify<StarWarsData>(argInfo);
-
-                // todo: arg1Func = arg1_attr1.ConstructResolver<StarWarsData>(argInfo);
-                arg1Func = context => context.RequestServices!.GetRequiredService<StarWarsData>();
+                arg1Func = arg1_attr1.GetResolver<StarWarsData>(argInfo);
             }
 
             // 4. configure resolver
@@ -98,11 +94,7 @@ public partial class SampleAotSchema : AotSchema
                 var argInfo = new ArgumentInformation(parameter, typeof(StarWarsData), fieldType, typeInformation);
 
                 var arg1_attr1 = new FromServicesAttribute();
-                arg1_attr1.Modify(typeInformation);
-                arg1_attr1.Modify(argInfo);
-                arg1_attr1.Modify<StarWarsData>(argInfo);
-
-                arg1Func = context => context.RequestServices!.GetRequiredService<StarWarsData>();
+                arg1Func = arg1_attr1.GetResolver<StarWarsData>(argInfo);
             }
 
             // create query argument for arg2
@@ -117,7 +109,7 @@ public partial class SampleAotSchema : AotSchema
                 arg2_attr1.Modify(argInfo);
                 arg2_attr1.Modify<string>(argInfo);
 
-                var queryArgument = argInfo.ConstructQueryArgument().QueryArgument!;
+                var queryArgument = argInfo.ConstructQueryArgument();
                 arg2_attr1.Modify(queryArgument);
 
                 fieldType.Arguments ??= new();
@@ -160,11 +152,7 @@ public partial class SampleAotSchema : AotSchema
                 var argInfo = new ArgumentInformation(parameter, typeof(StarWarsData), fieldType, typeInformation);
 
                 var arg1_attr1 = new FromServicesAttribute();
-                arg1_attr1.Modify(typeInformation);
-                arg1_attr1.Modify(argInfo);
-                arg1_attr1.Modify<StarWarsData>(argInfo);
-
-                arg1Func = context => context.RequestServices!.GetRequiredService<StarWarsData>();
+                arg1Func = arg1_attr1.GetResolver<StarWarsData>(argInfo);
             }
 
             // create query argument for arg2
@@ -179,7 +167,7 @@ public partial class SampleAotSchema : AotSchema
                 arg2_attr1.Modify(argInfo);
                 arg2_attr1.Modify<string>(argInfo);
 
-                var queryArgument = argInfo.ConstructQueryArgument().QueryArgument!;
+                var queryArgument = argInfo.ConstructQueryArgument();
                 arg2_attr1.Modify(queryArgument);
 
                 fieldType.Arguments ??= new();

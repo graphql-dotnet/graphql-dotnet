@@ -109,10 +109,7 @@ public partial class SampleAotSchema : AotSchema
                 var argInfo = new ArgumentInformation(parameter, typeof(StarWarsData), fieldType, typeInformation);
 
                 var arg1_attr1 = new FromServicesAttribute();
-                arg1_attr1.Modify(argInfo);
-                arg1_attr1.Modify<StarWarsData>(argInfo);
-
-                arg1Func = context => context.RequestServices!.GetRequiredService<StarWarsData>();
+                arg1Func = arg1_attr1.GetResolver<StarWarsData>(argInfo);
             }
 
             // 4. configure resolver
