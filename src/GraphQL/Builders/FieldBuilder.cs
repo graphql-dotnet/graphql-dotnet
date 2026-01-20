@@ -43,7 +43,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     }
 
     /// <inheritdoc cref="Create(string, IGraphType)"/>
-    public static FieldBuilder<TSourceType, TReturnType> Create(string name, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type = null)
+    public static FieldBuilder<TSourceType, TReturnType> Create(string name, Type? type = null)
     {
         var fieldType = new FieldType
         {

@@ -1,5 +1,5 @@
+using System.Buffers;
 using System.Collections.Concurrent;
-using System.Linq.Expressions;
 
 namespace GraphQL;
 
@@ -9,30 +9,14 @@ namespace GraphQL;
 public static class MemoryExtensions
 {
     private static readonly ConcurrentDictionary<Type, Action<Array>> _delegates = new();
-    private static readonly Func<Type, Action<Array>> _factory = CreateDelegate;
 
-    internal static void Return(this Array array) => _delegates.GetOrAdd(array.GetType(), _factory)(array);
-
-    // 'ArrayPool.Return' method takes generic T[] parameter for returned array, therefore it is required
-    // to generate a method-adapter which takes 'Array' parameter and then casts it to the required type.
-    //
-    // Example:
-    //
-    // arr => ArrayPool<ElementType>.Shared.Return((ElementType[])arr, true)
-    private static Action<Array> CreateDelegate(Type arrayType)
+    internal static T[] Rent<T>(int count)
     {
-        var poolType = typeof(System.Buffers.ArrayPool<>).MakeGenericType(arrayType.GetElementType()!);
-        var parameter = Expression.Parameter(typeof(Array), "arr");
-
-        var lambda = Expression.Lambda<Action<Array>>(
-            Expression.Call(
-                Expression.Property(null, poolType.GetProperty(nameof(System.Buffers.ArrayPool<object>.Shared))!),
-                poolType.GetMethod(nameof(System.Buffers.ArrayPool<object>.Return))!,
-            Expression.Convert(parameter, arrayType),
-            Expression.Constant(true, typeof(bool))), parameter);
-
-        return lambda.Compile();
+        _delegates.TryAdd(typeof(T[]), static (array) => ArrayPool<T>.Shared.Return((T[])array));
+        return ArrayPool<T>.Shared.Rent(count);
     }
+
+    internal static void Return(this Array array) => _delegates[array.GetType()](array);
 
     /// <summary>
     /// Returns an array or array-like object of a given length.

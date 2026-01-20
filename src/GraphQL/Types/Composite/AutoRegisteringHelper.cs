@@ -19,6 +19,7 @@ public static class AutoRegisteringHelper
     /// An example of an instance expression would be as follows:
     /// <code>context =&gt; (TSourceType)context.Source</code>
     /// </summary>
+    [RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
     public static IFieldResolver BuildFieldResolver(MemberInfo memberInfo, Type? sourceType, FieldType? fieldType, LambdaExpression instanceExpression)
     {
         // this entire method is a simplification of AutoRegisteringObjectGraphType.BuildFieldType
@@ -49,12 +50,14 @@ public static class AutoRegisteringHelper
     /// An example of an instance expression would be as follows:
     /// <code>context =&gt; (TSourceType)context.Source</code>
     /// </summary>
+    [RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
     public static ISourceStreamResolver BuildSourceStreamResolver(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType, LambdaExpression instanceExpression)
     {
         var arguments = BuildFieldResolver_BuildMethodArguments(methodInfo, sourceType, fieldType);
         return new SourceStreamMethodResolver(methodInfo, instanceExpression, arguments);
     }
 
+    [RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
     private static IList<LambdaExpression> BuildFieldResolver_BuildMethodArguments(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType)
     {
         List<LambdaExpression> expressions = [];
@@ -99,6 +102,7 @@ public static class AutoRegisteringHelper
     /// Builds the following instance expression:
     /// <code>context =&gt; context.Source as TSourceType ?? (context.RequestServices ?? serviceProvider).GetService(sourceType) ?? throw new InvalidOperationException(...)</code>
     /// </summary>
+    [RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
     internal static LambdaExpression BuildInstanceExpressionForSchemaBuilder(Type sourceType, IServiceProvider serviceProvider)
     {
         // exception cannot occur here, so don't worry catching TargetInvokeException

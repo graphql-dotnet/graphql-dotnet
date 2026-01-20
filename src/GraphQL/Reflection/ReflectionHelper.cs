@@ -10,7 +10,9 @@ internal static class ReflectionHelper
     /// <param name="type">The type to check.</param>
     /// <param name="field">The desired field.</param>
     /// <param name="resolverType">defaults to Resolver</param>
-    public static IAccessor? ToAccessor(this Type? type, string field, ResolverType resolverType)
+    public static IAccessor? ToAccessor(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicMethods)]
+        this Type? type, string field, ResolverType resolverType)
     {
         if (type == null)
             return null;
@@ -41,7 +43,7 @@ internal static class ReflectionHelper
     /// <param name="type">The type to check.</param>
     /// <param name="field">The desired field.</param>
     /// <param name="resolverType">Indicates if a resolver or stream resolver method is requested.</param>
-    public static MethodInfo? MethodForField(this Type type, string field, ResolverType resolverType)
+    public static MethodInfo? MethodForField([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] this Type type, string field, ResolverType resolverType)
     {
         var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
 
@@ -60,7 +62,7 @@ internal static class ReflectionHelper
     /// </summary>
     /// <param name="type">The type to check.</param>
     /// <param name="field">The desired field.</param>
-    public static PropertyInfo? PropertyForField(this Type type, string field)
+    public static PropertyInfo? PropertyForField([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] this Type type, string field)
     {
         var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 

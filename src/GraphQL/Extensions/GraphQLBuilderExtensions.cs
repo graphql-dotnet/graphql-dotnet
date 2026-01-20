@@ -317,7 +317,8 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <br/><br/>
     /// This allows for a schema that is entirely configured with CLR types.
     /// </summary>
-    [RequiresUnreferencedCode("Please ensure that the CLR types used by your schema are not trimmed by the compiler.")]
+    [RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
+    [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
     public static IGraphQLBuilder AddAutoSchema<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicProperties)] TQueryClrType>(this IGraphQLBuilder builder, Action<IConfigureAutoSchema>? configure = null)
     {
         builder.AddSchema(provider => new AutoSchema<TQueryClrType>(provider), ServiceLifetime.Singleton);
@@ -480,6 +481,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <see cref="InputObjectGraphType{TSourceType}"/>, <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/>, and
     /// <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> as generic types.
     /// </summary>
+    [RequiresUnreferencedCode("Uses reflection to scan assemblies for IGraphType implementations. Types may be removed when trimming the application.")]
     public static IGraphQLBuilder AddGraphTypes(this IGraphQLBuilder builder)
         => builder.AddGraphTypes(Assembly.GetCallingAssembly());
 
@@ -497,6 +499,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <see cref="InputObjectGraphType{TSourceType}"/>, <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/>, and
     /// <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> as generic types.
     /// </summary>
+    [RequiresUnreferencedCode("Uses reflection to scan assemblies for IGraphType implementations. Types may be removed when trimming the application.")]
     public static IGraphQLBuilder AddGraphTypes(this IGraphQLBuilder builder, Assembly assembly)
     {
         // Graph types are always created with the transient lifetime, since they are only instantiated once
@@ -579,6 +582,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> graph types.
     /// </summary>
     [RequiresUnreferencedCode("Please ensure that the CLR types used by your schema are not trimmed by the compiler.")]
+    [RequiresDynamicCode("Creating generic types requires dynamic code.")]
     public static IGraphQLBuilder AddAutoClrMappings(this IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true)
     {
         builder.AddGraphTypeMappingProvider(new AutoRegisteringGraphTypeMappingProvider(mapInputTypes, mapOutputTypes));
@@ -1368,7 +1372,7 @@ public static class GraphQLBuilderExtensions // TODO: split
         => builder.UsePersistedDocuments<TLoader>(serviceLifetime, action == null ? null : (options, _) => action(options));
 
     /// <inheritdoc cref="UsePersistedDocuments{TLoader}(IGraphQLBuilder, ServiceLifetime, Action{PersistedDocumentOptions}?)"/>
-    public static IGraphQLBuilder UsePersistedDocuments<TLoader>(this IGraphQLBuilder builder, DI.ServiceLifetime serviceLifetime, Action<PersistedDocumentOptions, IServiceProvider>? action)
+    public static IGraphQLBuilder UsePersistedDocuments<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TLoader>(this IGraphQLBuilder builder, DI.ServiceLifetime serviceLifetime, Action<PersistedDocumentOptions, IServiceProvider>? action)
         where TLoader : class, IPersistedDocumentLoader
     {
         builder.Services.Register<IPersistedDocumentLoader, TLoader>(serviceLifetime);

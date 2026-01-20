@@ -15,6 +15,7 @@ public static class TypeConfigExtensions
     /// <typeparam name="TSourceType">The CLR type of the source representation that the resolver handles.</typeparam>
     /// <param name="typeConfig">The type configuration to apply the resolver to.</param>
     /// <param name="resolver">The function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType>(this TypeConfig typeConfig, Func<IResolveFieldContext, TSourceType, TSourceType?> resolver) =>
         typeConfig.Metadata[FederationHelper.RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
 
@@ -24,6 +25,7 @@ public static class TypeConfigExtensions
     /// <typeparam name="TSourceType">The CLR type of the source representation that the resolver handles.</typeparam>
     /// <param name="typeConfig">The type configuration to apply the resolver to.</param>
     /// <param name="resolver">The asynchronous function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType>(this TypeConfig typeConfig, Func<IResolveFieldContext, TSourceType, Task<TSourceType?>> resolver) =>
         typeConfig.Metadata[FederationHelper.RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
 
@@ -33,6 +35,7 @@ public static class TypeConfigExtensions
     /// <typeparam name="TSourceType">The CLR type of the source representation that the resolver handles.</typeparam>
     /// <param name="typeConfig">The type configuration to apply the resolver to.</param>
     /// <param name="resolver">The data loader function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType>(this TypeConfig typeConfig, Func<IResolveFieldContext, TSourceType, IDataLoaderResult<TSourceType?>> resolver) =>
         typeConfig.Metadata[FederationHelper.RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
 
@@ -43,6 +46,7 @@ public static class TypeConfigExtensions
     /// <typeparam name="TReturnType">The CLR type of the resolved object returned by the resolver.</typeparam>
     /// <param name="config">The type configuration to apply the resolver to.</param>
     /// <param name="resolver">The asynchronous function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType, TReturnType>(this TypeConfig config, Func<IResolveFieldContext, TSourceType, Task<TReturnType?>> resolver)
     {
         config.Metadata[FederationHelper.RESOLVER_METADATA] = new FederationResolver<TSourceType, TReturnType>(resolver);
@@ -55,6 +59,7 @@ public static class TypeConfigExtensions
     /// <typeparam name="TReturnType">The CLR type of the resolved object returned by the resolver.</typeparam>
     /// <param name="config">The type configuration to apply the resolver to.</param>
     /// <param name="resolver">The data loader function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType, TReturnType>(this TypeConfig config, Func<IResolveFieldContext, TSourceType, IDataLoaderResult<TReturnType?>> resolver)
     {
         config.Metadata[FederationHelper.RESOLVER_METADATA] = new FederationResolver<TSourceType, TReturnType>(resolver);
@@ -67,6 +72,7 @@ public static class TypeConfigExtensions
     /// <typeparam name="TReturnType">The CLR type of the resolved object returned by the resolver.</typeparam>
     /// <param name="config">The type configuration to apply the resolver to.</param>
     /// <param name="resolver">The function used to resolve the source representation.</param>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
     public static void ResolveReference<TSourceType, TReturnType>(this TypeConfig config, Func<IResolveFieldContext, TSourceType, TReturnType?> resolver)
     {
         config.Metadata[FederationHelper.RESOLVER_METADATA] = new FederationResolver<TSourceType, TReturnType>(resolver);

@@ -4,8 +4,15 @@ using GraphQL.Types;
 namespace GraphQL.Federation.Resolvers;
 
 /// <inheritdoc cref="FederationResolverBase"/>
-public abstract class FederationResolverBase<TParsedType> : FederationResolverBase
+public abstract class FederationResolverBase<
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)] TParsedType> : FederationResolverBase
 {
+    /// <inheritdoc cref="FederationResolverBase.FederationResolverBase"/>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
+    public FederationResolverBase()
+    {
+    }
+
     /// <inheritdoc/>
     public override Type SourceType => typeof(TParsedType);
 
@@ -23,6 +30,14 @@ public abstract class FederationResolverBase<TParsedType> : FederationResolverBa
 /// </summary>
 public abstract class FederationResolverBase : IFederationResolver
 {
+    /// <summary>
+    /// Initializes a new instance of <see cref="FederationResolverBase"/>.
+    /// </summary>
+    [RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
+    public FederationResolverBase()
+    {
+    }
+
     /// <summary>
     /// Gets the CLR type of the representation that this resolver is responsible for.
     /// This property indicates the type to which the 'parsedRepresentation' parameter's representation
@@ -60,6 +75,10 @@ public abstract class FederationResolverBase : IFederationResolver
     /// Deserializes an object based on properties provided in a dictionary, using graph type information from
     /// an output graph type. Requires that the object type has a parameterless constructor.
     /// </summary>
+    [UnconditionalSuppressMessage("AOT", "IL2067:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2070:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     private static object ToObject(Type objectType, IComplexGraphType objectGraphType, IDictionary<string, object?> map, IValueConverter valueConverter)
     {
         // create an instance of the target CLR type
