@@ -28,6 +28,7 @@ namespace GraphQL
     public sealed class AotOutputTypeAttribute<T> : GraphQL.AotSchemaAttribute
     {
         public AotOutputTypeAttribute() { }
+        public bool? IsInterface { get; set; }
     }
     [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=false)]
     public sealed class AotQueryTypeAttribute<T> : GraphQL.AotSchemaAttribute
