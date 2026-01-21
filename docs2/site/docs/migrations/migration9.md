@@ -138,6 +138,41 @@ A new `AotSchema` abstract base class has been added to support creating AOT-com
 
 Please see the documentation located (todo) for creating AOT-friendly schemas.
 
+### 6. MemberScanAttribute for Auto-Registering Types
+
+A new `MemberScanAttribute` has been added to control which member types (properties, fields, and/or methods) are scanned when building auto-registering graph types. This attribute provides more control over which members of your CLR types become GraphQL fields.
+
+The attribute accepts a `ScanMemberTypes` enum value (flags enum) that can be combined:
+
+- **`Properties`** - Scan public properties
+- **`Fields`** - Scan public fields
+- **`Methods`** - Scan public methods (not applicable for input objects)
+
+Default behavior:
+- Output types (`AutoRegisteringObjectGraphType<T>`, `AutoRegisteringInterfaceGraphType<T>`): Properties and Methods (fields excluded by default)
+- Input types (`AutoRegisteringInputObjectGraphType<T>`): Properties only (fields and methods excluded by default)
+
+Example usage:
+
+```csharp
+// Scan only methods, excluding properties
+[MemberScan(ScanMemberTypes.Methods)]
+public class QueryMethodsOnly
+{
+    public string Property1 { get; set; }  // Not scanned
+    public string GetData() => "data";     // Scanned
+}
+
+// Scan properties and fields, excluding methods
+[MemberScan(ScanMemberTypes.Properties | ScanMemberTypes.Fields)]
+public class OutputWithFields
+{
+    public string Property1 { get; set; } = "prop";  // Scanned
+    public string Field1 = "field";                  // Scanned
+    public string Method1() => "method";             // Not scanned
+}
+```
+
 ## Breaking Changes
 
 ### 1. Removal of Obsolete Members
