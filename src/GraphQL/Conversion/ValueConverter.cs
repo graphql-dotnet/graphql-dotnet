@@ -32,7 +32,7 @@ public class ValueConverter : ValueConverterBase
             System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
 #endif
 
-        // types that return an array (fully supported by AOT, if the array type is not trimmed)
+        // types that return an array
         RegisterListConverterFactory(typeof(ICollection), Conversion.ArrayListConverterFactory.Instance);
         RegisterListConverterFactory(typeof(IEnumerable), Conversion.ArrayListConverterFactory.Instance);
         RegisterListConverterFactory(typeof(IList), Conversion.ArrayListConverterFactory.Instance);
@@ -96,15 +96,18 @@ public class ValueConverter : ValueConverterBase
     /// <inheritdoc/>
     protected override IListConverterFactory? DefaultListConverterFactory
     {
-        [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
-        [UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with 'RequiresUnreferencedCodeAttribute' may break functionality when trimming application code.", Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+            Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
+        [UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with 'RequiresUnreferencedCodeAttribute' may break functionality when trimming application code.",
+            Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
         get => CustomListConverterFactory.DefaultInstance;
     }
 
     /// <inheritdoc/>
     protected override IListConverterFactory? ArrayListConverterFactory
     {
-        [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "The constructor is marked with RequiresDynamicCode.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+            Justification = "The constructor is marked with RequiresDynamicCode.")]
         get => Conversion.ArrayListConverterFactory.Instance;
     }
 
@@ -118,9 +121,12 @@ public class ValueConverter : ValueConverterBase
         return ToObjectImpl(source, type, inputGraphType);
     }
 
-    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
-    [UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with 'RequiresUnreferencedCodeAttribute' may break functionality when trimming application code.", Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
-    [UnconditionalSuppressMessage("AOT", "IL2067:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.", Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with 'RequiresUnreferencedCodeAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2067:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     private object ToObjectImpl(IDictionary<string, object?> source, Type type, IInputObjectGraphType inputGraphType)
         => ObjectExtensions.ToObjectReflection(source, type, inputGraphType, this);
 }

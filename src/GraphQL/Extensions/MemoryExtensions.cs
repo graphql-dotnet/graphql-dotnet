@@ -16,7 +16,11 @@ public static class MemoryExtensions
         return ArrayPool<T>.Shared.Rent(count);
     }
 
-    internal static void Return(this Array array) => _delegates[array.GetType()](array);
+    internal static void Return(this Array array)
+    {
+        if (_delegates.TryGetValue(array.GetType(), out var action))
+            action(array);
+    }
 
     /// <summary>
     /// Returns an array or array-like object of a given length.

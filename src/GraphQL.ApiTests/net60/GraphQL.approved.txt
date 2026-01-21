@@ -1291,7 +1291,6 @@ namespace GraphQL.DI
         protected GraphQLBuilderBase() { }
         public abstract GraphQL.DI.IServiceRegister Services { get; }
         protected virtual void RegisterBasicServices() { }
-        [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(GraphQL.Execution.ErrorInfoProviderOptions))]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Public constructors for requested generic types may not be statically referenced.")]
         protected virtual void RegisterDefaultServices() { }
     }
@@ -1887,7 +1886,7 @@ namespace GraphQL.Federation.Resolvers
     public abstract class FederationResolverBase : GraphQL.Federation.Resolvers.IFederationResolver
     {
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
-        public FederationResolverBase() { }
+        protected FederationResolverBase() { }
         public abstract System.Type SourceType { get; }
         public virtual bool MatchKeys(System.Collections.Generic.IDictionary<string, object?> representation) { }
         public object ParseRepresentation(GraphQL.Types.IComplexGraphType graphType, System.Collections.Generic.IDictionary<string, object?> representation, GraphQL.IValueConverter valueConverter) { }
@@ -1896,7 +1895,7 @@ namespace GraphQL.Federation.Resolvers
     public abstract class FederationResolverBase<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TParsedType> : GraphQL.Federation.Resolvers.FederationResolverBase
     {
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This uses reflection at runtime to deserialize the representation.")]
-        public FederationResolverBase() { }
+        protected FederationResolverBase() { }
         public override System.Type SourceType { get; }
         public abstract System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, TParsedType parsedRepresentation);
         public override System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, object parsedRepresentation) { }

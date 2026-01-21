@@ -10,7 +10,12 @@ internal sealed class HashSetListConverterFactory : ListConverterFactoryBase
     }
 
     /// <inheritdoc cref="HashSetListConverterFactory"/>
-    public static HashSetListConverterFactory Instance { get; } = new();
+    public static HashSetListConverterFactory Instance
+    {
+        [RequiresUnreferencedCode("Uses reflection to access generic method information which may be trimmed.")]
+        [RequiresDynamicCode("Uses reflection to create generic method signatures.")]
+        get;
+    } = new();
 
     public override Func<object?[], object> Create<T>() => static list =>
     {

@@ -150,7 +150,8 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
     /// <summary>
     /// Finds an 'Add' method that can be used to add items to the list.
     /// </summary>
-    [UnconditionalSuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     private static MethodInfo? GetAddMethod(Type listType, Type elementType)
     {
         var addMethod = listType.GetMethod("Add", [elementType]);
@@ -196,7 +197,7 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
     /// the delegate's parameter to <see cref="IEnumerable{T}"/> of the <paramref name="elementType"/>.
     /// </summary>
     [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
-        Justification = "Method is only called when dynamic code compilation is available or element type is not a value type.")]
+        Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
     private static Func<object?[], object> CreateLambdaViaConstructor(Type elementType, ConstructorInfo constructor)
     {
         var methodInfo = _castMethodInfo.MakeGenericMethod(elementType);

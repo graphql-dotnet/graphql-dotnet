@@ -21,8 +21,8 @@ internal sealed class ArrayListConverterFactory : IListConverterFactory
         get;
     } = new();
 
-    [SuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
-        Justification = $"{nameof(ArrayListConverterFactory)}.{nameof(Instance)} is marked with [RequiresDynamicCode].")]
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "ArrayListConverterFactory.Instance is marked with [RequiresDynamicCode].")]
     public IListConverter Create(Type listType)
     {
         if (listType == typeof(object[]))

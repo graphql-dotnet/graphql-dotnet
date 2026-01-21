@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Reflection;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -75,12 +74,6 @@ public abstract class GraphQLAttribute : Attribute
     public virtual void Modify(TypeInformation typeInformation)
     {
     }
-
-    private static readonly MethodInfo _modifyMethod = typeof(GraphQLAttribute)
-        .GetMethods(BindingFlags.Instance | BindingFlags.Public)
-        .Where(x => x.Name == nameof(GraphQLAttribute.Modify) && x.IsGenericMethod)
-        .Single();
-    private static readonly ConcurrentDictionary<Type, MethodInfo> _typedModifyMethods = new();
 
     /// <summary>
     /// Updates the properties of the specified <see cref="ArgumentInformation"/> as necessary.

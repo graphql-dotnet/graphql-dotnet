@@ -10,7 +10,12 @@ internal sealed class DefaultListConverterFactory : ListConverterFactoryBase
     }
 
     /// <inheritdoc cref="DefaultListConverterFactory"/>
-    public static readonly DefaultListConverterFactory Instance = new();
+    public static DefaultListConverterFactory Instance
+    {
+        [RequiresUnreferencedCode("Uses reflection to access generic method information which may be trimmed.")]
+        [RequiresDynamicCode("Uses reflection to create generic method signatures.")]
+        get;
+    } = new();
 
     public override Func<object?[], object> Create<T>()
     {

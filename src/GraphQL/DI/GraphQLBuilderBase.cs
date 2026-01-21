@@ -39,7 +39,6 @@ public abstract class GraphQLBuilderBase : IGraphQLBuilder
     /// Does not include <see cref="IGraphQLSerializer"/>.
     /// </summary>
     [RequiresUnreferencedCode("Public constructors for requested generic types may not be statically referenced.")]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(ErrorInfoProviderOptions))] // TODO: this should be preserved by the call to Configure<ErrorInfoProviderOptions>(), but it is not
     protected virtual void RegisterDefaultServices()
     {
         RegisterBasicServices();
