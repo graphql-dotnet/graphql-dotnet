@@ -875,6 +875,16 @@ public class AutoRegisteringInterfaceGraphTypeTests
     }
 
     [Fact]
+    public void MemberScanAttribute_Interface_PropertiesDerivedOnly()
+    {
+        // verifies that overriding an attribute on a derived class works properly
+        var graphType = new AutoRegisteringInterfaceGraphType<InterfacePropertiesOnlyDerivedClass>();
+        graphType.Fields.Find("Property1").ShouldNotBeNull();
+        graphType.Fields.Find("Method1").ShouldBeNull();
+        graphType.Fields.Find("Method2").ShouldBeNull();
+    }
+
+    [Fact]
     public void MemberScanAttribute_Interface_MethodsOnly()
     {
         var graphType = new AutoRegisteringInterfaceGraphType<InterfaceMethodsOnlyClass>();
@@ -914,5 +924,10 @@ public class AutoRegisteringInterfaceGraphTypeTests
     {
         public string Property2 { get; set; } = "prop2";
         public string Method3() => "method3";
+    }
+
+    [MemberScan(ScanMemberTypes.Properties)]
+    private class InterfacePropertiesOnlyDerivedClass : InterfaceMethodsOnlyClass
+    {
     }
 }
