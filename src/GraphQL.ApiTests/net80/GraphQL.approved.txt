@@ -1258,9 +1258,12 @@ namespace GraphQL.Conversion
     }
     public abstract class ListConverterFactoryBase : GraphQL.Conversion.IListConverterFactory
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Uses reflection to create generic method signatures.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection to access generic method information which may be trimmed.")]
         protected ListConverterFactoryBase() { }
-        public virtual GraphQL.Conversion.IListConverter Create([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type listType) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with \'RequiresDynamicCodeAttribute\' may break fu" +
+            "nctionality when AOT compiling.", Justification="The constructor is marked with RequiresDynamicCode.")]
+        public virtual GraphQL.Conversion.IListConverter Create(System.Type listType) { }
         public abstract System.Func<object?[], object> Create<T>();
         protected virtual System.Type GetElementType(System.Type listType) { }
     }
