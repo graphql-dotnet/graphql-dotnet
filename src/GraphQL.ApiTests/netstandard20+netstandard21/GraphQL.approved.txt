@@ -368,7 +368,6 @@ namespace GraphQL
         public virtual void Modify(GraphQL.Types.IGraphType graphType, System.Type sourceType) { }
         public virtual void Modify(GraphQL.Types.QueryArgument queryArgument, System.Reflection.ParameterInfo parameterInfo) { }
         public virtual void Modify(GraphQL.Types.FieldType fieldType, bool isInputType, GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, ref bool ignore) { }
-        public virtual void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
         public virtual bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool? isInputType) { }
     }
     public static class GraphQLBuilderExtensions
