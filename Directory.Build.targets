@@ -7,7 +7,6 @@
     <EnableTrimAnalyzer Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">true</EnableTrimAnalyzer>
     <!--<EnableAotAnalyzer>true</EnableAotAnalyzer> PublishAot property enables it-->
     <!--<ILLinkTreatWarningsAsErrors>false</ILLinkTreatWarningsAsErrors> does not work-->
-    <WarningsNotAsErrors>$(WarningsNotAsErrors);IL2067</WarningsNotAsErrors>
     <!--<WarningsNotAsErrors>$(WarningsNotAsErrors);IL2026;IL2055;IL2067;IL2070;IL2072;IL2075;IL2090;IL2091;IL2092;IL2095</WarningsNotAsErrors>-->
   </PropertyGroup>
 
