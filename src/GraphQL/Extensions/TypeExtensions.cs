@@ -471,35 +471,6 @@ public static class TypeExtensions
     }
 
     /// <summary>
-    /// Returns whether or not the given <paramref name="type"/> implements <paramref name="genericType"/>
-    /// by testing itself, and then recursively up it's base types hierarchy.
-    /// </summary>
-    /// <param name="type">Type to test.</param>
-    /// <param name="genericType">Type to test for.</param>
-    /// <returns>
-    ///   <see langword="true"/> if the indicated type implements <paramref name="genericType"/>; otherwise, <see langword="false"/>.
-    /// </returns>
-    public static bool ImplementsGenericType(this Type type, Type genericType)
-    {
-        if (type.IsGenericType && type.GetGenericTypeDefinition() == genericType)
-        {
-            return true;
-        }
-
-        var interfaceTypes = type.GetInterfaces();
-        foreach (var it in interfaceTypes)
-        {
-            if (it.IsGenericType && it.GetGenericTypeDefinition() == genericType)
-            {
-                return true;
-            }
-        }
-
-        var baseType = type.BaseType;
-        return baseType != null && ImplementsGenericType(baseType, genericType);
-    }
-
-    /// <summary>
     /// Looks for a <see cref="DescriptionAttribute"/> on the specified member and returns
     /// the <see cref="DescriptionAttribute.Description">description</see>, if any. Otherwise
     /// returns XML documentation on the specified member, if any. Note that behavior of this

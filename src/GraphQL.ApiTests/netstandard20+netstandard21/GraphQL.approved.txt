@@ -937,7 +937,6 @@ namespace GraphQL
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable, bool isInputType) { }
         public static System.Collections.Generic.IEnumerable<GraphQL.ParameterAttribute> GetParameterAttributes(this System.Reflection.ParameterInfo parameterInfo) { }
         public static string GraphQLName(this System.Type type) { }
-        public static bool ImplementsGenericType(this System.Type type, System.Type genericType) { }
         public static bool IsGraphType(this System.Type type) { }
         public static string? ObsoleteMessage(this System.Reflection.MemberInfo memberInfo) { }
     }
