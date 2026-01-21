@@ -30,12 +30,15 @@ public class SelfActivatingServiceProvider : IServiceProvider
     /// <summary>
     /// Creates a new instance with the specified underlying service provider.
     /// </summary>
+    [RequiresUnreferencedCode("Public constructors for requested types may not be statically referenced.")]
     public SelfActivatingServiceProvider(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     }
 
     /// <inheritdoc cref="ActivatorUtilities.GetServiceOrCreateInstance(IServiceProvider, Type)"/>
+    [UnconditionalSuppressMessage("AOT", "IL2067:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     public object? GetService(Type serviceType)
     {
         // if the type is an interface, attempt to retrieve the interface registration from the

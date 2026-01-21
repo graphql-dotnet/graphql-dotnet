@@ -27,6 +27,7 @@ public class GraphQLBuilderBaseTests
                 return builder.ServiceRegister;
             }).Verifiable();
         mock.Setup(b => b.TryRegister(typeof(IDocumentExecuter), typeof(DocumentExecuter), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(IDocumentExecuter<ISchema>), typeof(DocumentExecuter<ISchema>), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
         mock.Setup(b => b.TryRegister(typeof(IDocumentExecuter<>), typeof(DocumentExecuter<>), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
         mock.Setup(b => b.TryRegister(typeof(IDocumentBuilder), typeof(GraphQLDocumentBuilder), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
         mock.Setup(b => b.TryRegister(typeof(IDocumentValidator), typeof(DocumentValidator), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();

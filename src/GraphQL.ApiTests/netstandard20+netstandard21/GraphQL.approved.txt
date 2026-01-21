@@ -1225,6 +1225,7 @@ namespace GraphQL.DI
     {
         protected GraphQLBuilderBase() { }
         public abstract GraphQL.DI.IServiceRegister Services { get; }
+        protected virtual void RegisterBasicServices() { }
         protected virtual void RegisterDefaultServices() { }
     }
     public interface IConfigureExecution
