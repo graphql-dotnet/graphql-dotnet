@@ -149,8 +149,8 @@ The attribute accepts a `ScanMemberTypes` enum value (flags enum) that can be co
 - **`Methods`** - Scan public methods (not applicable for input objects)
 
 Default behavior:
-- Output types (`AutoRegisteringObjectGraphType<T>`, `AutoRegisteringInterfaceGraphType<T>`): Properties and Methods (fields excluded by default)
-- Input types (`AutoRegisteringInputObjectGraphType<T>`): Properties only (fields and methods excluded by default)
+- Output types (`AutoRegisteringObjectGraphType<T>`, `AutoRegisteringInterfaceGraphType<T>`): Properties and Methods
+- Input types (`AutoRegisteringInputObjectGraphType<T>`): Properties only
 
 Example usage:
 
