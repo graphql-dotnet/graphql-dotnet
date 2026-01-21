@@ -18,6 +18,7 @@ public class MemberResolver : IFieldResolver, IRequiresResolveFieldContextAccess
     /// An example of an instance expression would be as follows:
     /// <code>context =&gt; (TSourceType)context.Source</code>
     /// </summary>
+    [RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
     public MemberResolver(FieldInfo fieldInfo, LambdaExpression? instanceExpression)
     {
         if (fieldInfo == null)
@@ -47,6 +48,7 @@ public class MemberResolver : IFieldResolver, IRequiresResolveFieldContextAccess
     /// An example of an instance expression would be as follows:
     /// <code>context =&gt; (TSourceType)context.Source</code>
     /// </summary>
+    [RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
     public MemberResolver(PropertyInfo propertyInfo, LambdaExpression? instanceExpression)
         : this((propertyInfo ?? throw new ArgumentNullException(nameof(propertyInfo))).GetMethod ?? throw new ArgumentException($"No 'get' method for the supplied {propertyInfo.Name} property.", nameof(propertyInfo)), instanceExpression, Array.Empty<LambdaExpression>())
     {
@@ -60,6 +62,7 @@ public class MemberResolver : IFieldResolver, IRequiresResolveFieldContextAccess
     /// An example of an instance expression would be as follows:
     /// <code>context =&gt; (TSourceType)context.Source</code>
     /// </summary>
+    [RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
     public MemberResolver(MethodInfo methodInfo, LambdaExpression? instanceExpression, IList<LambdaExpression> methodArgumentExpressions)
     {
         if (methodInfo == null)
@@ -118,10 +121,12 @@ public class MemberResolver : IFieldResolver, IRequiresResolveFieldContextAccess
     /// <summary>
     /// Creates an appropriate resolver function based on the return type of the expression body.
     /// </summary>
+    [RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
     protected virtual Func<IResolveFieldContext, ValueTask<object?>> BuildFieldResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
         => BuildFieldResolverInternal(resolveFieldContextParameter, bodyExpression);
 
     /// <inheritdoc cref="BuildFieldResolver(ParameterExpression, Expression)"/>
+    [RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
     internal static Func<IResolveFieldContext, ValueTask<object?>> BuildFieldResolverInternal(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
     {
         Expression? valueTaskExpr = null;

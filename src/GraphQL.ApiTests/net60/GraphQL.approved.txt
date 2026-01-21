@@ -2258,6 +2258,8 @@ namespace GraphQL.Resolvers
     public class NameFieldResolver : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IRequiresResolveFieldContextAccessor
     {
         public bool RequiresResolveFieldContextAccessor { get; }
+        [get: System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Properties intended to be accessed by this resolver may be trimmed by the compile" +
+            "r.")]
         public static GraphQL.Resolvers.NameFieldResolver Instance { get; }
         public System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context) { }
     }
