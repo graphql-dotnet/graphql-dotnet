@@ -114,7 +114,7 @@ public class ExecutionContext : IExecutionContext, IExecutionArrayPool, IDisposa
     /// <inheritdoc/>
     public TElement[] Rent<TElement>(int minimumLength)
     {
-        var array = System.Buffers.ArrayPool<TElement>.Shared.Rent(minimumLength);
+        var array = MemoryExtensions.Rent<TElement>(minimumLength);
         lock (_trackedArrays)
             _trackedArrays.Add(array);
         return array;
