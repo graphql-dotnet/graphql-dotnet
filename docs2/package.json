@@ -34,7 +34,7 @@
     "gh-pages": "^5.0.0",
     "github-slugger": "^2.0.0",
     "js-yaml": "^4.1.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "prettier": "^2.8.7",
     "babel-eslint": "^10.1.0",
     "typescript": "^5.0.4",
