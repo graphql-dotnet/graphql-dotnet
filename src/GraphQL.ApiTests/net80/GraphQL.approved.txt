@@ -1022,10 +1022,18 @@ namespace GraphQL
     }
     public class ValueConverter : GraphQL.ValueConverterBase
     {
-        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
-            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Creates list and array types dynamically as needed.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Creates list and array types dynamically as needed.")]
         public ValueConverter() { }
+        [get: System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with \'RequiresDynamicCodeAttribute\' may break fu" +
+            "nctionality when AOT compiling.", Justification="The constructor is marked with RequiresDynamicCode.")]
+        protected override GraphQL.Conversion.IListConverterFactory? ArrayListConverterFactory { get; }
+        [get: System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with \'RequiresUnreferencedCodeAttribute\' may bre" +
+            "ak functionality when trimming application code.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+        [get: System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with \'RequiresDynamicCodeAttribute\' may break fu" +
+            "nctionality when AOT compiling.", Justification="The constructor is marked with RequiresDynamicCodeAttribute.")]
         protected override GraphQL.Conversion.IListConverterFactory? DefaultListConverterFactory { get; }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Compiles code at runtime to populate the specified type.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(@"For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors or other members, which can cause runtime failures.")]
         public override void RegisterListConverterFactory(System.Type listType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type implementationType) { }
         public override object ToObject(System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IInputObjectGraphType inputGraphType) { }
@@ -1033,6 +1041,7 @@ namespace GraphQL
     public class ValueConverterAot : GraphQL.ValueConverterBase
     {
         public ValueConverterAot() { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Compiles code at runtime to populate the specified type.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(@"For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors or other members, which can cause runtime failures.")]
         public override void RegisterListConverterFactory(System.Type listType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type implementationType) { }
         public override object ToObject(System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IInputObjectGraphType inputGraphType) { }
@@ -1040,6 +1049,7 @@ namespace GraphQL
     public abstract class ValueConverterBase : GraphQL.IValueConverter
     {
         protected ValueConverterBase() { }
+        protected virtual GraphQL.Conversion.IListConverterFactory? ArrayListConverterFactory { get; }
         protected virtual GraphQL.Conversion.IListConverterFactory? DefaultListConverterFactory { get; }
         protected System.Collections.Generic.Dictionary<System.Type, GraphQL.Conversion.IListConverterFactory> ListConverterFactories { get; }
         protected System.Collections.Generic.Dictionary<System.ValueTuple<System.Type, System.Type>, System.Func<object, object>> ValueConversions { get; }
@@ -1051,6 +1061,7 @@ namespace GraphQL
         public virtual void RegisterListConverter<TListType, TElementType>(System.Func<System.Collections.Generic.IEnumerable<TElementType>, TListType>? conversion)
             where TListType : System.Collections.Generic.IEnumerable<TElementType> { }
         public virtual void RegisterListConverterFactory(System.Type listType, GraphQL.Conversion.IListConverterFactory? converter) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Compiles code at runtime to populate the specified type.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(@"For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors or other members, which can cause runtime failures.")]
         public abstract void RegisterListConverterFactory(System.Type listType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type implementationType);
         protected void RegisterScalarConversions() { }
