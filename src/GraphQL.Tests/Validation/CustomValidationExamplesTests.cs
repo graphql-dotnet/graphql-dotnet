@@ -18,10 +18,15 @@ public class CustomValidationExamplesTests
     /// </summary>
     public class MaxDepthValidationRule : ValidationRuleBase, INodeVisitor
     {
+        /// <summary>
+        /// The default maximum query depth.
+        /// </summary>
+        public const int DefaultMaxDepth = 10;
+
         private readonly int _maxDepth;
         private int _currentDepth;
 
-        public MaxDepthValidationRule() : this(10)
+        public MaxDepthValidationRule() : this(DefaultMaxDepth)
         {
         }
 

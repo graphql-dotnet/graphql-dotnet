@@ -324,10 +324,19 @@ This rule prevents excessively nested queries that could cause performance issue
 /// </summary>
 public class MaxDepthValidationRule : ValidationRuleBase, INodeVisitor
 {
+    /// <summary>
+    /// The default maximum query depth.
+    /// </summary>
+    public const int DefaultMaxDepth = 10;
+
     private readonly int _maxDepth;
     private int _currentDepth;
 
-    public MaxDepthValidationRule(int maxDepth = 10)
+    public MaxDepthValidationRule() : this(DefaultMaxDepth)
+    {
+    }
+
+    public MaxDepthValidationRule(int maxDepth)
     {
         _maxDepth = maxDepth;
     }
