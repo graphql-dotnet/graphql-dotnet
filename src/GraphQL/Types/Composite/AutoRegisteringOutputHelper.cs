@@ -21,6 +21,7 @@ internal static class AutoRegisteringOutputHelper
     /// <see cref="AutoRegisteringObjectGraphType{TSourceType}.GetArgumentInformation{TParameterType}(FieldType, ParameterInfo)">GetArgumentInformation</see>, building
     /// a list of query arguments and expressions as necessary. Then a field resolver is built around the method.
     /// </summary>
+    [RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
     public static void BuildFieldType(
         MemberInfo memberInfo,
         FieldType fieldType,
@@ -141,6 +142,7 @@ internal static class AutoRegisteringOutputHelper
     /// that do not return <see langword="void"/> or <see cref="Task"/>
     /// including properties and methods declared on inherited classes.
     /// </summary>
+    [RequiresUnreferencedCode("This method scans the specified type for public properties and methods including on base types.")]
     public static IEnumerable<MemberInfo> GetRegisteredMembers<TSourceType>(Expression<Func<TSourceType, object?>>[]? excludedProperties)
     {
         if (typeof(TSourceType).IsInterface)
