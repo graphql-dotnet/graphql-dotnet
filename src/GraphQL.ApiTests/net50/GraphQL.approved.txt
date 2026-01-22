@@ -744,6 +744,12 @@ namespace GraphQL
     {
         public MapAutoClrTypeAttribute() { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=true)]
+    public sealed class MemberScanAttribute : GraphQL.GraphQLAttribute
+    {
+        public MemberScanAttribute(GraphQL.ScanMemberTypes memberTypes) { }
+        public GraphQL.ScanMemberTypes MemberTypes { get; }
+    }
     public static class MemoryExtensions
     {
         public static System.Collections.Generic.IList<T> Constrained<T>(this T[] array, int count) { }
@@ -935,6 +941,13 @@ namespace GraphQL
     {
         Resolver = 0,
         StreamResolver = 1,
+    }
+    [System.Flags]
+    public enum ScanMemberTypes
+    {
+        Properties = 1,
+        Fields = 2,
+        Methods = 4,
     }
     public static class SchemaExtensions
     {
