@@ -723,6 +723,7 @@ namespace GraphQL
     public sealed class MapAutoClrTypeAttribute : System.Attribute
     {
         public MapAutoClrTypeAttribute() { }
+        public System.Type? ClrType { get; set; }
     }
     public static class MemoryExtensions
     {

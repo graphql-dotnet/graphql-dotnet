@@ -315,7 +315,7 @@ public class SchemaTests
                 Name = "Query",
             };
             // Field references GraphTypeWithClrTypeAttribute, which has MapAutoClrType with ClrType set to TargetClrType
-            query.Field<GraphTypeWithClrTypeAttribute>("testField", true).Resolve(_ => new TargetClrType());
+            query.Field<GraphTypeWithClrTypeAttribute>("testField", true).Resolve(_ => (GraphTypeWithClrTypeAttribute)null!);
             Query = query;
         }
 
