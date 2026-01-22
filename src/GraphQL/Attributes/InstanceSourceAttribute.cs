@@ -49,5 +49,5 @@ public enum InstanceSource
     /// <summary>
     /// Create a new instance using the CLR type's constructor and dependency injection for constructor parameters.
     /// </summary>
-    NewInstance = 3
+    NewInstance = 3,
 }
