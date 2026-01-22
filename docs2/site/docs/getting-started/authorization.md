@@ -30,7 +30,7 @@ public class RequiresAuthValidationRule : ValidationRuleBase
     var userContext = context.UserContext as GraphQLUserContext;
     var authenticated = userContext.User?.IsAuthenticated() ?? false;
 
-    return new(new NodeVisitors(
+    return new ValueTask<INodeVisitor?>(new NodeVisitors(
       new MatchingNodeVisitor<GraphQLOperationDefinition>((op, ctx) =>
       {
         if (op.Operation == OperationType.Mutation && !authenticated)

@@ -683,7 +683,7 @@ the directives implementation without mutual influence on the schemas using them
   {
     public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
     {
-      return new(new NodeVisitors(
+      return new ValueTask<INodeVisitor?>(new NodeVisitors(
         new MatchingNodeVisitor<GraphQLOperationDefinition>((op, ctx) =>
         {
           // validation logic for operations
