@@ -71,6 +71,14 @@ http://localhost:5000/graphql?query={hero}
 {"data":{"hero":"Luke Skywalker"}}
 ```
 
+## Authorization
+
+The GraphQL.Server library includes comprehensive authorization support that integrates seamlessly with ASP.NET Core's authentication and authorization infrastructure. The library provides validation rules that automatically enforce authorization policies defined in your GraphQL schema, leveraging the built-in ASP.NET Core authentication mechanisms.
+
+You can secure your GraphQL fields and types using authorization attributes, and the server will validate these during query execution using the authenticated user context from ASP.NET Core. This allows you to protect your GraphQL API using the same authentication methods (JWT, cookies, etc.) and authorization policies you use throughout your ASP.NET Core application.
+
+For detailed information on configuring authorization, see the [server repository documentation](https://github.com/graphql-dotnet/server).
+
 ## Additional Resources
 
 The [GraphQL.Server repository](https://github.com/graphql-dotnet/server) contains extensive documentation covering:
