@@ -35,8 +35,9 @@ public enum InstanceSource
     /// <summary>
     /// Get the service from the service provider (<see cref="IResolveFieldContext.RequestServices"/>
     /// or the schema's configured service provider). If the service is not registered, create a new
-    /// instance using the CLR type's constructor and dependency injection for constructor parameters.
-    /// Similar to ASP.NET MVC controller instantiation.
+    /// instance using the CLR type's constructor and dependency injection for constructor parameters and
+    /// public required properties. Parameters or properties of type <see cref="IResolveFieldContext"/>
+    /// are populated from the resolving field's current context. Similar to ASP.NET MVC controller instantiation.
     /// </summary>
     GetServiceOrCreateInstance = 1,
 
@@ -47,7 +48,9 @@ public enum InstanceSource
     GetRequiredService = 2,
 
     /// <summary>
-    /// Create a new instance using the CLR type's constructor and dependency injection for constructor parameters.
+    /// Create a new instance using the CLR type's constructor and dependency injection for constructor parameters
+    /// and public required properties. Parameters or properties of type <see cref="IResolveFieldContext"/>
+    /// are populated from the resolving field's current context.
     /// </summary>
     NewInstance = 3,
 }
