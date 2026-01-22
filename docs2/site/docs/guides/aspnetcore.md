@@ -20,7 +20,7 @@ Below is a complete sample of a .NET 8 console app that hosts a GraphQL endpoint
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL.Server.All" Version="7.0.0" />
+    <PackageReference Include="GraphQL.Server.All" Version="8.3.3" />
   </ItemGroup>
 
 </Project>
@@ -78,7 +78,7 @@ The [GraphQL.Server repository](https://github.com/graphql-dotnet/server) contai
 * Configuration options
 * WebSocket support for subscriptions
 * Authorization and authentication
-* Multiple UI options (GraphiQL, Playground, Altair, Voyager, Banana Cake Pop)
+* Multiple UI options (GraphiQL, Playground, Altair, Voyager)
 * Sample projects and templates
 * Performance optimization
 * Error handling
