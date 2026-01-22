@@ -32,7 +32,11 @@ In the example above, a using a DataLoader will allow us to batch together all o
 
 ## Setup
 
-1. Register the DataLoader services
+### Using with GraphQL.NET (with IGraphQLBuilder)
+
+When using the `IGraphQLBuilder` interface (available through the `GraphQL.MicrosoftDI` package), setup is straightforward:
+
+1. Register the DataLoader services by calling `AddDataLoader()` on the builder:
 
 ``` csharp
 services.AddGraphQL(b => b
@@ -41,7 +45,9 @@ services.AddGraphQL(b => b
 );
 ```
 
-2. Hook up your GraphQL schema to your IoC container.
+This automatically registers the `DataLoaderDocumentListener` and `IDataLoaderContextAccessor`, and ensures the listener is added to the execution pipeline. No additional configuration is needed.
+
+2. Hook up your GraphQL schema to your IoC container:
 
 ``` csharp
 public class MySchema : Schema
@@ -56,17 +62,27 @@ public class MySchema : Schema
 services.AddSingleton<MySchema>();
 ```
 
-3. Add the `DataLoaderDocumentListener` to the `DocumentExecuter`.
+> **Note for ASP.NET Core Users**: If you're building an ASP.NET Core application with GraphQL, consider using the [GraphQL.Server](https://github.com/graphql-dotnet/server) project, which provides additional middleware and configuration options specifically designed for ASP.NET Core integration. The setup above works with both standalone GraphQL.NET and the server project.
+
+### Manual Setup (without IGraphQLBuilder)
+
+If you're not using `IGraphQLBuilder`, you'll need to manually register and configure the DataLoader components:
+
+1. Register the `IDataLoaderContextAccessor`:
 
 ``` csharp
-var listener = Services.GetRequiredService<DataLoaderDocumentListener>();
+services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>();
+```
+
+2. Add the `DataLoaderDocumentListener` to the `DocumentExecuter`:
+
+``` csharp
+var listener = services.GetRequiredService<DataLoaderDocumentListener>();
 
 var executer = new DocumentExecuter();
-var result = executer.ExecuteAsync(opts => {
-
-	...
-
-	opts.Listeners.Add(listener);
+var result = await executer.ExecuteAsync(opts => {
+    // ... other options
+    opts.Listeners.Add(listener);
 });
 ```
 
@@ -74,7 +90,7 @@ var result = executer.ExecuteAsync(opts => {
 
 First, inject the `IDataLoaderContextAccessor` into your GraphQL type class.
 
-Then use the `Context` property on the accessor to get the current `DataLoaderContext`. The `DataLoaderDocumentListener` configured above ensures that each request will have its own context instance.
+Then use the `Context` property on the accessor to get the current `DataLoaderContext`. The `DataLoaderDocumentListener` (which is automatically configured when using `AddDataLoader()`) ensures that each request will have its own context instance.
 
 Use one of the `GetOrAdd*Loader` methods on the `DataLoaderContext`. These methods all require a string key to uniquely identify each loader. They also require a delegate for fetching the data. Each method will get an existing loader or add a new one, identified by the string key. Each method has various overloads to support different ways to load and map data with the keys.
 
@@ -327,6 +343,8 @@ The above instructions describe how to use the data loader context and accessor 
 to the current request. You can also use dependency injection to register a data loader instance. This can eliminate
 duplicated code if you call the same data loader from different field resolvers. It can also help to prevent
 unforseen bugs due to a data loader fetch delegate capturing variables from a field resolver's scope.
+
+> **Note**: When using DI-based data loaders (inheriting from `DataLoaderBase`), you do not need to call `AddDataLoader()` or use `IDataLoaderContextAccessor`. DI-based data loaders handle their own dispatching and do not require the `DataLoaderDocumentListener`. Simply register your custom data loader classes as scoped services.
 
 To create a custom and register a custom data loader instance, first create a class and inherit `DataLoaderBase<TKey, T>`.
 Override the `FetchAsync` method with the code to retrieve the data based on the provided keys. Call `SetResult` on
