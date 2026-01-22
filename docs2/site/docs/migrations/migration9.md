@@ -504,3 +504,7 @@ public string GetUserName([MyUserContext] MyUserContext userContext)
     return userContext.UserName;
 }
 ```
+
+### 19. Type-first and auto-registering graph types will not function with NativeAOT
+
+For GraphQL.NET v9, NativeAOT compatibility is provided through a source generator; see the New Features section.
