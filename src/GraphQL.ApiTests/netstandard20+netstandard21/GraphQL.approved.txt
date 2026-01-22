@@ -110,6 +110,19 @@ namespace GraphQL
         Output = 2,
         Both = 3,
     }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter)]
+    public sealed class BaseGraphTypeAttribute : GraphQL.GraphQLAttribute
+    {
+        public BaseGraphTypeAttribute(System.Type graphType) { }
+        public System.Type BaseGraphType { get; set; }
+        public override void Modify(GraphQL.Types.TypeInformation typeInformation) { }
+    }
+    public class BaseGraphTypeAttribute<TGraphType> : GraphQL.GraphQLAttribute
+        where TGraphType : GraphQL.Types.IGraphType
+    {
+        public BaseGraphTypeAttribute() { }
+        public override void Modify(GraphQL.Types.TypeInformation typeInformation) { }
+    }
     public static class BoolBox
     {
         public static readonly object False;
@@ -633,10 +646,9 @@ namespace GraphQL
         object ToObject(System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IInputObjectGraphType inputGraphType);
     }
     [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter)]
-    public class IdAttribute : GraphQL.GraphQLAttribute
+    public class IdAttribute : GraphQL.BaseGraphTypeAttribute<GraphQL.Types.IdGraphType>
     {
         public IdAttribute() { }
-        public override void Modify(GraphQL.Types.TypeInformation typeInformation) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
     public class IgnoreAttribute : GraphQL.GraphQLAttribute
@@ -651,6 +663,19 @@ namespace GraphQL
         public System.Type InterfaceGraphType { get; }
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter)]
+    public sealed class InputBaseTypeAttribute : GraphQL.GraphQLAttribute
+    {
+        public InputBaseTypeAttribute(System.Type graphType) { }
+        public System.Type InputBaseType { get; set; }
+        public override void Modify(GraphQL.Types.TypeInformation typeInformation) { }
+    }
+    public class InputBaseTypeAttribute<TGraphType> : GraphQL.GraphQLAttribute
+        where TGraphType : GraphQL.Types.IGraphType
+    {
+        public InputBaseTypeAttribute() { }
+        public override void Modify(GraphQL.Types.TypeInformation typeInformation) { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter)]
     public class InputNameAttribute : GraphQL.GraphQLAttribute
     {
@@ -660,7 +685,7 @@ namespace GraphQL
         public override void Modify(GraphQL.Types.QueryArgument queryArgument) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter)]
     public class InputTypeAttribute : GraphQL.GraphQLAttribute
     {
         public InputTypeAttribute(System.Type graphType) { }
@@ -760,6 +785,19 @@ namespace GraphQL
     {
         public OneOfAttribute() { }
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    public sealed class OutputBaseTypeAttribute : GraphQL.GraphQLAttribute
+    {
+        public OutputBaseTypeAttribute(System.Type graphType) { }
+        public System.Type OutputBaseType { get; set; }
+        public override void Modify(GraphQL.Types.TypeInformation typeInformation) { }
+    }
+    public class OutputBaseTypeAttribute<TGraphType> : GraphQL.GraphQLAttribute
+        where TGraphType : GraphQL.Types.IGraphType
+    {
+        public OutputBaseTypeAttribute() { }
+        public override void Modify(GraphQL.Types.TypeInformation typeInformation) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface)]
     public class OutputNameAttribute : GraphQL.GraphQLAttribute
