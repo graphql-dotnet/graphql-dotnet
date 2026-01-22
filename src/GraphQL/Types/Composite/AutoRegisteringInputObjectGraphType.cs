@@ -112,7 +112,7 @@ public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(Dyn
         var memberScanAttr = typeof(TSourceType).GetCustomAttribute<MemberScanAttribute>();
         var memberTypes = memberScanAttr?.MemberTypes ?? ScanMemberTypes.Properties;
 
-        // Note: for input types, methods are not skipped regardless of the attribute setting, as the same attribute may be used for output types
+        // Note: for input types, methods are skipped regardless of the attribute setting, as the same attribute may be used for output types
         var scanProperties = memberTypes.HasFlag(ScanMemberTypes.Properties);
         var scanFields = memberTypes.HasFlag(ScanMemberTypes.Fields);
 
