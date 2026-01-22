@@ -105,7 +105,8 @@ public class MessageObservable : IObservable<Message>
             if (source == null)
                 return;
                 
-            // observer is guaranteed to be non-null if source is non-null
+            // observer is non-null here because both fields are initialized in the
+            // constructor and only set to null together during the first Dispose() call
             var observer = Interlocked.Exchange(ref _observer, null);
             
             lock (source._lock)
