@@ -17,7 +17,7 @@ to the `extensions` property of the GraphQL error which contain:
 * Within `codes`, the `Code` property of the `ExecutionError` along with generated codes of any inner exceptions, if any.
 
 Note that the `data` property is **not** included in the error extensions by default. To include it, you must
-configure the `ErrorInfoProvider` to set `ExposeData = true` (see [Error Serialization](#ErrorSerialization) below).
+configure the `ErrorInfoProvider` to set `ExposeData = true` (see [Error Serialization](#error-serialization) below).
 
 Note that by default, messages from unhandled processing errors are masked and a
 generic "Error trying to resolve field '<FIELD_NAME>'." or similar error is returned.
@@ -116,7 +116,7 @@ the default setting, unhandled exceptions are wrapped in an `UnhandledError` and
 error message to the `ExecutionResult.Errors` property. Error codes are dynamically generated from the
 inner exceptions of the wrapped exception and also returned. Data contained within the inner exception's
 `Data` property can also be included in the error response by configuring the error serialization options
-(see [Error Serialization](#ErrorSerialization) below).
+(see [Error Serialization](#error-serialization) below).
 
 You can also handle these processing exceptions by setting a delegate within the
 `ExecutionOptions.UnhandledExceptionDelegate` property. Within the delegate you can log the error message
@@ -201,7 +201,7 @@ services.AddGraphQL(b => b
 Please note that the unhandled exception handler is not called when the request's cancellation
 token is triggered, for instance when the client disconnects before execution is complete.
 
-## <a name="ErrorSerialization"></a>Error Serialization
+## Error Serialization
 
 After the `DocumentExecuter` has returned a `ExecutionResult` containing the data and/or errors,
 typically you will pass this object to an implementation of `IGraphQLSerializer` to convert the
