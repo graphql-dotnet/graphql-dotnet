@@ -28,6 +28,9 @@ public sealed class BaseGraphTypeAttribute : GraphQLAttribute
             if (!value.IsGraphType())
                 throw new ArgumentException(nameof(BaseGraphType), $"'{value.GetFriendlyName()}' specified on '{GetType().GetFriendlyName()}' should be a graph type");
 
+            if (typeof(ListGraphType).IsAssignableFrom(value) || typeof(NonNullGraphType).IsAssignableFrom(value))
+                throw new ArgumentException(nameof(BaseGraphType), $"'{value.GetFriendlyName()}' specified on '{GetType().GetFriendlyName()}' should not be a wrapper type such as ListGraphType or NonNullGraphType");
+
             field = value;
         }
     } = null!;

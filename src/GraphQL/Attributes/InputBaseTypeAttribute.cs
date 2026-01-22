@@ -27,6 +27,9 @@ public sealed class InputBaseTypeAttribute : GraphQLAttribute
             if (!value.IsInputType())
                 throw new ArgumentException(nameof(InputBaseType), $"'{value.GetFriendlyName()}' specified on '{GetType().GetFriendlyName()}' should be an input type");
 
+            if (typeof(ListGraphType).IsAssignableFrom(value) || typeof(NonNullGraphType).IsAssignableFrom(value))
+                throw new ArgumentException(nameof(InputBaseType), $"'{value.GetFriendlyName()}' specified on '{GetType().GetFriendlyName()}' should not be a wrapper type such as ListGraphType or NonNullGraphType");
+
             field = value;
         }
     } = null!;

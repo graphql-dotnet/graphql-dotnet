@@ -184,6 +184,54 @@ public class BaseGraphTypeAttributeTests
     }
 
     [Fact]
+    public void BaseGraphTypeAttribute_ThrowsForListType()
+    {
+        var attr = new BaseGraphTypeAttribute(typeof(IdGraphType));
+        var ex = Should.Throw<ArgumentException>(() => attr.BaseGraphType = typeof(ListGraphType<IdGraphType>));
+        ex.Message.ShouldContain("should not be a wrapper type");
+    }
+
+    [Fact]
+    public void BaseGraphTypeAttribute_ThrowsForNonNullType()
+    {
+        var attr = new BaseGraphTypeAttribute(typeof(IdGraphType));
+        var ex = Should.Throw<ArgumentException>(() => attr.BaseGraphType = typeof(NonNullGraphType<IdGraphType>));
+        ex.Message.ShouldContain("should not be a wrapper type");
+    }
+
+    [Fact]
+    public void InputBaseTypeAttribute_ThrowsForListType()
+    {
+        var attr = new InputBaseTypeAttribute(typeof(CustomInputGraphType));
+        var ex = Should.Throw<ArgumentException>(() => attr.InputBaseType = typeof(ListGraphType<CustomInputGraphType>));
+        ex.Message.ShouldContain("should not be a wrapper type");
+    }
+
+    [Fact]
+    public void InputBaseTypeAttribute_ThrowsForNonNullType()
+    {
+        var attr = new InputBaseTypeAttribute(typeof(CustomInputGraphType));
+        var ex = Should.Throw<ArgumentException>(() => attr.InputBaseType = typeof(NonNullGraphType<CustomInputGraphType>));
+        ex.Message.ShouldContain("should not be a wrapper type");
+    }
+
+    [Fact]
+    public void OutputBaseTypeAttribute_ThrowsForListType()
+    {
+        var attr = new OutputBaseTypeAttribute(typeof(CustomOutputGraphType));
+        var ex = Should.Throw<ArgumentException>(() => attr.OutputBaseType = typeof(ListGraphType<CustomOutputGraphType>));
+        ex.Message.ShouldContain("should not be a wrapper type");
+    }
+
+    [Fact]
+    public void OutputBaseTypeAttribute_ThrowsForNonNullType()
+    {
+        var attr = new OutputBaseTypeAttribute(typeof(CustomOutputGraphType));
+        var ex = Should.Throw<ArgumentException>(() => attr.OutputBaseType = typeof(NonNullGraphType<CustomOutputGraphType>));
+        ex.Message.ShouldContain("should not be a wrapper type");
+    }
+
+    [Fact]
     public void IdAttribute_InheritsFromBaseGraphType()
     {
         var attr = new IdAttribute();

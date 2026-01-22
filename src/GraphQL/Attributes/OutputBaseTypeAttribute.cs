@@ -27,6 +27,9 @@ public sealed class OutputBaseTypeAttribute : GraphQLAttribute
             if (!value.IsOutputType())
                 throw new ArgumentException(nameof(OutputBaseType), $"'{value.GetFriendlyName()}' specified on '{GetType().GetFriendlyName()}' should be an output type");
 
+            if (typeof(ListGraphType).IsAssignableFrom(value) || typeof(NonNullGraphType).IsAssignableFrom(value))
+                throw new ArgumentException(nameof(OutputBaseType), $"'{value.GetFriendlyName()}' specified on '{GetType().GetFriendlyName()}' should not be a wrapper type such as ListGraphType or NonNullGraphType");
+
             field = value;
         }
     } = null!;
