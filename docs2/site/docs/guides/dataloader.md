@@ -32,6 +32,12 @@ In the example above, a using a DataLoader will allow us to batch together all o
 
 ## Setup
 
+GraphQL.NET provides two approaches to using DataLoaders:
+
+1. **Context-based DataLoaders** (recommended for most users): Use `IDataLoaderContextAccessor` to access data loaders through a context object. This approach is covered in the sections below.
+
+2. **DI-based DataLoaders**: Create custom data loader classes that inherit from `DataLoaderBase`. This approach is covered in the [DI-based data loaders](#di-based-data-loaders) section and doesn't require the setup steps below.
+
 ### Using with GraphQL.NET (with IGraphQLBuilder)
 
 When using the `IGraphQLBuilder` interface (available through the `GraphQL.MicrosoftDI` package), setup is straightforward:
@@ -68,10 +74,11 @@ services.AddSingleton<MySchema>();
 
 If you're not using `IGraphQLBuilder`, you'll need to manually register and configure the DataLoader components:
 
-1. Register the `IDataLoaderContextAccessor`:
+1. Register the `IDataLoaderContextAccessor` and `DataLoaderDocumentListener`:
 
 ``` csharp
 services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>();
+services.AddSingleton<DataLoaderDocumentListener>();
 ```
 
 2. Add the `DataLoaderDocumentListener` to the `DocumentExecuter`:
