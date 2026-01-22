@@ -159,11 +159,11 @@ In this example, even though the GraphQL argument is a list, the value converter
 
 ### Registering Custom List Converters
 
-You can register custom list converters for your own collection types. There are two approaches:
+You can register custom list converters for your own collection types. There are three approaches:
 
-#### 1. Using RegisterListConverterFactory with Implementation Type
+#### 1. Using RegisterListConverter (Recommended, AOT-Compatible)
 
-If you have a custom list type that has a constructor accepting `IEnumerable<T>` or implements `IList`, you can register it with an implementation type:
+The recommended approach is to use `RegisterListConverter<TListType, TElementType>`, which is AOT-compatible and explicitly registers converters for each element type:
 
 ```csharp
 public class MyCustomList<T> : IList<T>
@@ -186,7 +186,44 @@ public class MySchema : Schema
     {
         Query = new MyQuery();
         
-        // Register the custom list type
+        // Register converters for each element type you need
+        this.ValueConverter.RegisterListConverter<MyCustomList<int>, int>(
+            items => new MyCustomList<int>(items));
+        
+        this.ValueConverter.RegisterListConverter<MyCustomList<string>, string>(
+            items => new MyCustomList<string>(items));
+    }
+}
+```
+
+This method is particularly important for AOT scenarios where dynamic code generation is not available. Each combination of list type and element type must be registered separately.
+
+#### 2. Using RegisterListConverterFactory with Implementation Type
+
+If you want to register an open generic type definition (not AOT-compatible), you can use `RegisterListConverterFactory` with an implementation type:
+
+```csharp
+public class MyCustomList<T> : IList<T>
+{
+    private List<T> _inner = new List<T>();
+    
+    // IList<T> implementation...
+    
+    public MyCustomList() { }
+    
+    public MyCustomList(IEnumerable<T> items)
+    {
+        _inner.AddRange(items);
+    }
+}
+
+public class MySchema : Schema
+{
+    public MySchema()
+    {
+        Query = new MyQuery();
+        
+        // Register the open generic type (requires dynamic code)
         this.ValueConverter.RegisterListConverterFactory(
             typeof(MyCustomList<>), 
             typeof(MyCustomList<>)
@@ -195,7 +232,9 @@ public class MySchema : Schema
 }
 ```
 
-#### 2. Using IListConverterFactory for Advanced Scenarios
+**Note:** This approach requires dynamic code generation and is not compatible with AOT scenarios.
+
+#### 3. Using IListConverterFactory for Advanced Scenarios
 
 For more control over the conversion process, you can implement `IListConverterFactory`:
 
@@ -254,20 +293,89 @@ public class MyListConverterFactory : ListConverterFactoryBase
 
 `ListConverterFactoryBase` handles the reflection and generic type construction for you. You only need to implement the `Create<T>` method that returns a function to convert an array to your list type.
 
+**Note:** Both `RegisterListConverterFactory` with implementation types and `ListConverterFactoryBase` require dynamic code generation and are not AOT-compatible. For AOT scenarios, always use `RegisterListConverter<TListType, TElementType>`.
+
 ## AOT Compatibility
 
-When running under Native AOT (Ahead-of-Time compilation), dynamic code generation is not available. GraphQL.NET provides AOT-compatible implementations:
+When running under Native AOT (Ahead-of-Time compilation), dynamic code generation is not available. GraphQL.NET provides `ValueConverterAot`, an AOT-compatible value converter that doesn't rely on dynamic code generation.
 
-- **ValueConverterAot**: An AOT-compatible value converter that doesn't rely on dynamic code generation
-- **CustomListConverterFactory**: Used for custom list types when running under AOT
+### Important AOT Considerations
 
-The `ValueConverter` class automatically detects whether the application is running under AOT and uses appropriate implementations. In AOT scenarios:
+**`ValueConverterAot` does not automatically register any list converters.** This is by design, as automatically registered list converters cannot guarantee that the list types won't be trimmed by the AOT compiler. While the standard `ValueConverter` class includes some extra code to support AOT scenarios, these converters will only work properly if the required list types are not trimmed.
 
-- `List<T>` converters use `CustomListConverterFactory` instead of dynamic code
-- `HashSet<T>` converters also use `CustomListConverterFactory`
-- You should prefer `CustomListConverterFactory` when registering custom list types
+For AOT scenarios, you must **explicitly register each list type and element type combination** that your application needs using the `RegisterListConverter<TListType, TElementType>` method.
 
-For more information about AOT support, see the [migration guide](../migrations/migration9.md#3-graphqlaotserializer-for-native-aot-support).
+### Registering List Converters for AOT
+
+The primary way to register list converters in AOT scenarios is using the `RegisterListConverter<TListType, TElementType>` method:
+
+```csharp
+public class MySchema : Schema
+{
+    public MySchema()
+    {
+        Query = new MyQuery();
+        
+        // Explicitly register each list type needed for AOT
+        // Register List<int> for integer lists
+        this.ValueConverter.RegisterListConverter<List<int>, int>(items => items.ToList());
+        
+        // Register List<string> for string lists
+        this.ValueConverter.RegisterListConverter<List<string>, string>(items => items.ToList());
+        
+        // Register HashSet<int> for unique integer collections
+        this.ValueConverter.RegisterListConverter<HashSet<int>, int>(items => items.ToHashSet());
+        
+        // Register custom list types
+        this.ValueConverter.RegisterListConverter<MyCustomList<string>, string>(
+            items => new MyCustomList<string>(items));
+    }
+}
+```
+
+### Why Explicit Registration is Required
+
+In AOT scenarios, the compiler performs aggressive trimming to reduce application size. Without explicit references to generic types like `List<int>` or `HashSet<string>`, the AOT compiler may remove:
+
+- Constructors needed to create instances
+- Methods needed to populate the collection
+- Generic type definitions required at runtime
+
+By explicitly registering each list type with `RegisterListConverter`, you ensure that:
+
+1. The specific closed generic type (e.g., `List<int>`) is preserved
+2. The conversion logic is defined without reflection
+3. No dynamic code generation is required
+
+### AOT-Compatible List Registration Pattern
+
+For each list type your schema uses, follow this pattern:
+
+```csharp
+// For arrays (usually not needed as arrays work by default)
+this.ValueConverter.RegisterListConverter<int[], int>(items => items.ToArray());
+
+// For List<T>
+this.ValueConverter.RegisterListConverter<List<T>, T>(items => items.ToList());
+
+// For HashSet<T>
+this.ValueConverter.RegisterListConverter<HashSet<T>, T>(items => items.ToHashSet());
+
+// For ImmutableList<T> (.NET Core 1.0+)
+this.ValueConverter.RegisterListConverter<ImmutableList<T>, T>(items => items.ToImmutableList());
+
+// For custom types with constructor accepting IEnumerable<T>
+this.ValueConverter.RegisterListConverter<MyList<T>, T>(items => new MyList<T>(items));
+```
+
+**Important:** You must register a converter for **each element type** you use. For example, if your schema has fields that return `List<int>` and `List<string>`, you need to register both:
+
+```csharp
+this.ValueConverter.RegisterListConverter<List<int>, int>(items => items.ToList());
+this.ValueConverter.RegisterListConverter<List<string>, string>(items => items.ToList());
+```
+
+For more information about AOT support in GraphQL.NET, see the [migration guide](../migrations/migration9.md#3-graphqlaotserializer-for-native-aot-support).
 
 ## ToObject Method
 
