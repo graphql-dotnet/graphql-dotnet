@@ -12,6 +12,8 @@ public class AutoSchema<[NotAGraphType] TQueryClrType> : Schema
     /// <summary>
     /// Initializes a new instance from the specified service provider.
     /// </summary>
+    [RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
+    [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
     public AutoSchema(IServiceProvider serviceProvider) : base(serviceProvider, true)
     {
         Query = serviceProvider.GetRequiredService<AutoRegisteringObjectGraphType<TQueryClrType>>();
