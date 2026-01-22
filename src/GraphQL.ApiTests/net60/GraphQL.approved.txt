@@ -971,6 +971,8 @@ namespace GraphQL
         public static string? Description(this System.Reflection.ParameterInfo parameterInfo) { }
         public static System.Collections.Generic.IEnumerable<GraphQL.GraphQLAttribute> GetGraphQLAttributes(this System.Reflection.MemberInfo memberInfo) { }
         public static System.Collections.Generic.IEnumerable<GraphQL.GraphQLAttribute> GetGraphQLAttributes(this System.Reflection.ParameterInfo parameterInfo) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses reflection to create types at runtime which is not compatible wi" +
+            "th trimming and AOT.")]
         [System.Obsolete("Use TypeExtensions.GetGraphTypeFromType(Type, bool, bool) overload instead. This " +
             "method will be removed in v10.")]
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable, GraphQL.TypeMappingMode mode) { }
@@ -2972,10 +2974,22 @@ namespace GraphQL.Types
     public class LegacySchemaTypes : GraphQL.Types.SchemaTypesBase
     {
         protected LegacySchemaTypes() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Automatically builds graph types for enumerables which are not statically referen" +
+            "ced.")]
         public LegacySchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Automatically builds graph types for enumerables which are not statically referen" +
+            "ced.")]
         public LegacySchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Automatically builds graph types for enumerables which are not statically referen" +
+            "ced.")]
         public LegacySchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings, System.Action<GraphQL.Types.IGraphType>? onBeforeInitialize) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2067:Calling members with arguments having \'DynamicallyAccessedMembersAttribute" +
+            "\' may break functionality when trimming application code.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
         protected virtual GraphQL.Types.IGraphType BuildGraphQLType(System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2070:Calling members with arguments having \'DynamicallyAccessedMembersAttribute" +
+            "\' may break functionality when trimming application code.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with \'RequiresDynamicCodeAttribute\' may break fu" +
+            "nctionality when AOT compiling.", Justification="The constructor is marked with RequiresDynamicCodeAttribute.")]
         protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? typeMappings) { }
         protected void Initialize(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings) { }
         protected virtual void OnBeforeInitialize(GraphQL.Types.IGraphType graphType) { }
