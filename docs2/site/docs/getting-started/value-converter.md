@@ -407,7 +407,7 @@ public class MySchema : Schema
 }
 ```
 
-The `ToObject` method:
+The standard `ToObject` implementation:
 1. Creates an instance of the target type
 2. Iterates through each property in the dictionary
 3. Converts each value to the property's type using the value converter
@@ -422,8 +422,58 @@ var dict = new Dictionary<string, object?>
     ["age"] = 30
 };
 
-var person = schema.Converter.ToObject(dict, typeof(PersonInput), personInputGraphType);
+var person = schema.ValueConverter.ToObject(dict, typeof(PersonInput), personInputGraphType);
 ```
+
+### ToObject in AOT Scenarios
+
+**Important:** For `ValueConverterAot`, the `ToObject` method does not perform automatic conversions by default. In AOT scenarios, input objects should parse input dictionaries using `IInputObjectGraphType.ParseDictionary` to convert to the proper object type.
+
+The `ParseDictionary` method is automatically called by the GraphQL execution engine when processing input types. If your input object type requires custom deserialization logic in AOT scenarios, you should override `ParseDictionary` in your input graph type:
+
+```csharp
+public class PersonInputType : InputObjectGraphType<PersonInput>
+{
+    public PersonInputType()
+    {
+        Field<NonNullGraphType<StringGraphType>>("name");
+        Field<NonNullGraphType<IntGraphType>>("age");
+    }
+    
+    public override object ParseDictionary(IDictionary<string, object?> value, IValueConverter valueConverter)
+    {
+        // Custom parsing logic for AOT scenarios
+        return new PersonInput
+        {
+            Name = (string)value["name"]!,
+            Age = Convert.ToInt32(value["age"])
+        };
+    }
+}
+```
+
+Alternatively, you can register a custom converter for your input type that will be used by `ToObject` when the input object graph type does not parse the dictionary:
+
+```csharp
+public class MySchema : Schema
+{
+    public MySchema()
+    {
+        Query = new MyQuery();
+        
+        // Register custom converter for input type
+        this.ValueConverter.Register<PersonInput>(dict => new PersonInput
+        {
+            Name = (string)dict["name"]!,
+            Age = Convert.ToInt32(dict["age"])
+        });
+    }
+}
+```
+
+This extension method registers a conversion from `IDictionary<string, object?>` to your input type. `ToObject` will attempt to use this custom converter if the input object graph type does not parse the input dictionary itself.
+
+For most AOT scenarios, it's recommended to override `ParseDictionary` in your input graph types rather than relying on `ToObject` conversions, as this provides better control and avoids relying on reflection-based deserialization.
 
 ## Common Use Cases
 
