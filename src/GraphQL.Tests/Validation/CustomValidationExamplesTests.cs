@@ -21,7 +21,11 @@ public class CustomValidationExamplesTests
         private readonly int _maxDepth;
         private int _currentDepth;
 
-        public MaxDepthValidationRule(int maxDepth = 10)
+        public MaxDepthValidationRule() : this(10)
+        {
+        }
+
+        public MaxDepthValidationRule(int maxDepth)
         {
             _maxDepth = maxDepth;
         }
@@ -40,7 +44,10 @@ public class CustomValidationExamplesTests
                 if (_currentDepth > _maxDepth)
                 {
                     context.ReportError(new ValidationError(
-                        $"Query exceeds maximum depth of {_maxDepth}. Deeply nested queries can cause performance issues."));
+                        context.Document.Source,
+                        null,
+                        $"Query exceeds maximum depth of {_maxDepth}. Deeply nested queries can cause performance issues.",
+                        node));
                 }
             }
             return default;
@@ -89,116 +96,7 @@ public class CustomValidationExamplesTests
                 _.Error(
                     message: "Query exceeds maximum depth of 2. Deeply nested queries can cause performance issues.",
                     line: 4,
-                    column: 5);
-            });
-        }
-    }
-
-    #endregion
-
-    #region Example 4: RequiresAuthenticationValidationRule
-
-    /// <summary>
-    /// Validates that authenticated fields are only accessed when a user is authenticated.
-    /// This rule checks for fields marked with "requiresAuth" metadata.
-    /// </summary>
-    public class RequiresAuthenticationValidationRule : ValidationRuleBase
-    {
-        private static readonly INodeVisitor _visitor = new MatchingNodeVisitor<GraphQLField>(
-            (fieldNode, context) =>
-            {
-                var fieldDef = context.TypeInfo.GetFieldDef();
-                if (fieldDef == null)
-                    return;
-
-                // Check if the field requires authentication
-                var requiresAuth = fieldDef.GetMetadata<bool>("requiresAuth", false);
-                if (!requiresAuth)
-                    return;
-
-                // Check if user is authenticated (assumes UserContext has IsAuthenticated property)
-                var isAuthenticated = context.UserContext?.GetType()
-                    .GetProperty("IsAuthenticated")
-                    ?.GetValue(context.UserContext) as bool? ?? false;
-
-                if (!isAuthenticated)
-                {
-                    context.ReportError(new ValidationError(
-                        $"Field '{fieldDef.Name}' requires authentication.",
-                        fieldNode));
-                }
-            });
-
-        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_visitor);
-    }
-
-    public class AuthTestSchema : Schema
-    {
-        public AuthTestSchema()
-        {
-            Query = new AuthTestQuery();
-        }
-    }
-
-    public class AuthTestQuery : ObjectGraphType
-    {
-        public AuthTestQuery()
-        {
-            Field<StringGraphType>("publicField")
-                .Resolve(_ => "public data");
-
-            Field<StringGraphType>("privateField")
-                .WithMetadata("requiresAuth", true)
-                .Resolve(_ => "private data");
-        }
-    }
-
-    public class AuthUserContext
-    {
-        public bool IsAuthenticated { get; set; }
-    }
-
-    public class RequiresAuthenticationValidationRuleTests : ValidationTestBase<RequiresAuthenticationValidationRule, AuthTestSchema>
-    {
-        [Fact]
-        public void allows_public_fields_without_auth()
-        {
-            ShouldPassRule("""
-                {
-                  publicField
-                }
-                """);
-        }
-
-        [Fact]
-        public void allows_private_fields_with_auth()
-        {
-            ShouldPassRule(config =>
-            {
-                config.Query = """
-                    {
-                      privateField
-                    }
-                    """;
-                config.UserContext = new AuthUserContext { IsAuthenticated = true };
-            });
-        }
-
-        [Fact]
-        public void rejects_private_fields_without_auth()
-        {
-            ShouldFailRule(_ =>
-            {
-                _.Query = """
-                    {
-                      privateField
-                    }
-                    """;
-                _.UserContext = new AuthUserContext { IsAuthenticated = false };
-                _.Error(
-                    message: "Field 'privateField' requires authentication.",
-                    line: 2,
-                    column: 3);
+                    column: 7);
             });
         }
     }
@@ -238,6 +136,8 @@ public class CustomValidationExamplesTests
                 if (hasStartDateArg != hasEndDateArg)
                 {
                     context.ReportError(new ValidationError(
+                        context.Document.Source,
+                        null,
                         $"Field '{fieldDef.Name}' requires both 'startDate' and 'endDate' arguments when filtering by date range.",
                         fieldNode));
                 }
@@ -272,7 +172,7 @@ public class CustomValidationExamplesTests
         {
             ShouldPassRule("""
                 {
-                  events(startDate: "2024-01-01", endDate: "2024-12-31")
+                  events(startDate: "2024-01-01T00:00:00Z", endDate: "2024-12-31T23:59:59Z")
                 }
                 """);
         }
@@ -294,7 +194,7 @@ public class CustomValidationExamplesTests
             {
                 _.Query = """
                     {
-                      events(startDate: "2024-01-01")
+                      events(startDate: "2024-01-01T00:00:00Z")
                     }
                     """;
                 _.Error(
@@ -311,7 +211,7 @@ public class CustomValidationExamplesTests
             {
                 _.Query = """
                     {
-                      events(endDate: "2024-12-31")
+                      events(endDate: "2024-12-31T23:59:59Z")
                     }
                     """;
                 _.Error(
@@ -342,6 +242,8 @@ public class CustomValidationExamplesTests
                     if (operation.SelectionSet.Selections.Count > 1)
                     {
                         context.ReportError(new ValidationError(
+                            context.Document.Source,
+                            null,
                             "Only one mutation operation is allowed per request.",
                             operation));
                     }
@@ -367,6 +269,8 @@ public class CustomValidationExamplesTests
                     if (!hasConfirm)
                     {
                         context.ReportError(new ValidationError(
+                            context.Document.Source,
+                            null,
                             $"Mutation '{fieldDef.Name}' requires a 'confirm' argument.",
                             fieldNode));
                     }

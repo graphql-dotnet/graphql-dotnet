@@ -346,7 +346,10 @@ public class MaxDepthValidationRule : ValidationRuleBase, INodeVisitor
             if (_currentDepth > _maxDepth)
             {
                 context.ReportError(new ValidationError(
-                    $"Query exceeds maximum depth of {_maxDepth}. Deeply nested queries can cause performance issues."));
+                    context.Document.Source,
+                    null,
+                    $"Query exceeds maximum depth of {_maxDepth}. Deeply nested queries can cause performance issues.",
+                    node));
             }
         }
         return default;
@@ -363,47 +366,7 @@ public class MaxDepthValidationRule : ValidationRuleBase, INodeVisitor
 }
 ```
 
-### Example 4: Requiring Authentication for Specific Fields
-
-This rule ensures that certain fields can only be accessed by authenticated users by checking field metadata.
-
-```csharp
-/// <summary>
-/// Validates that authenticated fields are only accessed when a user is authenticated.
-/// This rule checks for fields marked with "requiresAuth" metadata.
-/// </summary>
-public class RequiresAuthenticationValidationRule : ValidationRuleBase
-{
-    private static readonly INodeVisitor _visitor = new MatchingNodeVisitor<GraphQLField>(
-        (fieldNode, context) =>
-        {
-            var fieldDef = context.TypeInfo.GetFieldDef();
-            if (fieldDef == null)
-                return;
-
-            // Check if the field requires authentication
-            var requiresAuth = fieldDef.GetMetadata<bool>("requiresAuth", false);
-            if (!requiresAuth)
-                return;
-
-            // Check if user is authenticated (assumes UserContext has IsAuthenticated property)
-            var isAuthenticated = context.UserContext?.GetType()
-                .GetProperty("IsAuthenticated")
-                ?.GetValue(context.UserContext) as bool? ?? false;
-
-            if (!isAuthenticated)
-            {
-                context.ReportError(new ValidationError(
-                    $"Field '{fieldDef.Name}' requires authentication.",
-                    fieldNode));
-            }
-        });
-
-    public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_visitor);
-}
-```
-
-### Example 5: Validating Multiple Related Arguments
+### Example 4: Validating Multiple Related Arguments
 
 This rule validates that certain combinations of arguments are provided together, useful for enforcing business rules.
 
@@ -439,6 +402,8 @@ public class DateRangeValidationRule : ValidationRuleBase
             if (hasStartDateArg != hasEndDateArg)
             {
                 context.ReportError(new ValidationError(
+                    context.Document.Source,
+                    null,
                     $"Field '{fieldDef.Name}' requires both 'startDate' and 'endDate' arguments when filtering by date range.",
                     fieldNode));
             }
@@ -448,7 +413,7 @@ public class DateRangeValidationRule : ValidationRuleBase
 }
 ```
 
-### Example 6: Combining Multiple Node Visitors
+### Example 5: Combining Multiple Node Visitors
 
 This example demonstrates using `NodeVisitors` to combine multiple validation checks into a single rule.
 
@@ -469,6 +434,8 @@ public class MutationValidationRule : ValidationRuleBase
                 if (operation.SelectionSet.Selections.Count > 1)
                 {
                     context.ReportError(new ValidationError(
+                        context.Document.Source,
+                        null,
                         "Only one mutation operation is allowed per request.",
                         operation));
                 }
@@ -494,6 +461,8 @@ public class MutationValidationRule : ValidationRuleBase
                 if (!hasConfirm)
                 {
                     context.ReportError(new ValidationError(
+                        context.Document.Source,
+                        null,
                         $"Mutation '{fieldDef.Name}' requires a 'confirm' argument.",
                         fieldNode));
                 }
