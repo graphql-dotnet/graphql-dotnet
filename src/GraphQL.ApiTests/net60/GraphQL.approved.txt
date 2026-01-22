@@ -117,6 +117,12 @@ namespace GraphQL
         public static object Boxed(this bool value) { }
         public static object? Boxed(this bool? value) { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=true)]
+    public sealed class ClrTypeMappingAttribute : System.Attribute
+    {
+        public ClrTypeMappingAttribute(System.Type clrType) { }
+        public System.Type ClrType { get; }
+    }
     public static class ComplexityAnalayzerMetadataExtensions
     {
         public static System.Func<GraphQL.Validation.Complexity.FieldImpactContext, GraphQL.Validation.Complexity.FieldComplexityResult>? GetComplexityImpactDelegate(this GraphQL.Types.FieldType provider) { }
