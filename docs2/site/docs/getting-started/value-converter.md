@@ -403,8 +403,8 @@ Field<StringGraphType>("updateTask")
 
 - [Custom Scalars](custom-scalars.md) - Learn how to create custom scalar types that may use the value converter
 - [Arguments](arguments.md) - Understand how arguments work with `GetArgument<T>`
-- [Migration Guide v9](../migrations/migration9.md) - See changes to value conversion in v9
-- [Migration Guide v8](../migrations/migration8.md) - Learn about list converter factories introduced in v8
+- [Migration Guide v9](../migrations/migration9.md) - See changes to value conversion in v9, including the change from static to instance class
+- [Migration Guide v8](../migrations/migration8.md) - Learn about list converter enhancements in v8
 
 ## See Also
 
