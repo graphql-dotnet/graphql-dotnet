@@ -193,8 +193,6 @@ internal static class AutoRegisteringOutputHelper
     /// </summary>
     private static IEnumerable<MemberInfo> GetRequiredMembers([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] Type type)
     {
-        var members = new List<MemberInfo>();
-
         // Get all properties with required modifier (including from base classes)
         IEnumerable<MemberInfo> properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Where(p => p.GetCustomAttribute<System.Runtime.CompilerServices.RequiredMemberAttribute>() != null);
