@@ -160,19 +160,15 @@ public class AutoRegisteringObjectGraphType<[DynamicallyAccessedMembers(Dynamica
     /// <br/><br/>
     /// Typically this is a lambda expression of type <see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, <typeparamref name="TSourceType"/>&gt;.
     /// <br/><br/>
-    /// By default this returns the <see cref="IResolveFieldContext.Source"/> property.
+    /// By default this returns the <see cref="IResolveFieldContext.Source"/> property,
+    /// unless <see cref="InstanceSourceAttribute"/> is applied to <typeparamref name="TSourceType"/> to specify
+    /// a different instance source.
     /// </summary>
     /// <param name="memberInfo">The member being called or accessed.</param>
     protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
         => _sourceExpression;
 
-    private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression
-        = context => (TSourceType)(context.Source ?? ThrowSourceNullException());
-
-    private static object ThrowSourceNullException()
-    {
-        throw new InvalidOperationException("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
-    }
+    private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression = AutoRegisteringOutputHelper.BuildSourceExpression<TSourceType>();
 
     private static readonly MethodInfo _getArgumentInformationInternalMethodInfo = typeof(AutoRegisteringObjectGraphType<TSourceType>).GetMethod(nameof(GetArgumentInformationInternal), BindingFlags.NonPublic | BindingFlags.Instance)!;
     private ArgumentInformation GetArgumentInformationInternal<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)

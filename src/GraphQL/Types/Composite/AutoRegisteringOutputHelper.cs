@@ -189,6 +189,23 @@ internal static class AutoRegisteringOutputHelper
         sourceType == type || sourceType.BaseType != typeof(object) && sourceType.BaseType is not null && IsTypeSourceOrAncestor(sourceType.BaseType, type);
 
     /// <summary>
+    /// Gets all required properties and fields for a type, including those from base classes.
+    /// </summary>
+    private static IEnumerable<MemberInfo> GetRequiredMembers([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] Type type)
+    {
+        var members = new List<MemberInfo>();
+
+        // Get all properties with required modifier (including from base classes)
+        IEnumerable<MemberInfo> properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(p => p.GetCustomAttribute<System.Runtime.CompilerServices.RequiredMemberAttribute>() != null);
+
+        var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance)
+            .Where(f => f.GetCustomAttribute<System.Runtime.CompilerServices.RequiredMemberAttribute>() != null);
+
+        return properties.Concat(fields);
+    }
+
+    /// <summary>
     /// Analyzes a method parameter and returns an instance of <see cref="ArgumentInformation"/>
     /// containing information necessary to build a <see cref="QueryArgument"/> and <see cref="IFieldResolver"/>.
     /// Also applies any <see cref="GraphQLAttribute"/> attributes defined on the <see cref="ParameterInfo"/>
@@ -215,5 +232,214 @@ internal static class AutoRegisteringOutputHelper
             attr.Modify(queryArgument);
             attr.Modify(queryArgument, parameterInfo);
         }
+    }
+
+    /// <summary>
+    /// Builds a lambda expression that determines how to obtain an instance of <typeparamref name="TSourceType"/>
+    /// based on the <see cref="InstanceSourceAttribute"/> applied to the type.
+    /// </summary>
+    [RequiresUnreferencedCode("Types using InstanceSource.NewInstance or InstanceSource.GetServiceOrCreateInstance require public constructors for dependency injection.")]
+    [RequiresDynamicCode("Types using InstanceSource.NewInstance or InstanceSource.GetServiceOrCreateInstance require dynamic instance creation.")]
+    public static Expression<Func<IResolveFieldContext, TSourceType>> BuildSourceExpression<TSourceType>()
+    {
+        var instanceSourceAttr = typeof(TSourceType).GetCustomAttribute<InstanceSourceAttribute>();
+        var instanceSource = instanceSourceAttr?.InstanceSource ?? InstanceSource.ContextSource;
+        return BuildSourceExpression<TSourceType>(instanceSource);
+    }
+
+    /// <summary>
+    /// Builds a lambda expression that determines how to obtain an instance of <typeparamref name="TSourceType"/>
+    /// based on the specified <paramref name="instanceSource"/>.
+    /// </summary>
+    [RequiresUnreferencedCode("Types using InstanceSource.NewInstance or InstanceSource.GetServiceOrCreateInstance require public constructors for dependency injection.")]
+    [RequiresDynamicCode("Types using InstanceSource.NewInstance or InstanceSource.GetServiceOrCreateInstance require dynamic instance creation.")]
+    public static Expression<Func<IResolveFieldContext, TSourceType>> BuildSourceExpression<TSourceType>(InstanceSource instanceSource)
+    {
+        return instanceSource switch
+        {
+            InstanceSource.ContextSource => BuildGetContextSourceExpression<TSourceType>(),
+            InstanceSource.GetServiceOrCreateInstance => BuildGetServiceOrCreateInstanceExpression<TSourceType>(true),
+            InstanceSource.GetRequiredService => BuildGetRequiredServiceExpression<TSourceType>(),
+            InstanceSource.NewInstance => BuildGetServiceOrCreateInstanceExpression<TSourceType>(false),
+            _ => throw new InvalidOperationException($"Unknown instance source: {instanceSource}")
+        };
+    }
+
+    private static Expression<Func<IResolveFieldContext, TSourceType>> BuildGetContextSourceExpression<TSourceType>()
+        => context => (TSourceType)(context.Source ?? ThrowSourceNullException());
+
+    private static object ThrowSourceNullException()
+    {
+        throw new InvalidOperationException("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+    }
+
+    [RequiresUnreferencedCode("Types using InstanceSource.GetServiceOrCreateInstance require public constructors for dependency injection.")]
+    [RequiresDynamicCode("Types using InstanceSource.GetServiceOrCreateInstance require dynamic instance creation.")]
+    private static Expression<Func<IResolveFieldContext, TSourceType>> BuildGetServiceOrCreateInstanceExpression<TSourceType>(bool tryGetServiceFirst)
+    {
+        var contextParam = Expression.Parameter(typeof(IResolveFieldContext), "context");
+        var serviceProviderVar = Expression.Variable(typeof(IServiceProvider), "serviceProvider");
+
+        // 1. Check RequestServices and store in variable, throwing if null
+        var requestServicesProperty = Expression.Property(contextParam, nameof(IResolveFieldContext.RequestServices));
+
+        var throwMissingServices = Expression.Throw(
+            Expression.New(typeof(MissingRequestServicesException)),
+            typeof(IServiceProvider));
+
+        var assignServiceProvider = Expression.Assign(
+            serviceProviderVar,
+            Expression.Coalesce(requestServicesProperty, throwMissingServices));
+
+        var getServiceMethod = typeof(IServiceProvider).GetMethod(nameof(IServiceProvider.GetService))!;
+        bool needsServiceProviderForDI = false;
+
+        // Local method to create dependency injection expression for a type
+        Expression CreateDependencyExpression(Type type)
+        {
+            // Special handling for IServiceProvider and IResolveFieldContext
+            if (type == typeof(IServiceProvider))
+            {
+                return serviceProviderVar;
+            }
+            else if (type == typeof(IResolveFieldContext))
+            {
+                return contextParam;
+            }
+            else
+            {
+                // Mark that we need service provider for actual dependency resolution
+                needsServiceProviderForDI = true;
+                var getServiceCall = Expression.Call(serviceProviderVar, getServiceMethod, Expression.Constant(type));
+                return Expression.Convert(getServiceCall, type);
+            }
+        }
+
+        // 2. Look for a single public constructor; if multiple or none assume null
+        var constructors = typeof(TSourceType).GetConstructors(BindingFlags.Public | BindingFlags.Instance);
+        var constructor = constructors.Length == 1 ? constructors[0] : null;
+
+        // 3. Generate fallback expression
+        Expression fallbackExpression;
+        if (constructor == null && !typeof(TSourceType).IsValueType)
+        {
+            // If no single constructor found, throw
+            fallbackExpression = Expression.Throw(
+                Expression.New(
+                    typeof(InvalidOperationException).GetConstructor([typeof(string)])!,
+                    Expression.Constant($"Unable to create instance of type {typeof(TSourceType).Name}; no single public constructor found and type is not registered in service provider.")),
+                typeof(TSourceType));
+        }
+        else
+        {
+            NewExpression newExpression;
+            if (constructor == null)
+            {
+                newExpression = Expression.New(typeof(TSourceType));
+            }
+            else
+            {
+                // 3a. For each constructor parameter, handle special types or call GetService
+                var parameters = constructor.GetParameters();
+
+                if (parameters.Length == 0)
+                {
+                    // Parameterless constructor
+                    newExpression = Expression.New(constructor);
+                }
+                else
+                {
+                    var parameterExpressions = new Expression[parameters.Length];
+                    for (int i = 0; i < parameters.Length; i++)
+                    {
+                        parameterExpressions[i] = CreateDependencyExpression(parameters[i].ParameterType);
+                    }
+                    newExpression = Expression.New(constructor, parameterExpressions);
+                }
+            }
+
+            // 3b. Handle required properties and fields
+            var requiredMembers = GetRequiredMembers(typeof(TSourceType)).ToList();
+            if (requiredMembers.Count > 0)
+            {
+                var bindings = new List<MemberBinding>();
+                foreach (var member in requiredMembers)
+                {
+                    var memberType = member switch
+                    {
+                        PropertyInfo pi => pi.PropertyType,
+                        FieldInfo fi => fi.FieldType,
+                        _ => throw new InvalidOperationException($"Unexpected member type: {member.GetType().Name}")
+                    };
+
+                    var valueExpression = CreateDependencyExpression(memberType);
+                    bindings.Add(Expression.Bind(member, valueExpression));
+                }
+
+                fallbackExpression = Expression.MemberInit(newExpression, bindings);
+            }
+            else
+            {
+                fallbackExpression = newExpression;
+            }
+        }
+
+        // 4. Build main expression using the stored service provider
+        var getServiceMethod2 = typeof(IServiceProvider).GetMethod(nameof(IServiceProvider.GetService))!;
+        var getServiceForType = Expression.Call(serviceProviderVar, getServiceMethod2, Expression.Constant(typeof(TSourceType)));
+
+        // 4b. Coalesce with fallback expression (handle value types differently)
+        Expression coalesceExpression;
+        if (typeof(TSourceType).IsValueType)
+        {
+            // For value types, check if GetService returns null, then convert or use fallback
+            var nullCheck = Expression.Equal(getServiceForType, Expression.Constant(null, typeof(object)));
+            var convertToTSourceType = Expression.Convert(getServiceForType, typeof(TSourceType));
+            coalesceExpression = Expression.Condition(nullCheck, fallbackExpression, convertToTSourceType);
+        }
+        else
+        {
+            // For reference types, use TypeAs and Coalesce
+            var convertToTSourceType = Expression.TypeAs(getServiceForType, typeof(TSourceType));
+            coalesceExpression = Expression.Coalesce(convertToTSourceType, fallbackExpression);
+        }
+
+        // 5. Create block expression with variable and statements
+        // For GetServiceOrCreateInstance (tryGetServiceFirst=true), always validate RequestServices
+        // For NewInstance (tryGetServiceFirst=false), only validate when actually needed for DI
+        var assignServiceProviderWithoutCheck = Expression.Assign(serviceProviderVar, requestServicesProperty);
+        var blockExpression = Expression.Block(
+            new[] { serviceProviderVar },
+            (tryGetServiceFirst || needsServiceProviderForDI) ? assignServiceProvider : assignServiceProviderWithoutCheck,
+            tryGetServiceFirst ? coalesceExpression : fallbackExpression);
+
+        return Expression.Lambda<Func<IResolveFieldContext, TSourceType>>(blockExpression, contextParam);
+    }
+
+    private static readonly PropertyInfo _requestServicesProperty = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.RequestServices))!;
+    private static Expression<Func<IResolveFieldContext, TSourceType>> BuildGetRequiredServiceExpression<TSourceType>()
+    {
+        // Build: context => (TSourceType)context.RequestServices.GetService(typeof(TSourceType)) ?? throw new InvalidOperationException(...)
+        var contextParam = Expression.Parameter(typeof(IResolveFieldContext), "context");
+        var requestServicesProperty = Expression.Property(contextParam, _requestServicesProperty);
+
+        var throwMissingServices = Expression.Throw(
+            Expression.New(typeof(MissingRequestServicesException)),
+            typeof(IServiceProvider));
+
+        var serviceProviderExpression = Expression.Coalesce(requestServicesProperty, throwMissingServices);
+
+        var getServiceMethod = typeof(IServiceProvider).GetMethod(nameof(IServiceProvider.GetService))!;
+        var getServiceCall = Expression.Call(serviceProviderExpression, getServiceMethod, Expression.Constant(typeof(TSourceType)));
+
+        var exceptionMessage = $"Required service of type {typeof(TSourceType).Name} is not registered in the service provider.";
+        var throwExpression = Expression.Throw(
+            Expression.New(typeof(InvalidOperationException).GetConstructor([typeof(string)])!, Expression.Constant(exceptionMessage)),
+            typeof(object));
+
+        var coalesceExpression = Expression.Coalesce(getServiceCall, throwExpression);
+        var convertExpression = Expression.Convert(coalesceExpression, typeof(TSourceType));
+
+        return Expression.Lambda<Func<IResolveFieldContext, TSourceType>>(convertExpression, contextParam);
     }
 }

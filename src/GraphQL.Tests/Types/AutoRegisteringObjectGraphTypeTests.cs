@@ -960,4 +960,353 @@ public class AutoRegisteringObjectGraphTypeTests
         public override int Field3() => 3;
         public override int GetHashCode() => 123;
     }
+
+    [Fact]
+    public async Task InstanceSourceAttribute_ContextSource_WorksLikeDefault()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<ContextSourceClass>();
+        var fieldType = graphType.Fields.Find("Value")!;
+
+        var context = new ResolveFieldContext
+        {
+            Source = new ContextSourceClass { Value = "test" },
+            FieldDefinition = fieldType,
+        };
+
+        var result = await fieldType.Resolver!.ResolveAsync(context);
+        result.ShouldBe("test");
+    }
+
+    [Fact]
+    public async Task InstanceSourceAttribute_GetServiceOrCreateInstance_GetsFromDI()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton(new GetServiceOrCreateInstanceClass { Value = "from-di" });
+        var serviceProvider = services.BuildServiceProvider();
+
+        var graphType = new AutoRegisteringObjectGraphType<GetServiceOrCreateInstanceClass>();
+        var fieldType = graphType.Fields.Find("Value")!;
+
+        var context = new ResolveFieldContext
+        {
+            RequestServices = serviceProvider,
+            FieldDefinition = fieldType,
+        };
+
+        var result = await fieldType.Resolver!.ResolveAsync(context);
+        result.ShouldBe("from-di");
+    }
+
+    [Fact]
+    public async Task InstanceSourceAttribute_GetServiceOrCreateInstance_CreatesInstanceWhenNotInDI()
+    {
+        var services = new ServiceCollection();
+        var serviceProvider = services.BuildServiceProvider();
+
+        var graphType = new AutoRegisteringObjectGraphType<GetServiceOrCreateInstanceClass>();
+        var fieldType = graphType.Fields.Find("Value")!;
+
+        var context = new ResolveFieldContext
+        {
+            RequestServices = serviceProvider,
+            FieldDefinition = fieldType,
+        };
+
+        var result = await fieldType.Resolver!.ResolveAsync(context);
+        result.ShouldBe("default");
+    }
+
+    [Fact]
+    public async Task InstanceSourceAttribute_GetServiceOrCreateInstance_UsesConstructorInjection()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton("injected");
+        var serviceProvider = services.BuildServiceProvider();
+
+        var graphType = new AutoRegisteringObjectGraphType<GetServiceOrCreateInstanceWithDependencyClass>();
+        var fieldType = graphType.Fields.Find("GetValue")!;
+
+        var context = new ResolveFieldContext
+        {
+            RequestServices = serviceProvider,
+            FieldDefinition = fieldType,
+        };
+
+        var result = await fieldType.Resolver!.ResolveAsync(context);
+        result.ShouldBe("injected");
+    }
+
+    [Fact]
+    public async Task InstanceSourceAttribute_GetRequiredService_GetsFromDI()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton(new GetRequiredServiceClass { Value = "from-di" });
+        var serviceProvider = services.BuildServiceProvider();
+
+        var graphType = new AutoRegisteringObjectGraphType<GetRequiredServiceClass>();
+        var fieldType = graphType.Fields.Find("Value")!;
+
+        var context = new ResolveFieldContext
+        {
+            RequestServices = serviceProvider,
+            FieldDefinition = fieldType,
+        };
+
+        var result = await fieldType.Resolver!.ResolveAsync(context);
+        result.ShouldBe("from-di");
+    }
+
+    [Fact]
+    public async Task InstanceSourceAttribute_GetRequiredService_ThrowsWhenNotInDI()
+    {
+        var services = new ServiceCollection();
+        var serviceProvider = services.BuildServiceProvider();
+
+        var graphType = new AutoRegisteringObjectGraphType<GetRequiredServiceClass>();
+        var fieldType = graphType.Fields.Find("Value")!;
+
+        var context = new ResolveFieldContext
+        {
+            RequestServices = serviceProvider,
+            FieldDefinition = fieldType,
+        };
+
+        var ex = await Should.ThrowAsync<InvalidOperationException>(
+            async () => await fieldType.Resolver!.ResolveAsync(context));
+        ex.Message.ShouldContain("GetRequiredServiceClass");
+    }
+
+    [Fact]
+    public async Task InstanceSourceAttribute_NewInstance_CreatesNewInstanceEachTime()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton(new NewInstanceClass { Value = "from-di" });
+        var serviceProvider = services.BuildServiceProvider();
+
+        var graphType = new AutoRegisteringObjectGraphType<NewInstanceClass>();
+        var fieldType = graphType.Fields.Find("Value")!;
+
+        var context = new ResolveFieldContext
+        {
+            RequestServices = serviceProvider,
+            FieldDefinition = fieldType,
+        };
+
+        // Even though it's registered in DI, NewInstance should create a new instance
+        var result = await fieldType.Resolver!.ResolveAsync(context);
+        result.ShouldBe("default");
+    }
+
+    [Fact]
+    public async Task InstanceSourceAttribute_NewInstance_UsesConstructorInjection()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton("injected");
+        var serviceProvider = services.BuildServiceProvider();
+
+        var graphType = new AutoRegisteringObjectGraphType<NewInstanceWithDependencyClass>();
+        var fieldType = graphType.Fields.Find("GetValue")!;
+
+        var context = new ResolveFieldContext
+        {
+            RequestServices = serviceProvider,
+            FieldDefinition = fieldType,
+        };
+
+        var result = await fieldType.Resolver!.ResolveAsync(context);
+        result.ShouldBe("injected");
+    }
+
+    [Fact]
+    public async Task InstanceSourceAttribute_GetServiceOrCreateInstance_InjectsIServiceProvider()
+    {
+        var services = new ServiceCollection();
+        var serviceProvider = services.BuildServiceProvider();
+
+        var graphType = new AutoRegisteringObjectGraphType<GetServiceOrCreateInstanceWithIServiceProviderClass>();
+        var fieldType = graphType.Fields.Find("GetValue")!;
+
+        var context = new ResolveFieldContext
+        {
+            RequestServices = serviceProvider,
+            FieldDefinition = fieldType,
+        };
+
+        var result = await fieldType.Resolver!.ResolveAsync(context);
+        result.ShouldBe(serviceProvider);
+    }
+
+    [Fact]
+    public async Task InstanceSourceAttribute_GetServiceOrCreateInstance_InjectsIResolveFieldContext()
+    {
+        var services = new ServiceCollection();
+        var serviceProvider = services.BuildServiceProvider();
+
+        var graphType = new AutoRegisteringObjectGraphType<GetServiceOrCreateInstanceWithIResolveFieldContextClass>();
+        var fieldType = graphType.Fields.Find("GetValue")!;
+
+        var context = new ResolveFieldContext
+        {
+            RequestServices = serviceProvider,
+            FieldDefinition = fieldType,
+        };
+
+        var result = await fieldType.Resolver!.ResolveAsync(context);
+        result.ShouldBe(context);
+    }
+
+    [Fact]
+    public async Task InstanceSourceAttribute_NewInstance_InjectsIServiceProvider()
+    {
+        var services = new ServiceCollection();
+        var serviceProvider = services.BuildServiceProvider();
+
+        var graphType = new AutoRegisteringObjectGraphType<NewInstanceWithIServiceProviderClass>();
+        var fieldType = graphType.Fields.Find("GetValue")!;
+
+        var context = new ResolveFieldContext
+        {
+            RequestServices = serviceProvider,
+            FieldDefinition = fieldType,
+        };
+
+        var result = await fieldType.Resolver!.ResolveAsync(context);
+        result.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public async Task InstanceSourceAttribute_NewInstance_InjectsIResolveFieldContext()
+    {
+        var services = new ServiceCollection();
+        var serviceProvider = services.BuildServiceProvider();
+
+        var graphType = new AutoRegisteringObjectGraphType<NewInstanceWithIResolveFieldContextClass>();
+        var fieldType = graphType.Fields.Find("GetValue")!;
+
+        var context = new ResolveFieldContext
+        {
+            RequestServices = serviceProvider,
+            FieldDefinition = fieldType,
+        };
+
+        var result = await fieldType.Resolver!.ResolveAsync(context);
+        result.ShouldBe(context);
+    }
+
+    [Fact]
+    public async Task InstanceSourceAttribute_ThrowsWhenRequestServicesNotAvailable()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<GetServiceOrCreateInstanceClass>();
+        var fieldType = graphType.Fields.Find("Value")!;
+
+        var context = new ResolveFieldContext
+        {
+            FieldDefinition = fieldType,
+        };
+
+        await Should.ThrowAsync<MissingRequestServicesException>(
+            async () => await fieldType.Resolver!.ResolveAsync(context));
+    }
+
+    [InstanceSource(InstanceSource.ContextSource)]
+    private class ContextSourceClass
+    {
+        public string Value { get; set; } = "default";
+    }
+
+    [InstanceSource(InstanceSource.GetServiceOrCreateInstance)]
+    private class GetServiceOrCreateInstanceClass
+    {
+        public string Value { get; set; } = "default";
+    }
+
+    [InstanceSource(InstanceSource.GetServiceOrCreateInstance)]
+    private class GetServiceOrCreateInstanceWithDependencyClass
+    {
+        private readonly string _dependency;
+
+        public GetServiceOrCreateInstanceWithDependencyClass(string dependency)
+        {
+            _dependency = dependency;
+        }
+
+        public string GetValue() => _dependency;
+    }
+
+    [InstanceSource(InstanceSource.GetRequiredService)]
+    private class GetRequiredServiceClass
+    {
+        public string Value { get; set; } = "default";
+    }
+
+    [InstanceSource(InstanceSource.NewInstance)]
+    private class NewInstanceClass
+    {
+        public string Value { get; set; } = "default";
+    }
+
+    [InstanceSource(InstanceSource.NewInstance)]
+    private class NewInstanceWithDependencyClass
+    {
+        private readonly string _dependency;
+
+        public NewInstanceWithDependencyClass(string dependency)
+        {
+            _dependency = dependency;
+        }
+
+        public string GetValue() => _dependency;
+    }
+
+    [InstanceSource(InstanceSource.GetServiceOrCreateInstance)]
+    private class GetServiceOrCreateInstanceWithIServiceProviderClass
+    {
+        private readonly IServiceProvider _serviceProvider;
+
+        public GetServiceOrCreateInstanceWithIServiceProviderClass(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        public IServiceProvider GetValue() => _serviceProvider;
+    }
+
+    [InstanceSource(InstanceSource.GetServiceOrCreateInstance)]
+    private class GetServiceOrCreateInstanceWithIResolveFieldContextClass
+    {
+        private readonly IResolveFieldContext _context;
+
+        public GetServiceOrCreateInstanceWithIResolveFieldContextClass(IResolveFieldContext context)
+        {
+            _context = context;
+        }
+
+        public IResolveFieldContext GetValue() => _context;
+    }
+
+    [InstanceSource(InstanceSource.NewInstance)]
+    private class NewInstanceWithIServiceProviderClass
+    {
+        private readonly IServiceProvider _serviceProvider;
+
+        public NewInstanceWithIServiceProviderClass(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        public IServiceProvider GetValue() => _serviceProvider;
+    }
+
+    [InstanceSource(InstanceSource.NewInstance)]
+    private class NewInstanceWithIResolveFieldContextClass
+    {
+        private readonly IResolveFieldContext _context;
+
+        public NewInstanceWithIResolveFieldContextClass(IResolveFieldContext context)
+        {
+            _context = context;
+        }
+
+        public IResolveFieldContext GetValue() => _context;
+    }
 }
