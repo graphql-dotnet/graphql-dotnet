@@ -71,8 +71,6 @@ public class LegacySchemaTypes : SchemaTypesBase
     [RequiresUnreferencedCode("Automatically builds graph types for enumerables which are not statically referenced.")]
     [RequiresDynamicCode("Automatically builds graph types for enumerables which are not statically referenced.")]
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    [RequiresUnreferencedCode("Automatically builds graph types for enumerables which are not statically referenced.")]
-    [RequiresDynamicCode("Automatically builds graph types for enumerables which are not statically referenced.")]
     public LegacySchemaTypes(ISchema schema, IServiceProvider serviceProvider, IEnumerable<IGraphTypeMappingProvider>? graphTypeMappings, Action<IGraphType>? onBeforeInitialize)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
