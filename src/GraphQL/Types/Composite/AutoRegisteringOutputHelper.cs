@@ -151,9 +151,9 @@ internal static class AutoRegisteringOutputHelper
         var memberScanAttr = typeof(TSourceType).GetCustomAttribute<MemberScanAttribute>(inherit: true);
         var memberTypes = memberScanAttr?.MemberTypes ?? (ScanMemberTypes.Properties | ScanMemberTypes.Methods);
 
-        var scanProperties = (memberTypes & ScanMemberTypes.Properties) == ScanMemberTypes.Properties;
-        var scanFields = (memberTypes & ScanMemberTypes.Fields) == ScanMemberTypes.Fields;
-        var scanMethods = (memberTypes & ScanMemberTypes.Methods) == ScanMemberTypes.Methods;
+        var scanProperties = memberTypes.HasFlag(ScanMemberTypes.Properties);
+        var scanFields = memberTypes.HasFlag(ScanMemberTypes.Fields);
+        var scanMethods = memberTypes.HasFlag(ScanMemberTypes.Methods);
 
         if (typeof(TSourceType).IsInterface)
         {

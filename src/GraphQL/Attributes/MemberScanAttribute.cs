@@ -30,17 +30,17 @@ public sealed class MemberScanAttribute : GraphQLAttribute
 public enum ScanMemberTypes
 {
     /// <summary>
-    /// Properties should be scanned.
+    /// Properties should be scanned. Read-only properties are ignored for input types. Write-only properties are ignored for output types.
     /// </summary>
     Properties = 1,
 
     /// <summary>
-    /// Fields should be scanned.
+    /// Fields should be scanned. Read-only fields are ignored for input types.
     /// </summary>
     Fields = 2,
 
     /// <summary>
-    /// Methods should be scanned.
+    /// Methods should be scanned. This flag is ignored for input types.
     /// </summary>
     Methods = 4,
 }

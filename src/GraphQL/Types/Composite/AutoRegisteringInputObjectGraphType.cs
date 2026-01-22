@@ -109,14 +109,9 @@ public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(Dyn
         var memberScanAttr = typeof(TSourceType).GetCustomAttribute<MemberScanAttribute>();
         var memberTypes = memberScanAttr?.MemberTypes ?? ScanMemberTypes.Properties;
 
-        // For input types, methods are not supported
-        if ((memberTypes & ScanMemberTypes.Methods) == ScanMemberTypes.Methods)
-        {
-            throw new InvalidOperationException($"Methods cannot be scanned for input types. Remove ScanMemberTypes.Methods from {nameof(MemberScanAttribute)} on type {typeof(TSourceType).GetFriendlyName()}.");
-        }
-
-        var scanProperties = (memberTypes & ScanMemberTypes.Properties) == ScanMemberTypes.Properties;
-        var scanFields = (memberTypes & ScanMemberTypes.Fields) == ScanMemberTypes.Fields;
+        // Note: for input types, methods are not skipped regardless of the attribute setting, as the same attribute may be used for output types
+        var scanProperties = memberTypes.HasFlag(ScanMemberTypes.Properties);
+        var scanFields = memberTypes.HasFlag(ScanMemberTypes.Fields);
 
         List<MemberInfo> members = [];
 
@@ -143,8 +138,9 @@ public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(Dyn
 
         if (scanFields)
         {
-            // get public instance fields
-            var fields = typeof(TSourceType).GetFields(BindingFlags.Public | BindingFlags.Instance);
+            // get public instance fields which are not readonly
+            var fields = typeof(TSourceType).GetFields(BindingFlags.Public | BindingFlags.Instance)
+                .Where(x => !x.IsInitOnly);
             members.AddRange(fields);
         }
 
