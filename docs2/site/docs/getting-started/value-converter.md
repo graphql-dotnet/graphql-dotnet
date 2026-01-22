@@ -349,23 +349,27 @@ By explicitly registering each list type with `RegisterListConverter`, you ensur
 
 ### AOT-Compatible List Registration Pattern
 
-For each list type your schema uses, follow this pattern:
+For each list type your schema uses, register converters with concrete element types. Here are common patterns:
 
 ```csharp
 // For arrays (usually not needed as arrays work by default)
 this.ValueConverter.RegisterListConverter<int[], int>(items => items.ToArray());
 
-// For List<T>
-this.ValueConverter.RegisterListConverter<List<T>, T>(items => items.ToList());
+// For List<T> with different element types
+this.ValueConverter.RegisterListConverter<List<int>, int>(items => items.ToList());
+this.ValueConverter.RegisterListConverter<List<string>, string>(items => items.ToList());
 
-// For HashSet<T>
-this.ValueConverter.RegisterListConverter<HashSet<T>, T>(items => items.ToHashSet());
+// For HashSet<T> with different element types
+this.ValueConverter.RegisterListConverter<HashSet<int>, int>(items => items.ToHashSet());
+this.ValueConverter.RegisterListConverter<HashSet<string>, string>(items => items.ToHashSet());
 
-// For ImmutableList<T> (.NET Core 1.0+)
-this.ValueConverter.RegisterListConverter<ImmutableList<T>, T>(items => items.ToImmutableList());
+// For ImmutableList<T> (requires System.Collections.Immutable package)
+this.ValueConverter.RegisterListConverter<ImmutableList<int>, int>(items => items.ToImmutableList());
+this.ValueConverter.RegisterListConverter<ImmutableList<string>, string>(items => items.ToImmutableList());
 
 // For custom types with constructor accepting IEnumerable<T>
-this.ValueConverter.RegisterListConverter<MyList<T>, T>(items => new MyList<T>(items));
+this.ValueConverter.RegisterListConverter<MyList<int>, int>(items => new MyList<int>(items));
+this.ValueConverter.RegisterListConverter<MyList<string>, string>(items => new MyList<string>(items));
 ```
 
 **Important:** You must register a converter for **each element type** you use. For example, if your schema has fields that return `List<int>` and `List<string>`, you need to register both:
