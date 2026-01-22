@@ -45,23 +45,25 @@ public class AutoRegisteringGraphTypeMappingProvider : IGraphTypeMappingProvider
         if (preferredType != null)
             return preferredType;
 
-        if (isInputType && !_mapInputTypes && !IsForcedType(clrType) ||
-            !isInputType && !_mapOutputTypes && !IsForcedType(clrType))
+        // Check if this type has MapAutoClrTypeAttribute and get the CLR type from it if specified
+        var attribute = clrType.GetCustomAttribute<MapAutoClrTypeAttribute>();
+        var mappingClrType = attribute?.ClrType ?? clrType;
+        
+        if (isInputType && !_mapInputTypes && attribute == null ||
+            !isInputType && !_mapOutputTypes && attribute == null)
             return null;
 
         if (isInputType)
         {
-            return typeof(AutoRegisteringInputObjectGraphType<>).MakeGenericType(clrType);
+            return typeof(AutoRegisteringInputObjectGraphType<>).MakeGenericType(mappingClrType);
         }
-        else if (clrType.IsInterface && _mapInterfaceTypes)
+        else if (mappingClrType.IsInterface && _mapInterfaceTypes)
         {
-            return typeof(AutoRegisteringInterfaceGraphType<>).MakeGenericType(clrType);
+            return typeof(AutoRegisteringInterfaceGraphType<>).MakeGenericType(mappingClrType);
         }
         else
         {
-            return typeof(AutoRegisteringObjectGraphType<>).MakeGenericType(clrType);
+            return typeof(AutoRegisteringObjectGraphType<>).MakeGenericType(mappingClrType);
         }
-
-        static bool IsForcedType(Type type) => type.GetCustomAttribute<MapAutoClrTypeAttribute>() != null;
     }
 }

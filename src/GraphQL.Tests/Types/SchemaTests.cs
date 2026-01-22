@@ -264,6 +264,26 @@ public class SchemaTests
         field2.ResolvedType.ShouldBeSameAs(objType);
     }
 
+    [Fact]
+    public void map_auto_clr_type_with_clr_type_property()
+    {
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .AddSchema<MapAutoClrTypeWithClrTypeSchema>()
+            .AddAutoClrMappings(false, false)
+            .AddSystemTextJson()
+        );
+        var provider = services.BuildServiceProvider();
+        var schema = provider.GetRequiredService<ISchema>();
+        schema.Initialize();
+        var parent = schema.Query;
+        var field = parent.Fields.Find("testField").ShouldNotBeNull();
+        // The field should use TargetClrType as the GraphQL type's source type
+        var graphType = field.ResolvedType.ShouldBeOfType<AutoRegisteringObjectGraphType<MapAutoClrTypeWithClrTypeSchema.TargetClrType>>();
+        graphType.ShouldNotBeNull();
+        graphType.Name.ShouldBe("Target");
+    }
+
     private class MyAuto<T> : AutoRegisteringObjectGraphType<T>;
     private class AutoMapSchema : Schema
     {
@@ -283,6 +303,31 @@ public class SchemaTests
         public class ObjType
         {
             public static string Hello => "world";
+        }
+    }
+
+    private class MapAutoClrTypeWithClrTypeSchema : Schema
+    {
+        public MapAutoClrTypeWithClrTypeSchema(IServiceProvider provider) : base(provider)
+        {
+            var query = new ObjectGraphType
+            {
+                Name = "Query",
+            };
+            // Field references GraphTypeWithClrTypeAttribute, which has MapAutoClrType with ClrType set to TargetClrType
+            query.Field<GraphTypeWithClrTypeAttribute>("testField", true).Resolve(_ => new TargetClrType());
+            Query = query;
+        }
+
+        [MapAutoClrType(ClrType = typeof(TargetClrType))]
+        public class GraphTypeWithClrTypeAttribute
+        {
+        }
+
+        [Name("Target")]
+        public class TargetClrType
+        {
+            public string Value { get; set; } = "test";
         }
     }
 }

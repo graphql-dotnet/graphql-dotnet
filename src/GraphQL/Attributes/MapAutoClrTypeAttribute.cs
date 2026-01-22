@@ -9,4 +9,9 @@ namespace GraphQL;
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
 public sealed class MapAutoClrTypeAttribute : Attribute
 {
+    /// <summary>
+    /// Gets or sets the CLR type to use for the mapping. If not set, the type that the attribute
+    /// is applied to will be used.
+    /// </summary>
+    public Type? ClrType { get; set; }
 }
