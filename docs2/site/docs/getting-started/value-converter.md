@@ -502,8 +502,6 @@ Field<StringGraphType>("updateTask")
 
 2. **Use per-schema converters appropriately**: Since each schema has its own `ValueConverter` instance, register conversions specific to each schema. If you need shared conversions across multiple schemas, consider creating a base schema class or a shared initialization method.
 
-3. **Avoid circular conversions**: Don't register conversions that could create circular dependencies (e.g., A→B and B→A).
-
 3. **Consider AOT compatibility**: If you plan to deploy with Native AOT, test your custom converters in an AOT environment.
 
 4. **Document custom conversions**: If you register custom conversions, document them for maintainability.
