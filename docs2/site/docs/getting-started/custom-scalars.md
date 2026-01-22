@@ -518,6 +518,9 @@ public class MySchema : Schema
 }
 ```
 
+For more information about the value converter, including list converters, AOT compatibility, and advanced usage,
+see the [ValueConverter](value-converter.md) documentation page.
+
 ## Null values
 
 Custom scalars process and handle null values during serialization and deserialization. For instance,
