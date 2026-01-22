@@ -62,6 +62,32 @@ public class AssemblyExtensionTests
         typeof(IGraphQLBuilder).Assembly.GetNuGetVersion().ShouldNotBeNull().ShouldEndWith("-preview");
     }
 
+    [Fact]
+    public void GetClrTypeMappings_WithClrTypeMappingAttribute()
+    {
+        GetClrTypeMappings_Test(
+            new Type[]
+            {
+                typeof(MyClass1),
+                typeof(MyClass2),
+                typeof(GraphWithClrTypeMapping),
+                typeof(GraphWithClrTypeMappingOverride),
+                typeof(GraphWithClrTypeMappingNoBase),
+                typeof(GraphWithClrTypeMappingInherited),
+                typeof(GraphWithClrTypeMappingAndDoNotMap),
+                typeof(BaseGraphWithClrTypeMapping),
+            },
+            new (Type ClrType, Type GraphType)[]
+            {
+                (typeof(MyClass2), typeof(GraphWithClrTypeMapping)),
+                (typeof(MyClass2), typeof(GraphWithClrTypeMappingOverride)),
+                (typeof(MyClass2), typeof(GraphWithClrTypeMappingNoBase)),
+                (typeof(MyClass2), typeof(GraphWithClrTypeMappingInherited)),
+                (typeof(MyClass2), typeof(BaseGraphWithClrTypeMapping)),
+                // GraphWithClrTypeMappingAndDoNotMap should be skipped due to DoNotMapClrTypeAttribute
+            });
+    }
+
     public class MockableAssembly : Assembly
     {
     }
@@ -104,6 +130,45 @@ public class AssemblyExtensionTests
     }
 
     public class MyGenericGraph<T> : ObjectGraphType<int>
+    {
+    }
+
+    public class MyClass2
+    {
+    }
+
+    // Test ClrTypeMappingAttribute specifying a CLR type on a graph type with a base
+    [ClrTypeMapping(typeof(MyClass2))]
+    public class GraphWithClrTypeMapping : ObjectGraphType<MyClass1>
+    {
+    }
+
+    // Test ClrTypeMappingAttribute overriding inferred CLR type
+    [ClrTypeMapping(typeof(MyClass2))]
+    public class GraphWithClrTypeMappingOverride : ObjectGraphType<MyClass1>
+    {
+    }
+
+    // Test ClrTypeMappingAttribute specifying a CLR type on a graph type with no generic base
+    [ClrTypeMapping(typeof(MyClass2))]
+    public class GraphWithClrTypeMappingNoBase : ObjectGraphType
+    {
+    }
+
+    // Test inheritance of ClrTypeMappingAttribute
+    public class GraphWithClrTypeMappingInherited : BaseGraphWithClrTypeMapping
+    {
+    }
+
+    [ClrTypeMapping(typeof(MyClass2))]
+    public class BaseGraphWithClrTypeMapping : ObjectGraphType<MyClass1>
+    {
+    }
+
+    // Test DoNotMapClrTypeAttribute taking priority over ClrTypeMappingAttribute
+    [DoNotMapClrType]
+    [ClrTypeMapping(typeof(MyClass2))]
+    public class GraphWithClrTypeMappingAndDoNotMap : ObjectGraphType<MyClass1>
     {
     }
 }

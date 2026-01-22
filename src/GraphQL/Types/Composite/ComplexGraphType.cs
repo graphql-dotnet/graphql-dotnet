@@ -159,7 +159,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <summary>
     /// Creates a field builder used by Field() methods.
     /// </summary>
-    protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<[NotAGraphType] TReturnType>(string name, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
+    protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<[NotAGraphType] TReturnType>(string name, Type type)
     {
         return FieldBuilder<TSourceType, TReturnType>.Create(name, type);
     }
@@ -178,7 +178,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
     /// <typeparam name="TReturnType">The return type of the field resolver.</typeparam>
     /// <param name="name">The name of the field.</param>
-    public virtual FieldBuilder<TSourceType, TReturnType> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType, [NotAGraphType] TReturnType>(string name)
+    public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, [NotAGraphType] TReturnType>(string name)
         where TGraphType : IGraphType
     {
         var builder = CreateBuilder<TReturnType>(name, typeof(TGraphType));
@@ -191,7 +191,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// </summary>
     /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
     /// <param name="name">The name of the field.</param>
-    public virtual FieldBuilder<TSourceType, object> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(string name)
+    public virtual FieldBuilder<TSourceType, object> Field<TGraphType>(string name)
         where TGraphType : IGraphType
         => Field<TGraphType, object>(name);
 
@@ -222,7 +222,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// </summary>
     /// <param name="type">The .NET type of the graph type of this field.</param>
     /// <param name="name">The name of the field.</param>
-    public virtual FieldBuilder<TSourceType, object> Field(string name, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
+    public virtual FieldBuilder<TSourceType, object> Field(string name, Type type)
     {
         var builder = CreateBuilder<object>(name, type);
         AddField(builder.FieldType);
@@ -260,11 +260,12 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// If expression is not <see cref="MemberExpression"/> and <typeparamref name="TProperty"/> is of value type
     /// the graph type nullability will match the <typeparamref name="TProperty"/> nullability. Otherwise, the field will be not nullable.
     /// </remarks>
+    [RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
     private FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         string name,
         Expression<Func<TSourceType, TProperty>> expression,
         bool? nullable,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type)
+        Type? type)
     {
         try
         {
@@ -331,6 +332,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// If expression is not <see cref="MemberExpression"/> and <typeparamref name="TProperty"/> is of value type
     /// the graph type nullability will match the <typeparamref name="TProperty"/> nullability. Otherwise, the field will be not nullable.
     /// </remarks>
+    [RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
     public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         string name,
         Expression<Func<TSourceType, TProperty>> expression) =>
@@ -347,6 +349,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <param name="name">The name of this field.</param>
     /// <param name="expression">The property of the source object represented within an expression.</param>
     /// <param name="nullable">Indicates if this field should be nullable or not.</param>
+    [RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
     public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         string name,
         Expression<Func<TSourceType, TProperty>> expression,
@@ -363,10 +366,11 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <param name="name">The name of this field.</param>
     /// <param name="expression">The property of the source object represented within an expression.</param>
     /// <param name="type">The graph type of the field.</param>
+    [RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
     public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         string name,
         Expression<Func<TSourceType, TProperty>> expression,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type) =>
+        Type type) =>
         Field(name, expression, nullable: null, type);
 
     /// <summary>
@@ -388,10 +392,11 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// If expression is not <see cref="MemberExpression"/> and <typeparamref name="TProperty"/> is of value type
     /// the graph type nullability will match the <typeparamref name="TProperty"/> nullability. Otherwise, the field will be not nullable.
     /// </remarks>
+    [RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
     private FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         Expression<Func<TSourceType, TProperty>> expression,
         bool? nullable,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type)
+        Type? type)
     {
         string name;
         try
@@ -424,6 +429,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// If expression is not <see cref="MemberExpression"/> and <typeparamref name="TProperty"/> is of value type
     /// the graph type nullability will match the <typeparamref name="TProperty"/> nullability. Otherwise, the field will be not nullable.
     /// </remarks>
+    [RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
     public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         Expression<Func<TSourceType, TProperty>> expression) =>
         Field(expression, nullable: null, type: null);
@@ -439,6 +445,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <typeparam name="TProperty">The return type of the field.</typeparam>
     /// <param name="expression">The property of the source object represented within an expression.</param>
     /// <param name="nullable">Indicates if this field should be nullable or not.</param>
+    [RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
     public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         Expression<Func<TSourceType, TProperty>> expression, bool nullable) =>
         Field(expression, (bool?)nullable, type: null);
@@ -453,13 +460,14 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <typeparam name="TProperty">The return type of the field.</typeparam>
     /// <param name="expression">The property of the source object represented within an expression.</param>
     /// <param name="type">The graph type of the field.</param>
+    [RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
     public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         Expression<Func<TSourceType, TProperty>> expression,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type) =>
+        Type type) =>
         Field(expression, nullable: null, type);
 
     /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType}(string)"/>
-    public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType>(string name)
+    public ConnectionBuilder<TSourceType> Connection<TNodeType>(string name)
         where TNodeType : IGraphType
     {
         var builder = ConnectionBuilder.Create<TNodeType, TSourceType>(name);
@@ -468,7 +476,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     }
 
     /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType}(string)"/>
-    public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType>(string name)
+    public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>(string name)
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
     {
@@ -478,7 +486,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     }
 
     /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType, TConnectionType}(string)"/>
-    public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TConnectionType>(string name)
+    public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>(string name)
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
         where TConnectionType : ConnectionType<TNodeType, TEdgeType>

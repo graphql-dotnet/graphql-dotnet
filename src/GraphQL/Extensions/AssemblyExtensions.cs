@@ -20,7 +20,8 @@ internal static class AssemblyExtensions
     /// <see cref="InputObjectGraphType{TSourceType}"/>, or <see cref="EnumerationGraphType{TEnum}"/>, and
     /// returns a list of mappings between matched classes and the source type or underlying enum type.
     /// Skips classes where the source type is <see cref="object"/>, or where the class is marked with
-    /// the <see cref="DoNotMapClrTypeAttribute"/>.
+    /// the <see cref="DoNotMapClrTypeAttribute"/>. The <see cref="ClrTypeMappingAttribute"/> can be used
+    /// to specify or override the CLR type mapping.
     /// </summary>
     [RequiresUnreferencedCode("Calls System.Reflection.Assembly.GetTypes()")]
     public static List<(Type ClrType, Type GraphType)> GetClrTypeMappings(this Assembly assembly)
@@ -43,6 +44,8 @@ internal static class AssemblyExtensions
             if (graphType.IsDefined(typeof(DoNotMapClrTypeAttribute)))
                 continue;
 
+            Type? clrType = null;
+
             //start with the base type
             var baseType = graphType.BaseType;
             while (baseType != null)
@@ -55,11 +58,7 @@ internal static class AssemblyExtensions
                 if (baseType.IsConstructedGenericType && _typesToRegister.Contains(baseType.GetGenericTypeDefinition()))
                 {
                     //get the base type
-                    var clrType = baseType.GetGenericArguments()[0];
-
-                    //as long as it's not of type 'object', register it
-                    if (clrType != typeof(object) && !clrType.IsDefined(typeof(DoNotMapClrTypeAttribute)))
-                        typeMappings.Add((clrType, graphType));
+                    clrType = baseType.GetGenericArguments()[0];
 
                     //skip to the next type
                     break;
@@ -68,6 +67,15 @@ internal static class AssemblyExtensions
                 //look up the inheritance chain for a match
                 baseType = baseType.BaseType;
             }
+
+            //check for ClrTypeMappingAttribute to specify or override the CLR type
+            var clrTypeMappingAttr = graphType.GetCustomAttribute<ClrTypeMappingAttribute>(inherit: true);
+            if (clrTypeMappingAttr != null)
+                clrType = clrTypeMappingAttr.ClrType;
+
+            //as long as it's not of type 'object', register it
+            if (clrType != null && clrType != typeof(object) && !clrType.IsDefined(typeof(DoNotMapClrTypeAttribute)))
+                typeMappings.Add((clrType, graphType));
         }
 
         //return the list of type mappings

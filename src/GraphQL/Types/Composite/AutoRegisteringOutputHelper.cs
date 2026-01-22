@@ -21,6 +21,7 @@ internal static class AutoRegisteringOutputHelper
     /// <see cref="AutoRegisteringObjectGraphType{TSourceType}.GetArgumentInformation{TParameterType}(FieldType, ParameterInfo)">GetArgumentInformation</see>, building
     /// a list of query arguments and expressions as necessary. Then a field resolver is built around the method.
     /// </summary>
+    [RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
     public static void BuildFieldType(
         MemberInfo memberInfo,
         FieldType fieldType,
@@ -144,6 +145,7 @@ internal static class AutoRegisteringOutputHelper
     /// The <see cref="MemberScanAttribute"/> can be applied to <typeparamref name="TSourceType"/> to control
     /// which member types are scanned. By default, only properties and methods are scanned (not fields).
     /// </summary>
+    [RequiresUnreferencedCode("This method scans the specified type for public properties and methods including on base types.")]
     public static IEnumerable<MemberInfo> GetRegisteredMembers<TSourceType>(Expression<Func<TSourceType, object?>>[]? excludedProperties)
     {
         // Check for MemberScanAttribute to determine which member types to scan

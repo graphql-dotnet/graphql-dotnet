@@ -28,12 +28,16 @@ public class AutoRegisteringObjectGraphType<[DynamicallyAccessedMembers(Dynamica
     /// so that the instance will be cached with the customizations. Also note that <see cref="ObjectGraphType{TSourceType}.Interfaces"/>
     /// will reference a shared instance of <see cref="Interfaces"/> when restored from the cache and must not be modified further.
     /// </summary>
+    [RequiresUnreferencedCode("Scans the specified type for public methods and properties, which may not be statically referenced.")]
+    [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
     public AutoRegisteringObjectGraphType() : this(null) { }
 
     /// <summary>
     /// Creates a GraphQL type from <typeparamref name="TSourceType"/> by specifying fields to exclude from registration.
     /// </summary>
     /// <param name="excludedProperties">Expressions for excluding fields, for example 'o => o.Age'.</param>
+    [RequiresUnreferencedCode("Scans the specified type for public methods and properties, which may not be statically referenced.")]
+    [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
     public AutoRegisteringObjectGraphType(params Expression<Func<TSourceType, object?>>[]? excludedProperties)
         : this(
             GlobalSwitches.EnableReflectionCaching && excludedProperties == null && AutoRegisteringObjectGraphType.ReflectionCache.TryGetValue(typeof(TSourceType), out var cacheEntry)
@@ -44,7 +48,7 @@ public class AutoRegisteringObjectGraphType<[DynamicallyAccessedMembers(Dynamica
     {
     }
 
-    internal AutoRegisteringObjectGraphType(AutoRegisteringObjectGraphType<TSourceType>? cloneFrom, Expression<Func<TSourceType, object?>>[]? excludedProperties, bool cache)
+    private AutoRegisteringObjectGraphType(AutoRegisteringObjectGraphType<TSourceType>? cloneFrom, Expression<Func<TSourceType, object?>>[]? excludedProperties, bool cache)
         : base(cloneFrom)
     {
         // if copying a cached instance, just return the instance
@@ -106,6 +110,8 @@ public class AutoRegisteringObjectGraphType<[DynamicallyAccessedMembers(Dynamica
         => AutoRegisteringHelper.CreateField(this, memberInfo, GetTypeInformation, BuildFieldType, false);
 
     /// <inheritdoc cref="AutoRegisteringOutputHelper.BuildFieldType(MemberInfo, FieldType, Func{MemberInfo, LambdaExpression}?, Func{Type, Func{FieldType, ParameterInfo, ArgumentInformation}}, Action{ParameterInfo, QueryArgument}, Func{Type, Func{ArgumentInformation, LambdaExpression?}})"/>
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
     protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
     {
         Func<Type, Func<FieldType, ParameterInfo, ArgumentInformation>> getTypedArgumentInfoMethod =
@@ -187,6 +193,8 @@ public class AutoRegisteringObjectGraphType<[DynamicallyAccessedMembers(Dynamica
         => AutoRegisteringOutputHelper.GetArgumentInformation<TSourceType>(GetTypeInformation(parameterInfo), fieldType, parameterInfo);
 
     /// <inheritdoc cref="AutoRegisteringOutputHelper.GetRegisteredMembers{TSourceType}(Expression{Func{TSourceType, object?}}[])"/>
+    [UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with 'RequiresUnreferencedCodeAttribute' may break functionality when trimming application code.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     protected virtual IEnumerable<MemberInfo> GetRegisteredMembers()
         => AutoRegisteringOutputHelper.GetRegisteredMembers(_excludedProperties);
 

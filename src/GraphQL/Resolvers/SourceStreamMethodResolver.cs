@@ -19,12 +19,14 @@ public class SourceStreamMethodResolver : MemberResolver, ISourceStreamResolver
     /// An example of an instance expression would be as follows:
     /// <code>context =&gt; (TSourceType)context.Source</code>
     /// </summary>
+    [RequiresDynamicCode("Calls MemberResolver constructor which calls a generic method and compiles a lambda at runtime.")]
     public SourceStreamMethodResolver(MethodInfo methodInfo, LambdaExpression instanceExpression, IList<LambdaExpression> methodArgumentExpressions)
         : base(methodInfo, instanceExpression, methodArgumentExpressions)
     {
     }
 
     /// <inheritdoc/>
+    [RequiresDynamicCode("Calls MakeGenericMethod and MakeGenericType. The native code for this instantiation might not be available at runtime.")]
     protected override Func<IResolveFieldContext, ValueTask<object?>> BuildFieldResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
     {
         _sourceStreamResolver = BuildSourceStreamResolver(resolveFieldContextParameter, bodyExpression);
@@ -34,6 +36,7 @@ public class SourceStreamMethodResolver : MemberResolver, ISourceStreamResolver
     /// <summary>
     /// Creates an appropriate event stream resolver function based on the return type of the expression body.
     /// </summary>
+    [RequiresDynamicCode("Calls MakeGenericMethod and MakeGenericType. The native code for this instantiation might not be available at runtime.")]
     protected virtual Func<IResolveFieldContext, ValueTask<IObservable<object?>>> BuildSourceStreamResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
     {
         // ValueTask<IObservable<object?>>
