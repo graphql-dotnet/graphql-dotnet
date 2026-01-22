@@ -105,6 +105,7 @@ public class MessageObservable : IObservable<Message>
             if (source == null)
                 return;
                 
+            // observer is guaranteed to be non-null if source is non-null
             var observer = Interlocked.Exchange(ref _observer, null);
             
             lock (source._lock)
