@@ -48,7 +48,7 @@ public class AutoRegisteringObjectGraphType<[DynamicallyAccessedMembers(Dynamica
     {
     }
 
-    internal AutoRegisteringObjectGraphType(AutoRegisteringObjectGraphType<TSourceType>? cloneFrom, Expression<Func<TSourceType, object?>>[]? excludedProperties, bool cache)
+    private AutoRegisteringObjectGraphType(AutoRegisteringObjectGraphType<TSourceType>? cloneFrom, Expression<Func<TSourceType, object?>>[]? excludedProperties, bool cache)
         : base(cloneFrom)
     {
         // if copying a cached instance, just return the instance

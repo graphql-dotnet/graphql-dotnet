@@ -68,6 +68,8 @@ public class LegacySchemaTypes : SchemaTypesBase
     /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
     /// <param name="graphTypeMappings">A list of <see cref="IGraphTypeMappingProvider"/> instances used to map CLR types to graph types.</param>
     /// <param name="onBeforeInitialize">An optional delegate to call before initializing each graph type.</param>
+    [RequiresUnreferencedCode("Automatically builds graph types for enumerables which are not statically referenced.")]
+    [RequiresDynamicCode("Automatically builds graph types for enumerables which are not statically referenced.")]
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     [RequiresUnreferencedCode("Automatically builds graph types for enumerables which are not statically referenced.")]
     [RequiresDynamicCode("Automatically builds graph types for enumerables which are not statically referenced.")]

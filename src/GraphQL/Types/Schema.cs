@@ -482,7 +482,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
             if (_visitorTypes != null)
             {
                 foreach (var type in _visitorTypes)
-                    yield return (ISchemaNodeVisitor)_services.GetRequiredService(type);
+                    yield return (ISchemaNodeVisitor)this.GetRequiredService(type);
             }
         }
 
@@ -512,7 +512,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
             }
 
             // Apply field-specific middleware before schema-wide middleware (so it runs after schema-wide middleware)
-            new FieldMiddlewareVisitor(_services).Run(this);
+            new FieldMiddlewareVisitor(this).Run(this);
 
             // Apply schema-wide middleware
             _allTypes.ApplyMiddleware(FieldMiddleware, this);
@@ -538,7 +538,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     /// </remarks>
     protected virtual SchemaTypesBase CreateSchemaTypes()
     {
-        var graphTypeMappingProviders = (IEnumerable<IGraphTypeMappingProvider>?)_services.GetService(typeof(IEnumerable<IGraphTypeMappingProvider>));
+        var graphTypeMappingProviders = this.GetService<IEnumerable<IGraphTypeMappingProvider>>();
         graphTypeMappingProviders = graphTypeMappingProviders != null ? _builtInMappingProviders.Concat(graphTypeMappingProviders) : _builtInMappingProviders;
         return new SchemaTypes(this, this, graphTypeMappingProviders, OnBeforeInitializeType);
     }

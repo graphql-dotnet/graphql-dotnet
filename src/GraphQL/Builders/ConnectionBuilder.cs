@@ -17,7 +17,7 @@ public static class ConnectionBuilder
     /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
     /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
     /// <param name="name">The name of the connection.</param>
-    public static ConnectionBuilder<TSourceType> Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [NotAGraphType] TSourceType>(string name)
+    public static ConnectionBuilder<TSourceType> Create<TNodeType, [NotAGraphType] TSourceType>(string name)
         where TNodeType : IGraphType
         => ConnectionBuilder<TSourceType>.Create<TNodeType>(name);
 
@@ -29,7 +29,7 @@ public static class ConnectionBuilder
     /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
     /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
     /// <param name="name">The name of the connection.</param>
-    public static ConnectionBuilder<TSourceType> Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType, [NotAGraphType] TSourceType>(string name)
+    public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, [NotAGraphType] TSourceType>(string name)
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
         => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>(name);
@@ -42,7 +42,7 @@ public static class ConnectionBuilder
     /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
     /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
     /// <param name="name">The name of the connection.</param>
-    public static ConnectionBuilder<TSourceType> Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TConnectionType, [NotAGraphType] TSourceType>(string name)
+    public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, [NotAGraphType] TSourceType>(string name)
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
         where TConnectionType : ConnectionType<TNodeType, TEdgeType>
@@ -85,7 +85,7 @@ public class ConnectionBuilder<[NotAGraphType] TSourceType> : IFieldMetadataWrit
     /// </summary>
     /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
     /// <param name="name">The name of the connection.</param>
-    public static ConnectionBuilder<TSourceType> Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType>(string name)
+    public static ConnectionBuilder<TSourceType> Create<TNodeType>(string name)
         where TNodeType : IGraphType => Create<TNodeType, EdgeType<TNodeType>>(name);
 
     /// <summary>
@@ -95,7 +95,7 @@ public class ConnectionBuilder<[NotAGraphType] TSourceType> : IFieldMetadataWrit
     /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
     /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
     /// <param name="name">The name of the connection.</param>
-    public static ConnectionBuilder<TSourceType> Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType>(string name)
+    public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>(string name)
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
         => Create<TNodeType, TEdgeType, ConnectionType<TNodeType, TEdgeType>>(name);
@@ -107,7 +107,7 @@ public class ConnectionBuilder<[NotAGraphType] TSourceType> : IFieldMetadataWrit
     /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
     /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
     /// <param name="name">The name of the connection.</param>
-    public static ConnectionBuilder<TSourceType> Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TConnectionType>(string name)
+    public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>(string name)
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
         where TConnectionType : ConnectionType<TNodeType, TEdgeType>

@@ -178,7 +178,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
     /// <typeparam name="TReturnType">The return type of the field resolver.</typeparam>
     /// <param name="name">The name of the field.</param>
-    public virtual FieldBuilder<TSourceType, TReturnType> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType, [NotAGraphType] TReturnType>(string name)
+    public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, [NotAGraphType] TReturnType>(string name)
         where TGraphType : IGraphType
     {
         var builder = CreateBuilder<TReturnType>(name, typeof(TGraphType));
@@ -191,7 +191,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// </summary>
     /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
     /// <param name="name">The name of the field.</param>
-    public virtual FieldBuilder<TSourceType, object> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(string name)
+    public virtual FieldBuilder<TSourceType, object> Field<TGraphType>(string name)
         where TGraphType : IGraphType
         => Field<TGraphType, object>(name);
 
@@ -222,7 +222,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// </summary>
     /// <param name="type">The .NET type of the graph type of this field.</param>
     /// <param name="name">The name of the field.</param>
-    public virtual FieldBuilder<TSourceType, object> Field(string name, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
+    public virtual FieldBuilder<TSourceType, object> Field(string name, Type type)
     {
         var builder = CreateBuilder<object>(name, type);
         AddField(builder.FieldType);
@@ -467,7 +467,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
         Field(expression, nullable: null, type);
 
     /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType}(string)"/>
-    public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType>(string name)
+    public ConnectionBuilder<TSourceType> Connection<TNodeType>(string name)
         where TNodeType : IGraphType
     {
         var builder = ConnectionBuilder.Create<TNodeType, TSourceType>(name);
@@ -476,7 +476,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     }
 
     /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType}(string)"/>
-    public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType>(string name)
+    public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>(string name)
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
     {
@@ -486,7 +486,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     }
 
     /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType, TConnectionType}(string)"/>
-    public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TConnectionType>(string name)
+    public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>(string name)
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
         where TConnectionType : ConnectionType<TNodeType, TEdgeType>

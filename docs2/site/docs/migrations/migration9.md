@@ -138,6 +138,27 @@ A new `AotSchema` abstract base class has been added to support creating AOT-com
 
 Please see the documentation located (todo) for creating AOT-friendly schemas.
 
+### 6. ClrTypeMappingAttribute for Explicit CLR Type Mappings
+
+A new `ClrTypeMappingAttribute` has been added to allow explicit specification of CLR type mappings when using `AddClrTypeMappings()` or `RegisterTypeMappings()`. This attribute can be used to override the inferred CLR type from generic base classes or to specify a mapping when no generic base is used.
+
+```csharp
+// Override inferred mapping from ObjectGraphType<MyModel>
+[ClrTypeMapping(typeof(MyDto))]
+public class MyGraphType : ObjectGraphType<MyModel> { }
+
+// Specify mapping without generic base
+[ClrTypeMapping(typeof(MyDto))]
+public class MyGraphType : ObjectGraphType { }
+```
+
+The attribute follows these priority rules:
+1. First, the CLR type is inferred from generic base types (e.g., `ObjectGraphType<T>`)
+2. Then, `ClrTypeMappingAttribute` can override that inferred type
+3. Finally, `DoNotMapClrTypeAttribute` takes highest priority and skips the mapping entirely
+
+The attribute is inherited by derived classes and does not allow multiple instances.
+
 ## Breaking Changes
 
 ### 1. Removal of Obsolete Members
@@ -504,3 +525,7 @@ public string GetUserName([MyUserContext] MyUserContext userContext)
     return userContext.UserName;
 }
 ```
+
+### 19. Type-first and auto-registering graph types will not function with NativeAOT
+
+For GraphQL.NET v9, NativeAOT compatibility is provided through a source generator; see the New Features section.

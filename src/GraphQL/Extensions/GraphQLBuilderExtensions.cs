@@ -544,7 +544,8 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <see cref="InputObjectGraphType{TSourceType}"/>, or <see cref="EnumerationGraphType{TEnum}"/>, and
     /// registers clr type mappings on the schema between that class and the source type or underlying enum type.
     /// Skips classes where the source type is <see cref="object"/>, or where the class is marked with
-    /// the <see cref="DoNotMapClrTypeAttribute"/>.
+    /// the <see cref="DoNotMapClrTypeAttribute"/>. The <see cref="ClrTypeMappingAttribute"/> can be used
+    /// to specify or override the CLR type mapping.
     /// </summary>
     /// <remarks>
     /// This is equivalent to calling <see cref="SchemaExtensions.RegisterTypeMappings(ISchema)"/>
@@ -559,7 +560,8 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <see cref="InputObjectGraphType{TSourceType}"/>, or <see cref="EnumerationGraphType{TEnum}"/>, and
     /// registers clr type mappings on the schema between that class and the source type or underlying enum type.
     /// Skips classes where the source type is <see cref="object"/>, or where the class is marked with
-    /// the <see cref="DoNotMapClrTypeAttribute"/>.
+    /// the <see cref="DoNotMapClrTypeAttribute"/>. The <see cref="ClrTypeMappingAttribute"/> can be used
+    /// to specify or override the CLR type mapping.
     /// </summary>
     /// <remarks>
     /// This is equivalent to calling <see cref="SchemaExtensions.RegisterTypeMappings(ISchema, Assembly)"/>

@@ -47,7 +47,7 @@ public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(Dyn
     }
 
     [RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
-    internal AutoRegisteringInputObjectGraphType(AutoRegisteringInputObjectGraphType<TSourceType>? cloneFrom, Expression<Func<TSourceType, object?>>[]? excludedProperties, bool cache)
+    private AutoRegisteringInputObjectGraphType(AutoRegisteringInputObjectGraphType<TSourceType>? cloneFrom, Expression<Func<TSourceType, object?>>[]? excludedProperties, bool cache)
         : base(cloneFrom)
     {
         // if copying a cached instance, just return the instance

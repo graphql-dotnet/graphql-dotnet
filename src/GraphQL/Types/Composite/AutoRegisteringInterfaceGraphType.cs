@@ -52,7 +52,9 @@ public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(
     {
     }
 
-    internal AutoRegisteringInterfaceGraphType(AutoRegisteringInterfaceGraphType<TSourceType>? cloneFrom, Expression<Func<TSourceType, object?>>[]? excludedProperties, bool cache)
+    [RequiresUnreferencedCode("Scans the specified type for public methods and properties, which may not be statically referenced.")]
+    [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
+    private AutoRegisteringInterfaceGraphType(AutoRegisteringInterfaceGraphType<TSourceType>? cloneFrom, Expression<Func<TSourceType, object?>>[]? excludedProperties, bool cache)
         : base(cloneFrom)
     {
         // if copying a cached instance, just return the instance

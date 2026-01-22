@@ -220,7 +220,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// <param name="description">The description of the argument.</param>
     /// <param name="configure">A delegate to further configure the argument.</param>
     [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
-    public virtual FieldBuilder<TSourceType, TReturnType> Argument<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TArgumentGraphType>(string name, string? description, Action<QueryArgument>? configure = null)
+    public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, Action<QueryArgument>? configure = null)
         where TArgumentGraphType : IGraphType
         => Argument<TArgumentGraphType>(name, arg =>
         {
@@ -234,7 +234,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
     /// <param name="name">The name of the argument.</param>
     [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
-    public virtual FieldBuilder<TSourceType, TReturnType> Argument<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TArgumentGraphType>(string name)
+    public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name)
         where TArgumentGraphType : IGraphType
         => Argument<TArgumentGraphType>(name, null);
 
@@ -245,7 +245,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// <param name="name">The name of the argument.</param>
     /// <param name="configure">A delegate to further configure the argument.</param>
     [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
-    public virtual FieldBuilder<TSourceType, TReturnType> Argument<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
+    public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
         where TArgumentGraphType : IGraphType
         => Argument(typeof(TArgumentGraphType), name, configure);
 
@@ -297,7 +297,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// <param name="name">The name of the argument.</param>
     /// <param name="configure">A delegate to further configure the argument.</param>
     [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
-    public virtual FieldBuilder<TSourceType, TReturnType> Argument([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type, string name, Action<QueryArgument>? configure = null)
+    public virtual FieldBuilder<TSourceType, TReturnType> Argument(Type type, string name, Action<QueryArgument>? configure = null)
     {
         var arg = new QueryArgument(type)
         {

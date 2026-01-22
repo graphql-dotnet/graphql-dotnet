@@ -19,6 +19,17 @@ namespace GraphQL
     {
         public AotInputTypeAttribute() { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=true, Inherited=false)]
+    public sealed class AotListTypeAttribute<TListType> : GraphQL.AotSchemaAttribute
+    {
+        public AotListTypeAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=true, Inherited=false)]
+    public sealed class AotListTypeAttribute<TListInterface, TListImplementation> : GraphQL.AotSchemaAttribute
+        where TListImplementation : TListInterface
+    {
+        public AotListTypeAttribute() { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=false)]
     public sealed class AotMutationTypeAttribute<T> : GraphQL.AotSchemaAttribute
     {
@@ -105,6 +116,12 @@ namespace GraphQL
         public static readonly object True;
         public static object Boxed(this bool value) { }
         public static object? Boxed(this bool? value) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=true)]
+    public sealed class ClrTypeMappingAttribute : System.Attribute
+    {
+        public ClrTypeMappingAttribute(System.Type clrType) { }
+        public System.Type ClrType { get; }
     }
     public static class ComplexityAnalayzerMetadataExtensions
     {

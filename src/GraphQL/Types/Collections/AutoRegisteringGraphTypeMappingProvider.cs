@@ -41,7 +41,8 @@ public class AutoRegisteringGraphTypeMappingProvider : IGraphTypeMappingProvider
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(AutoRegisteringObjectGraphType<>))]
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(AutoRegisteringInterfaceGraphType<>))]
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(AutoRegisteringInputObjectGraphType<>))]
-    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT",
+        Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
     [UnconditionalSuppressMessage("AOT", "IL2070:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
         Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     public virtual Type? GetGraphTypeFromClrType(Type clrType, bool isInputType, Type? preferredType)

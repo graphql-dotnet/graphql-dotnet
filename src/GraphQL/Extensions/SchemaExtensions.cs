@@ -165,7 +165,7 @@ public static class SchemaExtensions
     /// <param name="clrType">The CLR property type from which to infer the GraphType.</param>
     /// <param name="mode">Which registering mode to use - input only, output only or both.</param>
     [RequiresUnreferencedCode("Please ensure that the CLR type and the related auto-registering graph type are not trimmed by the compiler.")]
-    [RequiresDynamicCode("Calls MakeGenericType to create AutoRegisteringObjectGraphType<T> and AutoRegisteringInputObjectGraphType<T>. The native code for this instantiation might not be available at runtime.")]
+    [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
     public static void AutoRegister(this ISchema schema, Type clrType, AutoRegisteringMode mode = AutoRegisteringMode.Both)
     {
         if (mode.HasFlag(AutoRegisteringMode.Output))
