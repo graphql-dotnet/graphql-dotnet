@@ -174,6 +174,8 @@ public class AutoRegisteringObjectGraphType<[DynamicallyAccessedMembers(Dynamica
     protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
         => _sourceExpression;
 
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "The constructor is marked with RequiresUnreferencedCode.")]
+    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "The constructor is marked with RequiresDynamicCode.")]
     private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression = AutoRegisteringOutputHelper.BuildSourceExpression<TSourceType>();
 
     private static readonly MethodInfo _getArgumentInformationInternalMethodInfo = typeof(AutoRegisteringObjectGraphType<TSourceType>).GetMethod(nameof(GetArgumentInformationInternal), BindingFlags.NonPublic | BindingFlags.Instance)!;
