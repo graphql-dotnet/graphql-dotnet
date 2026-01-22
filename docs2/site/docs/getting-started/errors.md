@@ -10,12 +10,14 @@ exceptions occurring during the execution of a field resolver, such as a timeout
 Input errors and processing errors are returned from the `DocumentExecuter` within the `ExecutionResult.Errors`
 property as a list of `ExecutionError` objects. `ExecutionError` is derived from `Exception`, and the `Message`
 property is serialized [according to the spec](https://spec.graphql.org/October2021/#sec-Errors)
-with location and path information. In addition, by default three additional pieces of information are serialized
+with location and path information. In addition, by default two additional pieces of information are serialized
 to the `extensions` property of the GraphQL error which contain:
 
-* Within `code`, the `Code` property of the `ExecutionError`, if any,
-* Within `codes`, the `Code` property of the `ExecutionError` along with generated codes of any inner exceptions, if any, and
-* Within `data`, the contents of the `ExecutionError.Data` property, which by default contains the data of the inner exception, if any.
+* Within `code`, the `Code` property of the `ExecutionError`, if any, and
+* Within `codes`, the `Code` property of the `ExecutionError` along with generated codes of any inner exceptions, if any.
+
+Note that the `data` property is **not** included in the error extensions by default. To include it, you must
+configure the `ErrorInfoProvider` to set `ExposeData = true` (see [Error Serialization](#error-serialization) below).
 
 Note that by default, messages from unhandled processing errors are masked and a
 generic "Error trying to resolve field '<FIELD_NAME>'." or similar error is returned.
@@ -112,8 +114,9 @@ Processing errors can be thrown back to the caller of `DocumentExecuter.ExecuteA
 `ExecutionOptions.ThrowOnUnhandledException` property to `true`. When this property is set to `false`,
 the default setting, unhandled exceptions are wrapped in an `UnhandledError` and added with a generic
 error message to the `ExecutionResult.Errors` property. Error codes are dynamically generated from the
-inner exceptions of the wrapped exception and also returned along with data contained within the inner
-exception's `Data` property.
+inner exceptions of the wrapped exception and also returned. Data contained within the inner exception's
+`Data` property can also be included in the error response by configuring the error serialization options
+(see [Error Serialization](#error-serialization) below).
 
 You can also handle these processing exceptions by setting a delegate within the
 `ExecutionOptions.UnhandledExceptionDelegate` property. Within the delegate you can log the error message
@@ -207,6 +210,132 @@ and `GraphQL.NewtonsoftJson` packages allow you to configure error serialization
 `IErrorInfoProvider` implementation. If you are using a dependency injection framework, you can register
 the `IErrorInfoProvider` instance and it will be consumed by the `IGraphQLSerializer` implementation
 automatically. Please review the [serialization](../../guides/serialization) documentation for more details.
+
+### Configuring Error Serialization Options
+
+The default `ErrorInfoProvider` implementation provides several options to control what information is
+included in serialized errors. These options are configured via the `ErrorInfoProviderOptions` class:
+
+#### Available Options
+
+Option | Default | Description
+-|-|-
+`ExposeExtensions` | `true` | When `true`, the `extensions` property is included in errors. When `false`, no extensions are serialized regardless of other settings.
+`ExposeCode` | `true` | When `true` and `ExposeExtensions` is `true`, includes the error's `Code` property in `extensions.code`.
+`ExposeCodes` | `true` | When `true` and `ExposeExtensions` is `true`, includes the error's code and all inner exception codes in `extensions.codes` as an array.
+`ExposeData` | `false` | When `true` and `ExposeExtensions` is `true`, includes the contents of `ExecutionError.Data` in `extensions.data`. **Note: This is disabled by default for security reasons.**
+`ExposeExceptionDetails` | `false` | When `true`, exposes detailed exception information including stack traces. **Note: This should only be enabled in development environments.**
+`ExposeExceptionDetailsMode` | `Extensions` | Controls where exception details are placed when `ExposeExceptionDetails` is `true`: `Message` places details in the error message, `Extensions` places details in `extensions.details`.
+
+#### Configuring ErrorInfoProvider
+
+You can configure the `ErrorInfoProvider` in several ways:
+
+**Using dependency injection with IGraphQLBuilder:**
+
+```csharp
+services.AddGraphQL(b => b
+    .AddSchema<MySchema>()
+    .AddErrorInfoProvider(opt => {
+        opt.ExposeData = true;  // Enable data property
+        opt.ExposeExceptionDetails = true;  // Only in development!
+    })
+);
+```
+
+**Creating an instance directly:**
+
+```csharp
+var errorInfoProvider = new ErrorInfoProvider(options =>
+{
+    options.ExposeData = true;
+    options.ExposeExceptionDetails = true;
+    options.ExposeExceptionDetailsMode = ExposeExceptionDetailsMode.Extensions;
+});
+
+var serializer = new GraphQLSerializer(errorInfoProvider);
+```
+
+#### Example Error Outputs
+
+**Default configuration (no data, no details):**
+
+```json
+{
+  "errors": [
+    {
+      "message": "Error trying to resolve field 'product'.",
+      "locations": [{ "line": 3, "column": 5 }],
+      "path": ["product"],
+      "extensions": {
+        "code": "FORMAT",
+        "codes": ["FORMAT"]
+      }
+    }
+  ]
+}
+```
+
+**With ExposeData enabled:**
+
+```json
+{
+  "errors": [
+    {
+      "message": "Error trying to resolve field 'product'.",
+      "locations": [{ "line": 3, "column": 5 }],
+      "path": ["product"],
+      "extensions": {
+        "code": "FORMAT",
+        "codes": ["FORMAT"],
+        "data": {
+          "customKey": "customValue"
+        }
+      }
+    }
+  ]
+}
+```
+
+**With ExposeExceptionDetails enabled (ExposeExceptionDetailsMode = Extensions):**
+
+```json
+{
+  "errors": [
+    {
+      "message": "Error trying to resolve field 'product'.",
+      "locations": [{ "line": 3, "column": 5 }],
+      "path": ["product"],
+      "extensions": {
+        "code": "FORMAT",
+        "codes": ["FORMAT"],
+        "details": "System.FormatException: Input string was not in a correct format.\n   at ..."
+      }
+    }
+  ]
+}
+```
+
+**With ExposeExceptionDetails enabled (ExposeExceptionDetailsMode = Message):**
+
+```json
+{
+  "errors": [
+    {
+      "message": "System.FormatException: Input string was not in a correct format.\n   at ...",
+      "locations": [{ "line": 3, "column": 5 }],
+      "path": ["product"],
+      "extensions": {
+        "code": "FORMAT",
+        "codes": ["FORMAT"]
+      }
+    }
+  ]
+}
+```
+
+> **Security Warning:** Never enable `ExposeExceptionDetails` in production environments as it can expose
+> sensitive information such as file paths, connection strings, and internal implementation details.
 
 ## <a name="ValidationErrors"></a>Validation error reference list
 
