@@ -397,8 +397,7 @@ namespace GraphQL
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the CLR types used by your schema are not trimmed by the compi" +
             "ler.")]
         public static GraphQL.DI.IGraphQLBuilder AddAutoClrMappings(this GraphQL.DI.IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true) { }
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the CLR types used by your schema are not trimmed by the compi" +
-            "ler.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Includes various functionality which does not statically reference members.")]
         public static GraphQL.DI.IGraphQLBuilder AddAutoSchema<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TQueryClrType>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.IConfigureAutoSchema>? configure = null) { }
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are" +
             " not trimmed by the compiler.")]
@@ -446,7 +445,11 @@ namespace GraphQL
             where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypeMappingProvider<TGraphTypeMappingProvider>(this GraphQL.DI.IGraphQLBuilder builder, TGraphTypeMappingProvider instance)
             where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection to scan assemblies for IGraphType implementations. Types may be r" +
+            "emoved when trimming the application.")]
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection to scan assemblies for IGraphType implementations. Types may be r" +
+            "emoved when trimming the application.")]
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
         public static GraphQL.DI.IGraphQLBuilder AddResolveFieldContextAccessor(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
@@ -524,7 +527,7 @@ namespace GraphQL
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions>? action) { }
         public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions, System.IServiceProvider>? action) { }
-        public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments<TLoader>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions, System.IServiceProvider>? action)
+        public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TLoader>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions, System.IServiceProvider>? action)
             where TLoader :  class, GraphQL.PersistedDocuments.IPersistedDocumentLoader { }
         public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TLoader>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions>? action = null)
             where TLoader :  class, GraphQL.PersistedDocuments.IPersistedDocumentLoader { }
