@@ -48,7 +48,7 @@ public class AutoRegisteringGraphTypeMappingProvider : IGraphTypeMappingProvider
         // Check if this type has MapAutoClrTypeAttribute and get the CLR type from it if specified
         var attribute = clrType.GetCustomAttribute<MapAutoClrTypeAttribute>();
         var mappingClrType = attribute?.ClrType ?? clrType;
-        
+
         if (isInputType && !_mapInputTypes && attribute == null ||
             !isInputType && !_mapOutputTypes && attribute == null)
             return null;
