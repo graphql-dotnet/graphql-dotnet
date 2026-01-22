@@ -611,4 +611,128 @@ public class AutoRegisteringInputObjectGraphTypeTests
         schema.Initialize();
         return graphType.ParseDictionary(dictionary, schema.ValueConverter).ShouldBeOfType<T>();
     }
+
+    [Fact]
+    public void MemberScanAttribute_InputType_PropertiesOnly()
+    {
+        var graphType = new AutoRegisteringInputObjectGraphType<InputPropertiesOnlyClass>();
+        graphType.Fields.Find("Property1").ShouldNotBeNull();
+        graphType.Fields.Find("Property2").ShouldNotBeNull();
+        graphType.Fields.Find("Field1").ShouldBeNull();
+    }
+
+    [Fact]
+    public void MemberScanAttribute_InputType_FieldsOnly()
+    {
+        var graphType = new AutoRegisteringInputObjectGraphType<InputFieldsOnlyClass>();
+        graphType.Fields.Find("Property1").ShouldBeNull();
+        graphType.Fields.Find("Field1").ShouldNotBeNull();
+        graphType.Fields.Find("Field2").ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void MemberScanAttribute_InputType_FieldsOnlyDerivedClass()
+    {
+        var graphType = new AutoRegisteringInputObjectGraphType<InputFieldsOnlyDerivedClass>();
+        graphType.Fields.Find("Property1").ShouldBeNull();
+        graphType.Fields.Find("Property2").ShouldBeNull();
+        graphType.Fields.Find("Field1").ShouldNotBeNull();
+        graphType.Fields.Find("Field2").ShouldNotBeNull();
+        graphType.Fields.Find("Field3").ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void MemberScanAttribute_InputType_PropertiesAndFields()
+    {
+        var graphType = new AutoRegisteringInputObjectGraphType<InputPropertiesAndFieldsClass>();
+        graphType.Fields.Find("Property1").ShouldNotBeNull();
+        graphType.Fields.Find("Field1").ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void MemberScanAttribute_InputType_MethodsAreSkipped()
+    {
+        // Methods should be silently ignored for input types, so when Methods-only is specified,
+        // no fields will be present (since properties are not included in the scan)
+        var graphType = new AutoRegisteringInputObjectGraphType<InputMethodsClass>();
+        graphType.Fields.Count.ShouldBe(0); // No fields should be present
+        graphType.Fields.Find("Property1").ShouldBeNull();
+        graphType.Fields.Find("GetData").ShouldBeNull(); // Method should be skipped
+    }
+
+    [Fact]
+    public void MemberScanAttribute_InputType_PropertiesAndMethodsSkipsMethods()
+    {
+        // When both Properties and Methods are specified, methods should be silently ignored
+        var graphType = new AutoRegisteringInputObjectGraphType<InputPropertiesAndMethodsClass>();
+        graphType.Fields.Find("Property1").ShouldNotBeNull();
+        graphType.Fields.Find("Property2").ShouldNotBeNull();
+        graphType.Fields.Find("GetData").ShouldBeNull(); // Method should be skipped
+        graphType.Fields.Find("Field1").ShouldBeNull(); // Field should not be included
+    }
+
+    [Fact]
+    public void MemberScanAttribute_InputType_AllMembersSkipsMethods()
+    {
+        // When all member types are specified, methods should be silently ignored
+        var graphType = new AutoRegisteringInputObjectGraphType<InputAllMembersClass>();
+        graphType.Fields.Find("Property1").ShouldNotBeNull();
+        graphType.Fields.Find("Field1").ShouldNotBeNull();
+        graphType.Fields.Find("GetData").ShouldBeNull(); // Method should be skipped
+    }
+
+    [MemberScan(ScanMemberTypes.Properties)]
+    private class InputPropertiesOnlyClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string Property2 { get; set; } = "prop2";
+        public string Field1 = "field1";
+    }
+
+    [MemberScan(ScanMemberTypes.Fields)]
+    private class InputFieldsOnlyClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string Field1 = "field1";
+        public string Field2 = "field2";
+    }
+
+    [MemberScan(ScanMemberTypes.Properties | ScanMemberTypes.Fields)]
+    private class InputPropertiesAndFieldsClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string Field1 = "field1";
+    }
+
+    [MemberScan(ScanMemberTypes.Methods)]
+    private class InputMethodsClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string GetData() => "data";
+    }
+
+    [MemberScan(ScanMemberTypes.Properties | ScanMemberTypes.Methods)]
+    private class InputPropertiesAndMethodsClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string Property2 { get; set; } = "prop2";
+        public string Field1 = "field1";
+        public string GetData() => "data";
+    }
+
+    [MemberScan(ScanMemberTypes.Properties | ScanMemberTypes.Fields | ScanMemberTypes.Methods)]
+    private class InputAllMembersClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string Field1 = "field1";
+        public string GetData() => "data";
+    }
+
+    [MemberScan(ScanMemberTypes.Fields)]
+    private class InputFieldsOnlyDerivedClass : InputFieldsOnlyClass
+    {
+        public string Property2 { get; set; } = "prop1";
+        public string Field3 = "field1";
+    }
+
 }

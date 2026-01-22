@@ -50,11 +50,13 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
+    [RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
     public InputObjectGraphType()
         : this(null)
     {
     }
 
+    [RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
     internal InputObjectGraphType(InputObjectGraphType<TSourceType>? cloneFrom)
         : base(cloneFrom)
     {
@@ -71,7 +73,8 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
     public bool IsOneOf { get; set; }
 
     /// <inheritdoc/>
-    [RequiresDynamicCode("This method uses dynamic code generation to compile object conversion logic.")]
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
     public override void Initialize(ISchema schema)
     {
         base.Initialize(schema);

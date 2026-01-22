@@ -138,7 +138,63 @@ A new `AotSchema` abstract base class has been added to support creating AOT-com
 
 Please see the documentation located (todo) for creating AOT-friendly schemas.
 
-### 6. InstanceSourceAttribute for Auto-Registering Types
+### 6. ClrTypeMappingAttribute for Explicit CLR Type Mappings
+
+A new `ClrTypeMappingAttribute` has been added to allow explicit specification of CLR type mappings when using `AddClrTypeMappings()` or `RegisterTypeMappings()`. This attribute can be used to override the inferred CLR type from generic base classes or to specify a mapping when no generic base is used.
+
+```csharp
+// Override inferred mapping from ObjectGraphType<MyModel>
+[ClrTypeMapping(typeof(MyDto))]
+public class MyGraphType : ObjectGraphType<MyModel> { }
+
+// Specify mapping without generic base
+[ClrTypeMapping(typeof(MyDto))]
+public class MyGraphType : ObjectGraphType { }
+```
+
+The attribute follows these priority rules:
+1. First, the CLR type is inferred from generic base types (e.g., `ObjectGraphType<T>`)
+2. Then, `ClrTypeMappingAttribute` can override that inferred type
+3. Finally, `DoNotMapClrTypeAttribute` takes highest priority and skips the mapping entirely
+
+The attribute is inherited by derived classes and does not allow multiple instances.
+
+### 7. MemberScanAttribute for Auto-Registering Types
+
+A new `MemberScanAttribute` has been added to control which member types (properties, fields, and/or methods) are scanned when building auto-registering graph types. This attribute provides more control over which members of your CLR types become GraphQL fields.
+
+The attribute accepts a `ScanMemberTypes` enum value (flags enum) that can be combined:
+
+- **`Properties`** - Scan public properties
+- **`Fields`** - Scan public fields
+- **`Methods`** - Scan public methods (not applicable for input objects)
+
+Default behavior:
+- Output types (`AutoRegisteringObjectGraphType<T>`, `AutoRegisteringInterfaceGraphType<T>`): Properties and Methods
+- Input types (`AutoRegisteringInputObjectGraphType<T>`): Properties only
+
+Example usage:
+
+```csharp
+// Scan only methods, excluding properties
+[MemberScan(ScanMemberTypes.Methods)]
+public class QueryMethodsOnly
+{
+    public string Property1 { get; set; }  // Not scanned
+    public string GetData() => "data";     // Scanned
+}
+
+// Scan properties and fields, excluding methods
+[MemberScan(ScanMemberTypes.Properties | ScanMemberTypes.Fields)]
+public class OutputWithFields
+{
+    public string Property1 { get; set; } = "prop";  // Scanned
+    public string Field1 = "field";                  // Scanned
+    public string Method1() => "method";             // Not scanned
+}
+```
+
+### 8. InstanceSourceAttribute for Auto-Registering Types
 
 A new `InstanceSourceAttribute` has been added to control how instances of CLR types are obtained during GraphQL field resolution in auto-registering graph types (`AutoRegisteringObjectGraphType<T>` and `AutoRegisteringInterfaceGraphType<T>`). This attribute provides fine-grained control over instance creation and dependency injection behavior.
 
@@ -564,3 +620,7 @@ public string GetUserName([MyUserContext] MyUserContext userContext)
     return userContext.UserName;
 }
 ```
+
+### 19. Type-first and auto-registering graph types will not function with NativeAOT
+
+For GraphQL.NET v9, NativeAOT compatibility is provided through a source generator; see the New Features section.

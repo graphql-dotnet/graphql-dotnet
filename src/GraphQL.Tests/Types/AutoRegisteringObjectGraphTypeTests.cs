@@ -1309,4 +1309,133 @@ public class AutoRegisteringObjectGraphTypeTests
 
         public IResolveFieldContext GetValue() => _context;
     }
+
+    [Fact]
+    public void MemberScanAttribute_PropertiesOnly()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<PropertiesOnlyClass>();
+        graphType.Fields.Find("Property1").ShouldNotBeNull();
+        graphType.Fields.Find("Property2").ShouldNotBeNull();
+        graphType.Fields.Find("Field1").ShouldBeNull();
+        graphType.Fields.Find("Method1").ShouldBeNull();
+    }
+
+    [Fact]
+    public void MemberScanAttribute_FieldsOnly()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<FieldsOnlyClass>();
+        graphType.Fields.Find("Property1").ShouldBeNull();
+        graphType.Fields.Find("Field1").ShouldNotBeNull();
+        graphType.Fields.Find("Field2").ShouldNotBeNull();
+        graphType.Fields.Find("Method1").ShouldBeNull();
+    }
+
+    [Fact]
+    public void MemberScanAttribute_MethodsOnly()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<MethodsOnlyClass>();
+        graphType.Fields.Find("Property1").ShouldBeNull();
+        graphType.Fields.Find("Field1").ShouldBeNull();
+        graphType.Fields.Find("Method1").ShouldNotBeNull();
+        graphType.Fields.Find("Method2").ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void MemberScanAttribute_PropertiesAndFields()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<PropertiesAndFieldsClass>();
+        graphType.Fields.Find("Property1").ShouldNotBeNull();
+        graphType.Fields.Find("Field1").ShouldNotBeNull();
+        graphType.Fields.Find("Method1").ShouldBeNull();
+    }
+
+    [Fact]
+    public void MemberScanAttribute_None()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<NoneClass>();
+        graphType.Fields.Count.ShouldBe(0);
+    }
+
+    [Fact]
+    public void MemberScanAttribute_AllCombined()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<AllMembersClass>();
+        graphType.Fields.Find("Property1").ShouldNotBeNull();
+        graphType.Fields.Find("Field1").ShouldNotBeNull();
+        graphType.Fields.Find("Method1").ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void MemberScanAttribute_Inheritance()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<DerivedPropertiesOnlyClass>();
+        graphType.Fields.Find("Property1").ShouldNotBeNull();
+        graphType.Fields.Find("Property2").ShouldNotBeNull();
+        graphType.Fields.Find("Field1").ShouldBeNull();
+        graphType.Fields.Find("Method1").ShouldBeNull();
+    }
+
+    [MemberScan(ScanMemberTypes.Properties)]
+    private class PropertiesOnlyClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string Property2 { get; set; } = "prop2";
+        public string Field1 = "field1";
+        public string Method1() => "method1";
+    }
+
+    [MemberScan(ScanMemberTypes.Fields)]
+    private class FieldsOnlyClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string Field1 = "field1";
+        public string Field2 = "field2";
+        public string Method1() => "method1";
+    }
+
+    [MemberScan(ScanMemberTypes.Methods)]
+    private class MethodsOnlyClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string Field1 = "field1";
+        public string Method1() => "method1";
+        public string Method2() => "method2";
+    }
+
+    [MemberScan(ScanMemberTypes.Properties | ScanMemberTypes.Fields)]
+    private class PropertiesAndFieldsClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string Field1 = "field1";
+        public string Method1() => "method1";
+    }
+
+    [MemberScan(0)]
+    private class NoneClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string Field1 = "field1";
+        public string Method1() => "method1";
+    }
+
+    [MemberScan(ScanMemberTypes.Properties | ScanMemberTypes.Fields | ScanMemberTypes.Methods)]
+    private class AllMembersClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string Field1 = "field1";
+        public string Method1() => "method1";
+    }
+
+    [MemberScan(ScanMemberTypes.Properties)]
+    private class BasePropertiesOnlyClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string Field1 = "field1";
+        public string Method1() => "method1";
+    }
+
+    private class DerivedPropertiesOnlyClass : BasePropertiesOnlyClass
+    {
+        public string Property2 { get; set; } = "prop2";
+    }
 }
