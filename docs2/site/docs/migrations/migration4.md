@@ -651,53 +651,7 @@ the directives implementation without mutual influence on the schemas using them
 * `EnumerableExtensions.Apply` for dictionaries has been removed.
 * `ISubscriptionExecuter` has been removed.
 * `EnterLeaveListener` has been removed and the signatures of `INodeVisitor.Enter` and `INodeVisitor.Leave` have
-  changed. `NodeVisitors` class has been added in its place. Additionally, validation rules should now inherit from
-  `ValidationRuleBase` and implement `GetPreNodeVisitorAsync` or `GetPostNodeVisitorAsync` instead of `ValidateAsync`.
-  Use `MatchingNodeVisitor<TNode>` to create node visitors that match specific node types.
-  
-  **Old code (v3.x):**
-  ```csharp
-  public class MyValidationRule : IValidationRule
-  {
-    public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-    {
-      return Task.FromResult(new EnterLeaveListener(_ =>
-      {
-        _.Match<Operation>(op =>
-        {
-          // validation logic for operations
-        });
-        
-        _.Match<Field>(field =>
-        {
-          // validation logic for fields
-        });
-      }));
-    }
-  }
-  ```
-  
-  **New code (v4.x):**
-  ```csharp
-  public class MyValidationRule : ValidationRuleBase
-  {
-    public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
-    {
-      return new ValueTask<INodeVisitor?>(new NodeVisitors(
-        new MatchingNodeVisitor<GraphQLOperationDefinition>((op, ctx) =>
-        {
-          // validation logic for operations
-        }),
-        new MatchingNodeVisitor<GraphQLField>((field, ctx) =>
-        {
-          // validation logic for fields
-        })
-      ));
-    }
-  }
-  ```
-  
-  Note that AST node types have changed: `Operation` is now `GraphQLOperationDefinition`, `Field` is now `GraphQLField`, etc.
+  changed. `NodeVisitors` class has been added in its place.
 * `TypeInfo.GetAncestors()` has been changed to `TypeInfo.GetAncestor(int index)`
 * Various methods within `StringUtils` have been removed; please use extension methods within `StringExtensions` instead.
 * `ISchema.FindDirective`, `ISchema.RegisterDirective`, `ISchema.RegisterDirectives` methods were moved into `SchemaDirectives` class
