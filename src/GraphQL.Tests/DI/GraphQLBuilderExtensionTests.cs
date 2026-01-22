@@ -610,12 +610,12 @@ public class GraphQLBuilderExtensionTests
     {
         // Verify that types with InstanceSourceAttribute that is not ContextSource are skipped
         var typeMappings = System.Reflection.Assembly.GetExecutingAssembly().GetClrTypeMappings();
-        
+
         // These types should be skipped because they have InstanceSource attributes other than ContextSource
         typeMappings.ShouldNotContain(t => t.GraphType == typeof(TestGraphTypeForGetServiceOrCreateInstance));
         typeMappings.ShouldNotContain(t => t.GraphType == typeof(TestGraphTypeForGetRequiredService));
         typeMappings.ShouldNotContain(t => t.GraphType == typeof(TestGraphTypeForNewInstance));
-        
+
         // This type should be included because it has InstanceSource.ContextSource
         typeMappings.ShouldContain(t => t.GraphType == typeof(TestGraphTypeForContextSource));
     }
