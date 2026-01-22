@@ -2268,6 +2268,8 @@ namespace GraphQL.Resolvers
 {
     public class ExpressionFieldResolver<TSourceType, TProperty> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IRequiresResolveFieldContextAccessor
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Calls MemberResolver.BuildFieldResolverInternal which calls a generic method and " +
+            "compiles a lambda at runtime.")]
         public ExpressionFieldResolver(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> property) { }
         public bool RequiresResolveFieldContextAccessor { get; }
     }
@@ -2297,16 +2299,24 @@ namespace GraphQL.Resolvers
     }
     public class MemberResolver : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IRequiresResolveFieldContextAccessor
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
         public MemberResolver(System.Reflection.FieldInfo fieldInfo, System.Linq.Expressions.LambdaExpression? instanceExpression) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
         public MemberResolver(System.Reflection.PropertyInfo propertyInfo, System.Linq.Expressions.LambdaExpression? instanceExpression) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
         public MemberResolver(System.Reflection.MethodInfo methodInfo, System.Linq.Expressions.LambdaExpression? instanceExpression, System.Collections.Generic.IList<System.Linq.Expressions.LambdaExpression> methodArgumentExpressions) { }
         public bool RequiresResolveFieldContextAccessor { get; }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
         protected virtual System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<object?>> BuildFieldResolver(System.Linq.Expressions.ParameterExpression resolveFieldContextParameter, System.Linq.Expressions.Expression bodyExpression) { }
         public virtual System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context) { }
     }
     public class NameFieldResolver : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IRequiresResolveFieldContextAccessor
     {
         public bool RequiresResolveFieldContextAccessor { get; }
+        [get: System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Calls AutoRegisteringHelper.BuildFieldResolver which calls a generic method and c" +
+            "ompiles a lambda at runtime.")]
+        [get: System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Properties intended to be accessed by this resolver may be trimmed by the compile" +
+            "r.")]
         public static GraphQL.Resolvers.NameFieldResolver Instance { get; }
         public System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context) { }
     }
@@ -2318,8 +2328,14 @@ namespace GraphQL.Resolvers
     }
     public class SourceStreamMethodResolver : GraphQL.Resolvers.MemberResolver, GraphQL.Resolvers.ISourceStreamResolver
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Calls MemberResolver constructor which calls a generic method and compiles a lamb" +
+            "da at runtime.")]
         public SourceStreamMethodResolver(System.Reflection.MethodInfo methodInfo, System.Linq.Expressions.LambdaExpression instanceExpression, System.Collections.Generic.IList<System.Linq.Expressions.LambdaExpression> methodArgumentExpressions) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Calls MakeGenericMethod and MakeGenericType. The native code for this instantiati" +
+            "on might not be available at runtime.")]
         protected override System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<object?>> BuildFieldResolver(System.Linq.Expressions.ParameterExpression resolveFieldContextParameter, System.Linq.Expressions.Expression bodyExpression) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Calls MakeGenericMethod and MakeGenericType. The native code for this instantiati" +
+            "on might not be available at runtime.")]
         protected virtual System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<System.IObservable<object?>>> BuildSourceStreamResolver(System.Linq.Expressions.ParameterExpression resolveFieldContextParameter, System.Linq.Expressions.Expression bodyExpression) { }
         public System.Threading.Tasks.ValueTask<System.IObservable<object?>> ResolveStreamAsync(GraphQL.IResolveFieldContext context) { }
     }

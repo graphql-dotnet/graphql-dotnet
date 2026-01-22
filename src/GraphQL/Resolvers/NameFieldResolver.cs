@@ -22,7 +22,12 @@ public class NameFieldResolver : IFieldResolver, IRequiresResolveFieldContextAcc
     /// <summary>
     /// Returns the static instance of the <see cref="NameFieldResolver"/> class.
     /// </summary>
-    public static NameFieldResolver Instance { get; } = new();
+    public static NameFieldResolver Instance
+    {
+        [RequiresDynamicCode("Calls AutoRegisteringHelper.BuildFieldResolver which calls a generic method and compiles a lambda at runtime.")]
+        [RequiresUnreferencedCode("Properties intended to be accessed by this resolver may be trimmed by the compiler.")]
+        get;
+    } = new();
 
     /// <inheritdoc/>
     public bool RequiresResolveFieldContextAccessor => false;
@@ -63,6 +68,10 @@ public class NameFieldResolver : IFieldResolver, IRequiresResolveFieldContextAcc
     /// <param name="target">The type from which you want to get the value.</param>
     /// <param name="name">Property/method name.</param>
     /// <returns>Compiled field resolver.</returns>
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "The Instance property getter is marked with RequiresDynamicCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2070:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
+        Justification = "The Instance property getter is marked with RequiresUnreferencedCodeAttribute.")]
     private static IFieldResolver CreateResolver(Type target, string name)
     {
         var param = Expression.Parameter(typeof(IResolveFieldContext), "context");
