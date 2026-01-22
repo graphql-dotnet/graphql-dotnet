@@ -650,11 +650,35 @@ public class AutoRegisteringInputObjectGraphTypeTests
     }
 
     [Fact]
-    public void MemberScanAttribute_InputType_ThrowsWhenMethodsSpecified()
+    public void MemberScanAttribute_InputType_MethodsAreSkipped()
     {
-        Should.Throw<InvalidOperationException>(
-            () => new AutoRegisteringInputObjectGraphType<InputMethodsClass>())
-            .Message.ShouldContain("Methods cannot be scanned for input types");
+        // Methods should be silently ignored for input types, so when Methods-only is specified,
+        // no fields will be present (since properties are not included in the scan)
+        var graphType = new AutoRegisteringInputObjectGraphType<InputMethodsClass>();
+        graphType.Fields.Count.ShouldBe(0); // No fields should be present
+        graphType.Fields.Find("Property1").ShouldBeNull();
+        graphType.Fields.Find("GetData").ShouldBeNull(); // Method should be skipped
+    }
+
+    [Fact]
+    public void MemberScanAttribute_InputType_PropertiesAndMethodsSkipsMethods()
+    {
+        // When both Properties and Methods are specified, methods should be silently ignored
+        var graphType = new AutoRegisteringInputObjectGraphType<InputPropertiesAndMethodsClass>();
+        graphType.Fields.Find("Property1").ShouldNotBeNull();
+        graphType.Fields.Find("Property2").ShouldNotBeNull();
+        graphType.Fields.Find("GetData").ShouldBeNull(); // Method should be skipped
+        graphType.Fields.Find("Field1").ShouldBeNull(); // Field should not be included
+    }
+
+    [Fact]
+    public void MemberScanAttribute_InputType_AllMembersSkipsMethods()
+    {
+        // When all member types are specified, methods should be silently ignored
+        var graphType = new AutoRegisteringInputObjectGraphType<InputAllMembersClass>();
+        graphType.Fields.Find("Property1").ShouldNotBeNull();
+        graphType.Fields.Find("Field1").ShouldNotBeNull();
+        graphType.Fields.Find("GetData").ShouldBeNull(); // Method should be skipped
     }
 
     [MemberScan(ScanMemberTypes.Properties)]
@@ -684,6 +708,24 @@ public class AutoRegisteringInputObjectGraphTypeTests
     private class InputMethodsClass
     {
         public string Property1 { get; set; } = "prop1";
+        public string GetData() => "data";
+    }
+
+    [MemberScan(ScanMemberTypes.Properties | ScanMemberTypes.Methods)]
+    private class InputPropertiesAndMethodsClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string Property2 { get; set; } = "prop2";
+        public string Field1 = "field1";
+        public string GetData() => "data";
+    }
+
+    [MemberScan(ScanMemberTypes.Properties | ScanMemberTypes.Fields | ScanMemberTypes.Methods)]
+    private class InputAllMembersClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string Field1 = "field1";
+        public string GetData() => "data";
     }
 
     [MemberScan(ScanMemberTypes.Fields)]
