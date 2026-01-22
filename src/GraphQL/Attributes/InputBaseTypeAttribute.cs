@@ -7,7 +7,7 @@ namespace GraphQL;
 /// and changes the base graph type for the generated graph type.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class InputBaseTypeAttribute : GraphQLAttribute
+public class InputBaseTypeAttribute : GraphQLAttribute
 {
     /// <inheritdoc cref="InputBaseTypeAttribute"/>
     public InputBaseTypeAttribute(Type graphType)
@@ -45,15 +45,12 @@ public sealed class InputBaseTypeAttribute : GraphQLAttribute
 }
 
 /// <inheritdoc cref="InputBaseTypeAttribute"/>
-public class InputBaseTypeAttribute<TGraphType> : GraphQLAttribute
+public class InputBaseTypeAttribute<TGraphType> : InputBaseTypeAttribute
     where TGraphType : IGraphType
 {
-    /// <inheritdoc/>
-    public override void Modify(TypeInformation typeInformation)
+    /// <inheritdoc cref="InputBaseTypeAttribute{TGraphType}"/>
+    public InputBaseTypeAttribute()
+        : base(typeof(TGraphType))
     {
-        if (typeInformation.IsInputType)
-        {
-            typeInformation.GraphType = typeof(TGraphType);
-        }
     }
 }
