@@ -56,11 +56,11 @@ Conversions from `string` to:
 ### Other Conversions
 - `int` to `bool` (0 = false, non-zero = true)
 
-See the [source code](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL/Conversion/ValueConverterBase.cs) for the complete list of built-in conversions.
+See the [ValueConverter source code](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL/Conversion/ValueConverter.cs) and [ValueConverterBase source code](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL/Conversion/ValueConverterBase.cs) for the complete list of built-in conversions.
 
 ## Registering Custom Conversions
 
-You can register your own type conversions globally by calling the static `Register` method on `ValueConverter`. This is typically done once during application startup, such as in a static constructor of your schema.
+Each schema has its own `ValueConverter` instance accessible via the `ValueConverter` property (or `Converter` for backward compatibility). You can register custom type conversions on this instance. This is typically done during schema construction in the schema's constructor.
 
 ### Example: Converting a Custom Type to String
 
@@ -83,15 +83,12 @@ public struct Vector3
 
 public class MySchema : Schema
 {
-    static MySchema()
-    {
-        // Register conversion from Vector3 to string
-        ValueConverter.Register<Vector3, string>(v => $"{v.X},{v.Y},{v.Z}");
-    }
-    
     public MySchema()
     {
         Query = new MyQuery();
+        
+        // Register conversion from Vector3 to string
+        this.ValueConverter.Register<Vector3, string>(v => $"{v.X},{v.Y},{v.Z}");
     }
 }
 ```
@@ -113,31 +110,21 @@ public class UserIdInput
     public int Id { get; set; }
 }
 
-static MySchema()
-{
-    // Register conversion from UserIdInput to UserId
-    ValueConverter.Register<UserIdInput, UserId>(input => new UserId { Value = input.Id });
-}
-```
-
-### Registering Converters Per Schema Instance
-
-While the static `Register` method is convenient for global conversions, you can also register conversions for a specific schema instance. Each schema has its own `ValueConverter` instance accessible via the `Converter` property:
-
-```csharp
 public class MySchema : Schema
 {
     public MySchema()
     {
         Query = new MyQuery();
         
-        // Register a schema-specific conversion
-        this.Converter.Register<MyCustomType, string>(value => value.ToString());
+        // Register conversion from UserIdInput to UserId
+        this.ValueConverter.Register<UserIdInput, UserId>(input => new UserId { Value = input.Id });
     }
 }
 ```
 
-Schema-specific converters are useful when different schemas need different conversion behaviors.
+### Schema-Specific vs Shared Converters
+
+Since each schema has its own `ValueConverter` instance, conversions registered on one schema do not affect other schemas. This is useful when different schemas need different conversion behaviors. If you need to share conversions across multiple schemas, you can create a base schema class that registers common conversions, or register them in a shared initialization method called by each schema.
 
 ## List Converters
 
@@ -193,13 +180,18 @@ public class MyCustomList<T> : IList<T>
     }
 }
 
-static MySchema()
+public class MySchema : Schema
 {
-    // Register the custom list type
-    ValueConverter.RegisterListConverterFactory(
-        typeof(MyCustomList<>), 
-        typeof(MyCustomList<>)
-    );
+    public MySchema()
+    {
+        Query = new MyQuery();
+        
+        // Register the custom list type
+        this.ValueConverter.RegisterListConverterFactory(
+            typeof(MyCustomList<>), 
+            typeof(MyCustomList<>)
+        );
+    }
 }
 ```
 
@@ -231,12 +223,18 @@ public class MyListConverterFactory : IListConverterFactory
     }
 }
 
-static MySchema()
+public class MySchema : Schema
 {
-    ValueConverter.RegisterListConverterFactory(
-        typeof(MyCustomList<>), 
-        new MyListConverterFactory()
-    );
+    public MySchema()
+    {
+        Query = new MyQuery();
+        
+        // Register the custom list converter factory
+        this.ValueConverter.RegisterListConverterFactory(
+            typeof(MyCustomList<>), 
+            new MyListConverterFactory()
+        );
+    }
 }
 ```
 
@@ -389,9 +387,9 @@ Field<StringGraphType>("updateTask")
 
 ## Best Practices
 
-1. **Register conversions early**: Register global conversions in static constructors or during application startup before the schema is initialized.
+1. **Register conversions during schema construction**: Register conversions in your schema's constructor before the schema is initialized, ensuring they are available for all field resolvers.
 
-2. **Use schema-specific converters when appropriate**: If different schemas need different conversion logic, use the schema's `Converter` property instead of static registration.
+2. **Use per-schema converters appropriately**: Since each schema has its own `ValueConverter` instance, register conversions specific to each schema. If you need shared conversions across multiple schemas, consider creating a base schema class or a shared initialization method.
 
 3. **Avoid circular conversions**: Don't register conversions that could create circular dependencies (e.g., A→B and B→A).
 
