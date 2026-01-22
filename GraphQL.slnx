@@ -97,6 +97,7 @@
     <File Path="docs2/site/docs/getting-started/subscriptions.md" />
     <File Path="docs2/site/docs/getting-started/unions.md" />
     <File Path="docs2/site/docs/getting-started/user-context.md" />
+    <File Path="docs2/site/docs/getting-started/value-converter.md" />
     <File Path="docs2/site/docs/getting-started/variables.md" />
   </Folder>
   <Folder Name="/Docs/guides/">
