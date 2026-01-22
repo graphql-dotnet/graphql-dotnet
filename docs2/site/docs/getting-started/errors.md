@@ -114,8 +114,9 @@ Processing errors can be thrown back to the caller of `DocumentExecuter.ExecuteA
 `ExecutionOptions.ThrowOnUnhandledException` property to `true`. When this property is set to `false`,
 the default setting, unhandled exceptions are wrapped in an `UnhandledError` and added with a generic
 error message to the `ExecutionResult.Errors` property. Error codes are dynamically generated from the
-inner exceptions of the wrapped exception and also returned along with data contained within the inner
-exception's `Data` property.
+inner exceptions of the wrapped exception and also returned. Data contained within the inner exception's
+`Data` property can also be included in the error response by configuring the error serialization options
+(see [Error Serialization](#ErrorSerialization) below).
 
 You can also handle these processing exceptions by setting a delegate within the
 `ExecutionOptions.UnhandledExceptionDelegate` property. Within the delegate you can log the error message
