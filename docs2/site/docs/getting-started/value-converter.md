@@ -8,8 +8,7 @@ The `ValueConverter` manages conversions between types in several scenarios:
 
 1. **Argument Value Retrieval**: When you call `context.GetArgument<T>("argName")`, the value converter coerces the argument value to the requested type `T` if necessary.
 2. **Complex Input Object Deserialization**: When an input graph type receives a dictionary of values (from variables or arguments), the value converter converts each property to the appropriate .NET type.
-3. **Scalar Type Processing**: Custom scalar types may leverage the value converter to handle type conversions in their `ParseValue` methods.
-4. **List Type Conversions**: The value converter can convert arrays to specific list types like `List<T>`, `HashSet<T>`, or `ImmutableList<T>`.
+3. **List Type Conversions**: The value converter can convert arrays to specific list types like `List<T>`, `HashSet<T>`, or `ImmutableList<T>`.
 
 The value converter contains a registry of conversion functions that map from one type to another. GraphQL.NET includes built-in conversions for common types, and you can register your own custom conversions.
 
@@ -135,7 +134,7 @@ The value converter includes support for converting arrays to specific list type
 GraphQL.NET automatically registers converters for common list types:
 
 - **Arrays**: `ICollection`, `IEnumerable`, `IList`, `IList<T>`, `IEnumerable<T>`, `ICollection<T>`, `IReadOnlyList<T>`, `IReadOnlyCollection<T>` → array (`T[]`)
-- **List<T>**: `List<T>` → `List<T>` (when not running under AOT)
+- **List<T>**: `List<T>` → `List<T>`
 - **HashSet<T>**: `ISet<T>`, `HashSet<T>` → `HashSet<T>`
 - **IReadOnlySet<T>**: `IReadOnlySet<T>` → `HashSet<T>` (.NET 5+)
 - **Immutable Collections**: `ImmutableList<T>`, `IImmutableList<T>`, `ImmutableHashSet<T>`, `IImmutableSet<T>`, `ImmutableArray<T>` (.NET Core 1.0+)
@@ -352,7 +351,7 @@ By explicitly registering each list type with `RegisterListConverter`, you ensur
 For each list type your schema uses, register converters with concrete element types. Here are common patterns:
 
 ```csharp
-// For arrays (usually not needed as arrays work by default)
+// For arrays
 this.ValueConverter.RegisterListConverter<int[], int>(items => items.ToArray());
 
 // For List<T> with different element types
@@ -379,7 +378,7 @@ this.ValueConverter.RegisterListConverter<List<int>, int>(items => items.ToList(
 this.ValueConverter.RegisterListConverter<List<string>, string>(items => items.ToList());
 ```
 
-For more information about AOT support in GraphQL.NET, see the [migration guide](../migrations/migration9.md#3-graphqlaotserializer-for-native-aot-support).
+For more information about AOT support in GraphQL.NET, see the [migration guide](../migrations/migration9#3-graphqlaotserializer-for-native-aot-support).
 
 ## ToObject Method
 
@@ -468,7 +467,7 @@ The value converter automatically handles enum conversions from strings and inte
 public enum Priority { Low, Medium, High }
 
 Field<StringGraphType>("createTask")
-    .Argument<EnumerationGraphType<Priority>>("priority")
+    .Argument<StringGraphType>("priority")
     .Resolve(context =>
     {
         // Automatically converts from GraphQL enum to .NET enum
@@ -483,8 +482,8 @@ The value converter respects nullable value types:
 
 ```csharp
 Field<StringGraphType>("updateTask")
-    .Argument<IntGraphType>("id")
-    .Argument<IntGraphType>("priority", nullable: true)
+    .Argument<NonNullGraphType<IntGraphType>>("id")
+    .Argument<IntGraphType>("priority")
     .Resolve(context =>
     {
         var id = context.GetArgument<int>("id");
@@ -505,11 +504,9 @@ Field<StringGraphType>("updateTask")
 
 3. **Avoid circular conversions**: Don't register conversions that could create circular dependencies (e.g., A→B and B→A).
 
-4. **Handle exceptions gracefully**: Conversion functions can throw exceptions. Make sure your conversions handle invalid input appropriately.
+3. **Consider AOT compatibility**: If you plan to deploy with Native AOT, test your custom converters in an AOT environment.
 
-5. **Consider AOT compatibility**: If you plan to deploy with Native AOT, test your custom converters in an AOT environment.
-
-6. **Document custom conversions**: If you register custom conversions, document them for maintainability.
+4. **Document custom conversions**: If you register custom conversions, document them for maintainability.
 
 ## Related Topics
 
