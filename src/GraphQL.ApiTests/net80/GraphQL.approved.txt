@@ -3471,7 +3471,6 @@ namespace GraphQL.Types.Aot
         protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<T>> fn) { }
         protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, T> fn) { }
         protected override sealed void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
-        protected override sealed GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
         protected override sealed System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
     }
     public abstract class AotAutoRegisteringObjectGraphType<TSource> : GraphQL.Types.AutoRegisteringObjectGraphType<TSource>
@@ -3483,7 +3482,6 @@ namespace GraphQL.Types.Aot
         protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, T> fn) { }
         protected override sealed void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
         protected override sealed System.Linq.Expressions.LambdaExpression BuildMemberInstanceExpression(System.Reflection.MemberInfo memberInfo) { }
-        protected override sealed GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
         protected virtual TSource GetMemberInstance(GraphQL.IResolveFieldContext context) { }
         protected override sealed System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
     }

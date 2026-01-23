@@ -16,8 +16,6 @@ public abstract class AotAutoRegisteringObjectGraphType<TSource> : AutoRegisteri
     }
 
     /// <inheritdoc/>
-    protected sealed override FieldType? CreateField(MemberInfo memberInfo) => AutoRegisteringHelper.CreateField(this, memberInfo, GetTypeInformation, null, false);
-    /// <inheritdoc/>
     protected sealed override IEnumerable<MemberInfo> GetRegisteredMembers() => throw new NotImplementedException("GetRegisteredMembers must be implemented by the derived class if used.");
     /// <inheritdoc/>
     protected sealed override void BuildFieldType(FieldType fieldType, MemberInfo memberInfo) => throw new NotImplementedException("BuildFieldType must be implemented by the derived class if used.");
