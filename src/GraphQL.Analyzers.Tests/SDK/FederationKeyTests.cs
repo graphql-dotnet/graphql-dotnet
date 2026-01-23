@@ -214,7 +214,7 @@ public class FederationKeyTests
     }
 
     [Fact]
-    public async Task FederationKey_InvalidKeyFields_IgnoresKey()
+    public async Task FederationKey_InvalidKeyFields_StoredWithNullFields()
     {
         var context = await TestContext.CreateAsync(
             """
