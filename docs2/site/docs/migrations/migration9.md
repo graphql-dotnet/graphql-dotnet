@@ -194,7 +194,67 @@ public class OutputWithFields
 }
 ```
 
-### 8. Base Graph Type Attributes
+### 8. InstanceSourceAttribute for Auto-Registering Types
+
+A new `InstanceSourceAttribute` has been added to control how instances of CLR types are obtained during GraphQL field resolution in auto-registering graph types (`AutoRegisteringObjectGraphType<T>` and `AutoRegisteringInterfaceGraphType<T>`). This attribute provides fine-grained control over instance creation and dependency injection behavior.
+
+The attribute accepts an `InstanceSource` enum value that determines the instance resolution strategy:
+
+- **`ContextSource` (default)** - Retrieves the instance from `IResolveFieldContext.Source` via a cast. This is the default behavior and matches how auto-registering types worked in previous versions.
+- **`GetServiceOrCreateInstance`** - Retrieves the service from the dependency injection container, or creates a new instance using constructor injection if not registered. This mirrors the ASP.NET MVC controller instantiation pattern.
+- **`GetRequiredService`** - Retrieves the required service from the dependency injection container. Throws an exception if the service is not registered.
+- **`NewInstance`** - Always creates a new instance using constructor injection, even if the type is registered in the DI container.
+
+#### Comparison to ASP.NET MVC Controllers
+
+The `GetServiceOrCreateInstance` option provides behavior similar to ASP.NET MVC controller instantiation. Just like MVC controllers, your GraphQL query/mutation/subscription root types can:
+
+- Be registered in the DI container as scoped, transient, or singleton services
+- Be automatically instantiated with constructor dependency injection if not registered
+- Receive injected dependencies like `DbContext`, repositories, or other services
+- Optionally receive `IResolveFieldContext` via constructor injection if requested (it will use the resolving field's context)
+
+This pattern is particularly useful for query root types that need access to scoped services like Entity Framework's `DbContext`:
+
+```csharp
+[InstanceSource(InstanceSource.GetServiceOrCreateInstance)]
+public class Query
+{
+    private readonly MyDbContext _dbContext;
+
+    // Constructor injection - dependencies resolved from DI container
+    public Query(MyDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    // Simple query method using the injected context
+    public async Task<User?> GetUser(int id)
+    {
+        return await _dbContext.Users.FindAsync(id);
+    }
+
+    public async Task<List<Product>> GetProducts()
+    {
+        return await _dbContext.Products.ToListAsync();
+    }
+}
+```
+
+In this example, when a GraphQL query is executed:
+
+1. GraphQL.NET checks if `Query` is registered in the `RequestServices` DI container
+2. If registered, that instance is used
+3. If not registered, a new `Query` instance is created, automatically resolving `MyDbContext` from the DI container for constructor injection
+4. The resolved/created instance is used to execute the field resolver
+
+This eliminates the need to manually register query types in the DI container while still supporting constructor injection for dependencies.
+
+Note that structs can be populated in a similar manner when using `GetServiceOrCreateInstance` or `NewInstance`. Since structs are value types, this approach saves an allocation each time the instance is resolved, potentially improving performance for frequently-resolved fields.
+
+Additionally, public `required` members (properties or fields marked with the `required` modifier in C# 11+) are automatically populated from DI, or from the resolving field's context if `IResolveFieldContext` is the required member type. This works for both classes and structs.
+
+### 9. Base Graph Type Attributes
 
 New attributes `InputBaseTypeAttribute`, `OutputBaseTypeAttribute`, and `BaseGraphTypeAttribute` have been added. Unlike `InputType`/`OutputType` which replace the entire graph type, these attributes change only the base type while preserving nullability and list wrappers from the property definition.
 

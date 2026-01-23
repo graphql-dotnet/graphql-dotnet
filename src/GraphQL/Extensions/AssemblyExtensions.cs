@@ -73,6 +73,14 @@ internal static class AssemblyExtensions
             if (clrTypeMappingAttr != null)
                 clrType = clrTypeMappingAttr.ClrType;
 
+            //skip types with InstanceSourceAttribute that is not ContextSource
+            if (clrType != null)
+            {
+                var instanceSourceAttr = clrType.GetCustomAttribute<InstanceSourceAttribute>(inherit: true);
+                if (instanceSourceAttr != null && instanceSourceAttr.InstanceSource != InstanceSource.ContextSource)
+                    continue;
+            }
+
             //as long as it's not of type 'object', register it
             if (clrType != null && clrType != typeof(object) && !clrType.IsDefined(typeof(DoNotMapClrTypeAttribute)))
                 typeMappings.Add((clrType, graphType));
