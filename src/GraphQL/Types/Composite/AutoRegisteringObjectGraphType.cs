@@ -180,7 +180,9 @@ public class AutoRegisteringObjectGraphType<[NotAGraphType] TSourceType> : Objec
     /// a different instance source.
     /// </summary>
     /// <param name="memberInfo">The member being called or accessed.</param>
-    protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo) => _sourceExpression!;
+    protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
+        => _sourceExpression!;
+
     private static Expression<Func<IResolveFieldContext, TSourceType>>? _sourceExpression;
 
     /// <inheritdoc cref="AutoRegisteringOutputHelper.ApplyArgumentAttributes(ParameterInfo, QueryArgument)"/>
