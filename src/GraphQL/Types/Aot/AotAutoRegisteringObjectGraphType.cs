@@ -8,7 +8,6 @@ namespace GraphQL.Types.Aot;
 /// Provides a base class for registering object graph types in AOT (Ahead-Of-Time) compiled environments.
 /// </summary>
 public abstract class AotAutoRegisteringObjectGraphType<TSource> : AutoRegisteringObjectGraphType<TSource>
-    where TSource : System.Net.Sockets.TcpClient
 {
     /// <inheritdoc/>
     public AotAutoRegisteringObjectGraphType() : base(true)
