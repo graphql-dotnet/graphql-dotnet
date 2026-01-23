@@ -18,6 +18,7 @@ public sealed class AotGraphTypeAttribute<TGraphType> : AotSchemaAttribute
     /// <item>The graph type does not inherit from <see cref="GraphQL.Types.ComplexGraphType{TSourceType}"/> or <see cref="GraphQL.Types.EnumerationGraphType{TEnum}"/>.</item>
     /// <item>The generic type is <see cref="object"/>.</item>
     /// <item>The CLR type is marked with <see cref="GraphQL.DoNotMapClrTypeAttribute"/>.</item>
+    /// <item>The CLR type is marked with <see cref="InstanceSourceAttribute"/> having a value other than <see cref="InstanceSource.ContextSource"/>.</item>
     /// </list>
     /// </summary>
     public bool AutoRegisterClrMapping { get; set; } = true;
