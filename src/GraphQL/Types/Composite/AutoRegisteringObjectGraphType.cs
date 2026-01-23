@@ -61,6 +61,8 @@ public class AutoRegisteringObjectGraphType<[NotAGraphType] TSourceType> : Objec
     {
     }
 
+    [RequiresUnreferencedCode("Scans the specified type for public methods and properties, which may not be statically referenced.")]
+    [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
     private AutoRegisteringObjectGraphType(AutoRegisteringObjectGraphType<TSourceType>? cloneFrom, Expression<Func<TSourceType, object?>>[]? excludedProperties, bool cache)
         : base(cloneFrom)
     {
@@ -68,6 +70,7 @@ public class AutoRegisteringObjectGraphType<[NotAGraphType] TSourceType> : Objec
         if (cloneFrom != null)
             return;
 
+        _sourceExpression ??= AutoRegisteringOutputHelper.BuildSourceExpression<TSourceType>();
         _excludedProperties = excludedProperties;
         Name = typeof(TSourceType).GraphQLName();
         ConfigureGraph();
@@ -177,11 +180,7 @@ public class AutoRegisteringObjectGraphType<[NotAGraphType] TSourceType> : Objec
     /// a different instance source.
     /// </summary>
     /// <param name="memberInfo">The member being called or accessed.</param>
-    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "The constructor is marked with RequiresUnreferencedCode.")]
-    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "The constructor is marked with RequiresDynamicCode.")]
-    protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
-        => _sourceExpression ??= AutoRegisteringOutputHelper.BuildSourceExpression<TSourceType>();
-
+    protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo) => _sourceExpression!;
     private static Expression<Func<IResolveFieldContext, TSourceType>>? _sourceExpression;
 
     /// <inheritdoc cref="AutoRegisteringOutputHelper.ApplyArgumentAttributes(ParameterInfo, QueryArgument)"/>
