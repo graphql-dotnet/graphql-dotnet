@@ -3465,7 +3465,6 @@ namespace GraphQL.Types.Aot
         protected override sealed System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
     }
     public abstract class AotAutoRegisteringObjectGraphType<TSource> : GraphQL.Types.AutoRegisteringObjectGraphType<TSource>
-        where TSource : System.Net.Sockets.TcpClient
     {
         public AotAutoRegisteringObjectGraphType() { }
         protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<T>> fn) { }
