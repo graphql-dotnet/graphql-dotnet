@@ -1,5 +1,4 @@
 using GraphQL.Analyzers.SDK;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace GraphQL.Analyzers.Tests.SDK;
 
