@@ -177,18 +177,12 @@ public class AutoRegisteringObjectGraphType<[NotAGraphType] TSourceType> : Objec
     /// a different instance source.
     /// </summary>
     /// <param name="memberInfo">The member being called or accessed.</param>
-    protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
-        => _sourceExpression;
-
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "The constructor is marked with RequiresUnreferencedCode.")]
     [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "The constructor is marked with RequiresDynamicCode.")]
-    private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression
-        = AutoRegisteringOutputHelper.BuildSourceExpression<TSourceType>();
+    protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
+        => _sourceExpression ??= AutoRegisteringOutputHelper.BuildSourceExpression<TSourceType>();
 
-    internal static object ThrowSourceNullException()
-    {
-        throw new InvalidOperationException("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
-    }
+    private static Expression<Func<IResolveFieldContext, TSourceType>>? _sourceExpression;
 
     /// <inheritdoc cref="AutoRegisteringOutputHelper.ApplyArgumentAttributes(ParameterInfo, QueryArgument)"/>
     protected virtual void ApplyArgumentAttributes(ParameterInfo parameterInfo, QueryArgument queryArgument)
