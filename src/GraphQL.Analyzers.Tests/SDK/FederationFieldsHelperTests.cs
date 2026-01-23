@@ -26,9 +26,7 @@ public class FederationFieldsHelperTests
             }
             """);
 
-        var invocation = context.Root.DescendantNodes()
-            .OfType<InvocationExpressionSyntax>()
-            .First(i => i.ToString().Contains("Key"));
+        var invocation = context.Root.FindMethodInvocation("Key");
 
         var argument = invocation.ArgumentList.Arguments[0].Expression;
 
@@ -59,9 +57,7 @@ public class FederationFieldsHelperTests
             }
             """);
 
-        var invocation = context.Root.DescendantNodes()
-            .OfType<InvocationExpressionSyntax>()
-            .First(i => i.ToString().Contains("Key"));
+        var invocation = context.Root.FindMethodInvocation("Key");
 
         var argument = invocation.ArgumentList.Arguments[0].Expression;
 
@@ -95,9 +91,7 @@ public class FederationFieldsHelperTests
             }
             """);
 
-        var invocation = context.Root.DescendantNodes()
-            .OfType<InvocationExpressionSyntax>()
-            .First(i => i.ToString().Contains("Key"));
+        var invocation = context.Root.FindMethodInvocation("Key");
 
         var argument = invocation.ArgumentList.Arguments[0].Expression;
 
@@ -126,9 +120,7 @@ public class FederationFieldsHelperTests
             }
             """);
 
-        var invocation = context.Root.DescendantNodes()
-            .OfType<InvocationExpressionSyntax>()
-            .First(i => i.ToString().Contains("Key"));
+        var invocation = context.Root.FindMethodInvocation("Key");
 
         var argument = invocation.ArgumentList.Arguments[0].Expression;
 
@@ -157,9 +149,7 @@ public class FederationFieldsHelperTests
             }
             """);
 
-        var invocation = context.Root.DescendantNodes()
-            .OfType<InvocationExpressionSyntax>()
-            .First(i => i.ToString().Contains("Key"));
+        var invocation = context.Root.FindMethodInvocation("Key");
 
         var argument = invocation.ArgumentList.Arguments[0].Expression;
 
@@ -191,9 +181,7 @@ public class FederationFieldsHelperTests
             }
             """);
 
-        var invocation = context.Root.DescendantNodes()
-            .OfType<InvocationExpressionSyntax>()
-            .First(i => i.ToString().Contains("Key"));
+        var invocation = context.Root.FindMethodInvocation("Key");
 
         var argument = invocation.ArgumentList.Arguments[0].Expression;
 
@@ -263,9 +251,7 @@ public class FederationFieldsHelperTests
             }
             """);
 
-        var invocation = context.Root.DescendantNodes()
-            .OfType<InvocationExpressionSyntax>()
-            .First(i => i.ToString().Contains("Key"));
+        var invocation = context.Root.FindMethodInvocation("Key");
 
         var argument = invocation.ArgumentList.Arguments[0].Expression;
 
