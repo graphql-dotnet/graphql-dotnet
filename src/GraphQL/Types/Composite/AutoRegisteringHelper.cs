@@ -161,9 +161,9 @@ public static class AutoRegisteringHelper
     /// Creates a <see cref="FieldType"/> for the specified <see cref="MemberInfo"/>.
     /// Does not add arguments or set the resolver; those must be done separately.
     /// </summary>
-    internal static FieldType? CreateField(IGraphType graphType, MemberInfo memberInfo, Func<MemberInfo, TypeInformation>? getTypeInformation, Action<FieldType, MemberInfo>? buildFieldType, bool isInputType)
+    internal static FieldType? CreateField(IGraphType graphType, MemberInfo memberInfo, Func<MemberInfo, TypeInformation> getTypeInformation, Action<FieldType, MemberInfo>? buildFieldType, bool isInputType)
     {
-        var typeInformation = getTypeInformation != null ? getTypeInformation(memberInfo) : GetTypeInformation(memberInfo, isInputType);
+        var typeInformation = getTypeInformation(memberInfo);
         var fieldGraphType = typeInformation.ConstructGraphType();
         var fieldType = CreateField(memberInfo, fieldGraphType, isInputType);
         // set resolver, if applicable
