@@ -46,6 +46,7 @@ public class InputObjectGraphType : InputObjectGraphType<object>
 public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TSourceType> : ComplexGraphType<TSourceType>, IInputObjectGraphType
 {
     private Func<IDictionary<string, object?>, IValueConverter, object>? _parseDictionary;
+    private readonly Action<ISchema>? _initialize;
 
     /// <summary>
     /// Initializes a new instance.
@@ -54,6 +55,7 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
     public InputObjectGraphType()
         : this(null)
     {
+        // do not set or reference initialization logic to allow for AOT trimming of code requiring reflection
     }
 
     [RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
@@ -67,46 +69,52 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
             // for InputObjectGraphType just return the dictionary
             _parseDictionary = static (x, _) => x;
         }
+        else
+        {
+            // set initialization function
+            _initialize = (schema) =>
+            {
+                if (_parseDictionary == null) // when typeof(TSourceType) != typeof(object)
+                {
+                    // check the value converter for a conversion from dictionary to this object type
+                    var conv = schema.ValueConverter.GetConversion(typeof(IDictionary<string, object?>), typeof(TSourceType));
+                    if (conv != null)
+                    {
+                        _parseDictionary = (val, _) => conv(val);
+                    }
+                    else if (GlobalSwitches.DynamicallyCompileToObject)
+                    {
+                        // check if the user has overridden ParseDictionary
+                        if (GetType().GetMethod(nameof(ParseDictionary), [typeof(IDictionary<string, object?>), typeof(IValueConverter)])!.DeclaringType == typeof(InputObjectGraphType<TSourceType>))
+                        {
+                            // if the user has not, validate and compile the conversion from dictionary to object immediately
+                            _parseDictionary = ObjectExtensions.CompileToObject(typeof(TSourceType), this, schema.ValueConverter);
+                        }
+                        else
+                        {
+                            // if they have, validate and compile upon first use (if any)
+                            _parseDictionary = (data, valueConverter) => (_parseDictionary = ObjectExtensions.CompileToObject(typeof(TSourceType), this, schema.ValueConverter))(data, valueConverter);
+                        }
+                    }
+                    else
+                    {
+                        // use reflection to convert the dictionary to object
+                        _parseDictionary = null;
+                    }
+                }
+            };
+        }
     }
 
     /// <inheritdoc/>
     public bool IsOneOf { get; set; }
 
     /// <inheritdoc/>
-    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
-        Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
     public override void Initialize(ISchema schema)
     {
         base.Initialize(schema);
 
-        if (_parseDictionary == null) // when typeof(TSourceType) != typeof(object)
-        {
-            // check the value converter for a conversion from dictionary to this object type
-            var conv = schema.ValueConverter.GetConversion(typeof(IDictionary<string, object?>), typeof(TSourceType));
-            if (conv != null)
-            {
-                _parseDictionary = (val, _) => conv(val);
-            }
-            else if (GlobalSwitches.DynamicallyCompileToObject)
-            {
-                // check if the user has overridden ParseDictionary
-                if (GetType().GetMethod(nameof(ParseDictionary), [typeof(IDictionary<string, object?>), typeof(IValueConverter)])!.DeclaringType == typeof(InputObjectGraphType<TSourceType>))
-                {
-                    // if the user has not, validate and compile the conversion from dictionary to object immediately
-                    _parseDictionary = ObjectExtensions.CompileToObject(typeof(TSourceType), this, schema.ValueConverter);
-                }
-                else
-                {
-                    // if they have, validate and compile upon first use (if any)
-                    _parseDictionary = (data, valueConverter) => (_parseDictionary = ObjectExtensions.CompileToObject(typeof(TSourceType), this, schema.ValueConverter))(data, valueConverter);
-                }
-            }
-            else
-            {
-                // use reflection to convert the dictionary to object
-                _parseDictionary = ParseDictionaryViaReflection;
-            }
-        }
+        _initialize?.Invoke(schema);
     }
 
     /// <summary>
@@ -127,12 +135,9 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
         if (_parseDictionary != null)
             return _parseDictionary(value, valueConverter);
 
-        // remainder of this method should not occur unless the user has overridden Initialize
-        return ParseDictionaryViaReflection(value, valueConverter);
+        // fallback to using reflection-based conversion (or as defined by the value converter)
+        return valueConverter.ToObject(value, typeof(TSourceType), this);
     }
-
-    private object ParseDictionaryViaReflection(IDictionary<string, object?> value, IValueConverter valueConverter)
-        => valueConverter.ToObject(value, typeof(TSourceType), this);
 
     /// <inheritdoc/>
     public virtual bool IsValidDefault(object value)
