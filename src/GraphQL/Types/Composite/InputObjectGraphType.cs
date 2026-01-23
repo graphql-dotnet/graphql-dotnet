@@ -46,7 +46,7 @@ public class InputObjectGraphType : InputObjectGraphType<object>
 public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TSourceType> : ComplexGraphType<TSourceType>, IInputObjectGraphType
 {
     private Func<IDictionary<string, object?>, IValueConverter, object>? _parseDictionary;
-    private readonly Action<ISchema>? _initialize;
+    private Action<ISchema>? _initialize;
 
     internal InputObjectGraphType(bool configureGraph)
     {
@@ -120,6 +120,7 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
         base.Initialize(schema);
 
         _initialize?.Invoke(schema);
+        _initialize = null;
     }
 
     /// <summary>
