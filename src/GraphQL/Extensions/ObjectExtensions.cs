@@ -203,11 +203,9 @@ public static partial class ObjectExtensions
         // find best constructor to use
         var (bestConstructor, ctorParameters) = _types.GetOrAdd(
             clrType,
-            static clrType =>
+            static ([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type clrType) =>
             {
-#pragma warning disable IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
                 var constructor = AutoRegisteringHelper.GetConstructor(clrType);
-#pragma warning restore IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
                 var parameters = constructor?.GetParameters() ?? Array.Empty<ParameterInfo>();
                 return (constructor, parameters);
             });

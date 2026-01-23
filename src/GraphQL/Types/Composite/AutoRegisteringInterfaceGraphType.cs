@@ -16,13 +16,22 @@ internal static class AutoRegisteringInterfaceGraphType
 /// Supports <see cref="DescriptionAttribute"/>, <see cref="ObsoleteAttribute"/>, <see cref="DefaultValueAttribute"/> and <see cref="RequiredAttribute"/>.
 /// Also it can get descriptions for fields from the XML comments.
 /// </summary>
-public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(
-#if NET6_0_OR_GREATER
-    DynamicallyAccessedMemberTypes.Interfaces |
-#endif
-    DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicMethods)][NotAGraphType] TSourceType> : InterfaceGraphType<TSourceType>
+public class AutoRegisteringInterfaceGraphType<[NotAGraphType] TSourceType> : InterfaceGraphType<TSourceType>
 {
     private readonly Expression<Func<TSourceType, object?>>[]? _excludedProperties;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AutoRegisteringInterfaceGraphType{TSourceType}"/> class without adding any fields.
+    /// </summary>
+    /// <param name="configureGraph">When true, sets the name and processes all attributes defined for the source type.</param>
+    internal AutoRegisteringInterfaceGraphType(bool configureGraph)
+    {
+        if (configureGraph)
+        {
+            Name = typeof(TSourceType).GraphQLName();
+            ConfigureGraph();
+        }
+    }
 
     /// <summary>
     /// Creates a GraphQL type from <typeparamref name="TSourceType"/>.
@@ -123,15 +132,8 @@ public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(
     /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.BuildFieldType(FieldType, MemberInfo)"/>
     [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
         Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
-    protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
+    protected virtual void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
     {
-        Func<Type, Func<FieldType, ParameterInfo, ArgumentInformation>> getTypedArgumentInfoMethod =
-            parameterType =>
-            {
-                var getArgumentInfoMethodInfo = _getArgumentInformationInternalMethodInfo.MakeGenericMethod(parameterType);
-                return (Func<FieldType, ParameterInfo, ArgumentInformation>)getArgumentInfoMethodInfo.CreateDelegate(typeof(Func<FieldType, ParameterInfo, ArgumentInformation>), this);
-            };
-
         Func<Type, Func<ArgumentInformation, LambdaExpression?>> getTypedParameterResolverMethod =
             parameterType =>
             {
@@ -143,7 +145,7 @@ public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(
             memberInfo,
             fieldType,
             null,
-            getTypedArgumentInfoMethod,
+            GetArgumentInformation,
             ApplyArgumentAttributes,
             getTypedParameterResolverMethod);
     }
@@ -172,17 +174,13 @@ public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(
         return expression;
     }
 
-    private static readonly MethodInfo _getArgumentInformationInternalMethodInfo = typeof(AutoRegisteringInterfaceGraphType<TSourceType>).GetMethod(nameof(GetArgumentInformationInternal), BindingFlags.NonPublic | BindingFlags.Instance)!;
-    private ArgumentInformation GetArgumentInformationInternal<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)
-        => GetArgumentInformation<TParameterType>(fieldType, parameterInfo);
-
     /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.ApplyArgumentAttributes(ParameterInfo, QueryArgument)"/>
     protected virtual void ApplyArgumentAttributes(ParameterInfo parameterInfo, QueryArgument queryArgument)
         => AutoRegisteringOutputHelper.ApplyArgumentAttributes(parameterInfo, queryArgument);
 
-    /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.GetArgumentInformation{TParameterType}(FieldType, ParameterInfo)"/>
-    protected virtual ArgumentInformation GetArgumentInformation<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)
-        => AutoRegisteringOutputHelper.GetArgumentInformation<TSourceType>(GetTypeInformation(parameterInfo), fieldType, parameterInfo);
+    /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.GetArgumentInformation(FieldType, ParameterInfo)"/>
+    protected virtual ArgumentInformation GetArgumentInformation(FieldType fieldType, ParameterInfo parameterInfo)
+        => AutoRegisteringOutputHelper.GetArgumentInformation(typeof(TSourceType), GetTypeInformation(parameterInfo), fieldType, parameterInfo);
 
     /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.GetRegisteredMembers"/>
     [UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with 'RequiresUnreferencedCodeAttribute' may break functionality when trimming application code.",
