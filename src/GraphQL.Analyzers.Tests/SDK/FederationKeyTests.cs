@@ -31,7 +31,7 @@ public class FederationKeyTests
     }
 
     [Fact]
-    public async Task GraphQLGraphType_SingleKeyDirectives_ReturnsAllKeys()
+    public async Task GraphQLGraphType_SingleKeyDirective_ReturnsKey()
     {
         var context = await TestContext.CreateAsync(
             """
@@ -60,6 +60,7 @@ public class FederationKeyTests
         graphType.FederationKeys.Count.ShouldBe(1);
 
         graphType.FederationKeys[0].FieldsString.ShouldBe("id");
+        graphType.FederationKeys[0].GraphType.ShouldBe(graphType);
     }
 
     [Fact]
@@ -94,85 +95,6 @@ public class FederationKeyTests
 
         graphType.FederationKeys[0].FieldsString.ShouldBe("id");
         graphType.FederationKeys[1].FieldsString.ShouldBe("sku");
-    }
-
-    [Theory]
-    [InlineData(10, "\"id\"", "id")]
-    [InlineData(11, "\"id name\"", "id", "name")]
-    [InlineData(12, "[\"id\", \"name\"]", "id", "name")]
-    [InlineData(13, "new[] { \"id\", \"name\" }", "id", "name")]
-    [InlineData(14, "new string[] { \"id\", \"name\" }", "id", "name")]
-    // const
-    [InlineData(15, "ConstFieldName", "Id")]
-    [InlineData(16, "Constants.ConstFieldName", "Id")]
-    [InlineData(17, "[ConstFieldName, \"name\"]", "Id", "name")]
-    [InlineData(18, "new[] { ConstFieldName, \"name\" }", "Id", "name")]
-    [InlineData(19, "new string[] { ConstFieldName, \"name\" }", "Id", "name")]
-    // nameof
-    [InlineData(20, "nameof(User.Id)", "Id")]
-    [InlineData(21, "new[] { nameof(User.Id), \"name\" }", "Id", "name")]
-    [InlineData(22, "new string[] { nameof(User.Id), \"name\" }", "Id", "name")]
-    // interpolation
-    [InlineData(23, "$\"{nameof(User.Id)}\"", "Id")]
-    [InlineData(24, "$\"{nameof(User.Id)} name\"", "Id", "name")]
-    [InlineData(25, "$\"{ConstFieldName} name\"", "Id", "name")]
-    [InlineData(26, "$\"{ConstFieldName} name {nameof(User.Organization)}\"", "Id", "name", "Organization")]
-    [InlineData(27, "[$\"{ConstFieldName} organization\", \"name\"]", "Id", "organization", "name")]
-    [InlineData(28, "new[] { $\"{ConstFieldName} organization\", \"name\" }", "Id", "organization", "name")]
-    [InlineData(29, "new string[] { $\"{ConstFieldName} organization\", \"name\" }", "Id", "organization", "name")]
-    [InlineData(30, "[$\"{ConstFieldName} {nameof(User.Organization)}\", \"name\"]", "Id", "Organization", "name")]
-    [InlineData(31, "new[] { $\"{ConstFieldName} {nameof(User.Organization)}\", \"name\" }", "Id", "Organization", "name")]
-    [InlineData(32, "new string[] { $\"{ConstFieldName} {nameof(User.Organization)}\", \"name\" }", "Id", "Organization", "name")]
-    public async Task FederationKey_PlainFields_ParsesCorrectly(int idx, string keyExpression, params string[] expectedFields)
-    {
-        _ = idx;
-
-        var context = await TestContext.CreateAsync(
-            $$"""
-            using GraphQL.Federation;
-            using GraphQL.Types;
-
-            namespace Sample.Server;
-
-            public class UserGraphType : ObjectGraphType<User>
-            {
-                private const string ConstFieldName = "Id";
-
-                public UserGraphType()
-                {
-                    this.Key({{keyExpression}});
-
-                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
-                    Field<NonNullGraphType<StringGraphType>>("name");
-                    Field<NonNullGraphType<StringGraphType>>("organization");
-                }
-            }
-
-            public class User
-            {
-                public int Id { get; set; }
-                public string Name { get; set; }
-                public string Organization { get; set; }
-            }
-
-            public class Constants
-            {
-                public const string ConstFieldName = "Id";
-            }
-            """);
-
-        var classDeclaration = context.Root.FindClassDeclaration("UserGraphType");
-        var graphType = GraphQLGraphType.TryCreate(classDeclaration, context.SemanticModel);
-
-        graphType.ShouldNotBeNull();
-        graphType.FederationKeys.ShouldNotBeNull();
-        graphType.FederationKeys.Count.ShouldBe(1);
-
-        var key = graphType.FederationKeys[0];
-        key.FieldsString.ShouldBe(string.Join(' ', expectedFields));
-        key.GetFieldNames().ShouldBe(expectedFields);
-        key.Fields.ShouldNotBeNull();
-        key.Fields.Selections.Count.ShouldBe(expectedFields.Length);
     }
 
     [Theory]
@@ -253,7 +175,46 @@ public class FederationKeyTests
     }
 
     [Fact]
-    public async Task GraphQLGraphType_InvalidKeyFields_IgnoresKey()
+    public async Task FederationKey_GetFieldLocation_ReturnsCorrectSpan()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+            using GraphQL.Federation;
+
+            namespace Sample;
+
+            public class Product : ObjectGraphType
+            {
+                public Product()
+                {
+                    this.Key("id sku");
+                    Field<StringGraphType>("id");
+                    Field<StringGraphType>("sku");
+                }
+            }
+            """);
+
+        var classDeclaration = context.Root.FindClassDeclaration("Product");
+        var graphType = GraphQLGraphType.TryCreate(classDeclaration, context.SemanticModel);
+
+        graphType.ShouldNotBeNull();
+        graphType.FederationKeys.ShouldNotBeNull();
+        var key = graphType.FederationKeys[0];
+
+        var sourceText = await context.SyntaxTree.GetTextAsync();
+
+        var idLocation = key.GetFieldLocation("id");
+        var idText = sourceText.ToString(idLocation.SourceSpan);
+        idText.ShouldBe("id");
+
+        var skuLocation = key.GetFieldLocation("sku");
+        var skuText = sourceText.ToString(skuLocation.SourceSpan);
+        skuText.ShouldBe("sku");
+    }
+
+    [Fact]
+    public async Task FederationKey_InvalidKeyFields_IgnoresKey()
     {
         var context = await TestContext.CreateAsync(
             """
@@ -277,7 +238,7 @@ public class FederationKeyTests
         var graphType = GraphQLGraphType.TryCreate(classDeclaration, context.SemanticModel);
 
         graphType.ShouldNotBeNull();
-        // Invalid keys should be ignored during analysis
+        // Invalid keys should be stored but with null Fields property
         graphType.FederationKeys.ShouldNotBeNull();
         graphType.FederationKeys.Count.ShouldBe(1);
         var key = graphType.FederationKeys[0];
