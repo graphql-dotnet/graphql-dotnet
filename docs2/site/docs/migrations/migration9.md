@@ -254,6 +254,65 @@ Note that structs can be populated in a similar manner when using `GetServiceOrC
 
 Additionally, public `required` members (properties or fields marked with the `required` modifier in C# 11+) are automatically populated from DI, or from the resolving field's context if `IResolveFieldContext` is the required member type. This works for both classes and structs.
 
+### 9. Base Graph Type Attributes
+
+New attributes `InputBaseTypeAttribute`, `OutputBaseTypeAttribute`, and `BaseGraphTypeAttribute` have been added. Unlike `InputType`/`OutputType` which replace the entire graph type, these attributes change only the base type while preserving nullability and list wrappers from the property definition.
+
+#### Comparison with InputType and OutputType
+
+```csharp
+public class ComparisonModel
+{
+    // InputType: Replaces entire graph type - you must include all wrappers
+    [InputType(typeof(IdGraphType))]
+    public Guid Field1 { get; set; }  // Result: IdGraphType (nullable)
+
+    [InputType(typeof(NonNullGraphType<IdGraphType>))]
+    public Guid Field2 { get; set; }  // Result: NonNullGraphType<IdGraphType>
+
+    [InputType(typeof(ListGraphType<IdGraphType>))]
+    public List<Guid> Field3 { get; set; }  // Result: ListGraphType<IdGraphType>
+
+    // InputBaseType: Changes only the base type - nullability and lists are preserved
+    [InputBaseType<IdGraphType>]
+    public Guid? Field4 { get; set; }  // Result: IdGraphType (nullable)
+
+    [InputBaseType<IdGraphType>]
+    public Guid Field5 { get; set; }  // Result: NonNullGraphType<IdGraphType>
+
+    [InputBaseType<IdGraphType>]
+    public List<Guid> Field6 { get; set; }  // Result: ListGraphType<NonNullGraphType<IdGraphType>>
+}
+```
+
+#### Creating Custom Attributes
+
+These attributes enable creating reusable domain-specific attributes. The `[Id]` attribute is now implemented as:
+
+```csharp
+public class IdAttribute : BaseGraphTypeAttribute<IdGraphType> { }
+```
+
+You can create similar attributes for your domain types:
+
+```csharp
+public class EmailAttribute : BaseGraphTypeAttribute<EmailGraphType> { }
+public class PhoneNumberAttribute : InputBaseTypeAttribute<PhoneNumberGraphType> { }
+
+// Usage
+public class User
+{
+    [Id]
+    public Guid UserId { get; set; }
+
+    [Email]
+    public string? EmailAddress { get; set; }
+
+    [PhoneNumber]
+    public string PhoneNumber { get; set; }
+}
+```
+
 ## Breaking Changes
 
 ### 1. Removal of Obsolete Members
