@@ -172,14 +172,18 @@ public class AutoRegisteringObjectGraphType<[NotAGraphType] TSourceType> : Objec
     /// <br/><br/>
     /// Typically this is a lambda expression of type <see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, <typeparamref name="TSourceType"/>&gt;.
     /// <br/><br/>
-    /// By default this returns the <see cref="IResolveFieldContext.Source"/> property.
+    /// By default this returns the <see cref="IResolveFieldContext.Source"/> property,
+    /// unless <see cref="InstanceSourceAttribute"/> is applied to <typeparamref name="TSourceType"/> to specify
+    /// a different instance source.
     /// </summary>
     /// <param name="memberInfo">The member being called or accessed.</param>
     protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
         => _sourceExpression;
 
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "The constructor is marked with RequiresUnreferencedCode.")]
+    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "The constructor is marked with RequiresDynamicCode.")]
     private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression
-        = context => (TSourceType)(context.Source ?? ThrowSourceNullException());
+        = AutoRegisteringOutputHelper.BuildSourceExpression<TSourceType>();
 
     internal static object ThrowSourceNullException()
     {

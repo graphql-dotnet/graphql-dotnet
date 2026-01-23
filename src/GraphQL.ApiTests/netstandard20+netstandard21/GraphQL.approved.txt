@@ -682,6 +682,19 @@ namespace GraphQL
     {
         public static GraphQL.Inputs ToInputs(this System.Collections.Generic.Dictionary<string, object?> dictionary) { }
     }
+    public enum InstanceSource
+    {
+        ContextSource = 0,
+        GetServiceOrCreateInstance = 1,
+        GetRequiredService = 2,
+        NewInstance = 3,
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=true)]
+    public sealed class InstanceSourceAttribute : GraphQL.GraphQLAttribute
+    {
+        public InstanceSourceAttribute(GraphQL.InstanceSource instanceSource) { }
+        public GraphQL.InstanceSource InstanceSource { get; }
+    }
     public class LightweightCache<TKey, TValue> : System.Collections.Generic.IEnumerable<TValue>, System.Collections.IEnumerable
         where TKey :  notnull
     {
