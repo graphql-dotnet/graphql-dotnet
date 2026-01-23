@@ -19,7 +19,7 @@ internal static class AutoRegisteringOutputHelper
     /// member from <see cref="IResolveFieldContext.Source"/>.
     /// <br/><br/>
     /// For methods, method arguments are iterated and processed by
-    /// <see cref="AutoRegisteringObjectGraphType{TSourceType}.GetArgumentInformation{TParameterType}(FieldType, ParameterInfo)">GetArgumentInformation</see>, building
+    /// <see cref="AutoRegisteringObjectGraphType{TSourceType}.GetArgumentInformation(FieldType, ParameterInfo)">GetArgumentInformation</see>, building
     /// a list of query arguments and expressions as necessary. Then a field resolver is built around the method.
     /// </summary>
     [RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
@@ -27,7 +27,7 @@ internal static class AutoRegisteringOutputHelper
         MemberInfo memberInfo,
         FieldType fieldType,
         Func<MemberInfo, LambdaExpression>? buildMemberInstanceExpressionFunc,
-        Func<Type, Func<FieldType, ParameterInfo, ArgumentInformation>> getTypedArgumentInfoMethod,
+        Func<FieldType, ParameterInfo, ArgumentInformation> getArgumentInfoMethod,
         Action<ParameterInfo, QueryArgument> applyArgumentAttributesFunc,
         Func<Type, Func<ArgumentInformation, LambdaExpression?>> getTypedParameterResolverMethod)
     {
@@ -56,7 +56,6 @@ internal static class AutoRegisteringOutputHelper
                 LambdaExpression? expression = null;
 
                 // Create ArgumentInformation for the parameter
-                var getArgumentInfoMethod = getTypedArgumentInfoMethod(parameterInfo.ParameterType);
                 var argumentInfo = getArgumentInfoMethod(fieldType, parameterInfo);
 
                 // Try to get a resolver from overridden method
@@ -252,9 +251,9 @@ internal static class AutoRegisteringOutputHelper
     /// Also applies any <see cref="GraphQLAttribute"/> attributes defined on the <see cref="ParameterInfo"/>
     /// to the returned <see cref="ArgumentInformation"/> instance.
     /// </summary>
-    public static ArgumentInformation GetArgumentInformation<TSourceType>(TypeInformation typeInformation, FieldType fieldType, ParameterInfo parameterInfo)
+    public static ArgumentInformation GetArgumentInformation(Type sourceType, TypeInformation typeInformation, FieldType fieldType, ParameterInfo parameterInfo)
     {
-        var argumentInfo = new ArgumentInformation(parameterInfo, typeof(TSourceType), fieldType, typeInformation);
+        var argumentInfo = new ArgumentInformation(parameterInfo, sourceType, fieldType, typeInformation);
         argumentInfo.ApplyAttributes();
         return argumentInfo;
     }

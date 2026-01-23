@@ -2400,10 +2400,10 @@ namespace GraphQL.Types
         public AutoRegisteringInterfaceGraphType() { }
         public AutoRegisteringInterfaceGraphType(params System.Linq.Expressions.Expression<System.Func<TSourceType, object?>>[]? excludedProperties) { }
         protected virtual void ApplyArgumentAttributes(System.Reflection.ParameterInfo parameterInfo, GraphQL.Types.QueryArgument queryArgument) { }
-        protected void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
+        protected virtual void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
         protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
-        protected virtual GraphQL.Types.ArgumentInformation GetArgumentInformation<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
+        protected virtual GraphQL.Types.ArgumentInformation GetArgumentInformation(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
         protected virtual System.Func<GraphQL.IResolveFieldContext, TParameterType>? GetParameterResolver<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
@@ -2415,11 +2415,11 @@ namespace GraphQL.Types
         public AutoRegisteringObjectGraphType() { }
         public AutoRegisteringObjectGraphType(params System.Linq.Expressions.Expression<System.Func<TSourceType, object?>>[]? excludedProperties) { }
         protected virtual void ApplyArgumentAttributes(System.Reflection.ParameterInfo parameterInfo, GraphQL.Types.QueryArgument queryArgument) { }
-        protected void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
+        protected virtual void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
         protected virtual System.Linq.Expressions.LambdaExpression BuildMemberInstanceExpression(System.Reflection.MemberInfo memberInfo) { }
         protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
-        protected virtual GraphQL.Types.ArgumentInformation GetArgumentInformation<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
+        protected virtual GraphQL.Types.ArgumentInformation GetArgumentInformation(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
         protected virtual System.Func<GraphQL.IResolveFieldContext, TParameterType>? GetParameterResolver<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
@@ -3238,6 +3238,37 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
         public override object? Serialize(object? value) { }
+    }
+}
+namespace GraphQL.Types.Aot
+{
+    public abstract class AotAutoRegisteringInputObjectGraphType<T> : GraphQL.Types.AutoRegisteringInputObjectGraphType<T>
+    {
+        public AotAutoRegisteringInputObjectGraphType() { }
+        protected override System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
+        public override bool IsValidDefault(object value) { }
+        public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
+    }
+    public abstract class AotAutoRegisteringInterfaceGraphType<TSource> : GraphQL.Types.AutoRegisteringInterfaceGraphType<TSource>
+    {
+        public AotAutoRegisteringInterfaceGraphType() { }
+        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<T>> fn) { }
+        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<T>> fn) { }
+        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, T> fn) { }
+        protected override sealed void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
+        protected override sealed System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
+    }
+    public abstract class AotAutoRegisteringObjectGraphType<TSource> : GraphQL.Types.AutoRegisteringObjectGraphType<TSource>
+        where TSource : System.Net.Sockets.TcpClient
+    {
+        public AotAutoRegisteringObjectGraphType() { }
+        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<T>> fn) { }
+        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<T>> fn) { }
+        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, T> fn) { }
+        protected override sealed void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
+        protected override sealed System.Linq.Expressions.LambdaExpression BuildMemberInstanceExpression(System.Reflection.MemberInfo memberInfo) { }
+        protected virtual TSource GetMemberInstance(GraphQL.IResolveFieldContext context) { }
+        protected override sealed System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
     }
 }
 namespace GraphQL.Types.Relay

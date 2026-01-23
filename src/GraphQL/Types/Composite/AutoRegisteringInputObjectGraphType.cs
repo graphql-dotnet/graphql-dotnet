@@ -22,6 +22,20 @@ public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(Dyn
     private readonly Expression<Func<TSourceType, object?>>[]? _excludedProperties;
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/> class without adding any fields.
+    /// </summary>
+    /// <param name="configureGraph">When true, sets the name and processes all attributes defined for the source type.</param>
+    internal AutoRegisteringInputObjectGraphType(bool configureGraph)
+        : base(configureGraph)
+    {
+        if (configureGraph)
+        {
+            Name = typeof(TSourceType).GraphQLName();
+            ConfigureGraph();
+        }
+    }
+
+    /// <summary>
     /// Creates a GraphQL type from <typeparamref name="TSourceType"/>.
     /// <br/><br/>
     /// When <see cref="GlobalSwitches.EnableReflectionCaching"/> is enabled (typically for scoped schemas),

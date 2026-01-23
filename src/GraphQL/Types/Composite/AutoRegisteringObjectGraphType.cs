@@ -16,9 +16,22 @@ internal static class AutoRegisteringObjectGraphType
 /// Supports <see cref="DescriptionAttribute"/>, <see cref="ObsoleteAttribute"/>, <see cref="DefaultValueAttribute"/> and <see cref="RequiredAttribute"/>.
 /// Also it can get descriptions for fields from the XML comments.
 /// </summary>
-public class AutoRegisteringObjectGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicMethods)][NotAGraphType] TSourceType> : ObjectGraphType<TSourceType>
+public class AutoRegisteringObjectGraphType<[NotAGraphType] TSourceType> : ObjectGraphType<TSourceType>
 {
     private readonly Expression<Func<TSourceType, object?>>[]? _excludedProperties;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> class without adding any fields.
+    /// </summary>
+    /// <param name="configureGraph">When true, sets the name and processes all attributes defined for the source type.</param>
+    internal AutoRegisteringObjectGraphType(bool configureGraph)
+    {
+        if (configureGraph)
+        {
+            Name = typeof(TSourceType).GraphQLName();
+            ConfigureGraph();
+        }
+    }
 
     /// <summary>
     /// Creates a GraphQL type from <typeparamref name="TSourceType"/>.
@@ -109,18 +122,11 @@ public class AutoRegisteringObjectGraphType<[DynamicallyAccessedMembers(Dynamica
     protected virtual FieldType? CreateField(MemberInfo memberInfo)
         => AutoRegisteringHelper.CreateField(this, memberInfo, GetTypeInformation, BuildFieldType, false);
 
-    /// <inheritdoc cref="AutoRegisteringOutputHelper.BuildFieldType(MemberInfo, FieldType, Func{MemberInfo, LambdaExpression}?, Func{Type, Func{FieldType, ParameterInfo, ArgumentInformation}}, Action{ParameterInfo, QueryArgument}, Func{Type, Func{ArgumentInformation, LambdaExpression?}})"/>
+    /// <inheritdoc cref="AutoRegisteringOutputHelper.BuildFieldType(MemberInfo, FieldType, Func{MemberInfo, LambdaExpression}?, Func{FieldType, ParameterInfo, ArgumentInformation}, Action{ParameterInfo, QueryArgument}, Func{Type, Func{ArgumentInformation, LambdaExpression?}})"/>
     [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
         Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
-    protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
+    protected virtual void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
     {
-        Func<Type, Func<FieldType, ParameterInfo, ArgumentInformation>> getTypedArgumentInfoMethod =
-            parameterType =>
-            {
-                var getArgumentInfoMethodInfo = _getArgumentInformationInternalMethodInfo.MakeGenericMethod(parameterType);
-                return (Func<FieldType, ParameterInfo, ArgumentInformation>)getArgumentInfoMethodInfo.CreateDelegate(typeof(Func<FieldType, ParameterInfo, ArgumentInformation>), this);
-            };
-
         Func<Type, Func<ArgumentInformation, LambdaExpression?>> getTypedParameterResolverMethod =
             parameterType =>
             {
@@ -132,7 +138,7 @@ public class AutoRegisteringObjectGraphType<[DynamicallyAccessedMembers(Dynamica
             memberInfo,
             fieldType,
             BuildMemberInstanceExpression,
-            getTypedArgumentInfoMethod,
+            GetArgumentInformation,
             ApplyArgumentAttributes,
             getTypedParameterResolverMethod);
     }
@@ -176,19 +182,21 @@ public class AutoRegisteringObjectGraphType<[DynamicallyAccessedMembers(Dynamica
 
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "The constructor is marked with RequiresUnreferencedCode.")]
     [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "The constructor is marked with RequiresDynamicCode.")]
-    private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression = AutoRegisteringOutputHelper.BuildSourceExpression<TSourceType>();
+    private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression
+        = AutoRegisteringOutputHelper.BuildSourceExpression<TSourceType>();
 
-    private static readonly MethodInfo _getArgumentInformationInternalMethodInfo = typeof(AutoRegisteringObjectGraphType<TSourceType>).GetMethod(nameof(GetArgumentInformationInternal), BindingFlags.NonPublic | BindingFlags.Instance)!;
-    private ArgumentInformation GetArgumentInformationInternal<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)
-        => GetArgumentInformation<TParameterType>(fieldType, parameterInfo);
+    internal static object ThrowSourceNullException()
+    {
+        throw new InvalidOperationException("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+    }
 
     /// <inheritdoc cref="AutoRegisteringOutputHelper.ApplyArgumentAttributes(ParameterInfo, QueryArgument)"/>
     protected virtual void ApplyArgumentAttributes(ParameterInfo parameterInfo, QueryArgument queryArgument)
         => AutoRegisteringOutputHelper.ApplyArgumentAttributes(parameterInfo, queryArgument);
 
-    /// <inheritdoc cref="AutoRegisteringOutputHelper.GetArgumentInformation{TSourceType}(TypeInformation, FieldType, ParameterInfo)"/>
-    protected virtual ArgumentInformation GetArgumentInformation<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)
-        => AutoRegisteringOutputHelper.GetArgumentInformation<TSourceType>(GetTypeInformation(parameterInfo), fieldType, parameterInfo);
+    /// <inheritdoc cref="AutoRegisteringOutputHelper.GetArgumentInformation(Type, TypeInformation, FieldType, ParameterInfo)"/>
+    protected virtual ArgumentInformation GetArgumentInformation(FieldType fieldType, ParameterInfo parameterInfo)
+        => AutoRegisteringOutputHelper.GetArgumentInformation(typeof(TSourceType), GetTypeInformation(parameterInfo), fieldType, parameterInfo);
 
     /// <inheritdoc cref="AutoRegisteringOutputHelper.GetRegisteredMembers{TSourceType}(Expression{Func{TSourceType, object?}}[])"/>
     [UnconditionalSuppressMessage("AOT", "IL2026:Calling members annotated with 'RequiresUnreferencedCodeAttribute' may break functionality when trimming application code.",
