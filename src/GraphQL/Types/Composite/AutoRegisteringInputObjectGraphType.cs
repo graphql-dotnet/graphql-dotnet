@@ -26,6 +26,7 @@ public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(Dyn
     /// </summary>
     /// <param name="configureGraph">When true, sets the name and processes all attributes defined for the source type.</param>
     internal AutoRegisteringInputObjectGraphType(bool configureGraph)
+        : base(configureGraph)
     {
         if (configureGraph)
         {

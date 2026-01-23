@@ -48,6 +48,12 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
     private Func<IDictionary<string, object?>, IValueConverter, object>? _parseDictionary;
     private readonly Action<ISchema>? _initialize;
 
+    internal InputObjectGraphType(bool configureGraph)
+    {
+        _ = configureGraph;
+        // do not set or reference initialization logic to allow for AOT trimming of code requiring reflection
+    }
+
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
@@ -55,7 +61,6 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
     public InputObjectGraphType()
         : this(null)
     {
-        // do not set or reference initialization logic to allow for AOT trimming of code requiring reflection
     }
 
     [RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
