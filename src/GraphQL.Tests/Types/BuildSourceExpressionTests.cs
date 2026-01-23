@@ -128,8 +128,7 @@ public class BuildSourceExpressionTests
         var context = new ResolveFieldContext { RequestServices = serviceProvider };
 
         var ex = Should.Throw<InvalidOperationException>(() => compiled(context));
-        ex.Message.ShouldContain("Required service");
-        ex.Message.ShouldContain("not registered");
+        ex.Message.ShouldBe("No service for type 'TestClass' has been registered.");
     }
 
     [Fact]
