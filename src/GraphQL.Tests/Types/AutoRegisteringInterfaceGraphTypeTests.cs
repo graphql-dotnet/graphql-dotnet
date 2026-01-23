@@ -864,4 +864,70 @@ public class AutoRegisteringInterfaceGraphTypeTests
         public int Field4 { get; }
         public int Field5();
     }
+
+    [Fact]
+    public void MemberScanAttribute_Interface_PropertiesOnly()
+    {
+        var graphType = new AutoRegisteringInterfaceGraphType<InterfacePropertiesOnlyClass>();
+        graphType.Fields.Find("Property1").ShouldNotBeNull();
+        graphType.Fields.Find("Property2").ShouldNotBeNull();
+        graphType.Fields.Find("Method1").ShouldBeNull();
+    }
+
+    [Fact]
+    public void MemberScanAttribute_Interface_PropertiesDerivedOnly()
+    {
+        // verifies that overriding an attribute on a derived class works properly
+        var graphType = new AutoRegisteringInterfaceGraphType<InterfacePropertiesOnlyDerivedClass>();
+        graphType.Fields.Find("Property1").ShouldNotBeNull();
+        graphType.Fields.Find("Method1").ShouldBeNull();
+        graphType.Fields.Find("Method2").ShouldBeNull();
+    }
+
+    [Fact]
+    public void MemberScanAttribute_Interface_MethodsOnly()
+    {
+        var graphType = new AutoRegisteringInterfaceGraphType<InterfaceMethodsOnlyClass>();
+        graphType.Fields.Find("Property1").ShouldBeNull();
+        graphType.Fields.Find("Method1").ShouldNotBeNull();
+        graphType.Fields.Find("Method2").ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void MemberScanAttribute_Interface_MethodsOnlyDerivedClass()
+    {
+        var graphType = new AutoRegisteringInterfaceGraphType<InterfaceMethodsOnlyDerivedClass>();
+        graphType.Fields.Find("Property1").ShouldBeNull();
+        graphType.Fields.Find("Property2").ShouldBeNull();
+        graphType.Fields.Find("Method1").ShouldNotBeNull();
+        graphType.Fields.Find("Method2").ShouldNotBeNull();
+        graphType.Fields.Find("Method3").ShouldNotBeNull();
+    }
+
+    [MemberScan(ScanMemberTypes.Properties)]
+    private class InterfacePropertiesOnlyClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string Property2 { get; set; } = "prop2";
+        public string Method1() => "method1";
+    }
+
+    [MemberScan(ScanMemberTypes.Methods)]
+    private class InterfaceMethodsOnlyClass
+    {
+        public string Property1 { get; set; } = "prop1";
+        public string Method1() => "method1";
+        public string Method2() => "method2";
+    }
+
+    private class InterfaceMethodsOnlyDerivedClass : InterfaceMethodsOnlyClass
+    {
+        public string Property2 { get; set; } = "prop2";
+        public string Method3() => "method3";
+    }
+
+    [MemberScan(ScanMemberTypes.Properties)]
+    private class InterfacePropertiesOnlyDerivedClass : InterfaceMethodsOnlyClass
+    {
+    }
 }

@@ -141,42 +141,76 @@ internal static class AutoRegisteringOutputHelper
     /// Unless overridden, returns a list of public instance readable properties and public instance methods
     /// that do not return <see langword="void"/> or <see cref="Task"/>
     /// including properties and methods declared on inherited classes.
+    /// <br/><br/>
+    /// The <see cref="MemberScanAttribute"/> can be applied to <typeparamref name="TSourceType"/> to control
+    /// which member types are scanned. By default, only properties and methods are scanned (not fields).
     /// </summary>
     [RequiresUnreferencedCode("This method scans the specified type for public properties and methods including on base types.")]
     public static IEnumerable<MemberInfo> GetRegisteredMembers<TSourceType>(Expression<Func<TSourceType, object?>>[]? excludedProperties)
     {
+        // Check for MemberScanAttribute to determine which member types to scan
+        // Default for output types is Properties and Methods (not fields)
+        var memberScanAttr = typeof(TSourceType).GetCustomAttribute<MemberScanAttribute>(inherit: true);
+        var memberTypes = memberScanAttr?.MemberTypes ?? (ScanMemberTypes.Properties | ScanMemberTypes.Methods);
+
+        var scanProperties = memberTypes.HasFlag(ScanMemberTypes.Properties);
+        var scanFields = memberTypes.HasFlag(ScanMemberTypes.Fields);
+        var scanMethods = memberTypes.HasFlag(ScanMemberTypes.Methods);
+
         if (typeof(TSourceType).IsInterface)
         {
             var types = typeof(TSourceType).GetInterfaces().Append(typeof(TSourceType));
 
             var flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
-            var properties = AutoRegisteringHelper.ExcludeProperties(
-                types.SelectMany(type => type.GetProperties(flags)).Where(x => x.GetMethod?.IsPublic ?? false),
-                excludedProperties);
-            var methods = types.SelectMany(type => type.GetMethods(flags))
-                .Where(x =>
-                    !x.ContainsGenericParameters &&     // exclude methods with open generics
-                    !x.IsSpecialName &&                 // exclude methods generated for properties
-                    x.ReturnType != typeof(void) &&     // exclude methods which do not return a value
-                    x.ReturnType != typeof(Task));
-            return properties.Concat<MemberInfo>(methods);
+
+            var properties = scanProperties
+                ? AutoRegisteringHelper.ExcludeProperties(
+                    types.SelectMany(type => type.GetProperties(flags)).Where(x => x.GetMethod?.IsPublic ?? false),
+                    excludedProperties)
+                : Enumerable.Empty<PropertyInfo>();
+
+            var fields = scanFields
+                ? types.SelectMany(type => type.GetFields(flags))
+                : Enumerable.Empty<FieldInfo>();
+
+            var methods = scanMethods
+                ? types.SelectMany(type => type.GetMethods(flags))
+                    .Where(x =>
+                        !x.ContainsGenericParameters &&     // exclude methods with open generics
+                        !x.IsSpecialName &&                 // exclude methods generated for properties
+                        x.ReturnType != typeof(void) &&     // exclude methods which do not return a value
+                        x.ReturnType != typeof(Task))
+                : Enumerable.Empty<MethodInfo>();
+
+            return properties.Concat<MemberInfo>(fields).Concat(methods);
         }
         else
         {
             var flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
-            var properties = AutoRegisteringHelper.ExcludeProperties(
-                typeof(TSourceType).GetProperties(flags).Where(x => x.GetMethod?.IsPublic ?? false),
-                excludedProperties);
-            var methods = typeof(TSourceType).GetMethods(flags)
-                .Where(x =>
-                    !x.ContainsGenericParameters &&                          // exclude methods with open generics
-                    !x.IsSpecialName &&                                      // exclude methods generated for properties
-                    x.ReturnType != typeof(void) &&                          // exclude methods which do not return a value
-                    x.ReturnType != typeof(Task) &&                          // exclude methods which do not return a value
-                    x.GetBaseDefinition().DeclaringType != typeof(object) && // exclude methods inherited from object (e.g. GetHashCode)
-                    !IsRecordEqualsMethod<TSourceType>(x) &&                 // exclude methods generated for record types: public virtual/override bool Equals(RECORD_TYPE)
-                    x.Name != "<Clone>$");                                   // exclude methods generated for record types: public [new] virtual RECORD_TYPE <Clone>$()
-            return properties.Concat<MemberInfo>(methods);
+
+            var properties = scanProperties
+                ? AutoRegisteringHelper.ExcludeProperties(
+                    typeof(TSourceType).GetProperties(flags).Where(x => x.GetMethod?.IsPublic ?? false),
+                    excludedProperties)
+                : Enumerable.Empty<PropertyInfo>();
+
+            var fields = scanFields
+                ? typeof(TSourceType).GetFields(flags)
+                : Enumerable.Empty<FieldInfo>();
+
+            var methods = scanMethods
+                ? typeof(TSourceType).GetMethods(flags)
+                    .Where(x =>
+                        !x.ContainsGenericParameters &&                          // exclude methods with open generics
+                        !x.IsSpecialName &&                                      // exclude methods generated for properties
+                        x.ReturnType != typeof(void) &&                          // exclude methods which do not return a value
+                        x.ReturnType != typeof(Task) &&                          // exclude methods which do not return a value
+                        x.GetBaseDefinition().DeclaringType != typeof(object) && // exclude methods inherited from object (e.g. GetHashCode)
+                        !IsRecordEqualsMethod<TSourceType>(x) &&                 // exclude methods generated for record types: public virtual/override bool Equals(RECORD_TYPE)
+                        x.Name != "<Clone>$")                                    // exclude methods generated for record types: public [new] virtual RECORD_TYPE <Clone>$()
+                : Enumerable.Empty<MethodInfo>();
+
+            return properties.Concat<MemberInfo>(fields).Concat(methods);
         }
     }
 

@@ -159,6 +159,41 @@ The attribute follows these priority rules:
 
 The attribute is inherited by derived classes and does not allow multiple instances.
 
+### 7. MemberScanAttribute for Auto-Registering Types
+
+A new `MemberScanAttribute` has been added to control which member types (properties, fields, and/or methods) are scanned when building auto-registering graph types. This attribute provides more control over which members of your CLR types become GraphQL fields.
+
+The attribute accepts a `ScanMemberTypes` enum value (flags enum) that can be combined:
+
+- **`Properties`** - Scan public properties
+- **`Fields`** - Scan public fields
+- **`Methods`** - Scan public methods (not applicable for input objects)
+
+Default behavior:
+- Output types (`AutoRegisteringObjectGraphType<T>`, `AutoRegisteringInterfaceGraphType<T>`): Properties and Methods
+- Input types (`AutoRegisteringInputObjectGraphType<T>`): Properties only
+
+Example usage:
+
+```csharp
+// Scan only methods, excluding properties
+[MemberScan(ScanMemberTypes.Methods)]
+public class QueryMethodsOnly
+{
+    public string Property1 { get; set; }  // Not scanned
+    public string GetData() => "data";     // Scanned
+}
+
+// Scan properties and fields, excluding methods
+[MemberScan(ScanMemberTypes.Properties | ScanMemberTypes.Fields)]
+public class OutputWithFields
+{
+    public string Property1 { get; set; } = "prop";  // Scanned
+    public string Field1 = "field";                  // Scanned
+    public string Method1() => "method";             // Not scanned
+}
+```
+
 ## Breaking Changes
 
 ### 1. Removal of Obsolete Members
