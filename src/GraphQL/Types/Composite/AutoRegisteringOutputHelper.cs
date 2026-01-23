@@ -313,8 +313,8 @@ internal static class AutoRegisteringOutputHelper
     private static object ThrowSourceNullException()
         => throw new InvalidOperationException("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
 
-    private static Expression<Func<IResolveFieldContext, TSourceType>> BuildGetRequiredServiceExpression<TSourceType>()
-        => context => (TSourceType)context.RequestServicesOrThrow().GetRequiredService<TSourceType>();
+    private static Expression<Func<IResolveFieldContext, TSourceType>> BuildGetRequiredServiceExpression<TSourceType>() 
+        => context => context.RequestServicesOrThrow().GetRequiredService<TSourceType>();
 
     /* BuildGetServiceOrCreateInstanceExpression builds something like this:
      * 
