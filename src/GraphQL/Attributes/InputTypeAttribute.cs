@@ -5,7 +5,7 @@ namespace GraphQL;
 /// <summary>
 /// Specifies an input graph type mapping for the CLR class or property marked with this attribute.
 /// </summary>
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Method)]
 public class InputTypeAttribute : GraphQLAttribute
 {
     /// <inheritdoc cref="InputTypeAttribute"/>
