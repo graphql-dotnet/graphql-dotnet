@@ -1,4 +1,5 @@
 using GraphQL;
+using GraphQL.Conversion;
 using GraphQL.DI;
 using GraphQL.StarWars.TypeFirst.Types;
 using GraphQL.Types;
@@ -7,7 +8,7 @@ using GraphQL.Types.Relay.DataObjects;
 namespace AotSample;
 
 // sample schema that would be auto generated in AOT scenarios
-public partial class SampleAotSchema : AotSchema
+public partial class SampleAotSchema : AotSchema, IListConverterFactory
 {
     // source-generated constructor (when the developer does not provide one)
     public SampleAotSchema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations) : base(services, configurations)
@@ -88,5 +89,32 @@ public partial class SampleAotSchema : AotSchema
         // configure root types when specified via [AotQueryType] or similar attributes
         Query = this.GetRequiredService<AutoOutputGraphType_StarWarsQuery>();
         Mutation = this.GetRequiredService<AutoOutputGraphType_StarWarsMutation>();
+
+        // register list types resolving to int[]
+        {
+            var converter = new ListConverter(typeof(int), values => Array.ConvertAll(values, value => (int?)value ?? default));
+            _listConverters[typeof(int[])] = converter;
+            _listConverters[typeof(IEnumerable<int>)] = converter;
+            _listConverters[typeof(IList<int>)] = converter;
+        }
+        // register list types resolving to int?[]
+        {
+            var converter = new ListConverter(typeof(int?), values => Array.ConvertAll(values, value => (int?)value));
+            _listConverters[typeof(int?[])] = converter;
+            _listConverters[typeof(ICollection<int?>)] = converter;
+        }
+        // register list types resolving to List<string>
+        _listConverters[typeof(List<string>)] = new ListConverter(typeof(string), values => Array.ConvertAll(values, value => (string?)value));
+
+        foreach (var listType in _listConverters.Keys)
+        {
+            ValueConverter.RegisterListConverterFactory(listType, this);
+        }
+    }
+
+    private readonly Dictionary<Type, IListConverter> _listConverters = new();
+    public IListConverter Create(Type listType)
+    {
+        return _listConverters[listType];
     }
 }
