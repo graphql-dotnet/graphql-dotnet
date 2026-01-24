@@ -22,7 +22,7 @@ public abstract class AotAutoRegisteringObjectGraphType<TSource> : AutoRegisteri
     /// <summary>
     /// Returns the instance of <typeparamref name="TSource"/> for a given field resolution.
     /// </summary>
-    protected virtual TSource GetMemberInstance(IResolveFieldContext context) => (TSource)(context.Source ?? ThrowSourceNullException());
+    protected virtual TSource GetMemberInstance(IResolveFieldContext context) => (TSource)(context.Source ?? AutoRegisteringOutputHelper.ThrowSourceNullException());
     /// <inheritdoc/>
     protected sealed override LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo) => throw new NotSupportedException();
 
