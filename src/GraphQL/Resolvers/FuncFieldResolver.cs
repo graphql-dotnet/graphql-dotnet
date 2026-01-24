@@ -154,3 +154,18 @@ internal class FuncFieldResolverNoAccessor<TSourceType, TReturnType> : FuncField
 
     public bool RequiresResolveFieldContextAccessor => false;
 }
+
+internal class FuncFieldResolverNoAccessor<TReturnType> : FuncFieldResolver<TReturnType>, IRequiresResolveFieldContextAccessor
+{
+    public FuncFieldResolverNoAccessor(Func<IResolveFieldContext, TReturnType?> resolver)
+        : base(resolver)
+    {
+    }
+
+    public FuncFieldResolverNoAccessor(Func<IResolveFieldContext, ValueTask<TReturnType?>> resolver)
+        : base(resolver)
+    {
+    }
+
+    public bool RequiresResolveFieldContextAccessor => false;
+}
