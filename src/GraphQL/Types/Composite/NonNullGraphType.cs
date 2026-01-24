@@ -56,7 +56,7 @@ public class NonNullGraphType : GraphType, IProvideResolvedType
 }
 
 /// <inheritdoc cref="NonNullGraphType"/>
-public sealed class NonNullGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T> : NonNullGraphType
+public sealed class NonNullGraphType<T> : NonNullGraphType
     where T : IGraphType
 {
     private NonNullGraphType() : base(null!) { }

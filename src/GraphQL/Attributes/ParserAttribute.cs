@@ -71,7 +71,7 @@ public sealed class ParserAttribute : GraphQLAttribute
         {
             if (method.ReturnType != typeof(object))
                 throw new InvalidOperationException($"Method '{_parserMethodName}' on CLR type '{parserType.GetFriendlyName()}' must have a return type of object.");
-            fieldType.Parser = (Func<object, IValueConverter, object>)method.CreateDelegate(typeof(Func<object, IValueConverter, object>));
+            fieldType.Parser = method.CreateDelegate<Func<object, IValueConverter, object>>();
         }
         else
         {
@@ -80,7 +80,7 @@ public sealed class ParserAttribute : GraphQLAttribute
                 ?? throw new InvalidOperationException($"Could not find method '{_parserMethodName}' on CLR type '{parserType.GetFriendlyName()}' while initializing '{graphType.Name}.{fieldType.Name}'. The method must have a single parameter of type object, or two parameters of type object and IValueConverter.");
             if (method.ReturnType != typeof(object))
                 throw new InvalidOperationException($"Method '{_parserMethodName}' on CLR type '{parserType.GetFriendlyName()}' must have a return type of object.");
-            var parser = (Func<object, object>)method.CreateDelegate(typeof(Func<object, object>));
+            var parser = method.CreateDelegate<Func<object, object>>();
             fieldType.Parser = (value, _) => parser(value);
         }
     }
@@ -99,7 +99,7 @@ public sealed class ParserAttribute : GraphQLAttribute
         {
             if (method.ReturnType != typeof(object))
                 throw new InvalidOperationException($"Method '{_parserMethodName}' on CLR type '{parserType.GetFriendlyName()}' must have a return type of object.");
-            queryArgument.Parser = (Func<object, IValueConverter, object>)method.CreateDelegate(typeof(Func<object, IValueConverter, object>));
+            queryArgument.Parser = method.CreateDelegate<Func<object, IValueConverter, object>>();
         }
         else
         {
@@ -108,7 +108,7 @@ public sealed class ParserAttribute : GraphQLAttribute
                 ?? throw new InvalidOperationException($"Could not find method '{_parserMethodName}' on CLR type '{parserType.GetFriendlyName()}' while initializing argument '{queryArgument.Name}'. The method must have a single parameter of type object, or two parameters of type object and IValueConverter.");
             if (method.ReturnType != typeof(object))
                 throw new InvalidOperationException($"Method '{_parserMethodName}' on CLR type '{parserType.GetFriendlyName()}' must have a return type of object.");
-            var parser = (Func<object, object>)method.CreateDelegate(typeof(Func<object, object>));
+            var parser = method.CreateDelegate<Func<object, object>>();
             queryArgument.Parser = (value, _) => parser(value);
         }
     }

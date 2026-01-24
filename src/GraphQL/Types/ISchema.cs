@@ -118,7 +118,7 @@ public interface ISchema : IMetadataReader, IMetadataWriter, IProvideDescription
     /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
     /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
     /// </summary>
-    public void RegisterType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type);
+    public void RegisterType(Type type);
 
     /// <summary>
     /// Registers type mapping from CLR type to GraphType.
@@ -131,7 +131,7 @@ public interface ISchema : IMetadataReader, IMetadataWriter, IProvideDescription
     /// </summary>
     /// <param name="clrType">The CLR property type from which to infer the GraphType.</param>
     /// <param name="graphType">Inferred GraphType.</param>
-    public void RegisterTypeMapping(Type clrType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type graphType);
+    public void RegisterTypeMapping(Type clrType, Type graphType);
 
     /// <summary>
     /// Returns all registered by <see cref="RegisterTypeMapping"/> type mappings.

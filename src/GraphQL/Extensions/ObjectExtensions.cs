@@ -250,13 +250,17 @@ public static partial class ObjectExtensions
             if (field.MemberName == null)
                 continue;
             // look for match on type
-#pragma warning disable IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindWritableMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
-            var (member, initOnly, isRequired) = _members.GetOrAdd((clrType, field.MemberName), static info => info.Type.FindWritableMember(info.PropertyName));
-#pragma warning restore IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindWritableMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
+            var (member, initOnly, isRequired) = FindWritableMemberCached(clrType, field.MemberName);
             members[memberIndex++] = new(field.Key, member, initOnly, isRequired, field.ResolvedType);
         }
 
         return new ReflectionInfo(clrType, bestConstructor, ctorFields, members);
+
+        [UnconditionalSuppressMessage("Trimming", "IL2077", Justification = "Parameter is properly marked")]
+        (MemberInfo MemberInfo, bool IsInitOnly, bool IsRequired) FindWritableMemberCached(
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)]
+            Type type, string propertyName)
+            => _members.GetOrAdd((clrType, propertyName), static info => info.Type.FindWritableMember(info.PropertyName));
     }
 
     /// <summary>

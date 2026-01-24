@@ -2337,7 +2337,7 @@ namespace GraphQL.Types
         protected void AddAotType<TGraphType>()
             where TGraphType : GraphQL.Types.IGraphType, new () { }
         protected void AddAotType<TGraphType, TGraphTypeImplementation>()
-            where TGraphType : GraphQL.Types.IGraphType, new ()
+            where TGraphType : GraphQL.Types.IGraphType
             where TGraphTypeImplementation : GraphQL.Types.IGraphType, new () { }
     }
     public class AppliedDirective : GraphQL.Utilities.MetadataProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveArgument>, System.Collections.IEnumerable
