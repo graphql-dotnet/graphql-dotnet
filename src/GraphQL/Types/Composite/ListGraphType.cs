@@ -50,7 +50,7 @@ public class ListGraphType : GraphType, IProvideResolvedType
 }
 
 /// <inheritdoc cref="ListGraphType"/>
-public sealed class ListGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T> : ListGraphType
+public sealed class ListGraphType<T> : ListGraphType
     where T : IGraphType
 {
     private ListGraphType() : base(null!) { }

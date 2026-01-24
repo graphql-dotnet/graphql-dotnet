@@ -56,6 +56,7 @@ public sealed class ValidatorAttribute : GraphQLAttribute
     }
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "The parser type is marked with DynamicallyAccessedMembers.PublicMethods")]
     public override void Modify(FieldType fieldType, bool isInputType, IGraphType graphType, MemberInfo memberInfo, ref bool ignore)
     {
         if (!isInputType)
@@ -64,28 +65,25 @@ public sealed class ValidatorAttribute : GraphQLAttribute
         var bindingFlags = BindingFlags.Public | BindingFlags.Static;
         if (validatorType == memberInfo.DeclaringType!)
             bindingFlags |= BindingFlags.NonPublic;
-#pragma warning disable IL2075 // UnrecognizedReflectionPattern
         var method = validatorType.GetMethod(_validatorMethodName, bindingFlags, null, [typeof(object)], null)
             ?? throw new InvalidOperationException($"Could not find method '{_validatorMethodName}' on CLR type '{validatorType.GetFriendlyName()}' while initializing '{graphType.Name}.{fieldType.Name}'. The method must have a single parameter of type object.");
-#pragma warning restore IL2075 // UnrecognizedReflectionPattern
         if (method.ReturnType != typeof(void))
             throw new InvalidOperationException($"Method '{_validatorMethodName}' on CLR type '{validatorType.GetFriendlyName()}' must have a void return type.");
-        fieldType.Validator += (Action<object>)method.CreateDelegate(typeof(Action<object>));
+        fieldType.Validator += method.CreateDelegate<Action<object>>();
     }
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "The parser type is marked with DynamicallyAccessedMembers.PublicMethods")]
     public override void Modify(QueryArgument queryArgument, ParameterInfo parameterInfo)
     {
         var validatorType = _validatorType ?? parameterInfo.Member.DeclaringType!;
         var bindingFlags = BindingFlags.Public | BindingFlags.Static;
         if (validatorType == parameterInfo.Member.DeclaringType!)
             bindingFlags |= BindingFlags.NonPublic;
-#pragma warning disable IL2075 // UnrecognizedReflectionPattern
         var method = validatorType.GetMethod(_validatorMethodName, bindingFlags, null, [typeof(object)], null)
             ?? throw new InvalidOperationException($"Could not find method '{_validatorMethodName}' on CLR type '{validatorType.GetFriendlyName()}' while initializing argument '{queryArgument.Name}'. The method must have a single parameter of type object.");
-#pragma warning restore IL2075 // UnrecognizedReflectionPattern
         if (method.ReturnType != typeof(void))
             throw new InvalidOperationException($"Method '{_validatorMethodName}' on CLR type '{validatorType.GetFriendlyName()}' must have a void return type.");
-        queryArgument.Validator += (Action<object>)method.CreateDelegate(typeof(Action<object>));
+        queryArgument.Validator += method.CreateDelegate<Action<object>>();
     }
 }

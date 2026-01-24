@@ -350,7 +350,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     }
 
     /// <inheritdoc/>
-    public void RegisterType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
+    public void RegisterType(Type type)
     {
         CheckDisposed();
         CheckInitialized();
@@ -370,8 +370,6 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     }
 
     /// <inheritdoc/>
-    [UnconditionalSuppressMessage("AOT", "IL2072:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
-        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     public void RegisterTypes(params Type[] types)
     {
         CheckDisposed();
@@ -391,10 +389,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     private List<(Type clrType, Type graphType)>? _clrToGraphTypeMappings;
 
     /// <inheritdoc/>
-    public void RegisterTypeMapping(
-        Type clrType,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-        Type graphType)
+    public void RegisterTypeMapping(Type clrType, Type graphType)
     {
         (_clrToGraphTypeMappings ??= []).Add((
             CheckClrType(clrType ?? throw new ArgumentNullException(nameof(clrType))),
