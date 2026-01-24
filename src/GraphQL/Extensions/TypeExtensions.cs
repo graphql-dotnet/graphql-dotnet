@@ -302,7 +302,6 @@ public static class TypeExtensions
     /// Respects <see cref="InputTypeAttribute"/> and <see cref="OutputTypeAttribute"/> for custom type mappings.
     /// Throws <see cref="ArgumentOutOfRangeException"/> if <paramref name="type"/> is already a GraphQL type or a <see cref="Task"/>.
     /// </remarks>
-    [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
     public static Type GetGraphTypeFromType(this Type type, bool isNullable, bool isInputType)
     {
         if (typeof(IGraphType).IsAssignableFrom(type))
@@ -597,7 +596,7 @@ public static class TypeExtensions
     /// Identifies a property or field on the specified type that matches the specified name.
     /// Search is performed case-insensitively. The property or field must be public and writable/settable.
     /// </summary>
-    /// <exception cref="InvalidOperationException"></exception>
+    [UnconditionalSuppressMessage("Trimming", "IL2070", Justification = "IgnoreCase is not properly recognized by the analyzer")]
     internal static (MemberInfo MemberInfo, bool IsInitOnly, bool IsRequired) FindWritableMember(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)]
         this Type type,
@@ -609,15 +608,11 @@ public static class TypeExtensions
 
         try
         {
-#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
             propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
         }
         catch (AmbiguousMatchException)
         {
-#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
             propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
         }
 
         if (propertyInfo?.SetMethod?.IsPublic ?? false)
@@ -634,15 +629,11 @@ public static class TypeExtensions
 
         try
         {
-#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
             fieldInfo = type.GetField(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
         }
         catch (AmbiguousMatchException)
         {
-#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
             fieldInfo = type.GetField(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
         }
 
         if (fieldInfo != null)

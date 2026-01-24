@@ -35,7 +35,7 @@ public abstract class AotSchema : Schema, IServiceProvider
     /// Registers an AOT graph type.
     /// </summary>
     protected void AddAotType<TGraphType, TGraphTypeImplementation>()
-        where TGraphType : IGraphType, new()
+        where TGraphType : IGraphType
         where TGraphTypeImplementation : IGraphType, new()
     {
         AotTypes.Add(typeof(TGraphType), () => new TGraphTypeImplementation());

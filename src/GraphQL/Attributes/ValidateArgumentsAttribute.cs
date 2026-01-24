@@ -56,6 +56,7 @@ public sealed class ValidateArgumentsAttribute : GraphQLAttribute
     }
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "The parser type is marked with DynamicallyAccessedMembers.PublicMethods")]
     public override void Modify(FieldType fieldType, bool isInputType, IGraphType graphType, MemberInfo memberInfo, ref bool ignore)
     {
         if (isInputType)
@@ -64,12 +65,10 @@ public sealed class ValidateArgumentsAttribute : GraphQLAttribute
         var bindingFlags = BindingFlags.Public | BindingFlags.Static;
         if (validationType == memberInfo.DeclaringType!)
             bindingFlags |= BindingFlags.NonPublic;
-#pragma warning disable IL2075 // UnrecognizedReflectionPattern
         var method = validationType.GetMethod(_validationMethodName, bindingFlags, null, [typeof(FieldArgumentsValidationContext)], null)
             ?? throw new InvalidOperationException($"Could not find method '{_validationMethodName}' on CLR type '{validationType.GetFriendlyName()}' while initializing '{graphType.Name}.{fieldType.Name}'. The method must have a single parameter of type {nameof(FieldArgumentsValidationContext)}.");
-#pragma warning restore IL2075 // UnrecognizedReflectionPattern
         if (method.ReturnType != typeof(ValueTask))
             throw new InvalidOperationException($"Method '{_validationMethodName}' on CLR type '{validationType.GetFriendlyName()}' must have a return type of ValueTask.");
-        fieldType.ValidateArguments = (Func<FieldArgumentsValidationContext, ValueTask>)method.CreateDelegate(typeof(Func<FieldArgumentsValidationContext, ValueTask>));
+        fieldType.ValidateArguments = method.CreateDelegate<Func<FieldArgumentsValidationContext, ValueTask>>();
     }
 }

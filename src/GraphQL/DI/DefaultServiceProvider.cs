@@ -16,6 +16,7 @@ public sealed class DefaultServiceProvider : IServiceProvider
     /// </summary>
     /// <param name="serviceType">Desired type</param>
     /// <returns>An instance of <paramref name="serviceType"/>.</returns>
+    [UnconditionalSuppressMessage("Trimming", "IL2067", Justification = "Constructor is marked with RequiresUnreferencedCode")]
     public object? GetService(Type serviceType)
     {
         if (serviceType == null)
@@ -29,9 +30,7 @@ public sealed class DefaultServiceProvider : IServiceProvider
 
         try
         {
-#pragma warning disable IL2067
             return Activator.CreateInstance(serviceType);
-#pragma warning restore IL2067
         }
         catch (Exception exception)
         {
