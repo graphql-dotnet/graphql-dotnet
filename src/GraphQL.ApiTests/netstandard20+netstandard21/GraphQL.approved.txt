@@ -3252,22 +3252,24 @@ namespace GraphQL.Types.Aot
     public abstract class AotAutoRegisteringInterfaceGraphType<TSource> : GraphQL.Types.AutoRegisteringInterfaceGraphType<TSource>
     {
         public AotAutoRegisteringInterfaceGraphType() { }
-        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<T>> fn) { }
-        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<T>> fn) { }
-        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, T> fn) { }
-        protected override sealed void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
-        protected override sealed System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
+        protected virtual System.Func<GraphQL.IResolveFieldContext, TParameterType> BuildArgument<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
+        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<T>> fn, bool requiresAccessor) { }
+        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<T>> fn, bool requiresAccessor) { }
+        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, T> fn, bool requiresAccessor) { }
+        protected override void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
+        protected override System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
     }
     public abstract class AotAutoRegisteringObjectGraphType<TSource> : GraphQL.Types.AutoRegisteringObjectGraphType<TSource>
     {
         public AotAutoRegisteringObjectGraphType() { }
-        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<T>> fn) { }
-        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<T>> fn) { }
-        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, T> fn) { }
-        protected override sealed void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
+        protected virtual System.Func<GraphQL.IResolveFieldContext, TParameterType> BuildArgument<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
+        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<T>> fn, bool requiresAccessor) { }
+        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<T>> fn, bool requiresAccessor) { }
+        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, T> fn, bool requiresAccessor) { }
+        protected override void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
         protected override sealed System.Linq.Expressions.LambdaExpression BuildMemberInstanceExpression(System.Reflection.MemberInfo memberInfo) { }
         protected virtual TSource GetMemberInstance(GraphQL.IResolveFieldContext context) { }
-        protected override sealed System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
+        protected override System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
     }
 }
 namespace GraphQL.Types.Relay

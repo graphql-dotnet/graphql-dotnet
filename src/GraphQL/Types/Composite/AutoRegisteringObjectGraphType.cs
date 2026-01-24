@@ -61,6 +61,8 @@ public class AutoRegisteringObjectGraphType<[NotAGraphType] TSourceType> : Objec
     {
     }
 
+    [RequiresUnreferencedCode("Scans the specified type for public methods and properties, which may not be statically referenced.")]
+    [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
     private AutoRegisteringObjectGraphType(AutoRegisteringObjectGraphType<TSourceType>? cloneFrom, Expression<Func<TSourceType, object?>>[]? excludedProperties, bool cache)
         : base(cloneFrom)
     {
@@ -68,6 +70,7 @@ public class AutoRegisteringObjectGraphType<[NotAGraphType] TSourceType> : Objec
         if (cloneFrom != null)
             return;
 
+        _sourceExpression ??= AutoRegisteringOutputHelper.BuildSourceExpression<TSourceType>();
         _excludedProperties = excludedProperties;
         Name = typeof(TSourceType).GraphQLName();
         ConfigureGraph();
@@ -178,17 +181,9 @@ public class AutoRegisteringObjectGraphType<[NotAGraphType] TSourceType> : Objec
     /// </summary>
     /// <param name="memberInfo">The member being called or accessed.</param>
     protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
-        => _sourceExpression;
+        => _sourceExpression!;
 
-    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "The constructor is marked with RequiresUnreferencedCode.")]
-    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "The constructor is marked with RequiresDynamicCode.")]
-    private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression
-        = AutoRegisteringOutputHelper.BuildSourceExpression<TSourceType>();
-
-    internal static object ThrowSourceNullException()
-    {
-        throw new InvalidOperationException("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
-    }
+    private static Expression<Func<IResolveFieldContext, TSourceType>>? _sourceExpression;
 
     /// <inheritdoc cref="AutoRegisteringOutputHelper.ApplyArgumentAttributes(ParameterInfo, QueryArgument)"/>
     protected virtual void ApplyArgumentAttributes(ParameterInfo parameterInfo, QueryArgument queryArgument)
