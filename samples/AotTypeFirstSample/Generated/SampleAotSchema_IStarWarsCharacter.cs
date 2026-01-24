@@ -1,142 +1,70 @@
-using GraphQL;
+using System.Reflection;
+using GraphQL.StarWars.TypeFirst;
 using GraphQL.StarWars.TypeFirst.Types;
 using GraphQL.Types;
-using GraphQL.Types.Relay.DataObjects;
+using GraphQL.Types.Aot;
 
 namespace AotSample;
 
 public partial class SampleAotSchema : AotSchema
 {
-    private class AutoOutputGraphType_IStarWarsCharacter : InterfaceGraphType<IStarWarsCharacter>
+    private class AutoOutputGraphType_IStarWarsCharacter : AotAutoRegisteringInterfaceGraphType<IStarWarsCharacter>
     {
+        private readonly Dictionary<MemberInfo, Action<FieldType, MemberInfo>> _members;
         public AutoOutputGraphType_IStarWarsCharacter()
         {
-            // 1. set name from type
-            Name = "IStarWarsCharacter";
-
-            // 2. apply graph type attributes (this happens before fields are added)
+            _members = new()
             {
-                var attr = new NameAttribute("Character");
-                attr.Modify(this);
-            }
-
-            // 3. add fields
-            ConditionalAddField(ConstructField_Id());
-            ConditionalAddField(ConstructField_Name());
-            // Friends property is marked with [Ignore], so no field is generated
-            ConditionalAddField(ConstructField_GetFriends());
-            ConditionalAddField(ConstructField_GetFriendsConnection());
-            ConditionalAddField(ConstructField_AppearsIn());
-            // Cursor property is marked with [Ignore], so no field is generated
-        }
-
-        private void ConditionalAddField(FieldType? fieldType)
-        {
-            // used when ShouldInclude returns false (note that fields marked with [Ignore] will not generate code at all)
-            if (fieldType != null)
+                { typeof(IStarWarsCharacter).GetProperty(nameof(IStarWarsCharacter.Id))!, ConstructField_Id },
+                { typeof(IStarWarsCharacter).GetProperty(nameof(IStarWarsCharacter.Name))!, ConstructField_Name },
+                // Friends property is marked with [Ignore], so no field is generated
+                { typeof(IStarWarsCharacter).GetMethod(nameof(IStarWarsCharacter.GetFriends), [typeof(StarWarsData)])!, ConstructField_GetFriends },
+                { typeof(IStarWarsCharacter).GetMethod(nameof(IStarWarsCharacter.GetFriendsConnection), [typeof(StarWarsData)])!, ConstructField_GetFriendsConnection },
+                { typeof(IStarWarsCharacter).GetProperty(nameof(IStarWarsCharacter.AppearsIn))!, ConstructField_AppearsIn },
+                // Cursor property is marked with [Ignore], so no field is generated
+            };
+            foreach (var fieldType in ProvideFields())
+            {
                 AddField(fieldType);
+            }
         }
 
-        public FieldType? ConstructField_Id()
+        protected override IEnumerable<MemberInfo> GetRegisteredMembers() => _members.Keys;
+        protected override void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
         {
-            // 1. setup
-            var fieldType = new FieldType()
+            _members[memberInfo](fieldType, memberInfo);
+            if (!fieldType.IsPrivate)
             {
-                Name = "Id",
-                Type = typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>),
-            };
-
-            // 2. process attributes on property
-            {
-                var attr = new System.ComponentModel.DescriptionAttribute("The id of the character.");
-                fieldType.Description = attr.Description;
+                fieldType.Resolver = null;
+                fieldType.StreamResolver = null;
             }
-
-            return fieldType;
         }
 
-        public FieldType? ConstructField_Name()
+        public void ConstructField_Id(FieldType fieldType, MemberInfo memberInfo)
         {
-            var fieldType = new FieldType()
-            {
-                Name = "Name",
-                Type = typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>),
-            };
-
-            // process attributes on property
-            {
-                var attr = new System.ComponentModel.DescriptionAttribute("The name of the character.");
-                fieldType.Description = attr.Description;
-            }
-
-            return fieldType;
+            fieldType.Description = "The id of the character.";
         }
 
-        public FieldType? ConstructField_GetFriends()
+        public void ConstructField_Name(FieldType fieldType, MemberInfo memberInfo)
         {
-            // 1. setup
-            var fieldType = new FieldType()
-            {
-                Name = "GetFriends",
-                Type = typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<IStarWarsCharacter>>>),
-            };
-            var method = typeof(IStarWarsCharacter).GetMethod(nameof(IStarWarsCharacter.GetFriends))
-                ?? throw new InvalidOperationException("Method not found");
-
-            // 2. process attributes on method
-            {
-                var attr = new NameAttribute("Friends");
-                attr.Modify(fieldType, false);
-                if (!attr.ShouldInclude(method, false))
-                    return null;
-            }
-
-            // 3. process parameters excluding those that are argument resolvers
-            var parameters = method.GetParameters();
-
-            return fieldType;
+            fieldType.Description = "The name of the character.";
         }
 
-        public FieldType? ConstructField_GetFriendsConnection()
+        public void ConstructField_GetFriends(FieldType fieldType, MemberInfo memberInfo)
         {
-            // 1. setup
-            var fieldType = new FieldType()
-            {
-                Name = "GetFriendsConnection",
-                Type = typeof(NonNullGraphType<GraphQLClrOutputTypeReference<Connection<IStarWarsCharacter>>>),
-            };
-            var method = typeof(IStarWarsCharacter).GetMethod(nameof(IStarWarsCharacter.GetFriendsConnection))
-                ?? throw new InvalidOperationException("Method not found");
-
-            // 2. process attributes on method
-            {
-                var attr = new NameAttribute("FriendsConnection");
-                attr.Modify(fieldType, false);
-                if (!attr.ShouldInclude(method, false))
-                    return null;
-            }
-
-            // 3. process parameters excluding those that are argument resolvers
-            var parameters = method.GetParameters();
-
-            return fieldType;
+            var parameters = ((MethodInfo)memberInfo).GetParameters();
+            var param0 = BuildArgument<StarWarsData>(fieldType, parameters[0]);
         }
 
-        public FieldType? ConstructField_AppearsIn()
+        public void ConstructField_GetFriendsConnection(FieldType fieldType, MemberInfo memberInfo)
         {
-            var fieldType = new FieldType()
-            {
-                Name = "AppearsIn",
-                Type = typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<Episodes>>>),
-            };
+            var parameters = ((MethodInfo)memberInfo).GetParameters();
+            var param0 = BuildArgument<StarWarsData>(fieldType, parameters[0]);
+        }
 
-            // process attributes on property
-            {
-                var attr = new System.ComponentModel.DescriptionAttribute("Which movie they appear in.");
-                fieldType.Description = attr.Description;
-            }
-
-            return fieldType;
+        public void ConstructField_AppearsIn(FieldType fieldType, MemberInfo memberInfo)
+        {
+            fieldType.Description = "Which movie they appear in.";
         }
     }
 }

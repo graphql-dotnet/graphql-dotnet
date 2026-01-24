@@ -1,202 +1,80 @@
-using GraphQL;
-using GraphQL.Resolvers;
+using System.Reflection;
 using GraphQL.StarWars.TypeFirst;
 using GraphQL.StarWars.TypeFirst.Types;
 using GraphQL.Types;
-using GraphQL.Types.Relay.DataObjects;
+using GraphQL.Types.Aot;
 
 namespace AotSample;
 
 public partial class SampleAotSchema : AotSchema
 {
-    private class AutoOutputGraphType_Droid : ObjectGraphType<Droid>
+    private class AutoOutputGraphType_Droid : AotAutoRegisteringObjectGraphType<Droid>
     {
+        private readonly Dictionary<MemberInfo, Action<FieldType, MemberInfo>> _members;
         public AutoOutputGraphType_Droid()
         {
-            // 1. set name from type name
-            Name = "Droid";
-
-            // 2. apply graph type attributes (this happens before fields are added)
+            _members = new()
             {
-                var attr = new ImplementsAttribute(typeof(IStarWarsCharacter));
-                attr.Modify(this);
-            }
-
-            // 3. add fields from IStarWarsCharacter interface
-            ConditionalAddField(ConstructField_Id());
-            ConditionalAddField(ConstructField_Name());
-            // Friends property is marked with [Ignore], so no field is generated
-            ConditionalAddField(ConstructField_GetFriends());
-            ConditionalAddField(ConstructField_GetFriendsConnection());
-            ConditionalAddField(ConstructField_AppearsIn());
-            // Cursor property is marked with [Ignore], so no field is generated
-            ConditionalAddField(ConstructField_PrimaryFunction());
-        }
-
-        private void ConditionalAddField(FieldType? fieldType)
-        {
-            // used when ShouldInclude returns false (note that fields marked with [Ignore] will not generate code at all)
-            if (fieldType != null)
+                { typeof(Droid).GetProperty(nameof(Droid.Id))!, ConstructField_Id },
+                { typeof(Droid).GetProperty(nameof(Droid.Name))!, ConstructField_Name },
+                // Friends property is marked with [Ignore], so no field is generated
+                { typeof(Droid).GetMethod(nameof(Droid.GetFriends), [typeof(StarWarsData)])!, ConstructField_GetFriends },
+                { typeof(Droid).GetMethod(nameof(Droid.GetFriendsConnection), [typeof(StarWarsData)])!, ConstructField_GetFriendsConnection },
+                { typeof(Droid).GetProperty(nameof(Droid.AppearsIn))!, ConstructField_AppearsIn },
+                // Cursor property is marked with [Ignore], so no field is generated
+                { typeof(Droid).GetProperty(nameof(Droid.PrimaryFunction))!, ConstructField_PrimaryFunction },
+            };
+            foreach (var fieldType in ProvideFields())
+            {
                 AddField(fieldType);
+            }
         }
 
-        public FieldType? ConstructField_Id()
+        protected override IEnumerable<MemberInfo> GetRegisteredMembers() => _members.Keys;
+        protected override void BuildFieldType(FieldType fieldType, MemberInfo memberInfo) => _members[memberInfo](fieldType, memberInfo);
+
+        public void ConstructField_Id(FieldType fieldType, MemberInfo memberInfo)
         {
-            // 1. setup
-            var fieldType = new FieldType()
-            {
-                Name = "Id",
-                Type = typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>),
-            };
-
-            // 2. process attributes on property
-            {
-                var attr = new System.ComponentModel.DescriptionAttribute("The id of the character.");
-                fieldType.Description = attr.Description;
-            }
-
-            // 3. configure resolver
-            fieldType.Resolver = new FuncFieldResolver<string>(context => ((Droid)context.Source!).Id);
-
-            return fieldType;
+            fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).Id, false);
         }
 
-        public FieldType? ConstructField_Name()
+        public void ConstructField_Name(FieldType fieldType, MemberInfo memberInfo)
         {
-            var fieldType = new FieldType()
-            {
-                Name = "Name",
-                Type = typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>),
-            };
-
-            // process attributes on property
-            {
-                var attr = new System.ComponentModel.DescriptionAttribute("The name of the character.");
-                fieldType.Description = attr.Description;
-            }
-
-            // configure resolver
-            fieldType.Resolver = new FuncFieldResolver<string>(context => ((Droid)context.Source!).Name);
-
-            return fieldType;
+            fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).Name, false);
         }
 
-        public FieldType? ConstructField_GetFriends()
+        public void ConstructField_GetFriends(FieldType fieldType, MemberInfo memberInfo)
         {
-            // 1. setup
-            var fieldType = new FieldType()
+            var parameters = ((MethodInfo)memberInfo).GetParameters();
+            var param0 = BuildArgument<StarWarsData>(fieldType, parameters[0]);
+            fieldType.Resolver = BuildFieldResolver(context =>
             {
-                Name = "GetFriends",
-                Type = typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<IStarWarsCharacter>>>),
-            };
-            var method = typeof(IStarWarsCharacter).GetMethod(nameof(IStarWarsCharacter.GetFriends))
-                ?? throw new InvalidOperationException("Method not found");
-
-            // 2. process attributes on method
-            {
-                var attr = new NameAttribute("Friends");
-                attr.Modify(fieldType, false);
-            }
-
-            // 3. process parameters
-            var parameters = method.GetParameters();
-
-            // compile arg1
-            Func<IResolveFieldContext, StarWarsData> arg1Func;
-            {
-                var parameter = parameters[0];
-                var typeInformation = new TypeInformation(parameter, typeof(StarWarsData), false, false, false, null);
-                var argInfo = new ArgumentInformation(parameter, typeof(StarWarsData), fieldType, typeInformation);
-
-                var arg1_attr1 = new FromServicesAttribute();
-                arg1Func = arg1_attr1.GetResolver<StarWarsData>(argInfo);
-            }
-
-            // 4. configure resolver
-            fieldType.Resolver = new FuncFieldResolver<IEnumerable<IStarWarsCharacter>>(context =>
-            {
-                var source = (Droid)context.Source!;
-                var arg1 = arg1Func(context);
-                return source.GetFriends(arg1)!;
-            });
-
-            return fieldType;
+                var source = GetMemberInstance(context);
+                var arg0 = param0(context);
+                return source.GetFriends(arg0);
+            }, true);
         }
 
-        public FieldType? ConstructField_GetFriendsConnection()
+        public void ConstructField_GetFriendsConnection(FieldType fieldType, MemberInfo memberInfo)
         {
-            // 1. setup
-            var fieldType = new FieldType()
+            var parameters = ((MethodInfo)memberInfo).GetParameters();
+            var param0 = BuildArgument<StarWarsData>(fieldType, parameters[0]);
+            fieldType.Resolver = BuildFieldResolver(context =>
             {
-                Name = "GetFriendsConnection",
-                Type = typeof(NonNullGraphType<GraphQLClrOutputTypeReference<Connection<IStarWarsCharacter>>>),
-            };
-            var method = typeof(IStarWarsCharacter).GetMethod(nameof(IStarWarsCharacter.GetFriendsConnection))
-                ?? throw new InvalidOperationException("Method not found");
-
-            // 2. process attributes on method
-            {
-                var attr = new NameAttribute("FriendsConnection");
-                attr.Modify(fieldType, false);
-            }
-
-            // 3. process parameters
-            var parameters = method.GetParameters();
-
-            // compile arg1
-            Func<IResolveFieldContext, StarWarsData> arg1Func;
-            {
-                var parameter = parameters[0];
-                var typeInformation = new TypeInformation(parameter, typeof(StarWarsData), false, false, false, null);
-                var argInfo = new ArgumentInformation(parameter, typeof(StarWarsData), fieldType, typeInformation);
-
-                var arg1_attr1 = new FromServicesAttribute();
-                arg1Func = arg1_attr1.GetResolver<StarWarsData>(argInfo);
-            }
-
-            // 4. configure resolver
-            fieldType.Resolver = new FuncFieldResolver<Connection<IStarWarsCharacter>>(context =>
-            {
-                var source = (Droid)context.Source!;
-                var arg1 = arg1Func(context);
-                return source.GetFriendsConnection(arg1)!;
-            });
-
-            return fieldType;
+                var source = GetMemberInstance(context);
+                var arg0 = param0(context);
+                return source.GetFriendsConnection(arg0);
+            }, true);
         }
 
-        public FieldType? ConstructField_AppearsIn()
+        public void ConstructField_AppearsIn(FieldType fieldType, MemberInfo memberInfo)
         {
-            var fieldType = new FieldType()
-            {
-                Name = "AppearsIn",
-                Type = typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<Episodes>>>),
-            };
-
-            // process attributes on property
-            {
-                var attr = new System.ComponentModel.DescriptionAttribute("Which movie they appear in.");
-                fieldType.Description = attr.Description;
-            }
-
-            // configure resolver
-            fieldType.Resolver = new FuncFieldResolver<Episodes[]>(context => ((Droid)context.Source!).AppearsIn);
-
-            return fieldType;
+            fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).AppearsIn, false);
         }
 
-        public FieldType? ConstructField_PrimaryFunction()
+        public void ConstructField_PrimaryFunction(FieldType fieldType, MemberInfo memberInfo)
         {
-            var fieldType = new FieldType()
-            {
-                Name = "PrimaryFunction",
-                Type = typeof(GraphQLClrOutputTypeReference<string>),
-            };
-
-            // configure resolver
-            fieldType.Resolver = new FuncFieldResolver<string?>(context => ((Droid)context.Source!).PrimaryFunction);
-
-            return fieldType;
+            fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).PrimaryFunction, false);
         }
     }
 }

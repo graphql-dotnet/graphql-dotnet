@@ -1,89 +1,54 @@
-using GraphQL.Resolvers;
+using System.Reflection;
 using GraphQL.StarWars.TypeFirst.Types;
 using GraphQL.Types;
+using GraphQL.Types.Aot;
 using GraphQL.Types.Relay.DataObjects;
 
 namespace AotSample;
 
 public partial class SampleAotSchema : AotSchema
 {
-    private class AutoOutputGraphType_Connection_IStarWarsCharacter : ObjectGraphType<Connection<IStarWarsCharacter>>
+    private class AutoOutputGraphType_Connection_IStarWarsCharacter : AotAutoRegisteringObjectGraphType<Connection<IStarWarsCharacter>>
     {
+        private readonly Dictionary<MemberInfo, Action<FieldType, MemberInfo>> _members;
         public AutoOutputGraphType_Connection_IStarWarsCharacter()
         {
-            // 1. apply graph type attributes (this happens before fields are added)
-
-            // set name from type name
             Name = "CharacterConnection";
 
-            // 2. add fields
-            ConditionalAddField(ConstructField_TotalCount());
-            ConditionalAddField(ConstructField_PageInfo());
-            ConditionalAddField(ConstructField_Edges());
-            ConditionalAddField(ConstructField_Items());
-        }
-
-        private void ConditionalAddField(FieldType? fieldType)
-        {
-            // used when ShouldInclude returns false (note that fields marked with [Ignore] will not generate code at all)
-            if (fieldType != null)
+            _members = new()
+            {
+                { typeof(GraphQL.Types.Relay.DataObjects.Connection<IStarWarsCharacter>).GetProperty(nameof(GraphQL.Types.Relay.DataObjects.Connection<IStarWarsCharacter>.TotalCount))!, ConstructField_TotalCount },
+                { typeof(GraphQL.Types.Relay.DataObjects.Connection<IStarWarsCharacter>).GetProperty(nameof(GraphQL.Types.Relay.DataObjects.Connection<IStarWarsCharacter>.PageInfo))!, ConstructField_PageInfo },
+                { typeof(GraphQL.Types.Relay.DataObjects.Connection<IStarWarsCharacter>).GetProperty(nameof(GraphQL.Types.Relay.DataObjects.Connection<IStarWarsCharacter>.Edges))!, ConstructField_Edges },
+                { typeof(GraphQL.Types.Relay.DataObjects.Connection<IStarWarsCharacter>).GetProperty(nameof(GraphQL.Types.Relay.DataObjects.Connection<IStarWarsCharacter>.Items))!, ConstructField_Items },
+            };
+            foreach (var fieldType in ProvideFields())
+            {
                 AddField(fieldType);
+            }
         }
 
-        public FieldType? ConstructField_TotalCount()
+        protected override IEnumerable<MemberInfo> GetRegisteredMembers() => _members.Keys;
+        protected override void BuildFieldType(FieldType fieldType, MemberInfo memberInfo) => _members[memberInfo](fieldType, memberInfo);
+
+        public void ConstructField_TotalCount(FieldType fieldType, MemberInfo memberInfo)
         {
-            var fieldType = new FieldType()
-            {
-                Name = "TotalCount",
-                Type = typeof(GraphQLClrOutputTypeReference<int>),
-            };
-
-            // configure resolver
-            fieldType.Resolver = new FuncFieldResolver<int?>(context => ((Connection<IStarWarsCharacter>)context.Source!).TotalCount);
-
-            return fieldType;
+            fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).TotalCount, false);
         }
 
-        public FieldType? ConstructField_PageInfo()
+        public void ConstructField_PageInfo(FieldType fieldType, MemberInfo memberInfo)
         {
-            var fieldType = new FieldType()
-            {
-                Name = "PageInfo",
-                Type = typeof(GraphQLClrOutputTypeReference<PageInfo>),
-            };
-
-            // configure resolver
-            fieldType.Resolver = new FuncFieldResolver<PageInfo?>(context => ((Connection<IStarWarsCharacter>)context.Source!).PageInfo);
-
-            return fieldType;
+            fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).PageInfo, false);
         }
 
-        public FieldType? ConstructField_Edges()
+        public void ConstructField_Edges(FieldType fieldType, MemberInfo memberInfo)
         {
-            var fieldType = new FieldType()
-            {
-                Name = "Edges",
-                Type = typeof(ListGraphType<GraphQLClrOutputTypeReference<Edge<IStarWarsCharacter>>>),
-            };
-
-            // configure resolver
-            fieldType.Resolver = new FuncFieldResolver<List<Edge<IStarWarsCharacter>>?>(context => ((Connection<IStarWarsCharacter>)context.Source!).Edges);
-
-            return fieldType;
+            fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).Edges, false);
         }
 
-        public FieldType? ConstructField_Items()
+        public void ConstructField_Items(FieldType fieldType, MemberInfo memberInfo)
         {
-            var fieldType = new FieldType()
-            {
-                Name = "Items",
-                Type = typeof(ListGraphType<GraphQLClrOutputTypeReference<IStarWarsCharacter>>),
-            };
-
-            // configure resolver
-            fieldType.Resolver = new FuncFieldResolver<List<IStarWarsCharacter?>?>(context => ((Connection<IStarWarsCharacter>)context.Source!).Items);
-
-            return fieldType;
+            fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).Items, false);
         }
     }
 }

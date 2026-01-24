@@ -1,69 +1,42 @@
+using System.Reflection;
 using GraphQL;
 using GraphQL.StarWars.TypeFirst.Types;
 using GraphQL.Types;
+using GraphQL.Types.Aot;
 using GraphQLParser.AST;
 
 namespace AotSample;
 
 public partial class SampleAotSchema : AotSchema
 {
-    private class AutoInputGraphType_HumanInput : ComplexGraphType<HumanInput>, IInputObjectGraphType
+    private class AutoInputGraphType_HumanInput : AotAutoRegisteringInputObjectGraphType<HumanInput>
     {
-        private readonly FieldType[] _inputFields;
-
-        /// <inheritdoc/>
-        public bool IsOneOf { get; set; }
+        private readonly MemberInfo[] _members;
+        private readonly FieldType[] _fields;
 
         public AutoInputGraphType_HumanInput()
         {
-            // 1. set default name from type name
-            Name = "HumanInput";
-
-            // 2. apply graph type attributes (this happens before fields are added)
-
-            // 3. add fields
-            _inputFields = [
-                AddField_Name(),
-                AddField_HomePlanet(),
+            _members = [
+                typeof(HumanInput).GetProperty(nameof(HumanInput.Name))!,
+                typeof(HumanInput).GetProperty(nameof(HumanInput.HomePlanet))!,
             ];
-        }
-
-        private FieldType AddField_Name()
-        {
-            var fieldType = new FieldType
+            _fields = ProvideFields().ToArray();
+            foreach (var fieldType in _fields)
             {
-                Name = "Name",
-                Type = typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>),
-            };
-
-            // process attributes on property (none in this case)
-
-            AddField(fieldType);
-            return fieldType;
+                AddField(fieldType);
+            }
         }
 
-        private FieldType AddField_HomePlanet()
-        {
-            var fieldType = new FieldType
-            {
-                Name = "HomePlanet",
-                Type = typeof(GraphQLClrInputTypeReference<string>),
-            };
+        protected override IEnumerable<MemberInfo> GetRegisteredMembers() => _members;
 
-            // process attributes on property (none in this case)
-
-            AddField(fieldType);
-            return fieldType;
-        }
-
-        public object ParseDictionary(IDictionary<string, object?> value, IValueConverter valueConverter)
+        public override object ParseDictionary(IDictionary<string, object?> value, IValueConverter valueConverter)
         {
             // supports arguments in constructors, required and init
             // exactly same semantics as non-aot input object types
             return new HumanInput
             {
-                Name = ParseField<string>(_inputFields[0]),
-                HomePlanet = ParseField<string?>(_inputFields[1]),
+                Name = ParseField<string>(_fields[0]),
+                HomePlanet = ParseField<string?>(_fields[1]),
             };
 
             TFieldType ParseField<TFieldType>(FieldType fieldType)
@@ -76,20 +49,20 @@ public partial class SampleAotSchema : AotSchema
             }
         }
 
-        public bool IsValidDefault(object value)
+        public override bool IsValidDefault(object value)
         {
             if (value is not HumanInput obj)
                 return false;
 
-            if (_inputFields[0].ResolvedType!.IsValidDefault(obj.Name))
+            if (_fields[0].ResolvedType!.IsValidDefault(obj.Name))
                 return false;
-            if (_inputFields[1].ResolvedType!.IsValidDefault(obj.HomePlanet))
+            if (_fields[1].ResolvedType!.IsValidDefault(obj.HomePlanet))
                 return false;
 
             return true;
         }
 
-        public GraphQLValue ToAST(object? value)
+        public override GraphQLValue ToAST(object? value)
         {
             if (value == null)
                 return new GraphQLNullValue();
@@ -99,12 +72,11 @@ public partial class SampleAotSchema : AotSchema
 
             var objectValue = new GraphQLObjectValue
             {
-                Fields = new(_inputFields.Length)
+                Fields = new(_fields.Length)
             };
 
-            // Handle 'name'
-            ProcessField(_inputFields[0], obj.Name);
-            ProcessField(_inputFields[1], obj.HomePlanet);
+            ProcessField(_fields[0], obj.Name);
+            ProcessField(_fields[1], obj.HomePlanet);
 
             return objectValue;
 

@@ -1,85 +1,42 @@
-using GraphQL;
-using GraphQL.Resolvers;
+using System.Reflection;
 using GraphQL.StarWars.TypeFirst;
 using GraphQL.StarWars.TypeFirst.Types;
 using GraphQL.Types;
+using GraphQL.Types.Aot;
 
 namespace AotSample;
 
 public partial class SampleAotSchema : AotSchema
 {
-    private class AutoOutputGraphType_StarWarsMutation : ObjectGraphType<StarWarsMutation>
+    private class AutoOutputGraphType_StarWarsMutation : AotAutoRegisteringObjectGraphType<StarWarsMutation>
     {
+        private readonly Dictionary<MemberInfo, Action<FieldType, MemberInfo>> _members;
         public AutoOutputGraphType_StarWarsMutation()
         {
-            // 1. apply graph type attributes (this happens before fields are added)
-
-            // set name from attribute
+            _members = new()
             {
-                var attr = new NameAttribute("Mutation");
-                attr.Modify(this);
-            }
-
-            // 2. add fields
-            ConditionalAddField(ConstructField_CreateHuman());
-        }
-
-        private void ConditionalAddField(FieldType? fieldType)
-        {
-            // used when ShouldInclude returns false (note that fields marked with [Ignore] will not generate code at all)
-            if (fieldType != null)
-                AddField(fieldType);
-        }
-
-        public FieldType? ConstructField_CreateHuman()
-        {
-            // 1. setup
-            var fieldType = new FieldType()
-            {
-                Name = "CreateHuman",
-                Type = typeof(NonNullGraphType<GraphQLClrOutputTypeReference<Human>>),
+                { typeof(StarWarsMutation).GetMethod(nameof(StarWarsMutation.CreateHuman), [typeof(StarWarsData), typeof(HumanInput)])!, ConstructField_CreateHuman },
             };
-            var method = typeof(StarWarsMutation).GetMethod(nameof(StarWarsMutation.CreateHuman), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static, [typeof(StarWarsData), typeof(HumanInput)])
-                ?? throw new InvalidOperationException("Method not found");
-
-            // 2. process attributes on method (none in this case)
-
-            // 3. process parameters
-            var parameters = method.GetParameters();
-
-            // compile arg1
-            Func<IResolveFieldContext, StarWarsData> arg1Func;
+            foreach (var fieldType in ProvideFields())
             {
-                var parameter = parameters[0];
-                var typeInformation = new TypeInformation(parameter, typeof(StarWarsData), false, false, false, null);
-                var argInfo = new ArgumentInformation(parameter, typeof(StarWarsData), fieldType, typeInformation);
-
-                var arg1_attr1 = new FromServicesAttribute();
-                arg1Func = arg1_attr1.GetResolver<StarWarsData>(argInfo);
+                AddField(fieldType);
             }
+        }
 
-            // create query argument for arg2
-            QueryArgument queryArgument2;
+        protected override IEnumerable<MemberInfo> GetRegisteredMembers() => _members.Keys;
+        protected override void BuildFieldType(FieldType fieldType, MemberInfo memberInfo) => _members[memberInfo](fieldType, memberInfo);
+
+        public void ConstructField_CreateHuman(FieldType fieldType, MemberInfo memberInfo)
+        {
+            var parameters = ((MethodInfo)memberInfo).GetParameters();
+            var param0 = BuildArgument<StarWarsData>(fieldType, parameters[0]);
+            var param1 = BuildArgument<HumanInput>(fieldType, parameters[1]);
+            fieldType.Resolver = BuildFieldResolver(context =>
             {
-                var parameter = parameters[1];
-                var typeInformation = new TypeInformation(parameter, typeof(HumanInput), false, false, false, null);
-                var argInfo = new ArgumentInformation(parameter, typeof(HumanInput), fieldType, typeInformation);
-
-                queryArgument2 = argInfo.ConstructQueryArgument();
-
-                fieldType.Arguments ??= new();
-                fieldType.Arguments.Add(queryArgument2);
-            }
-
-            // 4. configure resolver
-            fieldType.Resolver = new FuncFieldResolver<Human>(context =>
-            {
-                var arg1 = arg1Func(context);
-                var arg2 = context.GetArgument<HumanInput>(queryArgument2.Name);
-                return StarWarsMutation.CreateHuman(arg1, arg2)!;
-            });
-
-            return fieldType;
+                var arg0 = param0(context);
+                var arg1 = param1(context);
+                return StarWarsMutation.CreateHuman(arg0, arg1);
+            }, true);
         }
     }
 }

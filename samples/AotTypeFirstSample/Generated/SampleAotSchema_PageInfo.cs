@@ -1,88 +1,51 @@
-using GraphQL.Resolvers;
+using System.Reflection;
 using GraphQL.Types;
+using GraphQL.Types.Aot;
 using GraphQL.Types.Relay.DataObjects;
 
 namespace AotSample;
 
 public partial class SampleAotSchema : AotSchema
 {
-    private class AutoOutputGraphType_PageInfo : ObjectGraphType<PageInfo>
+    private class AutoOutputGraphType_PageInfo : AotAutoRegisteringObjectGraphType<PageInfo>
     {
+        private readonly Dictionary<MemberInfo, Action<FieldType, MemberInfo>> _members;
         public AutoOutputGraphType_PageInfo()
         {
-            // 1. apply graph type attributes (this happens before fields are added)
-
-            // set name from type name
-            Name = "PageInfo";
-
-            // 2. add fields
-            ConditionalAddField(ConstructField_HasNextPage());
-            ConditionalAddField(ConstructField_HasPreviousPage());
-            ConditionalAddField(ConstructField_StartCursor());
-            ConditionalAddField(ConstructField_EndCursor());
-        }
-
-        private void ConditionalAddField(FieldType? fieldType)
-        {
-            // used when ShouldInclude returns false (note that fields marked with [Ignore] will not generate code at all)
-            if (fieldType != null)
+            _members = new()
+            {
+                { typeof(PageInfo).GetProperty(nameof(PageInfo.HasNextPage))!, ConstructField_HasNextPage },
+                { typeof(PageInfo).GetProperty(nameof(PageInfo.HasPreviousPage))!, ConstructField_HasPreviousPage },
+                { typeof(PageInfo).GetProperty(nameof(PageInfo.StartCursor))!, ConstructField_StartCursor },
+                { typeof(PageInfo).GetProperty(nameof(PageInfo.EndCursor))!, ConstructField_EndCursor },
+            };
+            foreach (var fieldType in ProvideFields())
+            {
                 AddField(fieldType);
+            }
         }
 
-        public FieldType? ConstructField_HasNextPage()
+        protected override IEnumerable<MemberInfo> GetRegisteredMembers() => _members.Keys;
+        protected override void BuildFieldType(FieldType fieldType, MemberInfo memberInfo) => _members[memberInfo](fieldType, memberInfo);
+
+        public void ConstructField_HasNextPage(FieldType fieldType, MemberInfo memberInfo)
         {
-            var fieldType = new FieldType()
-            {
-                Name = "HasNextPage",
-                Type = typeof(NonNullGraphType<GraphQLClrOutputTypeReference<bool>>),
-            };
-
-            // configure resolver
-            fieldType.Resolver = new FuncFieldResolver<bool>(context => ((PageInfo)context.Source!).HasNextPage);
-
-            return fieldType;
+            fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).HasNextPage, false);
         }
 
-        public FieldType? ConstructField_HasPreviousPage()
+        public void ConstructField_HasPreviousPage(FieldType fieldType, MemberInfo memberInfo)
         {
-            var fieldType = new FieldType()
-            {
-                Name = "HasPreviousPage",
-                Type = typeof(NonNullGraphType<GraphQLClrOutputTypeReference<bool>>),
-            };
-
-            // configure resolver
-            fieldType.Resolver = new FuncFieldResolver<bool>(context => ((PageInfo)context.Source!).HasPreviousPage);
-
-            return fieldType;
+            fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).HasPreviousPage, false);
         }
 
-        public FieldType? ConstructField_StartCursor()
+        public void ConstructField_StartCursor(FieldType fieldType, MemberInfo memberInfo)
         {
-            var fieldType = new FieldType()
-            {
-                Name = "StartCursor",
-                Type = typeof(GraphQLClrOutputTypeReference<string>),
-            };
-
-            // configure resolver
-            fieldType.Resolver = new FuncFieldResolver<string?>(context => ((PageInfo)context.Source!).StartCursor);
-
-            return fieldType;
+            fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).StartCursor, false);
         }
 
-        public FieldType? ConstructField_EndCursor()
+        public void ConstructField_EndCursor(FieldType fieldType, MemberInfo memberInfo)
         {
-            var fieldType = new FieldType()
-            {
-                Name = "EndCursor",
-                Type = typeof(GraphQLClrOutputTypeReference<string>),
-            };
-
-            // configure resolver
-            fieldType.Resolver = new FuncFieldResolver<string?>(context => ((PageInfo)context.Source!).EndCursor);
-
-            return fieldType;
+            fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).EndCursor, false);
         }
     }
 }
