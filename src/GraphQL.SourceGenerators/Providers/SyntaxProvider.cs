@@ -66,16 +66,17 @@ internal static class SyntaxProvider
     /// Resolves AOT attribute symbols from the compilation once and caches them.
     /// Called once per compilation by the incremental generator.
     /// </summary>
-    private static ImmutableArray<INamedTypeSymbol?> GetAotAttributeSymbols(Compilation compilation)
+    private static ImmutableArray<INamedTypeSymbol> GetAotAttributeSymbols(Compilation compilation)
     {
-        var builder = ImmutableArray.CreateBuilder<INamedTypeSymbol?>(Constants.AttributeNames.All.Length);
+        var builder = ImmutableArray.CreateBuilder<INamedTypeSymbol>(Constants.AttributeNames.All.Length);
 
         foreach (var attributeName in Constants.AttributeNames.All)
         {
             // Resolve each attribute symbol using metadata name
             // Returns null if the attribute type is not referenced by the compilation
             var symbol = compilation.GetTypeByMetadataName(attributeName);
-            builder.Add(symbol);
+            if (symbol != null)
+                builder.Add(symbol);
         }
 
         return builder.ToImmutable();
@@ -89,7 +90,7 @@ internal static class SyntaxProvider
     private static bool HasAotAttribute(
         SemanticModel semanticModel,
         ClassDeclarationSyntax classDeclaration,
-        ImmutableArray<INamedTypeSymbol?> aotAttributeSymbols)
+        ImmutableArray<INamedTypeSymbol> aotAttributeSymbols)
     {
         // Get the declared symbol for the class
         var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration);
@@ -110,8 +111,7 @@ internal static class SyntaxProvider
             // Use symbol equality comparison with cached symbols
             foreach (var aotAttributeSymbol in aotAttributeSymbols)
             {
-                if (aotAttributeSymbol != null &&
-                    SymbolEqualityComparer.Default.Equals(attributeDefinition, aotAttributeSymbol))
+                if (SymbolEqualityComparer.Default.Equals(attributeDefinition, aotAttributeSymbol))
                 {
                     return true;
                 }
