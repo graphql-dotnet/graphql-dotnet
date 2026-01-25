@@ -26,6 +26,7 @@
     <Project Path="src/GraphQL.Analyzers.CodeFixes/GraphQL.Analyzers.CodeFixes.csproj" />
     <Project Path="src/GraphQL.Analyzers.Package/GraphQL.Analyzers.Package.csproj" />
     <Project Path="src/GraphQL.Analyzers/GraphQL.Analyzers.csproj" />
+    <Project Path="src/GraphQL.SourceGenerators/GraphQL.SourceGenerators.csproj" />
   </Folder>
   <Folder Name="/Caching/">
     <Project Path="src/GraphQL.MemoryCache/GraphQL.MemoryCache.csproj" />
