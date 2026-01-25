@@ -7,7 +7,7 @@ namespace GraphQL.Analyzers.Tests.SourceGenerators;
 /// Tests for Provider D (SyntaxProvider) filtering logic.
 /// These tests verify that the provider correctly identifies candidate classes based on AOT attributes.
 /// </summary>
-public class SyntaxProviderTests
+public class CandidateProviderTests
 {
     [Fact]
     public async Task FiltersOutNonPartialClasses()
