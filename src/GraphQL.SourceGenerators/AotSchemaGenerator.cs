@@ -1,7 +1,6 @@
 using System.Text;
 using GraphQL.SourceGenerators.Providers;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
 namespace GraphQL.SourceGenerators;
@@ -22,11 +21,17 @@ public class AotSchemaGenerator : IIncrementalGenerator
         context.RegisterSourceOutput(candidateClasses, GenerateSource);
     }
 
-    private static void GenerateSource(SourceProductionContext context, ClassDeclarationSyntax classDeclaration)
+    private static void GenerateSource(SourceProductionContext context, INamedTypeSymbol classSymbol)
     {
-        // Extract class information
-        var className = classDeclaration.Identifier.Text;
-        var namespaceName = GetNamespace(classDeclaration);
+        // Extract class information from symbol
+        var className = classSymbol.Name;
+
+        // Get namespace, handling global namespace properly
+        var namespaceName = string.Empty;
+        if (classSymbol.ContainingNamespace != null && !classSymbol.ContainingNamespace.IsGlobalNamespace)
+        {
+            namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
+        }
 
         // Generate the source code
         var sourceCode = GeneratePartialClass(namespaceName, className);
@@ -34,16 +39,6 @@ public class AotSchemaGenerator : IIncrementalGenerator
         // Add the generated source
         var fileName = $"{className}.g.cs";
         context.AddSource(fileName, SourceText.From(sourceCode, Encoding.UTF8));
-    }
-
-    private static string GetNamespace(ClassDeclarationSyntax classDeclaration)
-    {
-        // Walk up the syntax tree to find the namespace
-        var namespaceDeclaration = classDeclaration.Ancestors()
-            .OfType<BaseNamespaceDeclarationSyntax>()
-            .FirstOrDefault();
-
-        return namespaceDeclaration?.Name.ToString() ?? string.Empty;
     }
 
     private static string GeneratePartialClass(string namespaceName, string className)

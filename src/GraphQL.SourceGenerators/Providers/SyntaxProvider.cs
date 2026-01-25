@@ -7,7 +7,7 @@ namespace GraphQL.SourceGenerators.Providers;
 
 /// <summary>
 /// Provider D: Identifies candidate class declarations that have AOT-related attributes.
-/// Uses efficient syntax-based filtering combined with semantic attribute checking.
+/// Uses the efficient ForAttributeWithMetadataName API for optimal incremental compilation performance.
 /// </summary>
 internal static class SyntaxProvider
 {
@@ -16,108 +16,62 @@ internal static class SyntaxProvider
     /// decorated with AOT-related attributes.
     /// </summary>
     /// <remarks>
-    /// This implementation uses a three-stage approach:
-    /// 1. Resolve AOT attribute symbols once per compilation (cached)
-    /// 2. Syntax predicate: Fast check for partial classes with attributes
-    /// 3. Semantic transform: Verifies the presence of AOT attributes using cached symbols
+    /// This implementation uses ForAttributeWithMetadataName which is highly optimized:
+    /// - Roslyn maintains an internal index of symbols by attribute
+    /// - Only processes syntax nodes that actually have the target attribute
+    /// - Provides both syntax and semantic information in one pass
+    /// - Automatically handles incremental compilation caching
+    /// 
+    /// Returns INamedTypeSymbol for semantic analysis, deduplicated using symbol equality.
     /// </remarks>
-    public static IncrementalValuesProvider<ClassDeclarationSyntax> CreateCandidateProvider(
+    public static IncrementalValuesProvider<INamedTypeSymbol> CreateCandidateProvider(
         IncrementalGeneratorInitializationContext context)
     {
-        // Step 1: Resolve attribute symbols once per compilation (incremental caching)
-        var aotAttributeSymbols = context.CompilationProvider
-            .Select(static (compilation, _) => GetAotAttributeSymbols(compilation));
+        // Create a collected provider for each AOT attribute type
+        var collectedProviders =
+            new IncrementalValueProvider<ImmutableArray<INamedTypeSymbol>>[Constants.AttributeNames.All.Length];
 
-        // Step 2: Create syntax provider for candidate classes
-        var candidateClasses = context.SyntaxProvider
-            .CreateSyntaxProvider(
-                predicate: static (node, _) => IsPartialClassWithAttributes(node),
-                transform: static (context, _) => (context.SemanticModel, (ClassDeclarationSyntax)context.Node));
+        for (int i = 0; i < Constants.AttributeNames.All.Length; i++)
+            collectedProviders[i] = CreateProviderForAttribute(context, Constants.AttributeNames.All[i]).Collect();
 
-        // Step 3: Combine resolved symbols with candidates and filter
-        return candidateClasses
-            .Combine(aotAttributeSymbols)
-            .Where(static tuple =>
-            {
-                var ((semanticModel, classDeclaration), attributeSymbols) = tuple;
-                return HasAotAttribute(semanticModel, classDeclaration, attributeSymbols);
-            })
-            .Select(static (tuple, _) => tuple.Left.Item2);
-    }
-
-    /// <summary>
-    /// Fast syntax-only check to determine if a node is a partial class with attributes.
-    /// </summary>
-    private static bool IsPartialClassWithAttributes(SyntaxNode node)
-    {
-        // Must be a class declaration
-        if (node is not ClassDeclarationSyntax classDecl)
-            return false;
-
-        // Must have the partial modifier (AOT schemas must be partial for code generation)
-        if (!classDecl.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)))
-            return false;
-
-        // Must have at least one attribute list
-        return classDecl.AttributeLists.Count > 0;
-    }
-
-    /// <summary>
-    /// Resolves AOT attribute symbols from the compilation once and caches them.
-    /// Called once per compilation by the incremental generator.
-    /// </summary>
-    private static ImmutableArray<INamedTypeSymbol> GetAotAttributeSymbols(Compilation compilation)
-    {
-        var builder = ImmutableArray.CreateBuilder<INamedTypeSymbol>(Constants.AttributeNames.All.Length);
-
-        foreach (var attributeName in Constants.AttributeNames.All)
+        // Combine all collected providers into a single array provider
+        var combined = collectedProviders[0];
+        for (int i = 1; i < collectedProviders.Length; i++)
         {
-            // Resolve each attribute symbol using metadata name
-            // Returns null if the attribute type is not referenced by the compilation
-            var symbol = compilation.GetTypeByMetadataName(attributeName);
-            if (symbol != null)
-                builder.Add(symbol);
+            var current = collectedProviders[i];
+            combined = combined.Combine(current)
+                .Select(static (t, _) => t.Left.AddRange(t.Right));
         }
 
-        return builder.ToImmutable();
+        // Deduplicate
+        return combined
+            .SelectMany(static (syms, _) => syms.Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default));
     }
 
     /// <summary>
-    /// Checks if the class has any AOT attributes using pre-resolved attribute symbols.
-    /// Uses symbol equality comparison which is more robust than string matching.
-    /// Handles both generic and non-generic attributes correctly.
+    /// Creates a provider for a specific AOT attribute using ForAttributeWithMetadataName.
     /// </summary>
-    private static bool HasAotAttribute(
-        SemanticModel semanticModel,
-        ClassDeclarationSyntax classDeclaration,
-        ImmutableArray<INamedTypeSymbol> aotAttributeSymbols)
+    private static IncrementalValuesProvider<INamedTypeSymbol> CreateProviderForAttribute(
+        IncrementalGeneratorInitializationContext context,
+        string fullyQualifiedMetadataName)
     {
-        // Get the declared symbol for the class
-        var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration);
-        if (classSymbol == null)
-            return false;
+        return context.SyntaxProvider.ForAttributeWithMetadataName(
+            fullyQualifiedMetadataName,
+            predicate: static (node, _) => IsPartialClass(node),
+            transform: static (ctx, _) => (INamedTypeSymbol)ctx.TargetSymbol);
+    }
 
-        // Check if any attribute on the class matches our pre-resolved AOT attribute symbols
-        foreach (var attribute in classSymbol.GetAttributes())
-        {
-            var attributeClass = attribute.AttributeClass;
-            if (attributeClass == null)
-                continue;
-
-            // For generic attributes (e.g., AotQueryType<T>), we need to compare the unbound generic type
-            // OriginalDefinition gives us the unbound generic type definition for comparison
-            var attributeDefinition = attributeClass.OriginalDefinition;
-
-            // Use symbol equality comparison with cached symbols
-            foreach (var aotAttributeSymbol in aotAttributeSymbols)
-            {
-                if (SymbolEqualityComparer.Default.Equals(attributeDefinition, aotAttributeSymbol))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+    /// <summary>
+    /// Fast syntax-only check to determine if a node is a partial class.
+    /// </summary>
+    /// <remarks>
+    /// ForAttributeWithMetadataName already filters by attribute presence,
+    /// so we only need to verify the class is partial (required for code generation).
+    /// </remarks>
+    private static bool IsPartialClass(SyntaxNode node)
+    {
+        // Must be a class declaration with the partial modifier
+        return node is ClassDeclarationSyntax classDecl &&
+               classDecl.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
     }
 }
