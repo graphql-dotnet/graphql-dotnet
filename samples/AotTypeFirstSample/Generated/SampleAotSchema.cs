@@ -81,14 +81,13 @@ public partial class SampleAotSchema : AotSchema, IListConverterFactory
         this.RegisterTypeMapping<bool, BooleanGraphType>();
         this.RegisterTypeMapping<double, FloatGraphType>();
 
-        // register list conversions for:
-        //   1. all input list fields identified during source-generation
-        //   2. all input list types specified via [AotListType] attributes
-        // (none in this sample)
-
         // configure root types when specified via [AotQueryType] or similar attributes
         Query = this.GetRequiredService<AutoRegisteringObjectGraphType<StarWarsQuery>>();
         Mutation = this.GetRequiredService<AutoRegisteringObjectGraphType<StarWarsMutation>>();
+
+        // register list conversions for:
+        //   1. all input list fields identified during source-generation
+        //   2. all input list types specified via [AotListType] attributes
 
         // register list types resolving to int[]
         {
