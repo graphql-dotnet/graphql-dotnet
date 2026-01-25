@@ -1,3 +1,4 @@
+using GraphQL.SourceGenerators.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -21,15 +22,15 @@ internal static class SyntaxProvider
     /// - Only processes syntax nodes that actually have the target attribute
     /// - Provides both syntax and semantic information in one pass
     /// - Automatically handles incremental compilation caching
-    /// 
-    /// Returns INamedTypeSymbol for semantic analysis, deduplicated using symbol equality.
+    ///
+    /// Returns CandidateClass containing both syntax and semantic model for code generation.
     /// </remarks>
-    public static IncrementalValuesProvider<INamedTypeSymbol> CreateCandidateProvider(
+    public static IncrementalValuesProvider<CandidateClass> CreateCandidateProvider(
         IncrementalGeneratorInitializationContext context)
     {
         // Create a collected provider for each AOT attribute type
         var collectedProviders =
-            new IncrementalValueProvider<ImmutableArray<INamedTypeSymbol>>[Constants.AttributeNames.All.Length];
+            new IncrementalValueProvider<ImmutableArray<CandidateClass>>[Constants.AttributeNames.All.Length];
 
         for (int i = 0; i < Constants.AttributeNames.All.Length; i++)
             collectedProviders[i] = CreateProviderForAttribute(context, Constants.AttributeNames.All[i]).Collect();
@@ -43,22 +44,24 @@ internal static class SyntaxProvider
                 .Select(static (t, _) => t.Left.AddRange(t.Right));
         }
 
-        // Deduplicate
+        // Deduplicate by comparing the syntax nodes (using reference equality is fine for syntax nodes)
         return combined
-            .SelectMany(static (syms, _) => syms.Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default));
+            .SelectMany(static (candidates, _) => Deduplicate(candidates));
     }
 
     /// <summary>
     /// Creates a provider for a specific AOT attribute using ForAttributeWithMetadataName.
     /// </summary>
-    private static IncrementalValuesProvider<INamedTypeSymbol> CreateProviderForAttribute(
+    private static IncrementalValuesProvider<CandidateClass> CreateProviderForAttribute(
         IncrementalGeneratorInitializationContext context,
         string fullyQualifiedMetadataName)
     {
         return context.SyntaxProvider.ForAttributeWithMetadataName(
             fullyQualifiedMetadataName,
             predicate: static (node, _) => IsPartialClass(node),
-            transform: static (ctx, _) => (INamedTypeSymbol)ctx.TargetSymbol);
+            transform: static (ctx, _) => new CandidateClass(
+                (ClassDeclarationSyntax)ctx.TargetNode,
+                ctx.SemanticModel));
     }
 
     /// <summary>
@@ -73,5 +76,28 @@ internal static class SyntaxProvider
         // Must be a class declaration with the partial modifier
         return node is ClassDeclarationSyntax classDecl &&
                classDecl.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
+    }
+
+    /// <summary>
+    /// Manually deduplicate candidates by syntax node reference.
+    /// </summary>
+    private static ImmutableArray<CandidateClass> Deduplicate(ImmutableArray<CandidateClass> candidates)
+    {
+        if (candidates.Length <= 1)
+            return candidates;
+
+        var seen = new HashSet<ClassDeclarationSyntax>();
+        var builder = ImmutableArray.CreateBuilder<CandidateClass>();
+
+        for (int i = 0; i < candidates.Length; i++)
+        {
+            var candidate = candidates[i];
+            if (seen.Add(candidate.ClassDeclarationSyntax))
+            {
+                builder.Add(candidate);
+            }
+        }
+
+        return builder.ToImmutable();
     }
 }

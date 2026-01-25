@@ -1,4 +1,5 @@
 using System.Text;
+using GraphQL.SourceGenerators.Models;
 using GraphQL.SourceGenerators.Providers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
@@ -21,14 +22,18 @@ public class AotSchemaGenerator : IIncrementalGenerator
         context.RegisterSourceOutput(candidateClasses, GenerateSource);
     }
 
-    private static void GenerateSource(SourceProductionContext context, INamedTypeSymbol classSymbol)
+    private static void GenerateSource(SourceProductionContext context, CandidateClass candidate)
     {
-        // Extract class information from symbol
-        var className = classSymbol.Name;
+        // Extract class information from syntax
+        var classDeclaration = candidate.ClassDeclarationSyntax;
+        var semanticModel = candidate.SemanticModel;
 
-        // Get namespace, handling global namespace properly
+        var className = classDeclaration.Identifier.Text;
+
+        // Get namespace from semantic model
+        var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration);
         var namespaceName = string.Empty;
-        if (classSymbol.ContainingNamespace != null && !classSymbol.ContainingNamespace.IsGlobalNamespace)
+        if (classSymbol?.ContainingNamespace != null && !classSymbol.ContainingNamespace.IsGlobalNamespace)
         {
             namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
         }
