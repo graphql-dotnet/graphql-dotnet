@@ -10,7 +10,7 @@ namespace GraphQL.SourceGenerators.Providers;
 /// Provider D: Identifies candidate class declarations that have AOT-related attributes.
 /// Uses the efficient ForAttributeWithMetadataName API for optimal incremental compilation performance.
 /// </summary>
-internal static class CandidateProvider
+public static class CandidateProvider
 {
     /// <summary>
     /// Creates an incremental provider that identifies all partial class declarations
