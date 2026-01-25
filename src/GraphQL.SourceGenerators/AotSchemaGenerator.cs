@@ -16,7 +16,7 @@ public class AotSchemaGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         // Provider D: Get all candidate class declarations with AOT attributes
-        var candidateClasses = SyntaxProvider.CreateCandidateProvider(context);
+        var candidateClasses = CandidateProvider.CreateCandidateProvider(context);
 
         // Register source output for each candidate class
         context.RegisterSourceOutput(candidateClasses, GenerateSource);
