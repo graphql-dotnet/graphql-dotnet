@@ -49,33 +49,42 @@ public partial class AttributeDataTransformerTests
                     sb.AppendLine($"// Schema: {data.SchemaClass.Name}");
                     sb.AppendLine("//");
 
-                    // Query Types
-                    sb.AppendLine($"// QueryTypes: {data.QueryTypes.Length}");
-                    for (int i = 0; i < data.QueryTypes.Length; i++)
+                    // Query Type
+                    if (data.QueryType.HasValue)
                     {
-                        var typeInfo = data.QueryTypes[i];
+                        var typeInfo = data.QueryType.Value;
                         var kind = typeInfo.IsClrType ? "CLR" : "GraphType";
-                        sb.AppendLine($"//   [{i}] {typeInfo.TypeArgument.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)} ({kind})");
+                        sb.AppendLine($"// QueryType: {typeInfo.TypeArgument.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)} ({kind})");
+                    }
+                    else
+                    {
+                        sb.AppendLine("// QueryType: (none)");
                     }
                     sb.AppendLine("//");
 
-                    // Mutation Types
-                    sb.AppendLine($"// MutationTypes: {data.MutationTypes.Length}");
-                    for (int i = 0; i < data.MutationTypes.Length; i++)
+                    // Mutation Type
+                    if (data.MutationType.HasValue)
                     {
-                        var typeInfo = data.MutationTypes[i];
+                        var typeInfo = data.MutationType.Value;
                         var kind = typeInfo.IsClrType ? "CLR" : "GraphType";
-                        sb.AppendLine($"//   [{i}] {typeInfo.TypeArgument.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)} ({kind})");
+                        sb.AppendLine($"// MutationType: {typeInfo.TypeArgument.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)} ({kind})");
+                    }
+                    else
+                    {
+                        sb.AppendLine("// MutationType: (none)");
                     }
                     sb.AppendLine("//");
 
-                    // Subscription Types
-                    sb.AppendLine($"// SubscriptionTypes: {data.SubscriptionTypes.Length}");
-                    for (int i = 0; i < data.SubscriptionTypes.Length; i++)
+                    // Subscription Type
+                    if (data.SubscriptionType.HasValue)
                     {
-                        var typeInfo = data.SubscriptionTypes[i];
+                        var typeInfo = data.SubscriptionType.Value;
                         var kind = typeInfo.IsClrType ? "CLR" : "GraphType";
-                        sb.AppendLine($"//   [{i}] {typeInfo.TypeArgument.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)} ({kind})");
+                        sb.AppendLine($"// SubscriptionType: {typeInfo.TypeArgument.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)} ({kind})");
+                    }
+                    else
+                    {
+                        sb.AppendLine("// SubscriptionType: (none)");
                     }
                     sb.AppendLine("//");
 

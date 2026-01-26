@@ -39,12 +39,11 @@ public partial class AttributeDataTransformerTests
 
             // Schema: MySchema
             //
-            // QueryTypes: 1
-            //   [0] Query (CLR)
+            // QueryType: Query (CLR)
             //
-            // MutationTypes: 0
+            // MutationType: (none)
             //
-            // SubscriptionTypes: 0
+            // SubscriptionType: (none)
             //
             // OutputTypes: 0
             //
@@ -90,12 +89,11 @@ public partial class AttributeDataTransformerTests
 
             // Schema: MySchema
             //
-            // QueryTypes: 0
+            // QueryType: (none)
             //
-            // MutationTypes: 1
-            //   [0] Mutation (CLR)
+            // MutationType: Mutation (CLR)
             //
-            // SubscriptionTypes: 0
+            // SubscriptionType: (none)
             //
             // OutputTypes: 0
             //
@@ -141,12 +139,11 @@ public partial class AttributeDataTransformerTests
 
             // Schema: MySchema
             //
-            // QueryTypes: 0
+            // QueryType: (none)
             //
-            // MutationTypes: 0
+            // MutationType: (none)
             //
-            // SubscriptionTypes: 1
-            //   [0] Subscription (CLR)
+            // SubscriptionType: Subscription (CLR)
             //
             // OutputTypes: 0
             //
@@ -194,12 +191,11 @@ public partial class AttributeDataTransformerTests
 
             // Schema: MySchema
             //
-            // QueryTypes: 1
-            //   [0] QueryGraphType (GraphType)
+            // QueryType: QueryGraphType (GraphType)
             //
-            // MutationTypes: 0
+            // MutationType: (none)
             //
-            // SubscriptionTypes: 0
+            // SubscriptionType: (none)
             //
             // OutputTypes: 0
             //
@@ -245,11 +241,11 @@ public partial class AttributeDataTransformerTests
 
             // Schema: MySchema
             //
-            // QueryTypes: 0
+            // QueryType: (none)
             //
-            // MutationTypes: 0
+            // MutationType: (none)
             //
-            // SubscriptionTypes: 0
+            // SubscriptionType: (none)
             //
             // OutputTypes: 1
             //   [0] Product
@@ -296,11 +292,11 @@ public partial class AttributeDataTransformerTests
 
             // Schema: MySchema
             //
-            // QueryTypes: 0
+            // QueryType: (none)
             //
-            // MutationTypes: 0
+            // MutationType: (none)
             //
-            // SubscriptionTypes: 0
+            // SubscriptionType: (none)
             //
             // OutputTypes: 0
             //
@@ -345,11 +341,11 @@ public partial class AttributeDataTransformerTests
 
             // Schema: MySchema
             //
-            // QueryTypes: 0
+            // QueryType: (none)
             //
-            // MutationTypes: 0
+            // MutationType: (none)
             //
-            // SubscriptionTypes: 0
+            // SubscriptionType: (none)
             //
             // OutputTypes: 0
             //
@@ -395,11 +391,11 @@ public partial class AttributeDataTransformerTests
 
             // Schema: MySchema
             //
-            // QueryTypes: 0
+            // QueryType: (none)
             //
-            // MutationTypes: 0
+            // MutationType: (none)
             //
-            // SubscriptionTypes: 0
+            // SubscriptionType: (none)
             //
             // OutputTypes: 0
             //
@@ -445,11 +441,11 @@ public partial class AttributeDataTransformerTests
 
             // Schema: MySchema
             //
-            // QueryTypes: 0
+            // QueryType: (none)
             //
-            // MutationTypes: 0
+            // MutationType: (none)
             //
-            // SubscriptionTypes: 0
+            // SubscriptionType: (none)
             //
             // OutputTypes: 0
             //
@@ -494,11 +490,11 @@ public partial class AttributeDataTransformerTests
 
             // Schema: MySchema
             //
-            // QueryTypes: 0
+            // QueryType: (none)
             //
-            // MutationTypes: 0
+            // MutationType: (none)
             //
-            // SubscriptionTypes: 0
+            // SubscriptionType: (none)
             //
             // OutputTypes: 0
             //
@@ -559,14 +555,11 @@ public partial class AttributeDataTransformerTests
 
             // Schema: MySchema
             //
-            // QueryTypes: 1
-            //   [0] Query (CLR)
+            // QueryType: Query (CLR)
             //
-            // MutationTypes: 1
-            //   [0] Mutation (CLR)
+            // MutationType: Mutation (CLR)
             //
-            // SubscriptionTypes: 1
-            //   [0] Subscription (CLR)
+            // SubscriptionType: Subscription (CLR)
             //
             // OutputTypes: 1
             //   [0] Product
@@ -623,11 +616,11 @@ public partial class AttributeDataTransformerTests
 
             // Schema: MySchema
             //
-            // QueryTypes: 0
+            // QueryType: (none)
             //
-            // MutationTypes: 0
+            // MutationType: (none)
             //
-            // SubscriptionTypes: 0
+            // SubscriptionType: (none)
             //
             // OutputTypes: 3
             //   [0] Product
@@ -677,11 +670,11 @@ public partial class AttributeDataTransformerTests
 
             // Schema: MySchema
             //
-            // QueryTypes: 0
+            // QueryType: (none)
             //
-            // MutationTypes: 0
+            // MutationType: (none)
             //
-            // SubscriptionTypes: 0
+            // SubscriptionType: (none)
             //
             // OutputTypes: 0
             //
@@ -738,12 +731,11 @@ public partial class AttributeDataTransformerTests
 
             // Schema: MySchema
             //
-            // QueryTypes: 1
-            //   [0] Query (CLR)
+            // QueryType: Query (CLR)
             //
-            // MutationTypes: 0
+            // MutationType: (none)
             //
-            // SubscriptionTypes: 0
+            // SubscriptionType: (none)
             //
             // OutputTypes: 1
             //   [0] Product
@@ -794,12 +786,11 @@ public partial class AttributeDataTransformerTests
 
             // Schema: MySchema
             //
-            // QueryTypes: 1
-            //   [0] Query (CLR)
+            // QueryType: Query (CLR)
             //
-            // MutationTypes: 0
+            // MutationType: (none)
             //
-            // SubscriptionTypes: 0
+            // SubscriptionType: (none)
             //
             // OutputTypes: 0
             //
@@ -867,13 +858,11 @@ public partial class AttributeDataTransformerTests
 
             // Schema: MySchema
             //
-            // QueryTypes: 1
-            //   [0] Query (CLR)
+            // QueryType: Query (CLR)
             //
-            // MutationTypes: 1
-            //   [0] MutationGraphType (GraphType)
+            // MutationType: MutationGraphType (GraphType)
             //
-            // SubscriptionTypes: 0
+            // SubscriptionType: (none)
             //
             // OutputTypes: 0
             //

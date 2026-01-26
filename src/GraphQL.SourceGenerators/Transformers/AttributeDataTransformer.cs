@@ -20,10 +20,12 @@ public static class AttributeDataTransformer
     {
         var schemaSymbol = candidate.ClassSymbol;
 
-        // Prepare builders for each attribute category
-        var queryTypes = ImmutableArray.CreateBuilder<RootTypeInfo>();
-        var mutationTypes = ImmutableArray.CreateBuilder<RootTypeInfo>();
-        var subscriptionTypes = ImmutableArray.CreateBuilder<RootTypeInfo>();
+        // Prepare nullable holders for root types (only zero or one allowed)
+        RootTypeInfo? queryType = null;
+        RootTypeInfo? mutationType = null;
+        RootTypeInfo? subscriptionType = null;
+
+        // Prepare builders for collection types
         var outputTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
         var inputTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
         var graphTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
@@ -46,18 +48,18 @@ public static class AttributeDataTransformer
             // Categorize by attribute type using symbolic comparison
             if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotQueryType))
             {
-                if (TryExtractRootTypeInfo(attributeClass, attributeSymbols.IGraphType, out var info))
-                    queryTypes.Add(info);
+                if (queryType == null && TryExtractRootTypeInfo(attributeClass, attributeSymbols.IGraphType, out var info))
+                    queryType = info;
             }
             else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotMutationType))
             {
-                if (TryExtractRootTypeInfo(attributeClass, attributeSymbols.IGraphType, out var info))
-                    mutationTypes.Add(info);
+                if (mutationType == null && TryExtractRootTypeInfo(attributeClass, attributeSymbols.IGraphType, out var info))
+                    mutationType = info;
             }
             else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotSubscriptionType))
             {
-                if (TryExtractRootTypeInfo(attributeClass, attributeSymbols.IGraphType, out var info))
-                    subscriptionTypes.Add(info);
+                if (subscriptionType == null && TryExtractRootTypeInfo(attributeClass, attributeSymbols.IGraphType, out var info))
+                    subscriptionType = info;
             }
             else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotOutputType))
             {
@@ -93,9 +95,9 @@ public static class AttributeDataTransformer
 
         return new SchemaAttributeData(
             SchemaClass: schemaSymbol,
-            QueryTypes: queryTypes.ToImmutable(),
-            MutationTypes: mutationTypes.ToImmutable(),
-            SubscriptionTypes: subscriptionTypes.ToImmutable(),
+            QueryType: queryType,
+            MutationType: mutationType,
+            SubscriptionType: subscriptionType,
             OutputTypes: outputTypes.ToImmutable(),
             InputTypes: inputTypes.ToImmutable(),
             GraphTypes: graphTypes.ToImmutable(),

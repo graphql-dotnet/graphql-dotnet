@@ -8,9 +8,9 @@ namespace GraphQL.SourceGenerators.Models;
 /// </summary>
 public readonly record struct SchemaAttributeData(
     INamedTypeSymbol SchemaClass,
-    ImmutableArray<RootTypeInfo> QueryTypes,
-    ImmutableArray<RootTypeInfo> MutationTypes,
-    ImmutableArray<RootTypeInfo> SubscriptionTypes,
+    RootTypeInfo? QueryType,
+    RootTypeInfo? MutationType,
+    RootTypeInfo? SubscriptionType,
     ImmutableArray<ITypeSymbol> OutputTypes,
     ImmutableArray<ITypeSymbol> InputTypes,
     ImmutableArray<ITypeSymbol> GraphTypes,
