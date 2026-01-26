@@ -101,7 +101,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // Type: AllCollectionsInput
             //
-            // DiscoveredClrTypes: 14
+            // DiscoveredInputClrTypes: 14
             //   [0] string
             //   [1] byte
             //   [2] decimal
@@ -176,7 +176,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // Type: CreateProductInput
             //
-            // DiscoveredClrTypes: 3
+            // DiscoveredInputClrTypes: 3
             //   [0] int
             //   [1] decimal
             //   [2] DateTime
@@ -223,7 +223,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // Type: CreateProductInput
             //
-            // DiscoveredClrTypes: 2
+            // DiscoveredInputClrTypes: 2
             //   [0] string
             //   [1] decimal
             //
@@ -274,7 +274,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // Type: CreateProductInput
             //
-            // DiscoveredClrTypes: 2
+            // DiscoveredInputClrTypes: 2
             //   [0] string
             //   [1] decimal
             //
@@ -329,7 +329,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // Type: CreateProductInput
             //
-            // DiscoveredClrTypes: 3
+            // DiscoveredInputClrTypes: 3
             //   [0] string
             //   [1] decimal
             //   [2] Guid
@@ -385,7 +385,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // Type: CreateProductInput
             //
-            // DiscoveredClrTypes: 0
+            // DiscoveredInputClrTypes: 0
             //
             // DiscoveredGraphTypes: 0
             //
@@ -456,7 +456,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // Type: CreateProductInput
             //
-            // DiscoveredClrTypes: 1
+            // DiscoveredInputClrTypes: 1
             //   [0] string
             //
             // DiscoveredGraphTypes: 5
@@ -537,7 +537,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // Type: CreateProductInput
             //
-            // DiscoveredClrTypes: 1
+            // DiscoveredInputClrTypes: 1
             //   [0] string
             //
             // DiscoveredGraphTypes: 6
@@ -616,7 +616,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // Type: CreateProductInput
             //
-            // DiscoveredClrTypes: 1
+            // DiscoveredInputClrTypes: 1
             //   [0] string
             //
             // DiscoveredGraphTypes: 5
@@ -694,7 +694,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // Type: EmptyInput
             //
-            // DiscoveredClrTypes: 0
+            // DiscoveredInputClrTypes: 0
             //
             // DiscoveredGraphTypes: 0
             //
@@ -740,7 +740,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // Type: CreateOrderInput
             //
-            // DiscoveredClrTypes: 2
+            // DiscoveredInputClrTypes: 2
             //   [0] string
             //   [1] int
             //
@@ -750,7 +750,7 @@ public partial class InputTypeSymbolTransformerTests
             
             // Type: CreateProductInput
             //
-            // DiscoveredClrTypes: 2
+            // DiscoveredInputClrTypes: 2
             //   [0] string
             //   [1] decimal
             //
@@ -792,7 +792,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // Type: AsyncInput
             //
-            // DiscoveredClrTypes: 2
+            // DiscoveredInputClrTypes: 2
             //   [0] string
             //   [1] int
             //
@@ -829,7 +829,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // Type: CreateProductInput
             //
-            // DiscoveredClrTypes: 3
+            // DiscoveredInputClrTypes: 3
             //   [0] string
             //   [1] decimal
             //   [2] int
@@ -886,7 +886,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // Type: CreateProductInput
             //
-            // DiscoveredClrTypes: 4
+            // DiscoveredInputClrTypes: 4
             //   [0] string
             //   [1] long
             //   [2] decimal
