@@ -21,4 +21,16 @@ public readonly struct KnownSymbols
     public INamedTypeSymbol? ListGraphType { get; init; }
     public INamedTypeSymbol? GraphQLClrInputTypeReference { get; init; }
     public INamedTypeSymbol? GraphQLClrOutputTypeReference { get; init; }
+    public INamedTypeSymbol? IgnoreAttribute { get; init; }
+    public INamedTypeSymbol? InputTypeAttributeT { get; init; }
+    public INamedTypeSymbol? InputBaseTypeAttributeT { get; init; }
+    public INamedTypeSymbol? BaseGraphTypeAttributeT { get; init; }
+    public INamedTypeSymbol? IEnumerableT { get; init; }
+    public INamedTypeSymbol? IListT { get; init; }
+    public INamedTypeSymbol? ListT { get; init; }
+    public INamedTypeSymbol? ICollectionT { get; init; }
+    public INamedTypeSymbol? IReadOnlyCollectionT { get; init; }
+    public INamedTypeSymbol? IReadOnlyListT { get; init; }
+    public INamedTypeSymbol? HashSetT { get; init; }
+    public INamedTypeSymbol? ISetT { get; init; }
 }

@@ -42,6 +42,18 @@ public partial class KnownSymbolsProviderTests
             // ListGraphType: GraphQL.Types.ListGraphType<T>
             // GraphQLClrInputTypeReference: GraphQL.Types.GraphQLClrInputTypeReference<T>
             // GraphQLClrOutputTypeReference: GraphQL.Types.GraphQLClrOutputTypeReference<T>
+            // IgnoreAttribute: GraphQL.IgnoreAttribute
+            // InputTypeAttributeT: GraphQL.InputTypeAttribute<TGraphType>
+            // InputBaseTypeAttributeT: GraphQL.InputBaseTypeAttribute<TGraphType>
+            // BaseGraphTypeAttributeT: GraphQL.BaseGraphTypeAttribute<TGraphType>
+            // IEnumerableT: System.Collections.Generic.IEnumerable<T>
+            // IListT: System.Collections.Generic.IList<T>
+            // ListT: System.Collections.Generic.List<T>
+            // ICollectionT: System.Collections.Generic.ICollection<T>
+            // IReadOnlyCollectionT: System.Collections.Generic.IReadOnlyCollection<T>
+            // IReadOnlyListT: System.Collections.Generic.IReadOnlyList<T>
+            // HashSetT: System.Collections.Generic.HashSet<T>
+            // ISetT: System.Collections.Generic.ISet<T>
 
             """);
     }

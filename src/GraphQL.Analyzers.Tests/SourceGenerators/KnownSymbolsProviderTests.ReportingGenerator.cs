@@ -39,6 +39,18 @@ public partial class KnownSymbolsProviderTests
                 sb.AppendLine($"// ListGraphType: {symbols.ListGraphType?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// GraphQLClrInputTypeReference: {symbols.GraphQLClrInputTypeReference?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// GraphQLClrOutputTypeReference: {symbols.GraphQLClrOutputTypeReference?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// IgnoreAttribute: {symbols.IgnoreAttribute?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// InputTypeAttributeT: {symbols.InputTypeAttributeT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// InputBaseTypeAttributeT: {symbols.InputBaseTypeAttributeT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// BaseGraphTypeAttributeT: {symbols.BaseGraphTypeAttributeT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// IEnumerableT: {symbols.IEnumerableT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// IListT: {symbols.IListT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// ListT: {symbols.ListT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// ICollectionT: {symbols.ICollectionT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// IReadOnlyCollectionT: {symbols.IReadOnlyCollectionT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// IReadOnlyListT: {symbols.IReadOnlyListT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// HashSetT: {symbols.HashSetT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// ISetT: {symbols.ISetT?.ToDisplayString() ?? "NULL"}");
 
                 spc.AddSource("AttributeSymbolsReport.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
             });

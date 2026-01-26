@@ -32,7 +32,7 @@ public static class TypeSymbolTransformer
             return null;
 
         // Get members to scan based on MemberScan attribute
-        var membersToScan = GetMembersToScan(typeSymbol, isInputType);
+        var membersToScan = GetMembersToScan(typeSymbol, isInputType, knownSymbols);
 
         var discoveredClrTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
         var discoveredGraphTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
@@ -58,26 +58,65 @@ public static class TypeSymbolTransformer
                 // Check if it's a GraphQLClrInputTypeReference<T>
                 if (TryExtractClrTypeReference(memberGraphType, knownSymbols.GraphQLClrInputTypeReference, out var clrType))
                 {
-                    // Extract T and add to discoveredClrTypes
-                    discoveredClrTypes.Add(clrType);
+                    // Extract T and add to discoveredClrTypes (with deduplication)
+                    bool clrRefTypeExists = false;
+                    foreach (var existingClrType in discoveredClrTypes)
+                    {
+                        if (SymbolEqualityComparer.Default.Equals(existingClrType, clrType))
+                        {
+                            clrRefTypeExists = true;
+                            break;
+                        }
+                    }
+
+                    if (!clrRefTypeExists)
+                    {
+                        discoveredClrTypes.Add(clrType);
+                    }
                 }
                 else
                 {
-                    // Add unwrapped GraphType to discoveredGraphTypes
-                    discoveredGraphTypes.Add(memberGraphType);
+                    // Add unwrapped GraphType to discoveredGraphTypes (with deduplication)
+                    bool graphTypeExists = false;
+                    foreach (var existingGraphType in discoveredGraphTypes)
+                    {
+                        if (SymbolEqualityComparer.Default.Equals(existingGraphType, memberGraphType))
+                        {
+                            graphTypeExists = true;
+                            break;
+                        }
+                    }
+
+                    if (!graphTypeExists)
+                    {
+                        discoveredGraphTypes.Add(memberGraphType);
+                    }
                 }
 
                 continue;
             }
 
             // Collect all list types at each level while unwrapping
-            CollectListTypes(memberClrType, inputListTypes);
+            CollectListTypes(memberClrType, inputListTypes, knownSymbols);
 
             // Unwrap nested generic wrappers (recursively)
-            var unwrappedClrType = UnwrapClrType(memberClrType);
+            var unwrappedClrType = UnwrapClrType(memberClrType, knownSymbols);
 
-            // Discover nested input types
-            discoveredClrTypes.Add(unwrappedClrType);
+            // Discover nested input types - only add if not already in the list
+            bool clrTypeExists = false;
+            foreach (var existingClrType in discoveredClrTypes)
+            {
+                if (SymbolEqualityComparer.Default.Equals(existingClrType, unwrappedClrType))
+                {
+                    clrTypeExists = true;
+                    break;
+                }
+            }
+
+            if (!clrTypeExists)
+            {
+                discoveredClrTypes.Add(unwrappedClrType);
+            }
         }
 
         return new InputTypeScanResult(
@@ -90,20 +129,34 @@ public static class TypeSymbolTransformer
     /// <summary>
     /// Recursively collects all list types at each level of nesting.
     /// </summary>
-    private static void CollectListTypes(ITypeSymbol type, ImmutableArray<ITypeSymbol>.Builder listTypes)
+    private static void CollectListTypes(ITypeSymbol type, ImmutableArray<ITypeSymbol>.Builder listTypes, KnownSymbols knownSymbols)
     {
-        if (IsListType(type))
+        if (IsListType(type, knownSymbols))
         {
-            listTypes.Add(type);
+            // Only add if not already in the list
+            bool alreadyExists = false;
+            foreach (var existingType in listTypes)
+            {
+                if (SymbolEqualityComparer.Default.Equals(existingType, type))
+                {
+                    alreadyExists = true;
+                    break;
+                }
+            }
+
+            if (!alreadyExists)
+            {
+                listTypes.Add(type);
+            }
 
             // Get the element type and recursively check for nested lists
             if (type is IArrayTypeSymbol arrayType)
             {
-                CollectListTypes(arrayType.ElementType, listTypes);
+                CollectListTypes(arrayType.ElementType, listTypes, knownSymbols);
             }
             else if (type is INamedTypeSymbol namedType && namedType.TypeArguments.Length == 1)
             {
-                CollectListTypes(namedType.TypeArguments[0], listTypes);
+                CollectListTypes(namedType.TypeArguments[0], listTypes, knownSymbols);
             }
         }
     }
@@ -111,7 +164,7 @@ public static class TypeSymbolTransformer
     /// <summary>
     /// Checks if a type is a list type (array or collection interface).
     /// </summary>
-    private static bool IsListType(ITypeSymbol type)
+    private static bool IsListType(ITypeSymbol type, KnownSymbols knownSymbols)
     {
         if (type is IArrayTypeSymbol)
             return true;
@@ -119,24 +172,22 @@ public static class TypeSymbolTransformer
         if (type is not INamedTypeSymbol namedType || !namedType.IsGenericType)
             return false;
 
-        var typeName = namedType.OriginalDefinition.ToDisplayString();
+        var originalDef = namedType.OriginalDefinition;
 
-        return typeName switch
-        {
-            "System.Collections.Generic.IEnumerable<T>" => true,
-            "System.Collections.Generic.IList<T>" => true,
-            "System.Collections.Generic.List<T>" => true,
-            "System.Collections.Generic.IReadOnlyList<T>" => true,
-            "System.Collections.Generic.ICollection<T>" => true,
-            "System.Collections.Generic.IReadOnlyCollection<T>" => true,
-            _ => false
-        };
+        return SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.IEnumerableT) ||
+               SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.IListT) ||
+               SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.ListT) ||
+               SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.ICollectionT) ||
+               SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.IReadOnlyCollectionT) ||
+               SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.IReadOnlyListT) ||
+               SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.HashSetT) ||
+               SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.ISetT);
     }
 
     /// <summary>
     /// Recursively unwraps nested generic wrappers to find the underlying CLR type.
     /// </summary>
-    private static ITypeSymbol UnwrapClrType(ITypeSymbol type)
+    private static ITypeSymbol UnwrapClrType(ITypeSymbol type, KnownSymbols knownSymbols)
     {
         if (type is INamedTypeSymbol namedType && namedType.IsGenericType)
         {
@@ -144,27 +195,27 @@ public static class TypeSymbolTransformer
 
             // Handle Nullable<T>
             if (typeName == "System.Nullable<T>" && namedType.TypeArguments.Length == 1)
-                return UnwrapClrType(namedType.TypeArguments[0]);
+                return UnwrapClrType(namedType.TypeArguments[0], knownSymbols);
 
             // Handle Task<T>
             if (typeName == "System.Threading.Tasks.Task<TResult>" && namedType.TypeArguments.Length == 1)
-                return UnwrapClrType(namedType.TypeArguments[0]);
+                return UnwrapClrType(namedType.TypeArguments[0], knownSymbols);
 
             // Handle ValueTask<T>
             if (typeName == "System.Threading.Tasks.ValueTask<TResult>" && namedType.TypeArguments.Length == 1)
-                return UnwrapClrType(namedType.TypeArguments[0]);
+                return UnwrapClrType(namedType.TypeArguments[0], knownSymbols);
 
             // Handle IDataLoaderResult<T>
             if (typeName == "GraphQL.DataLoader.IDataLoaderResult<T>" && namedType.TypeArguments.Length == 1)
-                return UnwrapClrType(namedType.TypeArguments[0]);
+                return UnwrapClrType(namedType.TypeArguments[0], knownSymbols);
 
             // Handle recognized list types
-            if (IsListType(type) && namedType.TypeArguments.Length == 1)
-                return UnwrapClrType(namedType.TypeArguments[0]);
+            if (IsListType(type, knownSymbols) && namedType.TypeArguments.Length == 1)
+                return UnwrapClrType(namedType.TypeArguments[0], knownSymbols);
         }
 
         if (type is IArrayTypeSymbol arrayType)
-            return UnwrapClrType(arrayType.ElementType);
+            return UnwrapClrType(arrayType.ElementType, knownSymbols);
 
         // Base case: return the unwrapped type
         return type;
@@ -199,7 +250,7 @@ public static class TypeSymbolTransformer
     /// <summary>
     /// Collects members (fields, properties) that should be scanned for a CLR type.
     /// </summary>
-    private static ImmutableArray<ISymbol> GetMembersToScan(ITypeSymbol clrType, bool isInputType)
+    private static ImmutableArray<ISymbol> GetMembersToScan(ITypeSymbol clrType, bool isInputType, KnownSymbols knownSymbols)
     {
         var membersToScan = ImmutableArray.CreateBuilder<ISymbol>();
 
@@ -231,7 +282,7 @@ public static class TypeSymbolTransformer
         {
             foreach (var field in clrType.GetMembers().OfType<IFieldSymbol>())
             {
-                if (ShouldSkipMember(field))
+                if (ShouldSkipMember(field, knownSymbols))
                     continue;
 
                 // Skip readonly fields for input types (can't be set)
@@ -247,7 +298,7 @@ public static class TypeSymbolTransformer
         {
             foreach (var property in clrType.GetMembers().OfType<IPropertySymbol>())
             {
-                if (ShouldSkipMember(property))
+                if (ShouldSkipMember(property, knownSymbols))
                     continue;
 
                 // Skip read-only properties for input types (can't be set)
@@ -264,12 +315,12 @@ public static class TypeSymbolTransformer
     /// <summary>
     /// Determines if a property or field should be skipped during type discovery.
     /// </summary>
-    private static bool ShouldSkipMember(ISymbol member)
+    private static bool ShouldSkipMember(ISymbol member, KnownSymbols knownSymbols)
     {
         // Skip if member has [Ignore] attribute
         foreach (var attribute in member.GetAttributes())
         {
-            if (attribute.AttributeClass?.Name == "IgnoreAttribute")
+            if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, knownSymbols.IgnoreAttribute))
                 return true;
         }
 
@@ -292,8 +343,11 @@ public static class TypeSymbolTransformer
             // For input types, check input-specific attributes first
             if (isInputType)
             {
+                // Get the original definition for generic types to compare properly
+                var originalDef = attributeClass.IsGenericType ? attributeClass.OriginalDefinition : attributeClass;
+
                 // Check InputType<TGraphType> or InputType (non-generic)
-                if (attributeClass.Name == "InputTypeAttribute")
+                if (SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.InputTypeAttributeT))
                 {
                     if (attributeClass.IsGenericType && attributeClass.TypeArguments.Length == 1)
                         memberGraphType = attributeClass.TypeArguments[0];
@@ -313,7 +367,7 @@ public static class TypeSymbolTransformer
                     break;
                 }
                 // Check InputBaseType<TGraphType> or InputBaseType
-                else if (attributeClass.Name == "InputBaseTypeAttribute")
+                else if (SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.InputBaseTypeAttributeT))
                 {
                     if (attributeClass.IsGenericType && attributeClass.TypeArguments.Length == 1)
                         memberGraphType = attributeClass.TypeArguments[0];
@@ -332,7 +386,7 @@ public static class TypeSymbolTransformer
                     break;
                 }
                 // Check BaseGraphType<TGraphType> or BaseGraphType
-                else if (attributeClass.Name == "BaseGraphTypeAttribute")
+                else if (SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.BaseGraphTypeAttributeT))
                 {
                     if (attributeClass.IsGenericType && attributeClass.TypeArguments.Length == 1)
                         memberGraphType = attributeClass.TypeArguments[0];

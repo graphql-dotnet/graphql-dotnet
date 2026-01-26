@@ -134,11 +134,9 @@ public partial class InputTypeSymbolTransformerTests
 
             // Type: CreateOrderInput
             //
-            // DiscoveredClrTypes: 4
+            // DiscoveredClrTypes: 2
             //   [0] string
-            //   [1] string
-            //   [2] string
-            //   [3] int
+            //   [1] int
             //
             // DiscoveredGraphTypes: 0
             //
@@ -507,6 +505,196 @@ public partial class InputTypeSymbolTransformerTests
             //   [1] IReadOnlyList<int>
             //   [2] ICollection<decimal>
             //   [3] IReadOnlyCollection<bool>
+
+            """);
+    }
+
+    [Fact]
+    public async Task DetectsHashSetAndISetTypes()
+    {
+        const string source =
+            """
+            using System;
+            using System.Collections.Generic;
+
+            namespace Sample;
+
+            [AttributeUsage(AttributeTargets.Class)]
+            public class ScanMeAttribute : Attribute { }
+
+            [ScanMe]
+            public class SetCollectionsInput
+            {
+                public HashSet<string> Tags { get; set; }
+                public ISet<int> Numbers { get; set; }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= TypeScanReport.g.cs ============
+
+            // Type: SetCollectionsInput
+            //
+            // DiscoveredClrTypes: 2
+            //   [0] string
+            //   [1] int
+            //
+            // DiscoveredGraphTypes: 0
+            //
+            // InputListTypes: 2
+            //   [0] HashSet<string>
+            //   [1] ISet<int>
+
+            """);
+    }
+
+    [Fact]
+    public async Task DetectsAllWhitelistedCollectionTypesAndArraysButNotOthers()
+    {
+        const string source =
+            """
+            using System;
+            using System.Collections.Generic;
+
+            namespace Sample;
+
+            [AttributeUsage(AttributeTargets.Class)]
+            public class ScanMeAttribute : Attribute { }
+
+            [ScanMe]
+            public class AllCollectionsInput
+            {
+                // Whitelisted collection types
+                public IEnumerable<string> IEnumerableStrings { get; set; }
+                public IList<int> IListInts { get; set; }
+                public List<bool> ListBools { get; set; }
+                public ICollection<decimal> ICollectionDecimals { get; set; }
+                public IReadOnlyCollection<long> IReadOnlyCollectionLongs { get; set; }
+                public IReadOnlyList<short> IReadOnlyListShorts { get; set; }
+                public HashSet<byte> HashSetBytes { get; set; }
+                public ISet<double> ISetDoubles { get; set; }
+                
+                // Array types
+                public string[] StringArray { get; set; }
+                public int[] IntArray { get; set; }
+                
+                // Non-whitelisted collection types (should NOT be detected as list types)
+                public Queue<string> QueueStrings { get; set; }
+                public Stack<int> StackInts { get; set; }
+                public LinkedList<bool> LinkedListBools { get; set; }
+
+                // Nested array types
+                public string[][] NestedStringArray { get; set; }
+                public List<short[]> ListOfStringArrays { get; set; }
+                public IEnumerable<List<int>> EnumerableOfListOfInts { get; set; }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= TypeScanReport.g.cs ============
+
+            // Type: AllCollectionsInput
+            //
+            // DiscoveredClrTypes: 11
+            //   [0] string
+            //   [1] int
+            //   [2] bool
+            //   [3] decimal
+            //   [4] long
+            //   [5] short
+            //   [6] byte
+            //   [7] double
+            //   [8] Queue<string>
+            //   [9] Stack<int>
+            //   [10] LinkedList<bool>
+            //
+            // DiscoveredGraphTypes: 0
+            //
+            // InputListTypes: 15
+            //   [0] IEnumerable<string>
+            //   [1] IList<int>
+            //   [2] List<bool>
+            //   [3] ICollection<decimal>
+            //   [4] IReadOnlyCollection<long>
+            //   [5] IReadOnlyList<short>
+            //   [6] HashSet<byte>
+            //   [7] ISet<double>
+            //   [8] string[]
+            //   [9] int[]
+            //   [10] string[][]
+            //   [11] List<short[]>
+            //   [12] short[]
+            //   [13] IEnumerable<List<int>>
+            //   [14] List<int>
+
+            """);
+    }
+
+    [Fact]
+    public async Task DeduplicatesListTypesIncludingNestedTypes()
+    {
+        const string source =
+            """
+            using System;
+            using System.Collections.Generic;
+
+            namespace Sample;
+
+            [AttributeUsage(AttributeTargets.Class)]
+            public class ScanMeAttribute : Attribute { }
+
+            [ScanMe]
+            public class DeduplicationInput
+            {
+                // Multiple properties with int[] - should only appear once
+                public int[] FirstIntArray { get; set; }
+                public int[] SecondIntArray { get; set; }
+                
+                // List<int[]> contains int[] as nested - int[] should not be duplicated
+                public List<int[]> ListOfIntArrays { get; set; }
+                
+                // Multiple List<string> - should only appear once
+                public List<string> FirstStringList { get; set; }
+                public List<string> SecondStringList { get; set; }
+                
+                // IEnumerable<List<int>> contains List<int> - both should appear once
+                public IEnumerable<List<int>> EnumerableOfListOfInts { get; set; }
+                public List<int> DirectListOfInts { get; set; }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= TypeScanReport.g.cs ============
+
+            // Type: DeduplicationInput
+            //
+            // DiscoveredClrTypes: 2
+            //   [0] int
+            //   [1] string
+            //
+            // DiscoveredGraphTypes: 0
+            //
+            // InputListTypes: 5
+            //   [0] int[]
+            //   [1] List<int[]>
+            //   [2] List<string>
+            //   [3] IEnumerable<List<int>>
+            //   [4] List<int>
 
             """);
     }
