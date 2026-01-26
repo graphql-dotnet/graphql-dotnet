@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators;
 
-public partial class TypeSymbolTransformerTests
+public partial class InputTypeSymbolTransformerTests
 {
     /// <summary>
     /// A minimal test generator that scans specified CLR types and reports discovered dependencies.
@@ -53,7 +53,7 @@ public partial class TypeSymbolTransformerTests
 
                     isFirst = false;
 
-                    var result = TypeSymbolTransformer.Transform(typeSymbol, attributeSymbols);
+                    var result = TypeSymbolTransformer.Transform(typeSymbol, attributeSymbols, true);
 
                     if (result == null)
                     {

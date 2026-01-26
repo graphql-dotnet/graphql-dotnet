@@ -1,5 +1,5 @@
 using VerifyTestSG = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpIncrementalGeneratorVerifier<
-    GraphQL.Analyzers.Tests.SourceGenerators.TypeSymbolTransformerTests.ReportingGenerator>;
+    GraphQL.Analyzers.Tests.SourceGenerators.InputTypeSymbolTransformerTests.ReportingGenerator>;
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators;
 
@@ -8,7 +8,7 @@ namespace GraphQL.Analyzers.Tests.SourceGenerators;
 /// These tests verify that the transformer correctly scans CLR input types and discovers dependencies.
 /// Uses ReportingGenerator to isolate testing of TypeSymbolTransformer from the full pipeline.
 /// </summary>
-public partial class TypeSymbolTransformerTests
+public partial class InputTypeSymbolTransformerTests
 {
     [Fact]
     public async Task ScansSimpleInputTypeWithPrimitiveProperties()

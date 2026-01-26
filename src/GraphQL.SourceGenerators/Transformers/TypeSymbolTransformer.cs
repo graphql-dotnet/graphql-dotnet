@@ -15,8 +15,11 @@ public static class TypeSymbolTransformer
     /// </summary>
     /// <param name="typeSymbol">The CLR type to scan.</param>
     /// <param name="knownSymbols">Known GraphQL symbol references for comparison.</param>
-    public static InputTypeScanResult? Transform(ITypeSymbol typeSymbol, KnownSymbols knownSymbols)
+    /// <param name="isInputType">Indicates whether the type is being scanned as an input type.</param>
+    public static InputTypeScanResult? Transform(ITypeSymbol typeSymbol, KnownSymbols knownSymbols, bool isInputType)
     {
+        _ = isInputType;
+
         // Return null for types that cannot be examined
         if (typeSymbol is INamedTypeSymbol namedType && namedType.IsUnboundGenericType)
             return null;
@@ -29,7 +32,7 @@ public static class TypeSymbolTransformer
             return null;
 
         // Get members to scan based on MemberScan attribute
-        var membersToScan = GetMembersToScan(typeSymbol, isInputType: true);
+        var membersToScan = GetMembersToScan(typeSymbol, isInputType);
 
         var discoveredClrTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
         var discoveredGraphTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
@@ -49,7 +52,7 @@ public static class TypeSymbolTransformer
                 continue;
 
             // Check if member has explicit GraphType override
-            var memberGraphType = GetMemberGraphType(member, isInputType: true, knownSymbols);
+            var memberGraphType = GetMemberGraphType(member, isInputType, knownSymbols);
             if (memberGraphType != null)
             {
                 // Check if it's a GraphQLClrInputTypeReference<T>
