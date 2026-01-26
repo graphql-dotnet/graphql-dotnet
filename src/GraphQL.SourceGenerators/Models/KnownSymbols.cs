@@ -20,4 +20,5 @@ public readonly struct KnownSymbols
     public INamedTypeSymbol? NonNullGraphType { get; init; }
     public INamedTypeSymbol? ListGraphType { get; init; }
     public INamedTypeSymbol? GraphQLClrInputTypeReference { get; init; }
+    public INamedTypeSymbol? GraphQLClrOutputTypeReference { get; init; }
 }

@@ -30,7 +30,8 @@ public static class KnownSymbolsProvider
                 IGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.IGRAPH_TYPE),
                 NonNullGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.NON_NULL_GRAPH_TYPE),
                 ListGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.LIST_GRAPH_TYPE),
-                GraphQLClrInputTypeReference = compilation.GetTypeByMetadataName(Constants.TypeNames.GRAPHQL_CLR_INPUT_TYPE_REFERENCE)
+                GraphQLClrInputTypeReference = compilation.GetTypeByMetadataName(Constants.TypeNames.GRAPHQL_CLR_INPUT_TYPE_REFERENCE),
+                GraphQLClrOutputTypeReference = compilation.GetTypeByMetadataName(Constants.TypeNames.GRAPHQL_CLR_OUTPUT_TYPE_REFERENCE)
             };
         });
     }

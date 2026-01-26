@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators;
 
-public partial class AttributeSymbolsProviderTests
+public partial class KnownSymbolsProviderTests
 {
     /// <summary>
     /// A minimal test generator that uses AttributeSymbolsProvider to report 
@@ -37,6 +37,10 @@ public partial class AttributeSymbolsProviderTests
                 sb.AppendLine($"// AotListType: {symbols.AotListType?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// AotRemapType: {symbols.AotRemapType?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// IGraphType: {symbols.IGraphType?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// NonNullGraphType: {symbols.NonNullGraphType?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// ListGraphType: {symbols.ListGraphType?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// GraphQLClrInputTypeReference: {symbols.GraphQLClrInputTypeReference?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// GraphQLClrOutputTypeReference: {symbols.GraphQLClrOutputTypeReference?.ToDisplayString() ?? "NULL"}");
 
                 spc.AddSource("AttributeSymbolsReport.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
             });

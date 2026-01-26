@@ -42,5 +42,6 @@ internal static class Constants
         internal const string NON_NULL_GRAPH_TYPE = "GraphQL.Types.NonNullGraphType`1";
         internal const string LIST_GRAPH_TYPE = "GraphQL.Types.ListGraphType`1";
         internal const string GRAPHQL_CLR_INPUT_TYPE_REFERENCE = "GraphQL.Types.GraphQLClrInputTypeReference`1";
+        internal const string GRAPHQL_CLR_OUTPUT_TYPE_REFERENCE = "GraphQL.Types.GraphQLClrOutputTypeReference`1";
     }
 }
