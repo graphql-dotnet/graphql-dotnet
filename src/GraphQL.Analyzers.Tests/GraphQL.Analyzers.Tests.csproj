@@ -5,6 +5,7 @@
     <TargetFrameworks>$(SingleFramework)</TargetFrameworks>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <NoWarn>$(NoWarn);RS1036</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

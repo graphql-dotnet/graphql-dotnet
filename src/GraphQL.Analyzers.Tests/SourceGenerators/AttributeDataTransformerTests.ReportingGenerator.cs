@@ -13,9 +13,7 @@ public partial class AttributeDataTransformerTests
     /// extracted attribute data. This isolates testing of the transformation logic from code generation.
     /// </summary>
     [Generator]
-#pragma warning disable RS1036 // Specify analyzer banned API enforcement setting
     public class ReportingGenerator : IIncrementalGenerator
-#pragma warning restore RS1036 // Specify analyzer banned API enforcement setting
     {
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {

@@ -14,9 +14,7 @@ public partial class TypeSymbolTransformerTests
     /// This isolates testing of the TypeSymbolTransformer logic.
     /// </summary>
     [Generator]
-#pragma warning disable RS1036 // Specify analyzer banned API enforcement setting
     public class ReportingGenerator : IIncrementalGenerator
-#pragma warning restore RS1036 // Specify analyzer banned API enforcement setting
     {
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
