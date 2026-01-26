@@ -26,14 +26,13 @@ public class AotSchemaGenerator : IIncrementalGenerator
     {
         // Extract class information from syntax
         var classDeclaration = candidate.ClassDeclarationSyntax;
-        var semanticModel = candidate.SemanticModel;
+        var classSymbol = candidate.ClassSymbol;
 
         var className = classDeclaration.Identifier.Text;
 
-        // Get namespace from semantic model
-        var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration);
+        // Get namespace from class symbol
         var namespaceName = string.Empty;
-        if (classSymbol?.ContainingNamespace != null && !classSymbol.ContainingNamespace.IsGlobalNamespace)
+        if (classSymbol.ContainingNamespace != null && !classSymbol.ContainingNamespace.IsGlobalNamespace)
         {
             namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
         }

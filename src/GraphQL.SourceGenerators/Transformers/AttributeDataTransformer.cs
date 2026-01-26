@@ -18,8 +18,7 @@ public static class AttributeDataTransformer
     /// <param name="attributeSymbols">The resolved attribute symbols for symbolic comparison.</param>
     public static SchemaAttributeData? Transform(CandidateClass candidate, AotAttributeSymbols attributeSymbols)
     {
-        if (candidate.SemanticModel.GetDeclaredSymbol(candidate.ClassDeclarationSyntax) is not INamedTypeSymbol schemaSymbol)
-            return null;
+        var schemaSymbol = candidate.ClassSymbol;
 
         // Prepare builders for each attribute category
         var queryTypes = ImmutableArray.CreateBuilder<RootTypeInfo>();

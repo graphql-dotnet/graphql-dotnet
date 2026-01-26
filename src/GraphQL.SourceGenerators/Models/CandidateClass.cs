@@ -8,4 +8,5 @@ namespace GraphQL.SourceGenerators.Models;
 /// </summary>
 public readonly record struct CandidateClass(
     ClassDeclarationSyntax ClassDeclarationSyntax,
-    SemanticModel SemanticModel);
+    SemanticModel SemanticModel,
+    INamedTypeSymbol ClassSymbol);

@@ -66,7 +66,8 @@ public static class CandidateProvider
             predicate: static (node, _) => IsPartialClass(node),
             transform: static (ctx, _) => new CandidateClass(
                 (ClassDeclarationSyntax)ctx.TargetNode,
-                ctx.SemanticModel));
+                ctx.SemanticModel,
+                null!));
     }
 
     /// <summary>
@@ -118,16 +119,21 @@ public static class CandidateProvider
             if (classSymbol == null)
                 continue;
 
-            // If we haven't seen this symbol before, add it
-            if (!seenSymbols.ContainsKey(classSymbol))
-            {
-                if (InheritsFromAotSchema(classSymbol, aotSchemaSymbol))
-                {
-                    seenSymbols.Add(classSymbol, candidate);
-                }
-            }
             // If we have seen it, we have multiple partial declarations with attributes
             // Keep the first one we found (it doesn't matter which we use as they represent the same class)
+            if (seenSymbols.ContainsKey(classSymbol))
+                continue;
+
+            // If we haven't seen this symbol before, add it
+            if (InheritsFromAotSchema(classSymbol, aotSchemaSymbol))
+            {
+                // Create a new candidate with the ClassSymbol populated
+                var candidateWithSymbol = new CandidateClass(
+                    candidate.ClassDeclarationSyntax,
+                    candidate.SemanticModel,
+                    classSymbol);
+                seenSymbols.Add(classSymbol, candidateWithSymbol);
+            }
         }
 
         return seenSymbols.Values.ToImmutableArray();
