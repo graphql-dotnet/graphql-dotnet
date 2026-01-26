@@ -404,6 +404,7 @@ public class FederationResolverTests
     }
 
     private static IObjectGraphType TypeFirstSetup<T>()
+        where T : notnull
     {
         var objectGraphType = new AutoRegisteringObjectGraphType<T>();
         objectGraphType.Fields.Find("Resolve").ShouldNotBeNull().IsPrivate.ShouldBeTrue();
