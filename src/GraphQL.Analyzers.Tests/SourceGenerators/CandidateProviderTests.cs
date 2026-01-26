@@ -547,4 +547,237 @@ public partial class CandidateProviderTests
 
             """);
     }
+
+    [Fact]
+    public async Task HandlesDuplicatePartialClassWithAttributeOnFirstDeclaration()
+    {
+        // Partial class split across multiple declarations with attribute on first only
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query { }
+
+            [AotQueryType<Query>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+
+            public partial class MySchema
+            {
+                public void AdditionalMethod() { }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= CandidatesReport.g.cs ============
+
+            // Matched Candidates:
+
+            // MySchema
+            //   Namespace: Sample
+            //   IsPartial: True
+            //   AttributeCount: 1
+
+            """);
+    }
+
+    [Fact]
+    public async Task HandlesDuplicatePartialClassWithAttributeOnSecondDeclaration()
+    {
+        // Partial class split across multiple declarations with attribute on second only
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query { }
+
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+
+            [AotQueryType<Query>]
+            public partial class MySchema
+            {
+                public void AdditionalMethod() { }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= CandidatesReport.g.cs ============
+
+            // Matched Candidates:
+
+            // MySchema
+            //   Namespace: Sample
+            //   IsPartial: True
+            //   AttributeCount: 1
+
+            """);
+    }
+
+    [Fact]
+    public async Task HandlesDuplicatePartialClassWithAttributesOnBothDeclarations()
+    {
+        // Partial class split across multiple declarations with attributes on both
+        const string source =
+            """
+            using System;
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query { }
+            public class MyInput { }
+
+            [AotQueryType<Query>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+
+            [AotInputType<MyInput>]
+            [AotTypeMapping<DateTime, DateTimeGraphType>]
+            public partial class MySchema
+            {
+                public void AdditionalMethod() { }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= CandidatesReport.g.cs ============
+
+            // Matched Candidates:
+
+            // MySchema
+            //   Namespace: Sample
+            //   IsPartial: True
+            //   AttributeCount: 3
+
+            """);
+    }
+
+    [Fact]
+    public async Task HandlesTriplePartialClassWithAttributesOnMultipleDeclarations()
+    {
+        // Partial class split across three declarations with attributes distributed
+        const string source =
+            """
+            using System;
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query { }
+            public class Mutation { }
+            public class MyInput { }
+
+            [AotQueryType<Query>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+
+            public partial class MySchema
+            {
+                public void MethodOne() { }
+            }
+
+            [AotMutationType<Mutation>]
+            [AotInputType<MyInput>]
+            public partial class MySchema
+            {
+                public void MethodTwo() { }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= CandidatesReport.g.cs ============
+
+            // Matched Candidates:
+
+            // MySchema
+            //   Namespace: Sample
+            //   IsPartial: True
+            //   AttributeCount: 3
+
+            """);
+    }
+
+    [Fact]
+    public async Task HandlesDuplicatePartialClassWithMixedAttributesOnBothDeclarations()
+    {
+        // Partial class with mix of AOT and non-AOT attributes across declarations
+        const string source =
+            """
+            using System;
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query { }
+
+            [Obsolete("Old approach")]
+            [AotQueryType<Query>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+
+            [Serializable]
+            [AotTypeMapping<DateTime, DateTimeGraphType>]
+            public partial class MySchema
+            {
+                public void AdditionalMethod() { }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= CandidatesReport.g.cs ============
+
+            // Matched Candidates:
+
+            // MySchema
+            //   Namespace: Sample
+            //   IsPartial: True
+            //   AttributeCount: 4
+
+            """);
+    }
 }

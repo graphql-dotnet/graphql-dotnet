@@ -69,8 +69,9 @@ public partial class CandidateProviderTests
                     // Check if partial
                     var isPartial = classDecl.Modifiers.Any(Microsoft.CodeAnalysis.CSharp.SyntaxKind.PartialKeyword);
 
-                    // Count total attributes
-                    var totalAttributes = classDecl.AttributeLists.Sum(al => al.Attributes.Count);
+                    // Count total attributes from the symbol (which includes all partial declarations)
+                    // This properly handles partial classes with attributes spread across multiple declarations
+                    var totalAttributes = classSymbol?.GetAttributes().Length ?? 0;
 
                     sb.AppendLine();
                     sb.AppendLine($"// {className}");

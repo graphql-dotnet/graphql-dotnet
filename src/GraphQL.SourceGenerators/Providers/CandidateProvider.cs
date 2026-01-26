@@ -1,8 +1,8 @@
+using System.Collections.Immutable;
 using GraphQL.SourceGenerators.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Collections.Immutable;
 
 namespace GraphQL.SourceGenerators.Providers;
 
@@ -92,27 +92,39 @@ public static class CandidateProvider
     }
 
     /// <summary>
-    /// Manually deduplicate candidates by syntax node reference and filter to only include
+    /// Manually deduplicate candidates by class symbol and filter to only include
     /// classes that inherit from GraphQL.Types.AotSchema.
+    /// For partial classes with attributes on multiple declarations, uses the first declaration.
     /// </summary>
     private static ImmutableArray<CandidateClass> DeduplicateAndFilter(ImmutableArray<CandidateClass> candidates)
     {
         if (candidates.Length == 0)
             return candidates;
 
-        var seen = new HashSet<ClassDeclarationSyntax>();
-        var builder = ImmutableArray.CreateBuilder<CandidateClass>();
+        // Group by class symbol to handle partial classes correctly
+        var seenSymbols = new Dictionary<INamedTypeSymbol, CandidateClass>(SymbolEqualityComparer.Default);
 
         for (int i = 0; i < candidates.Length; i++)
         {
             var candidate = candidates[i];
-            if (seen.Add(candidate.ClassDeclarationSyntax) && InheritsFromAotSchema(candidate))
+            var classSymbol = candidate.SemanticModel.GetDeclaredSymbol(candidate.ClassDeclarationSyntax);
+
+            if (classSymbol == null)
+                continue;
+
+            // If we haven't seen this symbol before, add it
+            if (!seenSymbols.ContainsKey(classSymbol))
             {
-                builder.Add(candidate);
+                if (InheritsFromAotSchema(candidate))
+                {
+                    seenSymbols.Add(classSymbol, candidate);
+                }
             }
+            // If we have seen it, we have multiple partial declarations with attributes
+            // Keep the first one we found (it doesn't matter which we use as they represent the same class)
         }
 
-        return builder.ToImmutable();
+        return seenSymbols.Values.ToImmutableArray();
     }
 
     /// <summary>
