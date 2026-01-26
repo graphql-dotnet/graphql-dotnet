@@ -17,17 +17,3 @@ public readonly record struct SchemaAttributeData(
     ImmutableArray<TypeMappingInfo> TypeMappings,
     ImmutableArray<ITypeSymbol> ListTypes,
     ImmutableArray<TypeMappingInfo> RemapTypes);
-
-/// <summary>
-/// Represents a single-argument AOT attribute with its generic type parameter.
-/// </summary>
-public readonly record struct RootTypeInfo(
-    ITypeSymbol TypeArgument,
-    bool IsClrType);
-
-/// <summary>
-/// Represents a two-argument AOT attribute (TypeMapping or RemapType) with both generic type parameters.
-/// </summary>
-public readonly record struct TypeMappingInfo(
-    ITypeSymbol FromType,
-    ITypeSymbol ToType);
