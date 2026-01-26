@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 namespace GraphQL.SourceGenerators;
 
 internal static class Constants
@@ -16,7 +18,11 @@ internal static class Constants
         internal const string AOT_LIST_TYPE = "GraphQL.AotListTypeAttribute`1";
         internal const string AOT_REMAP_TYPE = "GraphQL.AotRemapTypeAttribute`2";  // 2 type parameters
 
-        internal static readonly string[] All =
+        /// <summary>
+        /// Includes AotQueryType, AotMutationType, AotSubscriptionType, AotOutputType, AotInputType,
+        /// AotGraphType, AotTypeMapping, AotListType, and AotRemapType.
+        /// </summary>
+        internal static readonly ImmutableArray<string> All = ImmutableArray<string>.Empty.AddRange(new string[]
         {
             AOT_QUERY_TYPE,
             AOT_MUTATION_TYPE,
@@ -27,6 +33,11 @@ internal static class Constants
             AOT_TYPE_MAPPING,
             AOT_LIST_TYPE,
             AOT_REMAP_TYPE
-        };
+        });
+    }
+
+    internal static class TypeNames
+    {
+        internal const string IGRAPH_TYPE = "GraphQL.Types.IGraphType";
     }
 }
