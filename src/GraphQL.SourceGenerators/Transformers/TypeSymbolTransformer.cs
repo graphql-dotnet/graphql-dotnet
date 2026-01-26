@@ -51,6 +51,9 @@ public static class TypeSymbolTransformer
             if (memberClrType == null)
                 continue;
 
+            // Collect all list types at each level while unwrapping - do this regardless of GraphType attribute
+            CollectListTypes(memberClrType, inputListTypes, knownSymbols);
+
             // Check if member has explicit GraphType override
             var memberGraphType = GetMemberGraphType(member, isInputType, knownSymbols);
             if (memberGraphType != null)
@@ -95,9 +98,6 @@ public static class TypeSymbolTransformer
 
                 continue;
             }
-
-            // Collect all list types at each level while unwrapping
-            CollectListTypes(memberClrType, inputListTypes, knownSymbols);
 
             // Unwrap nested generic wrappers (recursively)
             var unwrappedClrType = UnwrapClrType(memberClrType, knownSymbols);
@@ -332,7 +332,8 @@ public static class TypeSymbolTransformer
     /// </summary>
     private static ITypeSymbol? GetMemberGraphType(ISymbol member, bool isInputType, KnownSymbols knownSymbols)
     {
-        ITypeSymbol? memberGraphType = null;
+        if (!isInputType)
+            return null;
 
         foreach (var attribute in member.GetAttributes())
         {
@@ -340,78 +341,86 @@ public static class TypeSymbolTransformer
             if (attributeClass == null)
                 continue;
 
-            // For input types, check input-specific attributes first
-            if (isInputType)
-            {
-                // Get the original definition for generic types to compare properly
-                var originalDef = attributeClass.IsGenericType ? attributeClass.OriginalDefinition : attributeClass;
+            // Check InputType attribute (generic or non-generic, including derived types)
+            var memberGraphType = TryGetGraphTypeFromAttribute(
+                attributeClass,
+                attribute,
+                knownSymbols.InputTypeAttributeT,
+                knownSymbols.InputTypeAttribute);
 
-                // Check InputType<TGraphType> or InputType (non-generic)
-                if (SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.InputTypeAttributeT))
-                {
-                    if (attributeClass.IsGenericType && attributeClass.TypeArguments.Length == 1)
-                        memberGraphType = attributeClass.TypeArguments[0];
-                    else if (!attributeClass.IsGenericType)
-                    {
-                        // Check for GraphType property in constructor or named arguments
-                        var graphTypeArg = attribute.ConstructorArguments.FirstOrDefault();
-                        if (graphTypeArg.Value is ITypeSymbol typeValue)
-                            memberGraphType = typeValue;
-                        else
-                        {
-                            var namedArg = attribute.NamedArguments.FirstOrDefault(arg => arg.Key == "GraphType");
-                            if (namedArg.Value.Value is ITypeSymbol namedTypeValue)
-                                memberGraphType = namedTypeValue;
-                        }
-                    }
-                    break;
-                }
-                // Check InputBaseType<TGraphType> or InputBaseType
-                else if (SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.InputBaseTypeAttributeT))
-                {
-                    if (attributeClass.IsGenericType && attributeClass.TypeArguments.Length == 1)
-                        memberGraphType = attributeClass.TypeArguments[0];
-                    else if (!attributeClass.IsGenericType)
-                    {
-                        var graphTypeArg = attribute.ConstructorArguments.FirstOrDefault();
-                        if (graphTypeArg.Value is ITypeSymbol typeValue)
-                            memberGraphType = typeValue;
-                        else
-                        {
-                            var namedArg = attribute.NamedArguments.FirstOrDefault(arg => arg.Key == "GraphType");
-                            if (namedArg.Value.Value is ITypeSymbol namedTypeValue)
-                                memberGraphType = namedTypeValue;
-                        }
-                    }
-                    break;
-                }
-                // Check BaseGraphType<TGraphType> or BaseGraphType
-                else if (SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.BaseGraphTypeAttributeT))
-                {
-                    if (attributeClass.IsGenericType && attributeClass.TypeArguments.Length == 1)
-                        memberGraphType = attributeClass.TypeArguments[0];
-                    else if (!attributeClass.IsGenericType)
-                    {
-                        var graphTypeArg = attribute.ConstructorArguments.FirstOrDefault();
-                        if (graphTypeArg.Value is ITypeSymbol typeValue)
-                            memberGraphType = typeValue;
-                        else
-                        {
-                            var namedArg = attribute.NamedArguments.FirstOrDefault(arg => arg.Key == "GraphType");
-                            if (namedArg.Value.Value is ITypeSymbol namedTypeValue)
-                                memberGraphType = namedTypeValue;
-                        }
-                    }
-                    break;
-                }
-            }
+            if (memberGraphType != null)
+                return UnwrapGraphType(memberGraphType, knownSymbols);
+
+            // Check InputBaseType attribute (generic or non-generic, including derived types)
+            memberGraphType = TryGetGraphTypeFromAttribute(
+                attributeClass,
+                attribute,
+                knownSymbols.InputBaseTypeAttributeT,
+                knownSymbols.InputBaseTypeAttribute);
+
+            if (memberGraphType != null)
+                return UnwrapGraphType(memberGraphType, knownSymbols);
+
+            // Check BaseGraphType attribute (generic or non-generic, including derived types)
+            memberGraphType = TryGetGraphTypeFromAttribute(
+                attributeClass,
+                attribute,
+                knownSymbols.BaseGraphTypeAttributeT,
+                knownSymbols.BaseGraphTypeAttribute);
+
+            if (memberGraphType != null)
+                return UnwrapGraphType(memberGraphType, knownSymbols);
         }
 
-        if (memberGraphType == null)
-            return null;
+        return null;
+    }
 
-        // Unwrap the GraphType to get the base type
-        return UnwrapGraphType(memberGraphType, knownSymbols);
+    /// <summary>
+    /// Attempts to extract a GraphType from an attribute by checking if the attribute
+    /// matches the generic type (or inherits from it), or is exactly the non-generic type.
+    /// </summary>
+    /// <param name="attributeClass">The attribute class to check.</param>
+    /// <param name="attribute">The attribute data for accessing constructor arguments.</param>
+    /// <param name="genericSymbol">The generic version symbol (e.g., InputTypeAttribute&lt;T&gt;).</param>
+    /// <param name="nonGenericSymbol">The non-generic version symbol (e.g., InputTypeAttribute).</param>
+    /// <returns>The GraphType if found, otherwise null.</returns>
+    private static ITypeSymbol? TryGetGraphTypeFromAttribute(
+        INamedTypeSymbol attributeClass,
+        AttributeData attribute,
+        INamedTypeSymbol? genericSymbol,
+        INamedTypeSymbol? nonGenericSymbol)
+    {
+        // Walk the inheritance tree to find if this attribute or any base class matches the generic type
+        var current = attributeClass;
+        while (current != null)
+        {
+            // Check if this is the generic version
+            if (genericSymbol != null && current.IsGenericType)
+            {
+                var originalDef = current.OriginalDefinition;
+                if (SymbolEqualityComparer.Default.Equals(originalDef, genericSymbol) &&
+                    current.TypeArguments.Length == 1)
+                {
+                    return current.TypeArguments[0];
+                }
+            }
+
+            // Move to base class
+            current = current.BaseType;
+        }
+
+        // Check if this attribute is exactly the non-generic version (not derived)
+        if (nonGenericSymbol != null &&
+            !attributeClass.IsGenericType &&
+            SymbolEqualityComparer.Default.Equals(attributeClass, nonGenericSymbol))
+        {
+            // Try to get the type from the first constructor argument
+            var graphTypeArg = attribute.ConstructorArguments.FirstOrDefault();
+            if (graphTypeArg.Value is ITypeSymbol typeValue)
+                return typeValue;
+        }
+
+        return null;
     }
 
     /// <summary>

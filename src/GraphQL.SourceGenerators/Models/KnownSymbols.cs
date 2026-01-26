@@ -23,8 +23,11 @@ public readonly struct KnownSymbols
     public INamedTypeSymbol? GraphQLClrOutputTypeReference { get; init; }
     public INamedTypeSymbol? IgnoreAttribute { get; init; }
     public INamedTypeSymbol? InputTypeAttributeT { get; init; }
+    public INamedTypeSymbol? InputTypeAttribute { get; init; }
     public INamedTypeSymbol? InputBaseTypeAttributeT { get; init; }
+    public INamedTypeSymbol? InputBaseTypeAttribute { get; init; }
     public INamedTypeSymbol? BaseGraphTypeAttributeT { get; init; }
+    public INamedTypeSymbol? BaseGraphTypeAttribute { get; init; }
     public INamedTypeSymbol? IEnumerableT { get; init; }
     public INamedTypeSymbol? IListT { get; init; }
     public INamedTypeSymbol? ListT { get; init; }

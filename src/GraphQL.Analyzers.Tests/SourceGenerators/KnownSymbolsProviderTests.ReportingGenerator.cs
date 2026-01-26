@@ -41,8 +41,11 @@ public partial class KnownSymbolsProviderTests
                 sb.AppendLine($"// GraphQLClrOutputTypeReference: {symbols.GraphQLClrOutputTypeReference?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// IgnoreAttribute: {symbols.IgnoreAttribute?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// InputTypeAttributeT: {symbols.InputTypeAttributeT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// InputTypeAttribute: {symbols.InputTypeAttribute?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// InputBaseTypeAttributeT: {symbols.InputBaseTypeAttributeT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// InputBaseTypeAttribute: {symbols.InputBaseTypeAttribute?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// BaseGraphTypeAttributeT: {symbols.BaseGraphTypeAttributeT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// BaseGraphTypeAttribute: {symbols.BaseGraphTypeAttribute?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// IEnumerableT: {symbols.IEnumerableT?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// IListT: {symbols.IListT?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// ListT: {symbols.ListT?.ToDisplayString() ?? "NULL"}");
