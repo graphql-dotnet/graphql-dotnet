@@ -8,6 +8,7 @@ namespace GraphQL.Types;
 /// reference to the actual GraphQL type before using the reference.
 /// </summary>
 public sealed class GraphQLClrInputTypeReference<[NotAGraphType] T> : IInputObjectGraphType
+    where T : notnull
 {
     private GraphQLClrInputTypeReference()
     {
