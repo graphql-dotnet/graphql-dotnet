@@ -7,11 +7,50 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace GraphQL.SourceGenerators.Providers;
 
 /// <summary>
-/// Provider D: Identifies candidate class declarations that have AOT-related attributes.
+/// Holds resolved INamedTypeSymbol for each AOT attribute type.
+/// </summary>
+public readonly struct AotAttributeSymbols
+{
+    public INamedTypeSymbol? AotQueryType { get; init; }
+    public INamedTypeSymbol? AotMutationType { get; init; }
+    public INamedTypeSymbol? AotSubscriptionType { get; init; }
+    public INamedTypeSymbol? AotOutputType { get; init; }
+    public INamedTypeSymbol? AotInputType { get; init; }
+    public INamedTypeSymbol? AotGraphType { get; init; }
+    public INamedTypeSymbol? AotTypeMapping { get; init; }
+    public INamedTypeSymbol? AotListType { get; init; }
+    public INamedTypeSymbol? AotRemapType { get; init; }
+}
+
+/// <summary>
+/// Identifies candidate class declarations that have AOT-related attributes.
 /// Uses the efficient ForAttributeWithMetadataName API for optimal incremental compilation performance.
 /// </summary>
 public static class CandidateProvider
 {
+    /// <summary>
+    /// Creates a provider that resolves INamedTypeSymbol for all AOT attribute types.
+    /// </summary>
+    public static IncrementalValueProvider<AotAttributeSymbols> CreateAttributeSymbolsProvider(
+        IncrementalGeneratorInitializationContext context)
+    {
+        return context.CompilationProvider.Select(static (compilation, _) =>
+        {
+            return new AotAttributeSymbols
+            {
+                AotQueryType = compilation.GetTypeByMetadataName(Constants.AttributeNames.AOT_QUERY_TYPE),
+                AotMutationType = compilation.GetTypeByMetadataName(Constants.AttributeNames.AOT_MUTATION_TYPE),
+                AotSubscriptionType = compilation.GetTypeByMetadataName(Constants.AttributeNames.AOT_SUBSCRIPTION_TYPE),
+                AotOutputType = compilation.GetTypeByMetadataName(Constants.AttributeNames.AOT_OUTPUT_TYPE),
+                AotInputType = compilation.GetTypeByMetadataName(Constants.AttributeNames.AOT_INPUT_TYPE),
+                AotGraphType = compilation.GetTypeByMetadataName(Constants.AttributeNames.AOT_GRAPH_TYPE),
+                AotTypeMapping = compilation.GetTypeByMetadataName(Constants.AttributeNames.AOT_TYPE_MAPPING),
+                AotListType = compilation.GetTypeByMetadataName(Constants.AttributeNames.AOT_LIST_TYPE),
+                AotRemapType = compilation.GetTypeByMetadataName(Constants.AttributeNames.AOT_REMAP_TYPE)
+            };
+        });
+    }
+
     /// <summary>
     /// Creates an incremental provider that identifies all partial class declarations
     /// decorated with AOT-related attributes.
@@ -28,6 +67,10 @@ public static class CandidateProvider
     public static IncrementalValuesProvider<CandidateClass> CreateCandidateProvider(
         IncrementalGeneratorInitializationContext context)
     {
+        // Create a provider for the AotSchema symbol to use in filtering
+        var aotSchemaSymbolProvider = context.CompilationProvider
+            .Select(static (compilation, _) => compilation.GetTypeByMetadataName("GraphQL.Types.AotSchema"));
+
         // Create a collected provider for each AOT attribute type
         var collectedProviders =
             new IncrementalValueProvider<ImmutableArray<CandidateClass>>[Constants.AttributeNames.All.Length];
@@ -44,10 +87,10 @@ public static class CandidateProvider
                 .Select(static (t, _) => t.Left.AddRange(t.Right));
         }
 
-        // Deduplicate by comparing the syntax nodes (using reference equality is fine for syntax nodes)
-        // Then filter to only include classes that inherit from GraphQL.Types.AotSchema
+        // Combine with AotSchema symbol and deduplicate/filter
         return combined
-            .SelectMany(static (candidates, _) => DeduplicateAndFilter(candidates));
+            .Combine(aotSchemaSymbolProvider)
+            .SelectMany(static (tuple, _) => DeduplicateAndFilter(tuple.Left, tuple.Right));
     }
 
     /// <summary>
@@ -96,7 +139,9 @@ public static class CandidateProvider
     /// classes that inherit from GraphQL.Types.AotSchema.
     /// For partial classes with attributes on multiple declarations, uses the first declaration.
     /// </summary>
-    private static ImmutableArray<CandidateClass> DeduplicateAndFilter(ImmutableArray<CandidateClass> candidates)
+    private static ImmutableArray<CandidateClass> DeduplicateAndFilter(
+        ImmutableArray<CandidateClass> candidates,
+        INamedTypeSymbol? aotSchemaSymbol)
     {
         if (candidates.Length == 0)
             return candidates;
@@ -115,7 +160,7 @@ public static class CandidateProvider
             // If we haven't seen this symbol before, add it
             if (!seenSymbols.ContainsKey(classSymbol))
             {
-                if (InheritsFromAotSchema(candidate))
+                if (InheritsFromAotSchema(classSymbol, aotSchemaSymbol))
                 {
                     seenSymbols.Add(classSymbol, candidate);
                 }
@@ -128,20 +173,18 @@ public static class CandidateProvider
     }
 
     /// <summary>
-    /// Checks if a candidate class inherits from GraphQL.Types.AotSchema (directly or indirectly).
+    /// Checks if a class symbol inherits from GraphQL.Types.AotSchema (directly or indirectly).
     /// </summary>
-    private static bool InheritsFromAotSchema(CandidateClass candidate)
+    private static bool InheritsFromAotSchema(INamedTypeSymbol classSymbol, INamedTypeSymbol? aotSchemaSymbol)
     {
-        var classSymbol = candidate.SemanticModel.GetDeclaredSymbol(candidate.ClassDeclarationSyntax);
-
-        if (classSymbol == null)
+        if (aotSchemaSymbol == null)
             return false;
 
-        // Walk up the inheritance chain to check if any base type is GraphQL.Types.AotSchema
+        // Walk up the inheritance chain to check if any base type is the AotSchema symbol
         var baseType = classSymbol.BaseType;
         while (baseType != null)
         {
-            if (baseType.ToDisplayString() == "GraphQL.Types.AotSchema")
+            if (SymbolEqualityComparer.Default.Equals(baseType, aotSchemaSymbol))
                 return true;
             baseType = baseType.BaseType;
         }
