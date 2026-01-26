@@ -87,6 +87,7 @@ public static class SchemaExtensions
     /// <typeparam name="TClrType">The CLR property type from which to infer the GraphType.</typeparam>
     /// <typeparam name="TGraphType">Inferred GraphType.</typeparam>
     public static void RegisterTypeMapping<TClrType, TGraphType>(this ISchema schema)
+        where TClrType : notnull
         where TGraphType : IGraphType
     {
         Preserve<GraphQLClrInputTypeReference<TClrType>>();
@@ -189,6 +190,7 @@ public static class SchemaExtensions
     [RequiresUnreferencedCode("Scans the specified type for public methods and properties, which may not be statically referenced.")]
     [RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
     public static void AutoRegister<TClrType>(this ISchema schema, AutoRegisteringMode mode = AutoRegisteringMode.Both)
+        where TClrType : notnull
     {
         if (mode.HasFlag(AutoRegisteringMode.Output))
             schema.RegisterTypeMapping<TClrType, AutoRegisteringObjectGraphType<TClrType>>();

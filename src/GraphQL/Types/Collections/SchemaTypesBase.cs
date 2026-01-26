@@ -101,6 +101,7 @@ public abstract class SchemaTypesBase : IReadOnlyCollection<IGraphType>
         Preserve<Uri>();
 
         static void Preserve<T>()
+            where T : notnull
         {
             // force the MSIL to contain strong references to the specified type
             GC.KeepAlive(typeof(GraphQLClrInputTypeReference<T>));
