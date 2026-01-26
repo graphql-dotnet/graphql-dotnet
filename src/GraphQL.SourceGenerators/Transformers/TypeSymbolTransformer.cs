@@ -123,6 +123,7 @@ public static class TypeSymbolTransformer
         return new TypeScanResult(
             ScannedType: typeSymbol,
             DiscoveredInputClrTypes: discoveredClrTypes.ToImmutable(),
+            DiscoveredOutputClrTypes: ImmutableArray<ITypeSymbol>.Empty,
             DiscoveredGraphTypes: discoveredGraphTypes.ToImmutable(),
             InputListTypes: inputListTypes.ToImmutable());
     }

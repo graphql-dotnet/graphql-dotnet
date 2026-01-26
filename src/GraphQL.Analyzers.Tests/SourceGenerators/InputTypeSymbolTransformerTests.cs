@@ -117,6 +117,8 @@ public partial class InputTypeSymbolTransformerTests
             //   [12] Stack<int>
             //   [13] LinkedList<bool>
             //
+            // DiscoveredOutputClrTypes: 0
+            //
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 21
@@ -181,6 +183,8 @@ public partial class InputTypeSymbolTransformerTests
             //   [1] decimal
             //   [2] DateTime
             //
+            // DiscoveredOutputClrTypes: 0
+            //
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
@@ -226,6 +230,8 @@ public partial class InputTypeSymbolTransformerTests
             // DiscoveredInputClrTypes: 2
             //   [0] string
             //   [1] decimal
+            //
+            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 0
             //
@@ -277,6 +283,8 @@ public partial class InputTypeSymbolTransformerTests
             // DiscoveredInputClrTypes: 2
             //   [0] string
             //   [1] decimal
+            //
+            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 0
             //
@@ -334,6 +342,8 @@ public partial class InputTypeSymbolTransformerTests
             //   [1] decimal
             //   [2] Guid
             //
+            // DiscoveredOutputClrTypes: 0
+            //
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
@@ -386,6 +396,8 @@ public partial class InputTypeSymbolTransformerTests
             // Type: CreateProductInput
             //
             // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 0
             //
@@ -458,6 +470,8 @@ public partial class InputTypeSymbolTransformerTests
             //
             // DiscoveredInputClrTypes: 1
             //   [0] string
+            //
+            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 5
             //   [0] IntGraphType
@@ -540,6 +554,8 @@ public partial class InputTypeSymbolTransformerTests
             // DiscoveredInputClrTypes: 1
             //   [0] string
             //
+            // DiscoveredOutputClrTypes: 0
+            //
             // DiscoveredGraphTypes: 6
             //   [0] IntGraphType
             //   [1] ByteGraphType
@@ -619,6 +635,8 @@ public partial class InputTypeSymbolTransformerTests
             // DiscoveredInputClrTypes: 1
             //   [0] string
             //
+            // DiscoveredOutputClrTypes: 0
+            //
             // DiscoveredGraphTypes: 5
             //   [0] IntGraphType
             //   [1] ByteGraphType
@@ -696,6 +714,8 @@ public partial class InputTypeSymbolTransformerTests
             //
             // DiscoveredInputClrTypes: 0
             //
+            // DiscoveredOutputClrTypes: 0
+            //
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
@@ -744,6 +764,8 @@ public partial class InputTypeSymbolTransformerTests
             //   [0] string
             //   [1] int
             //
+            // DiscoveredOutputClrTypes: 0
+            //
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
@@ -753,6 +775,8 @@ public partial class InputTypeSymbolTransformerTests
             // DiscoveredInputClrTypes: 2
             //   [0] string
             //   [1] decimal
+            //
+            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 0
             //
@@ -796,6 +820,8 @@ public partial class InputTypeSymbolTransformerTests
             //   [0] string
             //   [1] int
             //
+            // DiscoveredOutputClrTypes: 0
+            //
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
@@ -833,6 +859,8 @@ public partial class InputTypeSymbolTransformerTests
             //   [0] string
             //   [1] decimal
             //   [2] int
+            //
+            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 0
             //
@@ -891,6 +919,8 @@ public partial class InputTypeSymbolTransformerTests
             //   [1] long
             //   [2] decimal
             //   [3] Class1
+            //
+            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 0
             //

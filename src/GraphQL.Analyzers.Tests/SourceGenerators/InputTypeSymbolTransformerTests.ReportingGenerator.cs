@@ -76,6 +76,14 @@ public partial class InputTypeSymbolTransformerTests
                     }
                     sb.AppendLine("//");
 
+                    // Discovered Output CLR Types
+                    sb.AppendLine($"// DiscoveredOutputClrTypes: {scanResult.DiscoveredOutputClrTypes.Length}");
+                    for (int i = 0; i < scanResult.DiscoveredOutputClrTypes.Length; i++)
+                    {
+                        sb.AppendLine($"//   [{i}] {scanResult.DiscoveredOutputClrTypes[i].ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}");
+                    }
+                    sb.AppendLine("//");
+
                     // Discovered GraphTypes
                     sb.AppendLine($"// DiscoveredGraphTypes: {scanResult.DiscoveredGraphTypes.Length}");
                     for (int i = 0; i < scanResult.DiscoveredGraphTypes.Length; i++)

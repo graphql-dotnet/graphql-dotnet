@@ -9,5 +9,6 @@ namespace GraphQL.SourceGenerators.Models;
 public readonly record struct TypeScanResult(
     ITypeSymbol ScannedType,
     ImmutableArray<ITypeSymbol> DiscoveredInputClrTypes,
+    ImmutableArray<ITypeSymbol> DiscoveredOutputClrTypes,
     ImmutableArray<ITypeSymbol> DiscoveredGraphTypes,
     ImmutableArray<ITypeSymbol> InputListTypes);
