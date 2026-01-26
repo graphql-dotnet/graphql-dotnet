@@ -45,8 +45,9 @@ public static class CandidateProvider
         }
 
         // Deduplicate by comparing the syntax nodes (using reference equality is fine for syntax nodes)
+        // Then filter to only include classes that inherit from GraphQL.Types.AotSchema
         return combined
-            .SelectMany(static (candidates, _) => Deduplicate(candidates));
+            .SelectMany(static (candidates, _) => DeduplicateAndFilter(candidates));
     }
 
     /// <summary>
@@ -70,20 +71,33 @@ public static class CandidateProvider
     /// <remarks>
     /// ForAttributeWithMetadataName already filters by attribute presence,
     /// so we only need to verify the class is partial (required for code generation).
+    /// Additionally, all containing classes must also be partial.
     /// </remarks>
-    private static bool IsPartialClass(SyntaxNode node)
+    private static bool IsPartialClass(SyntaxNode? node)
     {
         // Must be a class declaration with the partial modifier
-        return node is ClassDeclarationSyntax classDecl &&
-               classDecl.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
+        if (node is not ClassDeclarationSyntax)
+            return false;
+
+        // Check that all containing classes are also partial
+        while (node is ClassDeclarationSyntax classDecl)
+        {
+            if (!classDecl.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)))
+                return false;
+
+            node = classDecl.Parent;
+        }
+
+        return true;
     }
 
     /// <summary>
-    /// Manually deduplicate candidates by syntax node reference.
+    /// Manually deduplicate candidates by syntax node reference and filter to only include
+    /// classes that inherit from GraphQL.Types.AotSchema.
     /// </summary>
-    private static ImmutableArray<CandidateClass> Deduplicate(ImmutableArray<CandidateClass> candidates)
+    private static ImmutableArray<CandidateClass> DeduplicateAndFilter(ImmutableArray<CandidateClass> candidates)
     {
-        if (candidates.Length <= 1)
+        if (candidates.Length == 0)
             return candidates;
 
         var seen = new HashSet<ClassDeclarationSyntax>();
@@ -92,12 +106,34 @@ public static class CandidateProvider
         for (int i = 0; i < candidates.Length; i++)
         {
             var candidate = candidates[i];
-            if (seen.Add(candidate.ClassDeclarationSyntax))
+            if (seen.Add(candidate.ClassDeclarationSyntax) && InheritsFromAotSchema(candidate))
             {
                 builder.Add(candidate);
             }
         }
 
         return builder.ToImmutable();
+    }
+
+    /// <summary>
+    /// Checks if a candidate class inherits from GraphQL.Types.AotSchema (directly or indirectly).
+    /// </summary>
+    private static bool InheritsFromAotSchema(CandidateClass candidate)
+    {
+        var classSymbol = candidate.SemanticModel.GetDeclaredSymbol(candidate.ClassDeclarationSyntax);
+
+        if (classSymbol == null)
+            return false;
+
+        // Walk up the inheritance chain to check if any base type is GraphQL.Types.AotSchema
+        var baseType = classSymbol.BaseType;
+        while (baseType != null)
+        {
+            if (baseType.ToDisplayString() == "GraphQL.Types.AotSchema")
+                return true;
+            baseType = baseType.BaseType;
+        }
+
+        return false;
     }
 }

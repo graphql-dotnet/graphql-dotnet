@@ -1,5 +1,5 @@
 using VerifyTestSG = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpIncrementalGeneratorVerifier<
-    GraphQL.Analyzers.Tests.SourceGenerators.TestCandidateReportingGenerator>;
+    GraphQL.Analyzers.Tests.SourceGenerators.CandidateProviderTests.ReportingGenerator>;
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators;
 
@@ -8,7 +8,7 @@ namespace GraphQL.Analyzers.Tests.SourceGenerators;
 /// These tests verify that the provider correctly identifies candidate classes based on AOT attributes.
 /// Uses TestCandidateReportingGenerator to isolate testing of CandidateProvider from the full pipeline.
 /// </summary>
-public class CandidateProviderTests
+public partial class CandidateProviderTests
 {
     [Fact]
     public async Task FiltersOutNonPartialClasses()
@@ -295,6 +295,255 @@ public class CandidateProviderTests
             //   Namespace: Sample
             //   IsPartial: True
             //   AttributeCount: 9
+
+            """);
+    }
+
+    [Fact]
+    public async Task FiltersOutClassesNotInheritingFromAotSchema()
+    {
+        // Partial class with AOT attribute but not inheriting from AotSchema should be filtered out
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query { }
+
+            [AotQueryType<Query>]
+            public partial class MySchema : Schema
+            {
+            }
+            """;
+
+        // Should not generate any code because class doesn't inherit from AotSchema
+        await VerifyTestSG.VerifyIncrementalGeneratorAsync(source);
+    }
+
+    [Fact]
+    public async Task IncludesClassesDirectlyInheritingFromAotSchema()
+    {
+        // Partial class directly inheriting from AotSchema should be included
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query { }
+
+            [AotQueryType<Query>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= CandidatesReport.g.cs ============
+
+            // Matched Candidates:
+
+            // MySchema
+            //   Namespace: Sample
+            //   IsPartial: True
+            //   AttributeCount: 1
+
+            """);
+    }
+
+    [Fact]
+    public async Task IncludesClassesIndirectlyInheritingFromAotSchema()
+    {
+        // Partial class indirectly inheriting from AotSchema should be included
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query { }
+
+            public class MyBaseSchema : AotSchema
+            {
+                public MyBaseSchema() : base(null!, null!) { }
+            }
+
+            [AotQueryType<Query>]
+            public partial class MyDerivedSchema : MyBaseSchema
+            {
+                public MyDerivedSchema() : base() { }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= CandidatesReport.g.cs ============
+
+            // Matched Candidates:
+
+            // MyDerivedSchema
+            //   Namespace: Sample
+            //   IsPartial: True
+            //   AttributeCount: 1
+
+            """);
+    }
+
+    [Fact]
+    public async Task FiltersOutNestedClassWhenContainingClassIsNotPartial()
+    {
+        // Nested partial class with AOT attribute should be filtered if containing class is not partial
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query { }
+
+            public class OuterClass
+            {
+                [AotQueryType<Query>]
+                public partial class MySchema : AotSchema
+                {
+                    public MySchema() : base(null!, null!) { }
+                }
+            }
+            """;
+
+        // Should not generate any code because containing class is not partial
+        await VerifyTestSG.VerifyIncrementalGeneratorAsync(source);
+    }
+
+    [Fact]
+    public async Task IncludesNestedClassWhenAllContainingClassesArePartial()
+    {
+        // Nested partial class with AOT attribute should be included if all containing classes are partial
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query { }
+
+            public partial class OuterClass
+            {
+                [AotQueryType<Query>]
+                public partial class MySchema : AotSchema
+                {
+                    public MySchema() : base(null!, null!) { }
+                }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= CandidatesReport.g.cs ============
+
+            // Matched Candidates:
+
+            // MySchema
+            //   Namespace: Sample.OuterClass
+            //   IsPartial: True
+            //   AttributeCount: 1
+
+            """);
+    }
+
+    [Fact]
+    public async Task FiltersOutDeeplyNestedClassWhenAnyContainingClassIsNotPartial()
+    {
+        // Deeply nested partial class should be filtered if any containing class is not partial
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query { }
+
+            public partial class Level1
+            {
+                public class Level2
+                {
+                    [AotQueryType<Query>]
+                    public partial class MySchema : AotSchema
+                    {
+                        public MySchema() : base(null!, null!) { }
+                    }
+                }
+            }
+            """;
+
+        // Should not generate any code because Level2 is not partial
+        await VerifyTestSG.VerifyIncrementalGeneratorAsync(source);
+    }
+
+    [Fact]
+    public async Task IncludesDeeplyNestedClassWhenAllContainingClassesArePartial()
+    {
+        // Deeply nested partial class should be included if all containing classes are partial
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query { }
+
+            public partial class Level1
+            {
+                public partial class Level2
+                {
+                    public partial class Level3
+                    {
+                        [AotQueryType<Query>]
+                        public partial class MySchema : AotSchema
+                        {
+                            public MySchema() : base(null!, null!) { }
+                        }
+                    }
+                }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= CandidatesReport.g.cs ============
+
+            // Matched Candidates:
+
+            // MySchema
+            //   Namespace: Sample.Level1.Level2.Level3
+            //   IsPartial: True
+            //   AttributeCount: 1
 
             """);
     }
