@@ -7,6 +7,7 @@ namespace GraphQL.Types;
 /// reference to the actual GraphQL type before using the reference.
 /// </summary>
 public sealed class GraphQLClrOutputTypeReference<[NotAGraphType] T> : IInterfaceGraphType, IObjectGraphType
+    where T : notnull
 {
     private GraphQLClrOutputTypeReference()
     {

@@ -1004,7 +1004,8 @@ namespace GraphQL
         public static void AutoRegister(this GraphQL.Types.ISchema schema, System.Type clrType, GraphQL.AutoRegisteringMode mode = 3) { }
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Scans the specified type for public methods and properties, which may not be stat" +
             "ically referenced.")]
-        public static void AutoRegister<TClrType>(this GraphQL.Types.ISchema schema, GraphQL.AutoRegisteringMode mode = 3) { }
+        public static void AutoRegister<TClrType>(this GraphQL.Types.ISchema schema, GraphQL.AutoRegisteringMode mode = 3)
+            where TClrType :  notnull { }
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
             where TSchema : GraphQL.Types.ISchema { }
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IGraphQLTextSerializer serializer, System.Action<GraphQL.ExecutionOptions> configure) { }
@@ -1015,6 +1016,7 @@ namespace GraphQL
         public static void RegisterType<T>(this GraphQL.Types.ISchema schema)
             where T : GraphQL.Types.IGraphType { }
         public static void RegisterTypeMapping<TClrType, TGraphType>(this GraphQL.Types.ISchema schema)
+            where TClrType :  notnull
             where TGraphType : GraphQL.Types.IGraphType { }
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are" +
             " not trimmed by the compiler.")]
@@ -2835,8 +2837,10 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
-    public sealed class GraphQLClrInputTypeReference<T> : GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInputObjectGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
-    public sealed class GraphQLClrOutputTypeReference<T> : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IInterfaceGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
+    public sealed class GraphQLClrInputTypeReference<T> : GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInputObjectGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
+        where T :  notnull { }
+    public sealed class GraphQLClrOutputTypeReference<T> : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IInterfaceGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
+        where T :  notnull { }
     public sealed class GraphQLTypeReference : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IInterfaceGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         public GraphQLTypeReference(string typeName) { }
