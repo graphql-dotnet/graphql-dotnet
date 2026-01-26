@@ -38,9 +38,9 @@ public static class AttributeDataTransformer
             if (attributeClass == null)
                 continue;
 
-            // Get the unbound generic type for comparison
+            // Get the original (unbound) generic type definition for comparison
             var unboundAttributeType = attributeClass.IsGenericType
-                ? attributeClass.ConstructUnboundGenericType()
+                ? attributeClass.OriginalDefinition
                 : attributeClass;
 
             // Categorize by attribute type using symbolic comparison
