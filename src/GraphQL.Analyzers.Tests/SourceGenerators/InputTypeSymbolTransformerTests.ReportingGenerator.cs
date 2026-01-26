@@ -69,10 +69,10 @@ public partial class InputTypeSymbolTransformerTests
                     sb.AppendLine("//");
 
                     // Discovered CLR Types
-                    sb.AppendLine($"// DiscoveredClrTypes: {scanResult.DiscoveredClrTypes.Length}");
-                    for (int i = 0; i < scanResult.DiscoveredClrTypes.Length; i++)
+                    sb.AppendLine($"// DiscoveredClrTypes: {scanResult.DiscoveredInputClrTypes.Length}");
+                    for (int i = 0; i < scanResult.DiscoveredInputClrTypes.Length; i++)
                     {
-                        sb.AppendLine($"//   [{i}] {scanResult.DiscoveredClrTypes[i].ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}");
+                        sb.AppendLine($"//   [{i}] {scanResult.DiscoveredInputClrTypes[i].ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}");
                     }
                     sb.AppendLine("//");
 

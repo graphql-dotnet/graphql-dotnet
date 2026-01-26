@@ -108,7 +108,7 @@ public partial class InputTypeSymbolTransformerTests
             //   [3] int
             //   [4] DateTime
             //   [5] long
-            //   [6] Class1?
+            //   [6] Class1
             //   [7] Class2
             //   [8] bool
             //   [9] short
@@ -718,6 +718,64 @@ public partial class InputTypeSymbolTransformerTests
             //   [0] string
             //   [1] decimal
             //   [2] int
+            //
+            // DiscoveredGraphTypes: 0
+            //
+            // InputListTypes: 0
+
+            """);
+    }
+
+    [Fact]
+    public async Task GraphQLClrInputTypeReference_AddsToClrTypes()
+    {
+        const string source =
+            """
+            using System;
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            [AttributeUsage(AttributeTargets.Class)]
+            public class ScanMeAttribute : Attribute { }
+
+            public class Class1 { }
+
+            [ScanMe]
+            public class CreateProductInput
+            {
+                public string Name { get; set; }
+                
+                [InputType(typeof(GraphQLClrInputTypeReference<long>))]
+                public int Quantity { get; set; }
+                
+                [InputType(typeof(GraphQLClrInputTypeReference<long?>))]
+                public int Quantity2 { get; set; }
+                
+                [InputType<GraphQLClrInputTypeReference<decimal>>]
+                public decimal Price { get; set; }
+
+                [InputType<GraphQLClrInputTypeReference<Class1>>]
+                public decimal Test1 { get; set; }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= TypeScanReport.g.cs ============
+
+            // Type: CreateProductInput
+            //
+            // DiscoveredClrTypes: 4
+            //   [0] string
+            //   [1] long
+            //   [2] decimal
+            //   [3] Class1
             //
             // DiscoveredGraphTypes: 0
             //

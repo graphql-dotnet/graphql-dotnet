@@ -16,10 +16,8 @@ public static class TypeSymbolTransformer
     /// <param name="typeSymbol">The CLR type to scan.</param>
     /// <param name="knownSymbols">Known GraphQL symbol references for comparison.</param>
     /// <param name="isInputType">Indicates whether the type is being scanned as an input type.</param>
-    public static InputTypeScanResult? Transform(ITypeSymbol typeSymbol, KnownSymbols knownSymbols, bool isInputType)
+    public static TypeScanResult? Transform(ITypeSymbol typeSymbol, KnownSymbols knownSymbols, bool isInputType)
     {
-        _ = isInputType;
-
         // Return null for types that cannot be examined
         if (typeSymbol is INamedTypeSymbol namedType && namedType.IsUnboundGenericType)
             return null;
@@ -61,11 +59,14 @@ public static class TypeSymbolTransformer
                 // Check if it's a GraphQLClrInputTypeReference<T>
                 if (TryExtractClrTypeReference(memberGraphType, knownSymbols.GraphQLClrInputTypeReference, out var clrType))
                 {
+                    // Unwrap the extracted CLR type to handle nullable types and other wrappers (invalid anyway; SchemaTypes will throw)
+                    var unwrappedClrType2 = UnwrapClrType(clrType, knownSymbols);
+
                     // Extract T and add to discoveredClrTypes (with deduplication)
                     bool clrRefTypeExists = false;
                     foreach (var existingClrType in discoveredClrTypes)
                     {
-                        if (SymbolEqualityComparer.Default.Equals(existingClrType, clrType))
+                        if (SymbolEqualityComparer.Default.Equals(existingClrType, unwrappedClrType2))
                         {
                             clrRefTypeExists = true;
                             break;
@@ -74,7 +75,7 @@ public static class TypeSymbolTransformer
 
                     if (!clrRefTypeExists)
                     {
-                        discoveredClrTypes.Add(clrType);
+                        discoveredClrTypes.Add(unwrappedClrType2);
                     }
                 }
                 else
@@ -119,9 +120,9 @@ public static class TypeSymbolTransformer
             }
         }
 
-        return new InputTypeScanResult(
+        return new TypeScanResult(
             ScannedType: typeSymbol,
-            DiscoveredClrTypes: discoveredClrTypes.ToImmutable(),
+            DiscoveredInputClrTypes: discoveredClrTypes.ToImmutable(),
             DiscoveredGraphTypes: discoveredGraphTypes.ToImmutable(),
             InputListTypes: inputListTypes.ToImmutable());
     }
@@ -189,6 +190,13 @@ public static class TypeSymbolTransformer
     /// </summary>
     private static ITypeSymbol UnwrapClrType(ITypeSymbol type, KnownSymbols knownSymbols)
     {
+        // Handle nullable reference types (e.g., string?, Class1?)
+        if (type.NullableAnnotation == NullableAnnotation.Annotated)
+        {
+            // Return the non-nullable version
+            return UnwrapClrType(type.WithNullableAnnotation(NullableAnnotation.NotAnnotated), knownSymbols);
+        }
+
         if (type is INamedTypeSymbol namedType && namedType.IsGenericType)
         {
             var typeName = namedType.OriginalDefinition.ToDisplayString();
