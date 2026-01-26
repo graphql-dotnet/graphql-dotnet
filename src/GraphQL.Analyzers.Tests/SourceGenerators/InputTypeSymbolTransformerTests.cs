@@ -235,7 +235,7 @@ public partial class InputTypeSymbolTransformerTests
     }
 
     [Fact]
-    public async Task SkipsReadOnlyPropertiesForInputTypes()
+    public async Task SkipsReadOnlyPropertiesAndFieldsForInputTypes()
     {
         const string source =
             """
@@ -255,6 +255,12 @@ public partial class InputTypeSymbolTransformerTests
                 public int ComputedValue { get; }
                 
                 public decimal Price { get; set; }
+
+                // Fields should be skipped by default
+                public Guid Identifier;
+
+                // Methods should be skipped
+                public byte GetInfo() => 3;
             }
             """;
 
@@ -271,6 +277,115 @@ public partial class InputTypeSymbolTransformerTests
             // DiscoveredClrTypes: 2
             //   [0] string
             //   [1] decimal
+            //
+            // DiscoveredGraphTypes: 0
+            //
+            // InputListTypes: 0
+
+            """);
+    }
+
+    [Fact]
+    public async Task MemberScan_All()
+    {
+        const string source =
+            """
+            using System;
+            using GraphQL;
+
+            namespace Sample;
+
+            [AttributeUsage(AttributeTargets.Class)]
+            public class ScanMeAttribute : Attribute { }
+
+            [ScanMe]
+            [MemberScan(ScanMemberTypes.Fields | ScanMemberTypes.Properties | ScanMemberTypes.Methods)]
+            public class CreateProductInput
+            {
+                public string Name { get; set; }
+                
+                // Read-only properties should be skipped for input types
+                public int ComputedValue { get; }
+                
+                public decimal Price { get; set; }
+
+                public Guid Identifier;
+
+                // Read-only fields should be skipped for input types
+                public readonly sbyte? ReadOnlyField;
+
+                // Methods should be skipped
+                public short GetInfo() => 3;
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= TypeScanReport.g.cs ============
+
+            // Type: CreateProductInput
+            //
+            // DiscoveredClrTypes: 3
+            //   [0] string
+            //   [1] decimal
+            //   [2] Guid
+            //
+            // DiscoveredGraphTypes: 0
+            //
+            // InputListTypes: 0
+
+            """);
+    }
+
+    [Fact]
+    public async Task MemberScan_None()
+    {
+        const string source =
+            """
+            using System;
+            using GraphQL;
+
+            namespace Sample;
+
+            [AttributeUsage(AttributeTargets.Class)]
+            public class ScanMeAttribute : Attribute { }
+
+            [ScanMe]
+            [MemberScan(0)]
+            public class CreateProductInput
+            {
+                public string Name { get; set; }
+                
+                // Read-only properties should be skipped for input types
+                public int ComputedValue { get; }
+                
+                public decimal Price { get; set; }
+
+                public Guid Identifier;
+
+                // Read-only fields should be skipped for input types
+                public readonly sbyte? ReadOnlyField;
+
+                // Methods should be skipped
+                public short GetInfo() => 3;
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= TypeScanReport.g.cs ============
+
+            // Type: CreateProductInput
+            //
+            // DiscoveredClrTypes: 0
             //
             // DiscoveredGraphTypes: 0
             //

@@ -273,15 +273,14 @@ public static class TypeSymbolTransformer
 
         if (memberScanAttribute != null)
         {
-            // Extract ScanFlags value if present
-            var scanFlagsArg = memberScanAttribute.NamedArguments
-                .FirstOrDefault(arg => arg.Key == "ScanFlags");
+            // Extract MemberTypes value from the first constructor argument
+            var memberTypesArg = memberScanAttribute.ConstructorArguments.FirstOrDefault();
 
-            if (scanFlagsArg.Value.Value is int scanFlags)
+            if (memberTypesArg.Value is int memberTypes)
             {
-                // Assuming: Fields = 1, Properties = 2, Methods = 4
-                scanFields = (scanFlags & 1) != 0;
-                scanProperties = (scanFlags & 2) != 0;
+                // ScanMemberTypes enum: Properties = 1, Fields = 2, Methods = 4
+                scanProperties = (memberTypes & 1) != 0;
+                scanFields = (memberTypes & 2) != 0;
             }
         }
 
