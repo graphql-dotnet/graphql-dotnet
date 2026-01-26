@@ -21,7 +21,7 @@ public partial class AttributeDataTransformerTests
         {
             // Get candidates and attribute symbols
             var candidateClasses = CandidateProvider.CreateCandidateProvider(context);
-            var attributeSymbols = AttributeSymbolsProvider.CreateAttributeSymbolsProvider(context);
+            var attributeSymbols = KnownSymbolsProvider.CreateAttributeSymbolsProvider(context);
 
             // Combine them for transformation
             var candidatesWithSymbols = candidateClasses.Combine(attributeSymbols);

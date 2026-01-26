@@ -19,7 +19,7 @@ public partial class AttributeSymbolsProviderTests
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             // Get attribute symbols
-            var attributeSymbols = AttributeSymbolsProvider.CreateAttributeSymbolsProvider(context);
+            var attributeSymbols = KnownSymbolsProvider.CreateAttributeSymbolsProvider(context);
 
             // Report the resolved symbols
             context.RegisterSourceOutput(attributeSymbols, (spc, symbols) =>
