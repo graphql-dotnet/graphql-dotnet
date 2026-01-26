@@ -358,6 +358,166 @@ public partial class InputTypeSymbolTransformerTests
     }
 
     [Fact]
+    public async Task ReadsTypeAttributes_ConstructorSyntax()
+    {
+        const string source =
+            """
+            using System;
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            [AttributeUsage(AttributeTargets.Class)]
+            public class ScanMeAttribute : Attribute { }
+
+            [ScanMe]
+            public class CreateProductInput
+            {
+                public string StringValue { get; set; }
+                
+                [InputType(typeof(IntGraphType))]
+                public int IntValue { get; set; }
+                
+                [InputBaseType(typeof(ByteGraphType))]
+                public byte ByteValue { get; set; }
+                
+                [BaseGraphType(typeof(LongGraphType))]
+                public long LongValue { get; set; }
+                
+                [InputType(typeof(ListGraphType<NonNullGraphType<DateTimeGraphType>>))]
+                public DateTime[] DateTimeValue { get; set; }
+
+                [Id]
+                public Guid IdValue { get; set; }
+
+                // duplicates
+                [InputType(typeof(IntGraphType))]
+                public int IntValue2 { get; set; }
+                
+                [InputBaseType(typeof(ByteGraphType))]
+                public byte ByteValue2 { get; set; }
+                
+                [BaseGraphType(typeof(LongGraphType))]
+                public long LongValue2 { get; set; }
+                
+                [InputType(typeof(ListGraphType<NonNullGraphType<DateTimeGraphType>>))]
+                public DateTime[] DateTimeValue2 { get; set; }
+            
+                [InputType(typeof(IdGraphType))]
+                public Guid IdValue2 { get; set; }
+            
+                [InputType(graphType: typeof(SByteGraphType))]
+                public sbyte SByteValue { get; set; }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= TypeScanReport.g.cs ============
+
+            // Type: CreateProductInput
+            //
+            // DiscoveredClrTypes: 1
+            //   [0] string
+            //
+            // DiscoveredGraphTypes: 6
+            //   [0] IntGraphType
+            //   [1] ByteGraphType
+            //   [2] LongGraphType
+            //   [3] DateTimeGraphType
+            //   [4] IdGraphType
+            //   [5] SByteGraphType
+            //
+            // InputListTypes: 1
+            //   [0] DateTime[]
+
+            """);
+    }
+
+    [Fact]
+    public async Task ReadsTypeAttributes_NamedParameterSyntax()
+    {
+        const string source =
+            """
+            using System;
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            [AttributeUsage(AttributeTargets.Class)]
+            public class ScanMeAttribute : Attribute { }
+
+            [ScanMe]
+            public class CreateProductInput
+            {
+                public string StringValue { get; set; }
+                
+                [InputType(graphType: typeof(IntGraphType))]
+                public int IntValue { get; set; }
+                
+                [InputBaseType(graphType: typeof(ByteGraphType))]
+                public byte ByteValue { get; set; }
+                
+                [BaseGraphType(graphType: typeof(LongGraphType))]
+                public long LongValue { get; set; }
+                
+                [InputType(graphType: typeof(ListGraphType<NonNullGraphType<DateTimeGraphType>>))]
+                public DateTime[] DateTimeValue { get; set; }
+
+                [Id]
+                public Guid IdValue { get; set; }
+
+                // duplicates
+                [InputType(graphType: typeof(IntGraphType))]
+                public int IntValue2 { get; set; }
+                
+                [InputBaseType(graphType: typeof(ByteGraphType))]
+                public byte ByteValue2 { get; set; }
+                
+                [BaseGraphType(graphType: typeof(LongGraphType))]
+                public long LongValue2 { get; set; }
+                
+                [InputType(graphType: typeof(ListGraphType<NonNullGraphType<DateTimeGraphType>>))]
+                public DateTime[] DateTimeValue2 { get; set; }
+            
+                [Id]
+                public Guid IdValue2 { get; set; }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= TypeScanReport.g.cs ============
+
+            // Type: CreateProductInput
+            //
+            // DiscoveredClrTypes: 1
+            //   [0] string
+            //
+            // DiscoveredGraphTypes: 5
+            //   [0] IntGraphType
+            //   [1] ByteGraphType
+            //   [2] LongGraphType
+            //   [3] DateTimeGraphType
+            //   [4] IdGraphType
+            //
+            // InputListTypes: 1
+            //   [0] DateTime[]
+
+            """);
+    }
+
+    [Fact]
     public async Task ReturnsNullForOpenGenericTypes()
     {
         const string source =
