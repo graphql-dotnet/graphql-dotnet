@@ -400,7 +400,7 @@ public readonly ref struct SchemaAttributeDataTransformer
     /// <summary>
     /// Attempts to extract the CLR type from a GraphType's generic type parameter.
     /// For example, ObjectGraphType&lt;MyClass&gt; returns MyClass.
-    /// Only extracts from types that inherit from ComplexGraphType&lt;T&gt; where T is not object.
+    /// Only extracts from types that inherit from ComplexGraphType&lt;T&gt; or EnumerationGraphType&lt;T&gt; where T is not object.
     /// </summary>
     private ITypeSymbol? ExtractClrTypeFromGraphType(ITypeSymbol graphType)
     {
@@ -438,26 +438,33 @@ public readonly ref struct SchemaAttributeDataTransformer
             }
         }
 
-        // Step 3: Walk up the inheritance hierarchy to find ComplexGraphType<T>
-        if (_knownSymbols.ComplexGraphType == null)
+        // Step 3: Walk up the inheritance hierarchy to find ComplexGraphType<T> or EnumerationGraphType<T>
+        if (_knownSymbols.ComplexGraphType == null && _knownSymbols.EnumerationGraphType == null)
             return null;
 
         var currentType = namedGraphType;
         while (currentType != null)
         {
-            if (currentType.IsGenericType &&
-                currentType.TypeArguments.Length == 1 &&
-                SymbolEqualityComparer.Default.Equals(currentType.OriginalDefinition, _knownSymbols.ComplexGraphType))
+            if (currentType.IsGenericType && currentType.TypeArguments.Length == 1)
             {
-                var typeArgument = currentType.TypeArguments[0];
+                bool isComplexGraphType = _knownSymbols.ComplexGraphType != null &&
+                    SymbolEqualityComparer.Default.Equals(currentType.OriginalDefinition, _knownSymbols.ComplexGraphType);
 
-                // Only return if the type argument is not System.Object
-                if (typeArgument.SpecialType != SpecialType.System_Object)
+                bool isEnumerationGraphType = _knownSymbols.EnumerationGraphType != null &&
+                    SymbolEqualityComparer.Default.Equals(currentType.OriginalDefinition, _knownSymbols.EnumerationGraphType);
+
+                if (isComplexGraphType || isEnumerationGraphType)
                 {
-                    return typeArgument;
-                }
+                    var typeArgument = currentType.TypeArguments[0];
 
-                return null;
+                    // Only return if the type argument is not System.Object
+                    if (typeArgument.SpecialType != SpecialType.System_Object)
+                    {
+                        return typeArgument;
+                    }
+
+                    return null;
+                }
             }
 
             currentType = currentType.BaseType;

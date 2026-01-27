@@ -76,6 +76,7 @@ public partial class KnownSymbolsProviderTests
             // IInterfaceGraphType: GraphQL.Types.IInterfaceGraphType
             // ScalarGraphType: GraphQL.Types.ScalarGraphType
             // ComplexGraphType: GraphQL.Types.ComplexGraphType<TSourceType>
+            // EnumerationGraphType: GraphQL.Types.EnumerationGraphType<TEnum>
             // AutoRegisteringObjectGraphType: GraphQL.Types.AutoRegisteringObjectGraphType<TSourceType>
             // AutoRegisteringInputObjectGraphType: GraphQL.Types.AutoRegisteringInputObjectGraphType<TSourceType>
             // AutoRegisteringInterfaceGraphType: GraphQL.Types.AutoRegisteringInterfaceGraphType<TSourceType>

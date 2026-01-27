@@ -1744,4 +1744,61 @@ public partial class SchemaAttributeDataTransformerTests
 
             """);
     }
+
+    [Fact]
+    public async Task EnumerationGraphType_ExtractsEnumTypeMapping()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public enum ProductStatus
+            {
+                Active,
+                Inactive,
+                Discontinued
+            }
+
+            public class ProductStatusGraphType : EnumerationGraphType<ProductStatus>
+            {
+            }
+
+            [AotGraphType<ProductStatusGraphType>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= SchemaTransformationReport.g.cs ============
+
+            // Schema: MySchema
+            //
+            // QueryRootGraphType: (none)
+            //
+            // MutationRootGraphType: (none)
+            //
+            // SubscriptionRootGraphType: (none)
+            //
+            // DiscoveredGraphTypes: 1
+            //   [0] ProductStatusGraphType
+            //
+            // OutputClrTypeMappings: 1
+            //   [0] ProductStatus -> ProductStatusGraphType
+            //
+            // InputClrTypeMappings: 0
+            //
+            // InputListTypes: 0
+
+            """);
+    }
 }

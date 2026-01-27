@@ -73,6 +73,7 @@ public partial class KnownSymbolsProviderTests
                 sb.AppendLine($"// IInterfaceGraphType: {symbols.IInterfaceGraphType?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// ScalarGraphType: {symbols.ScalarGraphType?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// ComplexGraphType: {symbols.ComplexGraphType?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// EnumerationGraphType: {symbols.EnumerationGraphType?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// AutoRegisteringObjectGraphType: {symbols.AutoRegisteringObjectGraphType?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// AutoRegisteringInputObjectGraphType: {symbols.AutoRegisteringInputObjectGraphType?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// AutoRegisteringInterfaceGraphType: {symbols.AutoRegisteringInterfaceGraphType?.ToDisplayString() ?? "NULL"}");

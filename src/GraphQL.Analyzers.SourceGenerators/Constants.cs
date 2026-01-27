@@ -71,6 +71,7 @@ internal static class Constants
         internal const string IINTERFACE_GRAPH_TYPE = "GraphQL.Types.IInterfaceGraphType";
         internal const string SCALAR_GRAPH_TYPE = "GraphQL.Types.ScalarGraphType";
         internal const string COMPLEX_GRAPH_TYPE = "GraphQL.Types.ComplexGraphType`1";
+        internal const string ENUMERATION_GRAPH_TYPE = "GraphQL.Types.EnumerationGraphType`1";
         internal const string AUTO_REGISTERING_OBJECT_GRAPH_TYPE = "GraphQL.Types.AutoRegisteringObjectGraphType`1";
         internal const string AUTO_REGISTERING_INPUT_OBJECT_GRAPH_TYPE = "GraphQL.Types.AutoRegisteringInputObjectGraphType`1";
         internal const string AUTO_REGISTERING_INTERFACE_GRAPH_TYPE = "GraphQL.Types.AutoRegisteringInterfaceGraphType`1";
