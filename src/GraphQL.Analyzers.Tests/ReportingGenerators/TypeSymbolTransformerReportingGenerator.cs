@@ -105,7 +105,7 @@ public class TypeSymbolTransformerReportingGenerator : IIncrementalGenerator
 
     private static bool IsScanCandidate(SyntaxNode node)
     {
-        return node is ClassDeclarationSyntax or RecordDeclarationSyntax;
+        return node is ClassDeclarationSyntax or RecordDeclarationSyntax or InterfaceDeclarationSyntax;
     }
 
     private static (ITypeSymbol TypeSymbol, bool IsInputType)? GetTypeToScan(GeneratorSyntaxContext context)

@@ -293,107 +293,124 @@ public static class TypeSymbolTransformer
         var currentType = clrType;
         while (currentType != null && currentType.SpecialType != SpecialType.System_Object)
         {
-            // Collect fields if requested
-            if (scanFields)
-            {
-                foreach (var field in currentType.GetMembers().OfType<IFieldSymbol>())
-                {
-                    // Only scan public fields
-                    if (field.DeclaredAccessibility != Accessibility.Public)
-                        continue;
-
-                    if (ShouldSkipMember(field, knownSymbols))
-                        continue;
-
-                    // Skip readonly fields for input types (can't be set)
-                    if (isInputType && field.IsReadOnly)
-                        continue;
-
-                    membersToScan.Add(field);
-                }
-            }
-
-            // Collect properties if requested
-            if (scanProperties)
-            {
-                foreach (var property in currentType.GetMembers().OfType<IPropertySymbol>())
-                {
-                    // Only scan public properties
-                    if (property.DeclaredAccessibility != Accessibility.Public)
-                        continue;
-
-                    if (ShouldSkipMember(property, knownSymbols))
-                        continue;
-
-                    // Skip read-only properties for input types (can't be set)
-                    if (isInputType && property.IsReadOnly)
-                        continue;
-
-                    // Skip write-only properties for output types (can't be read)
-                    if (!isInputType && property.IsWriteOnly)
-                        continue;
-
-                    membersToScan.Add(property);
-                }
-            }
-
-            // Collect methods if requested (for output types)
-            if (scanMethods && !isInputType)
-            {
-                foreach (var method in currentType.GetMembers().OfType<IMethodSymbol>())
-                {
-                    // Only scan public methods
-                    if (method.DeclaredAccessibility != Accessibility.Public)
-                        continue;
-
-                    if (ShouldSkipMember(method, knownSymbols))
-                        continue;
-
-                    // Skip special methods (constructors, property accessors, etc.)
-                    if (method.MethodKind != MethodKind.Ordinary)
-                        continue;
-
-                    // Skip void methods
-                    if (method.ReturnsVoid)
-                        continue;
-
-                    // Skip methods that return Task (methods which do not return a value)
-                    if (knownSymbols.Task != null && SymbolEqualityComparer.Default.Equals(method.ReturnType, knownSymbols.Task))
-                        continue;
-
-                    // Skip methods inherited from System.Object (e.g., GetHashCode, GetType, ToString, Equals)
-                    if (method.ContainingType?.SpecialType == SpecialType.System_Object)
-                        continue;
-
-                    // For overridden methods, check if the base definition is from System.Object
-                    if (method.IsOverride && method.OverriddenMethod != null)
-                    {
-                        var baseDefinition = method.OverriddenMethod;
-                        while (baseDefinition.OverriddenMethod != null)
-                            baseDefinition = baseDefinition.OverriddenMethod;
-
-                        if (baseDefinition.ContainingType?.SpecialType == SpecialType.System_Object)
-                            continue;
-                    }
-
-                    // Skip compiler-generated methods for record types
-                    // Exclude public virtual/override bool Equals(RECORD_TYPE)
-                    if (IsRecordEqualsMethod(method, clrType))
-                        continue;
-
-                    // Exclude <Clone>$() method generated for record types
-                    if (method.Name == "<Clone>$")
-                        continue;
-
-                    membersToScan.Add(method);
-                }
-            }
+            ScanTypeMembers(currentType, membersToScan, scanFields, scanProperties, scanMethods, isInputType, knownSymbols, clrType);
 
             // Move to the base type
             currentType = currentType.BaseType;
         }
 
+        // For interfaces, collect members from all implemented interfaces also
+        if (clrType.TypeKind == TypeKind.Interface && clrType is INamedTypeSymbol namedInterface)
+        {
+            foreach (var interfaceType in namedInterface.AllInterfaces)
+            {
+                ScanTypeMembers(interfaceType, membersToScan, scanFields, scanProperties, scanMethods, isInputType, knownSymbols, clrType);
+            }
+        }
+
         return membersToScan;
+    }
+
+    /// <summary>
+    /// Scans a specific type for members and adds them to the members list.
+    /// </summary>
+    private static void ScanTypeMembers(ITypeSymbol typeToScan, List<ISymbol> membersToScan, bool scanFields, bool scanProperties, bool scanMethods, bool isInputType, KnownSymbols knownSymbols, ITypeSymbol originalType)
+    {
+        // Collect fields if requested
+        if (scanFields)
+        {
+            foreach (var field in typeToScan.GetMembers().OfType<IFieldSymbol>())
+            {
+                // Only scan public fields
+                if (field.DeclaredAccessibility != Accessibility.Public)
+                    continue;
+
+                if (ShouldSkipMember(field, knownSymbols))
+                    continue;
+
+                // Skip readonly fields for input types (can't be set)
+                if (isInputType && field.IsReadOnly)
+                    continue;
+
+                membersToScan.Add(field);
+            }
+        }
+
+        // Collect properties if requested
+        if (scanProperties)
+        {
+            foreach (var property in typeToScan.GetMembers().OfType<IPropertySymbol>())
+            {
+                // Only scan public properties
+                if (property.DeclaredAccessibility != Accessibility.Public)
+                    continue;
+
+                if (ShouldSkipMember(property, knownSymbols))
+                    continue;
+
+                // Skip read-only properties for input types (can't be set)
+                if (isInputType && property.IsReadOnly)
+                    continue;
+
+                // Skip write-only properties for output types (can't be read)
+                if (!isInputType && property.IsWriteOnly)
+                    continue;
+
+                membersToScan.Add(property);
+            }
+        }
+
+        // Collect methods if requested (for output types)
+        if (scanMethods && !isInputType)
+        {
+            foreach (var method in typeToScan.GetMembers().OfType<IMethodSymbol>())
+            {
+                // Only scan public methods
+                if (method.DeclaredAccessibility != Accessibility.Public)
+                    continue;
+
+                if (ShouldSkipMember(method, knownSymbols))
+                    continue;
+
+                // Skip special methods (constructors, property accessors, etc.)
+                if (method.MethodKind != MethodKind.Ordinary)
+                    continue;
+
+                // Skip void methods
+                if (method.ReturnsVoid)
+                    continue;
+
+                // Skip methods that return Task (methods which do not return a value)
+                if (knownSymbols.Task != null && SymbolEqualityComparer.Default.Equals(method.ReturnType, knownSymbols.Task))
+                    continue;
+
+                // Skip methods inherited from System.Object (e.g., GetHashCode, GetType, ToString, Equals)
+                if (method.ContainingType?.SpecialType == SpecialType.System_Object)
+                    continue;
+
+                // For overridden methods, check if the base definition is from System.Object
+                if (method.IsOverride && method.OverriddenMethod != null)
+                {
+                    var baseDefinition = method.OverriddenMethod;
+                    while (baseDefinition.OverriddenMethod != null)
+                        baseDefinition = baseDefinition.OverriddenMethod;
+
+                    if (baseDefinition.ContainingType?.SpecialType == SpecialType.System_Object)
+                        continue;
+                }
+
+                // Skip compiler-generated methods for record types
+                // Exclude public virtual/override bool Equals(RECORD_TYPE)
+                if (IsRecordEqualsMethod(method, originalType))
+                    continue;
+
+                // Exclude <Clone>$() method generated for record types
+                if (method.Name == "<Clone>$")
+                    continue;
+
+                membersToScan.Add(method);
+            }
+        }
     }
 
     /// <summary>

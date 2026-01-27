@@ -966,4 +966,63 @@ public partial class OutputTypeSymbolTransformerTests
 
             """);
     }
+
+    [Fact]
+    public async Task ScansAllImplementedInterfacesForOutputType()
+    {
+        const string source =
+            """
+            using System;
+
+            namespace Sample;
+
+            [AttributeUsage(AttributeTargets.Interface)]
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
+
+            public interface IBaseInterface1
+            {
+                string Property1 { get; }
+                int Property2 { get; }
+            }
+
+            public interface IBaseInterface2
+            {
+                decimal Property3 { get; }
+                byte Property4 { get; }
+            }
+
+            [ScanMe(false)]
+            public interface IMainInterface : IBaseInterface1, IBaseInterface2
+            {
+                double Property5 { get; }
+                long Property6 { get; }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= TypeScanReport.g.cs ============
+
+            // Type: IMainInterface
+            //
+            // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 6
+            //   [0] double
+            //   [1] long
+            //   [2] string
+            //   [3] int
+            //   [4] decimal
+            //   [5] byte
+            //
+            // DiscoveredGraphTypes: 0
+            //
+            // InputListTypes: 0
+
+            """);
+    }
 }
