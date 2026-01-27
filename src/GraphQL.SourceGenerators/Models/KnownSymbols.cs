@@ -48,4 +48,8 @@ public readonly record struct KnownSymbols
     public INamedTypeSymbol? IDataLoaderResultT { get; init; }
     public INamedTypeSymbol? IResolveFieldContext { get; init; }
     public INamedTypeSymbol? CancellationToken { get; init; }
+    public INamedTypeSymbol? IInputObjectGraphType { get; init; }
+    public INamedTypeSymbol? IObjectGraphType { get; init; }
+    public INamedTypeSymbol? IInterfaceGraphType { get; init; }
+    public INamedTypeSymbol? ScalarGraphType { get; init; }
 }

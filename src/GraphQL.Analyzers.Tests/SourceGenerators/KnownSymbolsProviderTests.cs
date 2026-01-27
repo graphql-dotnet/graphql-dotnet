@@ -69,6 +69,10 @@ public partial class KnownSymbolsProviderTests
             // IDataLoaderResultT: GraphQL.DataLoader.IDataLoaderResult<T>
             // IResolveFieldContext: GraphQL.IResolveFieldContext
             // CancellationToken: System.Threading.CancellationToken
+            // IInputObjectGraphType: GraphQL.Types.IInputObjectGraphType
+            // IObjectGraphType: GraphQL.Types.IObjectGraphType
+            // IInterfaceGraphType: GraphQL.Types.IInterfaceGraphType
+            // ScalarGraphType: GraphQL.Types.ScalarGraphType
 
             """);
     }

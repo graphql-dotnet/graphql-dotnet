@@ -66,6 +66,10 @@ public partial class KnownSymbolsProviderTests
                 sb.AppendLine($"// IDataLoaderResultT: {symbols.IDataLoaderResultT?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// IResolveFieldContext: {symbols.IResolveFieldContext?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// CancellationToken: {symbols.CancellationToken?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// IInputObjectGraphType: {symbols.IInputObjectGraphType?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// IObjectGraphType: {symbols.IObjectGraphType?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// IInterfaceGraphType: {symbols.IInterfaceGraphType?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// ScalarGraphType: {symbols.ScalarGraphType?.ToDisplayString() ?? "NULL"}");
 
                 spc.AddSource("AttributeSymbolsReport.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
             });
