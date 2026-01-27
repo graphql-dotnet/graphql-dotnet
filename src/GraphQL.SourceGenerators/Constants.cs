@@ -22,6 +22,10 @@ internal static class Constants
         internal const string INPUT_TYPE_NON_GENERIC = "GraphQL.InputTypeAttribute";
         internal const string INPUT_BASE_TYPE = "GraphQL.InputBaseTypeAttribute`1";
         internal const string INPUT_BASE_TYPE_NON_GENERIC = "GraphQL.InputBaseTypeAttribute";
+        internal const string OUTPUT_TYPE = "GraphQL.OutputTypeAttribute`1";
+        internal const string OUTPUT_TYPE_NON_GENERIC = "GraphQL.OutputTypeAttribute";
+        internal const string OUTPUT_BASE_TYPE = "GraphQL.OutputBaseTypeAttribute`1";
+        internal const string OUTPUT_BASE_TYPE_NON_GENERIC = "GraphQL.OutputBaseTypeAttribute";
         internal const string BASE_GRAPH_TYPE = "GraphQL.BaseGraphTypeAttribute`1";
         internal const string BASE_GRAPH_TYPE_NON_GENERIC = "GraphQL.BaseGraphTypeAttribute";
 

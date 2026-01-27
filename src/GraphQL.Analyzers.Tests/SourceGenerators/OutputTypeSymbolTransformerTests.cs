@@ -5,10 +5,10 @@ namespace GraphQL.Analyzers.Tests.SourceGenerators;
 
 /// <summary>
 /// Tests for TypeSymbolTransformer transformation logic.
-/// These tests verify that the transformer correctly scans CLR input types and discovers dependencies.
+/// These tests verify that the transformer correctly scans CLR output types and discovers dependencies.
 /// Uses ReportingGenerator to isolate testing of TypeSymbolTransformer from the full pipeline.
 /// </summary>
-public partial class InputTypeSymbolTransformerTests
+public partial class OutputTypeSymbolTransformerTests
 {
     [Fact]
     public async Task MasterList()
@@ -29,8 +29,8 @@ public partial class InputTypeSymbolTransformerTests
                 public sbyte Value { get; set; }
             }
 
-            [ScanMe(true)]
-            public class AllCollectionsInput
+            [ScanMe(false)]
+            public class AllCollectionsOutput
             {
                 // Primitive properties
                 public string Name { get; set; }
@@ -88,6 +88,10 @@ public partial class InputTypeSymbolTransformerTests
                 // IEnumerable<List<int>> contains List<int> - both should appear once
                 public List<int> DirectListOfInts { get; set; }
 
+                // Methods (without arguments) should be scanned by default for output types
+                public Guid GetIdentifier() => Guid.NewGuid();
+                public float CalculateDiscount() => 0.1f;
+
             }
             """;
 
@@ -99,9 +103,11 @@ public partial class InputTypeSymbolTransformerTests
 
             // ========= TypeScanReport.g.cs ============
 
-            // Type: AllCollectionsInput
+            // Type: AllCollectionsOutput
             //
-            // DiscoveredInputClrTypes: 14
+            // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 16
             //   [0] string
             //   [1] byte
             //   [2] decimal
@@ -116,33 +122,12 @@ public partial class InputTypeSymbolTransformerTests
             //   [11] Queue<string>
             //   [12] Stack<int>
             //   [13] LinkedList<bool>
-            //
-            // DiscoveredOutputClrTypes: 0
+            //   [14] Guid
+            //   [15] float
             //
             // DiscoveredGraphTypes: 0
             //
-            // InputListTypes: 21
-            //   [0] int?[]
-            //   [1] List<long?>
-            //   [2] List<Class1?>
-            //   [3] List<Class2?>
-            //   [4] IEnumerable<string>
-            //   [5] IList<int>
-            //   [6] List<bool>
-            //   [7] ICollection<decimal>
-            //   [8] IReadOnlyCollection<long>
-            //   [9] IReadOnlyList<short>
-            //   [10] HashSet<byte>
-            //   [11] ISet<double>
-            //   [12] string[]
-            //   [13] int[]
-            //   [14] string[][]
-            //   [15] List<short[]>
-            //   [16] short[]
-            //   [17] IEnumerable<List<int>>
-            //   [18] List<int>
-            //   [19] List<int[]>
-            //   [20] List<string>
+            // InputListTypes: 0
 
             """);
     }
@@ -159,8 +144,8 @@ public partial class InputTypeSymbolTransformerTests
             [AttributeUsage(AttributeTargets.Class)]
             public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe(true)]
-            public class CreateProductInput
+            [ScanMe(false)]
+            public class CreateProductOutput
             {
                 public int? Quantity { get; set; }
                 public decimal? Price { get; set; }
@@ -176,14 +161,14 @@ public partial class InputTypeSymbolTransformerTests
 
             // ========= TypeScanReport.g.cs ============
 
-            // Type: CreateProductInput
+            // Type: CreateProductOutput
             //
-            // DiscoveredInputClrTypes: 3
+            // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 3
             //   [0] int
             //   [1] decimal
             //   [2] DateTime
-            //
-            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 0
             //
@@ -205,8 +190,8 @@ public partial class InputTypeSymbolTransformerTests
             [AttributeUsage(AttributeTargets.Class)]
             public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe(true)]
-            public class CreateProductInput
+            [ScanMe(false)]
+            public class CreateProductOutput
             {
                 public string Name { get; set; }
                 
@@ -225,13 +210,13 @@ public partial class InputTypeSymbolTransformerTests
 
             // ========= TypeScanReport.g.cs ============
 
-            // Type: CreateProductInput
+            // Type: CreateProductOutput
             //
-            // DiscoveredInputClrTypes: 2
+            // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 2
             //   [0] string
             //   [1] decimal
-            //
-            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 0
             //
@@ -241,7 +226,7 @@ public partial class InputTypeSymbolTransformerTests
     }
 
     [Fact]
-    public async Task SkipsReadOnlyPropertiesAndFieldsForInputTypes()
+    public async Task SkipsWriteOnlyPropertiesAndFieldsForOutputTypes()
     {
         const string source =
             """
@@ -252,20 +237,21 @@ public partial class InputTypeSymbolTransformerTests
             [AttributeUsage(AttributeTargets.Class)]
             public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe(true)]
-            public class CreateProductInput
+            [ScanMe(false)]
+            public class CreateProductOutput
             {
                 public string Name { get; set; }
                 
-                // Read-only properties should be skipped for input types
-                public int ComputedValue { get; }
+                // Write-only properties should be skipped for output types
+                private int _writeOnlyValue;
+                public int WriteOnlyValue { set => _writeOnlyValue = value; }
                 
                 public decimal Price { get; set; }
 
                 // Fields should be skipped by default
                 public Guid Identifier;
 
-                // Methods should be skipped
+                // Methods should be scanned by default for output types (without arguments)
                 public byte GetInfo() => 3;
             }
             """;
@@ -278,13 +264,14 @@ public partial class InputTypeSymbolTransformerTests
 
             // ========= TypeScanReport.g.cs ============
 
-            // Type: CreateProductInput
+            // Type: CreateProductOutput
             //
-            // DiscoveredInputClrTypes: 2
+            // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 3
             //   [0] string
             //   [1] decimal
-            //
-            // DiscoveredOutputClrTypes: 0
+            //   [2] byte
             //
             // DiscoveredGraphTypes: 0
             //
@@ -306,23 +293,23 @@ public partial class InputTypeSymbolTransformerTests
             [AttributeUsage(AttributeTargets.Class)]
             public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe(true)]
+            [ScanMe(false)]
             [MemberScan(ScanMemberTypes.Fields | ScanMemberTypes.Properties | ScanMemberTypes.Methods)]
-            public class CreateProductInput
+            public class CreateProductOutput
             {
                 public string Name { get; set; }
                 
-                // Read-only properties should be skipped for input types
+                // Read-only properties should be included for output types
                 public int ComputedValue { get; }
                 
                 public decimal Price { get; set; }
 
                 public Guid Identifier;
 
-                // Read-only fields should be skipped for input types
+                // Read-only fields should be included for output types
                 public readonly sbyte? ReadOnlyField;
 
-                // Methods should be skipped
+                // Methods should be scanned (without arguments)
                 public short GetInfo() => 3;
             }
             """;
@@ -335,14 +322,17 @@ public partial class InputTypeSymbolTransformerTests
 
             // ========= TypeScanReport.g.cs ============
 
-            // Type: CreateProductInput
+            // Type: CreateProductOutput
             //
-            // DiscoveredInputClrTypes: 3
+            // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 6
             //   [0] Guid
-            //   [1] string
-            //   [2] decimal
-            //
-            // DiscoveredOutputClrTypes: 0
+            //   [1] sbyte
+            //   [2] string
+            //   [3] int
+            //   [4] decimal
+            //   [5] short
             //
             // DiscoveredGraphTypes: 0
             //
@@ -364,23 +354,23 @@ public partial class InputTypeSymbolTransformerTests
             [AttributeUsage(AttributeTargets.Class)]
             public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe(true)]
+            [ScanMe(false)]
             [MemberScan(0)]
-            public class CreateProductInput
+            public class CreateProductOutput
             {
                 public string Name { get; set; }
                 
-                // Read-only properties should be skipped for input types
+                // Read-only properties should be included for output types
                 public int ComputedValue { get; }
                 
                 public decimal Price { get; set; }
 
                 public Guid Identifier;
 
-                // Read-only fields should be skipped for input types
+                // Read-only fields should be included for output types
                 public readonly sbyte? ReadOnlyField;
 
-                // Methods should be skipped
+                // Methods should be scanned
                 public short GetInfo() => 3;
             }
             """;
@@ -393,7 +383,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // ========= TypeScanReport.g.cs ============
 
-            // Type: CreateProductInput
+            // Type: CreateProductOutput
             //
             // DiscoveredInputClrTypes: 0
             //
@@ -420,37 +410,37 @@ public partial class InputTypeSymbolTransformerTests
             [AttributeUsage(AttributeTargets.Class)]
             public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe(true)]
-            public class CreateProductInput
+            [ScanMe(false)]
+            public class CreateProductOutput
             {
                 public string StringValue { get; set; }
                 
-                [InputType<IntGraphType>]
+                [OutputType<IntGraphType>]
                 public int IntValue { get; set; }
                 
-                [InputBaseType<ByteGraphType>]
+                [OutputBaseType<ByteGraphType>]
                 public byte ByteValue { get; set; }
                 
                 [BaseGraphType<LongGraphType>]
                 public long LongValue { get; set; }
                 
-                [InputType<ListGraphType<NonNullGraphType<DateTimeGraphType>>>]
+                [OutputType<ListGraphType<NonNullGraphType<DateTimeGraphType>>>]
                 public DateTime[] DateTimeValue { get; set; }
 
                 [Id]
                 public Guid IdValue { get; set; }
 
                 // duplicates
-                [InputType<IntGraphType>]
+                [OutputType<IntGraphType>]
                 public int IntValue2 { get; set; }
                 
-                [InputBaseType<ByteGraphType>]
+                [OutputBaseType<ByteGraphType>]
                 public byte ByteValue2 { get; set; }
                 
                 [BaseGraphType<LongGraphType>]
                 public long LongValue2 { get; set; }
                 
-                [InputType<ListGraphType<NonNullGraphType<DateTimeGraphType>>>]
+                [OutputType<ListGraphType<NonNullGraphType<DateTimeGraphType>>>]
                 public DateTime[] DateTimeValue2 { get; set; }
             
                 [Id]
@@ -466,12 +456,12 @@ public partial class InputTypeSymbolTransformerTests
 
             // ========= TypeScanReport.g.cs ============
 
-            // Type: CreateProductInput
+            // Type: CreateProductOutput
             //
-            // DiscoveredInputClrTypes: 1
+            // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 1
             //   [0] string
-            //
-            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 5
             //   [0] IntGraphType
@@ -480,8 +470,7 @@ public partial class InputTypeSymbolTransformerTests
             //   [3] DateTimeGraphType
             //   [4] IdGraphType
             //
-            // InputListTypes: 1
-            //   [0] DateTime[]
+            // InputListTypes: 0
 
             """);
     }
@@ -500,43 +489,43 @@ public partial class InputTypeSymbolTransformerTests
             [AttributeUsage(AttributeTargets.Class)]
             public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe(true)]
-            public class CreateProductInput
+            [ScanMe(false)]
+            public class CreateProductOutput
             {
                 public string StringValue { get; set; }
                 
-                [InputType(typeof(IntGraphType))]
+                [OutputType(typeof(IntGraphType))]
                 public int IntValue { get; set; }
                 
-                [InputBaseType(typeof(ByteGraphType))]
+                [OutputBaseType(typeof(ByteGraphType))]
                 public byte ByteValue { get; set; }
                 
                 [BaseGraphType(typeof(LongGraphType))]
                 public long LongValue { get; set; }
                 
-                [InputType(typeof(ListGraphType<NonNullGraphType<DateTimeGraphType>>))]
+                [OutputType(typeof(ListGraphType<NonNullGraphType<DateTimeGraphType>>))]
                 public DateTime[] DateTimeValue { get; set; }
 
                 [Id]
                 public Guid IdValue { get; set; }
 
                 // duplicates
-                [InputType(typeof(IntGraphType))]
+                [OutputType(typeof(IntGraphType))]
                 public int IntValue2 { get; set; }
                 
-                [InputBaseType(typeof(ByteGraphType))]
+                [OutputBaseType(typeof(ByteGraphType))]
                 public byte ByteValue2 { get; set; }
                 
                 [BaseGraphType(typeof(LongGraphType))]
                 public long LongValue2 { get; set; }
                 
-                [InputType(typeof(ListGraphType<NonNullGraphType<DateTimeGraphType>>))]
+                [OutputType(typeof(ListGraphType<NonNullGraphType<DateTimeGraphType>>))]
                 public DateTime[] DateTimeValue2 { get; set; }
             
-                [InputType(typeof(IdGraphType))]
+                [OutputType(typeof(IdGraphType))]
                 public Guid IdValue2 { get; set; }
             
-                [InputType(graphType: typeof(SByteGraphType))]
+                [OutputType(graphType: typeof(SByteGraphType))]
                 public sbyte SByteValue { get; set; }
             }
             """;
@@ -549,12 +538,12 @@ public partial class InputTypeSymbolTransformerTests
 
             // ========= TypeScanReport.g.cs ============
 
-            // Type: CreateProductInput
+            // Type: CreateProductOutput
             //
-            // DiscoveredInputClrTypes: 1
+            // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 1
             //   [0] string
-            //
-            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 6
             //   [0] IntGraphType
@@ -564,8 +553,7 @@ public partial class InputTypeSymbolTransformerTests
             //   [4] IdGraphType
             //   [5] SByteGraphType
             //
-            // InputListTypes: 1
-            //   [0] DateTime[]
+            // InputListTypes: 0
 
             """);
     }
@@ -584,37 +572,37 @@ public partial class InputTypeSymbolTransformerTests
             [AttributeUsage(AttributeTargets.Class)]
             public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe(true)]
-            public class CreateProductInput
+            [ScanMe(false)]
+            public class CreateProductOutput
             {
                 public string StringValue { get; set; }
                 
-                [InputType(graphType: typeof(IntGraphType))]
+                [OutputType(graphType: typeof(IntGraphType))]
                 public int IntValue { get; set; }
                 
-                [InputBaseType(graphType: typeof(ByteGraphType))]
+                [OutputBaseType(graphType: typeof(ByteGraphType))]
                 public byte ByteValue { get; set; }
                 
                 [BaseGraphType(graphType: typeof(LongGraphType))]
                 public long LongValue { get; set; }
                 
-                [InputType(graphType: typeof(ListGraphType<NonNullGraphType<DateTimeGraphType>>))]
+                [OutputType(graphType: typeof(ListGraphType<NonNullGraphType<DateTimeGraphType>>))]
                 public DateTime[] DateTimeValue { get; set; }
 
                 [Id]
                 public Guid IdValue { get; set; }
 
                 // duplicates
-                [InputType(graphType: typeof(IntGraphType))]
+                [OutputType(graphType: typeof(IntGraphType))]
                 public int IntValue2 { get; set; }
                 
-                [InputBaseType(graphType: typeof(ByteGraphType))]
+                [OutputBaseType(graphType: typeof(ByteGraphType))]
                 public byte ByteValue2 { get; set; }
                 
                 [BaseGraphType(graphType: typeof(LongGraphType))]
                 public long LongValue2 { get; set; }
                 
-                [InputType(graphType: typeof(ListGraphType<NonNullGraphType<DateTimeGraphType>>))]
+                [OutputType(graphType: typeof(ListGraphType<NonNullGraphType<DateTimeGraphType>>))]
                 public DateTime[] DateTimeValue2 { get; set; }
             
                 [Id]
@@ -630,12 +618,12 @@ public partial class InputTypeSymbolTransformerTests
 
             // ========= TypeScanReport.g.cs ============
 
-            // Type: CreateProductInput
+            // Type: CreateProductOutput
             //
-            // DiscoveredInputClrTypes: 1
+            // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 1
             //   [0] string
-            //
-            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 5
             //   [0] IntGraphType
@@ -644,8 +632,7 @@ public partial class InputTypeSymbolTransformerTests
             //   [3] DateTimeGraphType
             //   [4] IdGraphType
             //
-            // InputListTypes: 1
-            //   [0] DateTime[]
+            // InputListTypes: 0
 
             """);
     }
@@ -662,8 +649,8 @@ public partial class InputTypeSymbolTransformerTests
             [AttributeUsage(AttributeTargets.Class)]
             public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe(true)]
-            public class GenericInput<T>
+            [ScanMe(false)]
+            public class GenericOutput<T>
             {
                 public T Value { get; set; }
             }
@@ -677,7 +664,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // ========= TypeScanReport.g.cs ============
 
-            // Type: GenericInput<T>
+            // Type: GenericOutput<T>
             // Result: null (cannot be scanned)
             //
 
@@ -685,7 +672,7 @@ public partial class InputTypeSymbolTransformerTests
     }
 
     [Fact]
-    public async Task HandlesEmptyInputType()
+    public async Task HandlesEmptyOutputType()
     {
         const string source =
             """
@@ -696,8 +683,8 @@ public partial class InputTypeSymbolTransformerTests
             [AttributeUsage(AttributeTargets.Class)]
             public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe(true)]
-            public class EmptyInput
+            [ScanMe(false)]
+            public class EmptyOutput
             {
             }
             """;
@@ -710,7 +697,7 @@ public partial class InputTypeSymbolTransformerTests
 
             // ========= TypeScanReport.g.cs ============
 
-            // Type: EmptyInput
+            // Type: EmptyOutput
             //
             // DiscoveredInputClrTypes: 0
             //
@@ -724,7 +711,7 @@ public partial class InputTypeSymbolTransformerTests
     }
 
     [Fact]
-    public async Task ScansMultipleInputTypes()
+    public async Task ScansMultipleOutputTypes()
     {
         const string source =
             """
@@ -735,15 +722,15 @@ public partial class InputTypeSymbolTransformerTests
             [AttributeUsage(AttributeTargets.Class)]
             public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe(true)]
-            public class CreateProductInput
+            [ScanMe(false)]
+            public class CreateProductOutput
             {
                 public string Name { get; set; }
                 public decimal Price { get; set; }
             }
 
-            [ScanMe(true)]
-            public class CreateOrderInput
+            [ScanMe(false)]
+            public class CreateOrderOutput
             {
                 public string OrderNumber { get; set; }
                 public int Quantity { get; set; }
@@ -758,25 +745,25 @@ public partial class InputTypeSymbolTransformerTests
 
             // ========= TypeScanReport.g.cs ============
 
-            // Type: CreateOrderInput
+            // Type: CreateOrderOutput
             //
-            // DiscoveredInputClrTypes: 2
+            // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 2
             //   [0] string
             //   [1] int
-            //
-            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
             
-            // Type: CreateProductInput
+            // Type: CreateProductOutput
             //
-            // DiscoveredInputClrTypes: 2
+            // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 2
             //   [0] string
             //   [1] decimal
-            //
-            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 0
             //
@@ -798,8 +785,8 @@ public partial class InputTypeSymbolTransformerTests
             [AttributeUsage(AttributeTargets.Class)]
             public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe(true)]
-            public class AsyncInput
+            [ScanMe(false)]
+            public class AsyncOutput
             {
                 public Task<string> Name { get; set; }
                 public ValueTask<int> Count { get; set; }
@@ -814,13 +801,13 @@ public partial class InputTypeSymbolTransformerTests
 
             // ========= TypeScanReport.g.cs ============
 
-            // Type: AsyncInput
+            // Type: AsyncOutput
             //
-            // DiscoveredInputClrTypes: 2
+            // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 2
             //   [0] string
             //   [1] int
-            //
-            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 0
             //
@@ -841,8 +828,8 @@ public partial class InputTypeSymbolTransformerTests
             [AttributeUsage(AttributeTargets.Class)]
             public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe(true)]
-            public record CreateProductInput(string Name, decimal Price, int Quantity);
+            [ScanMe(false)]
+            public record CreateProductOutput(string Name, decimal Price, int Quantity);
             """;
 
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
@@ -853,14 +840,14 @@ public partial class InputTypeSymbolTransformerTests
 
             // ========= TypeScanReport.g.cs ============
 
-            // Type: CreateProductInput
+            // Type: CreateProductOutput
             //
-            // DiscoveredInputClrTypes: 3
+            // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 3
             //   [0] string
             //   [1] decimal
             //   [2] int
-            //
-            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 0
             //
@@ -870,7 +857,7 @@ public partial class InputTypeSymbolTransformerTests
     }
 
     [Fact]
-    public async Task GraphQLClrInputTypeReference_AddsToClrTypes()
+    public async Task GraphQLClrOutputTypeReference_AddsToClrTypes()
     {
         const string source =
             """
@@ -885,21 +872,21 @@ public partial class InputTypeSymbolTransformerTests
 
             public class Class1 { }
 
-            [ScanMe(true)]
-            public class CreateProductInput
+            [ScanMe(false)]
+            public class CreateProductOutput
             {
                 public string Name { get; set; }
                 
-                [InputType(typeof(GraphQLClrInputTypeReference<long>))]
+                [OutputType(typeof(GraphQLClrOutputTypeReference<long>))]
                 public int Quantity { get; set; }
                 
-                [InputType(typeof(GraphQLClrInputTypeReference<long?>))]
+                [OutputType(typeof(GraphQLClrOutputTypeReference<long?>))]
                 public int Quantity2 { get; set; }
                 
-                [InputType<GraphQLClrInputTypeReference<decimal>>]
+                [OutputType<GraphQLClrOutputTypeReference<decimal>>]
                 public decimal Price { get; set; }
 
-                [InputType<GraphQLClrInputTypeReference<Class1>>]
+                [OutputType<GraphQLClrOutputTypeReference<Class1>>]
                 public decimal Test1 { get; set; }
             }
             """;
@@ -912,15 +899,15 @@ public partial class InputTypeSymbolTransformerTests
 
             // ========= TypeScanReport.g.cs ============
 
-            // Type: CreateProductInput
+            // Type: CreateProductOutput
             //
-            // DiscoveredInputClrTypes: 4
+            // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 4
             //   [0] string
             //   [1] long
             //   [2] decimal
             //   [3] Class1
-            //
-            // DiscoveredOutputClrTypes: 0
             //
             // DiscoveredGraphTypes: 0
             //

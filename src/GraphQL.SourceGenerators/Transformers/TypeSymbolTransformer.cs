@@ -5,17 +5,17 @@ using Microsoft.CodeAnalysis;
 namespace GraphQL.SourceGenerators.Transformers;
 
 /// <summary>
-/// Scans a CLR input type and discovers its dependencies by examining properties and fields.
+/// Scans a CLR input or output type and discovers its dependencies by examining properties, fields, and methods.
 /// </summary>
 public static class TypeSymbolTransformer
 {
     /// <summary>
-    /// Scans a CLR input type and discovers referenced CLR types, GraphTypes, and list types.
+    /// Scans a CLR type and discovers referenced CLR types, GraphTypes, and list types.
     /// Returns null if the type cannot be examined (e.g., open generic types).
     /// </summary>
     /// <param name="typeSymbol">The CLR type to scan.</param>
     /// <param name="knownSymbols">Known GraphQL symbol references for comparison.</param>
-    /// <param name="isInputType">Indicates whether the type is being scanned as an input type.</param>
+    /// <param name="isInputType">Indicates whether the type is being scanned as an input type (true) or output type (false).</param>
     public static TypeScanResult? Transform(ITypeSymbol typeSymbol, KnownSymbols knownSymbols, bool isInputType)
     {
         // Return null for types that cannot be examined
@@ -43,21 +43,24 @@ public static class TypeSymbolTransformer
             {
                 IPropertySymbol prop => prop.Type,
                 IFieldSymbol field => field.Type,
+                IMethodSymbol method => method.ReturnType,
                 _ => null
             };
 
             if (memberClrType == null)
                 continue;
 
-            // Collect all list types at each level while unwrapping - do this regardless of GraphType attribute
-            CollectListTypes(memberClrType, inputListTypes, knownSymbols);
+            // Collect all list types at each level while unwrapping - only for input types
+            if (isInputType)
+                CollectListTypes(memberClrType, inputListTypes, knownSymbols);
 
             // Check if member has explicit GraphType override
             var memberGraphType = GetMemberGraphType(member, isInputType, knownSymbols);
             if (memberGraphType != null)
             {
-                // Check if it's a GraphQLClrInputTypeReference<T>
-                if (TryExtractClrTypeReference(memberGraphType, knownSymbols.GraphQLClrInputTypeReference, out var clrType))
+                // Check if it's a GraphQLClrInputTypeReference<T> or GraphQLClrOutputTypeReference<T>
+                var clrTypeRefSymbol = isInputType ? knownSymbols.GraphQLClrInputTypeReference : knownSymbols.GraphQLClrOutputTypeReference;
+                if (TryExtractClrTypeReference(memberGraphType, clrTypeRefSymbol, out var clrType))
                 {
                     // Unwrap the extracted CLR type to handle nullable types and other wrappers (invalid anyway; SchemaTypes will throw)
                     var unwrappedClrType2 = UnwrapClrType(clrType, knownSymbols);
@@ -122,8 +125,8 @@ public static class TypeSymbolTransformer
 
         return new TypeScanResult(
             ScannedType: typeSymbol,
-            DiscoveredInputClrTypes: discoveredClrTypes.ToImmutable(),
-            DiscoveredOutputClrTypes: ImmutableArray<ITypeSymbol>.Empty,
+            DiscoveredInputClrTypes: isInputType ? discoveredClrTypes.ToImmutable() : ImmutableArray<ITypeSymbol>.Empty,
+            DiscoveredOutputClrTypes: isInputType ? ImmutableArray<ITypeSymbol>.Empty : discoveredClrTypes.ToImmutable(),
             DiscoveredGraphTypes: discoveredGraphTypes.ToImmutable(),
             InputListTypes: inputListTypes.ToImmutable());
     }
@@ -200,22 +203,22 @@ public static class TypeSymbolTransformer
 
         if (type is INamedTypeSymbol namedType && namedType.IsGenericType)
         {
-            var typeName = namedType.OriginalDefinition.ToDisplayString();
+            var originalDef = namedType.OriginalDefinition;
 
             // Handle Nullable<T>
-            if (typeName == "System.Nullable<T>" && namedType.TypeArguments.Length == 1)
+            if (namedType.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T && namedType.TypeArguments.Length == 1)
                 return UnwrapClrType(namedType.TypeArguments[0], knownSymbols);
 
             // Handle Task<T>
-            if (typeName == "System.Threading.Tasks.Task<TResult>" && namedType.TypeArguments.Length == 1)
+            if (knownSymbols.TaskT != null && SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.TaskT) && namedType.TypeArguments.Length == 1)
                 return UnwrapClrType(namedType.TypeArguments[0], knownSymbols);
 
             // Handle ValueTask<T>
-            if (typeName == "System.Threading.Tasks.ValueTask<TResult>" && namedType.TypeArguments.Length == 1)
+            if (knownSymbols.ValueTaskT != null && SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.ValueTaskT) && namedType.TypeArguments.Length == 1)
                 return UnwrapClrType(namedType.TypeArguments[0], knownSymbols);
 
             // Handle IDataLoaderResult<T>
-            if (typeName == "GraphQL.DataLoader.IDataLoaderResult<T>" && namedType.TypeArguments.Length == 1)
+            if (knownSymbols.IDataLoaderResultT != null && SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.IDataLoaderResultT) && namedType.TypeArguments.Length == 1)
                 return UnwrapClrType(namedType.TypeArguments[0], knownSymbols);
 
             // Handle recognized list types
@@ -257,7 +260,7 @@ public static class TypeSymbolTransformer
     }
 
     /// <summary>
-    /// Collects members (fields, properties) that should be scanned for a CLR type.
+    /// Collects members (fields, properties, methods) that should be scanned for a CLR type.
     /// </summary>
     private static ImmutableArray<ISymbol> GetMembersToScan(ITypeSymbol clrType, bool isInputType, KnownSymbols knownSymbols)
     {
@@ -268,9 +271,10 @@ public static class TypeSymbolTransformer
             .FirstOrDefault(a => a.AttributeClass?.Name == "MemberScanAttribute");
 
         // Determine which member types to scan
-        // Default: properties and methods (but methods are not valid for input types)
+        // Default: properties (and methods for output types only)
         bool scanFields = false;
         bool scanProperties = true;
+        bool scanMethods = !isInputType; // Methods are scanned by default for output types
 
         if (memberScanAttribute != null)
         {
@@ -282,6 +286,7 @@ public static class TypeSymbolTransformer
                 // ScanMemberTypes enum: Properties = 1, Fields = 2, Methods = 4
                 scanProperties = (memberTypes & 1) != 0;
                 scanFields = (memberTypes & 2) != 0;
+                scanMethods = (memberTypes & 4) != 0;
             }
         }
 
@@ -290,6 +295,10 @@ public static class TypeSymbolTransformer
         {
             foreach (var field in clrType.GetMembers().OfType<IFieldSymbol>())
             {
+                // Only scan public fields
+                if (field.DeclaredAccessibility != Accessibility.Public)
+                    continue;
+
                 if (ShouldSkipMember(field, knownSymbols))
                     continue;
 
@@ -306,6 +315,10 @@ public static class TypeSymbolTransformer
         {
             foreach (var property in clrType.GetMembers().OfType<IPropertySymbol>())
             {
+                // Only scan public properties
+                if (property.DeclaredAccessibility != Accessibility.Public)
+                    continue;
+
                 if (ShouldSkipMember(property, knownSymbols))
                     continue;
 
@@ -313,7 +326,72 @@ public static class TypeSymbolTransformer
                 if (isInputType && property.IsReadOnly)
                     continue;
 
+                // Skip write-only properties for output types (can't be read)
+                if (!isInputType && property.IsWriteOnly)
+                    continue;
+
                 membersToScan.Add(property);
+            }
+        }
+
+        // Collect methods if requested (for output types)
+        if (scanMethods && !isInputType)
+        {
+            foreach (var method in clrType.GetMembers().OfType<IMethodSymbol>())
+            {
+                // Only scan public methods
+                if (method.DeclaredAccessibility != Accessibility.Public)
+                    continue;
+
+                if (ShouldSkipMember(method, knownSymbols))
+                    continue;
+
+                // Skip methods with parameters (only parameterless methods)
+                if (method.Parameters.Length > 0)
+                    continue;
+
+                // Skip special methods (constructors, property accessors, etc.)
+                if (method.MethodKind != MethodKind.Ordinary)
+                    continue;
+
+                // Skip void methods
+                if (method.ReturnsVoid)
+                    continue;
+
+                // Skip methods that return Task (methods which do not return a value)
+                if (knownSymbols.Task != null && SymbolEqualityComparer.Default.Equals(method.ReturnType, knownSymbols.Task))
+                    continue;
+
+                // Skip methods inherited from System.Object (e.g., GetHashCode, GetType, ToString, Equals)
+                // For inherited (non-overridden) methods, check if they're declared in System.Object
+                if (!SymbolEqualityComparer.Default.Equals(method.ContainingType, clrType))
+                {
+                    // This is an inherited method; skip if from System.Object
+                    if (method.ContainingType?.SpecialType == SpecialType.System_Object)
+                        continue;
+                }
+
+                // For overridden methods, check if the base definition is from System.Object
+                if (method.IsOverride && method.OverriddenMethod != null)
+                {
+                    var baseDefinition = method.OverriddenMethod;
+                    while (baseDefinition.OverriddenMethod != null)
+                        baseDefinition = baseDefinition.OverriddenMethod;
+
+                    if (baseDefinition.ContainingType?.SpecialType == SpecialType.System_Object)
+                        continue;
+                }
+
+                // Skip compiler-generated methods for record types
+                // Exclude public virtual/override bool Equals(RECORD_TYPE)
+                if (IsRecordEqualsMethod(method, clrType))
+                    continue;
+
+                // Exclude <Clone>$() method generated for record types
+                if (method.Name == "<Clone>$")
+                    continue;
+
+                membersToScan.Add(method);
             }
         }
 
@@ -340,36 +418,60 @@ public static class TypeSymbolTransformer
     /// </summary>
     private static ITypeSymbol? GetMemberGraphType(ISymbol member, bool isInputType, KnownSymbols knownSymbols)
     {
-        if (!isInputType)
-            return null;
-
         foreach (var attribute in member.GetAttributes())
         {
             var attributeClass = attribute.AttributeClass;
             if (attributeClass == null)
                 continue;
 
-            // Check InputType attribute (generic or non-generic, including derived types)
-            var memberGraphType = TryGetGraphTypeFromAttribute(
-                attributeClass,
-                attribute,
-                knownSymbols.InputTypeAttributeT,
-                knownSymbols.InputTypeAttribute);
+            ITypeSymbol? memberGraphType;
 
-            if (memberGraphType != null)
-                return UnwrapGraphType(memberGraphType, knownSymbols);
+            if (isInputType)
+            {
+                // Check InputType attribute (generic or non-generic, including derived types)
+                memberGraphType = TryGetGraphTypeFromAttribute(
+                    attributeClass,
+                    attribute,
+                    knownSymbols.InputTypeAttributeT,
+                    knownSymbols.InputTypeAttribute);
 
-            // Check InputBaseType attribute (generic or non-generic, including derived types)
-            memberGraphType = TryGetGraphTypeFromAttribute(
-                attributeClass,
-                attribute,
-                knownSymbols.InputBaseTypeAttributeT,
-                knownSymbols.InputBaseTypeAttribute);
+                if (memberGraphType != null)
+                    return UnwrapGraphType(memberGraphType, knownSymbols);
 
-            if (memberGraphType != null)
-                return UnwrapGraphType(memberGraphType, knownSymbols);
+                // Check InputBaseType attribute (generic or non-generic, including derived types)
+                memberGraphType = TryGetGraphTypeFromAttribute(
+                    attributeClass,
+                    attribute,
+                    knownSymbols.InputBaseTypeAttributeT,
+                    knownSymbols.InputBaseTypeAttribute);
 
-            // Check BaseGraphType attribute (generic or non-generic, including derived types)
+                if (memberGraphType != null)
+                    return UnwrapGraphType(memberGraphType, knownSymbols);
+            }
+            else
+            {
+                // Check OutputType attribute (generic or non-generic, including derived types)
+                memberGraphType = TryGetGraphTypeFromAttribute(
+                    attributeClass,
+                    attribute,
+                    knownSymbols.OutputTypeAttributeT,
+                    knownSymbols.OutputTypeAttribute);
+
+                if (memberGraphType != null)
+                    return UnwrapGraphType(memberGraphType, knownSymbols);
+
+                // Check OutputBaseType attribute (generic or non-generic, including derived types)
+                memberGraphType = TryGetGraphTypeFromAttribute(
+                    attributeClass,
+                    attribute,
+                    knownSymbols.OutputBaseTypeAttributeT,
+                    knownSymbols.OutputBaseTypeAttribute);
+
+                if (memberGraphType != null)
+                    return UnwrapGraphType(memberGraphType, knownSymbols);
+            }
+
+            // Check BaseGraphType attribute (generic or non-generic, including derived types) - for both input and output types
             memberGraphType = TryGetGraphTypeFromAttribute(
                 attributeClass,
                 attribute,
@@ -432,18 +534,18 @@ public static class TypeSymbolTransformer
     }
 
     /// <summary>
-    /// Attempts to extract the CLR type from a GraphQLClrInputTypeReference&lt;T&gt;.
+    /// Attempts to extract the CLR type from a GraphQLClrInputTypeReference&lt;T&gt; or GraphQLClrOutputTypeReference&lt;T&gt;.
     /// </summary>
-    private static bool TryExtractClrTypeReference(ITypeSymbol graphType, INamedTypeSymbol? clrInputTypeRefSymbol, out ITypeSymbol clrType)
+    private static bool TryExtractClrTypeReference(ITypeSymbol graphType, INamedTypeSymbol? clrTypeRefSymbol, out ITypeSymbol clrType)
     {
         clrType = null!;
 
-        if (clrInputTypeRefSymbol == null)
+        if (clrTypeRefSymbol == null)
             return false;
 
         if (graphType is INamedTypeSymbol namedType &&
             namedType.IsGenericType &&
-            SymbolEqualityComparer.Default.Equals(namedType.OriginalDefinition, clrInputTypeRefSymbol) &&
+            SymbolEqualityComparer.Default.Equals(namedType.OriginalDefinition, clrTypeRefSymbol) &&
             namedType.TypeArguments.Length == 1)
         {
             clrType = namedType.TypeArguments[0];
@@ -451,5 +553,32 @@ public static class TypeSymbolTransformer
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Checks if a method is a record-generated Equals method.
+    /// Record types generate: public virtual bool Equals(RECORD_TYPE? other)
+    /// </summary>
+    private static bool IsRecordEqualsMethod(IMethodSymbol method, ITypeSymbol recordType)
+    {
+        // Check method name
+        if (method.Name != "Equals")
+            return false;
+
+        // Check return type is bool
+        if (method.ReturnType.SpecialType != SpecialType.System_Boolean)
+            return false;
+
+        // Check it has exactly one parameter of the record type
+        if (method.Parameters.Length != 1)
+            return false;
+
+        var paramType = method.Parameters[0].Type;
+
+        // Handle nullable reference types - unwrap to compare
+        if (paramType.NullableAnnotation == NullableAnnotation.Annotated)
+            paramType = paramType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+
+        return SymbolEqualityComparer.Default.Equals(paramType, recordType);
     }
 }

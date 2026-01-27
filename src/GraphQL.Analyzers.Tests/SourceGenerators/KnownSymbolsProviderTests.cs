@@ -47,6 +47,10 @@ public partial class KnownSymbolsProviderTests
             // InputTypeAttribute: GraphQL.InputTypeAttribute
             // InputBaseTypeAttributeT: GraphQL.InputBaseTypeAttribute<TGraphType>
             // InputBaseTypeAttribute: GraphQL.InputBaseTypeAttribute
+            // OutputTypeAttributeT: GraphQL.OutputTypeAttribute<TGraphType>
+            // OutputTypeAttribute: GraphQL.OutputTypeAttribute
+            // OutputBaseTypeAttributeT: GraphQL.OutputBaseTypeAttribute<TGraphType>
+            // OutputBaseTypeAttribute: GraphQL.OutputBaseTypeAttribute
             // BaseGraphTypeAttributeT: GraphQL.BaseGraphTypeAttribute<TGraphType>
             // BaseGraphTypeAttribute: GraphQL.BaseGraphTypeAttribute
             // IEnumerableT: System.Collections.Generic.IEnumerable<T>
@@ -57,6 +61,10 @@ public partial class KnownSymbolsProviderTests
             // IReadOnlyListT: System.Collections.Generic.IReadOnlyList<T>
             // HashSetT: System.Collections.Generic.HashSet<T>
             // ISetT: System.Collections.Generic.ISet<T>
+            // Task: System.Threading.Tasks.Task
+            // TaskT: System.Threading.Tasks.Task<TResult>
+            // ValueTaskT: System.Threading.Tasks.ValueTask<TResult>
+            // IDataLoaderResultT: GraphQL.DataLoader.IDataLoaderResult<T>
 
             """);
     }

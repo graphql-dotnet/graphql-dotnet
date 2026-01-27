@@ -37,6 +37,10 @@ public static class KnownSymbolsProvider
                 InputTypeAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.INPUT_TYPE_NON_GENERIC),
                 InputBaseTypeAttributeT = compilation.GetTypeByMetadataName(Constants.AttributeNames.INPUT_BASE_TYPE),
                 InputBaseTypeAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.INPUT_BASE_TYPE_NON_GENERIC),
+                OutputTypeAttributeT = compilation.GetTypeByMetadataName(Constants.AttributeNames.OUTPUT_TYPE),
+                OutputTypeAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.OUTPUT_TYPE_NON_GENERIC),
+                OutputBaseTypeAttributeT = compilation.GetTypeByMetadataName(Constants.AttributeNames.OUTPUT_BASE_TYPE),
+                OutputBaseTypeAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.OUTPUT_BASE_TYPE_NON_GENERIC),
                 BaseGraphTypeAttributeT = compilation.GetTypeByMetadataName(Constants.AttributeNames.BASE_GRAPH_TYPE),
                 BaseGraphTypeAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.BASE_GRAPH_TYPE_NON_GENERIC),
                 IEnumerableT = compilation.GetTypeByMetadataName("System.Collections.Generic.IEnumerable`1"),
@@ -47,6 +51,10 @@ public static class KnownSymbolsProvider
                 IReadOnlyListT = compilation.GetTypeByMetadataName("System.Collections.Generic.IReadOnlyList`1"),
                 HashSetT = compilation.GetTypeByMetadataName("System.Collections.Generic.HashSet`1"),
                 ISetT = compilation.GetTypeByMetadataName("System.Collections.Generic.ISet`1"),
+                Task = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task"),
+                TaskT = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1"),
+                ValueTaskT = compilation.GetTypeByMetadataName("System.Threading.Tasks.ValueTask`1"),
+                IDataLoaderResultT = compilation.GetTypeByMetadataName("GraphQL.DataLoader.IDataLoaderResult`1"),
             };
         });
     }

@@ -44,6 +44,10 @@ public partial class KnownSymbolsProviderTests
                 sb.AppendLine($"// InputTypeAttribute: {symbols.InputTypeAttribute?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// InputBaseTypeAttributeT: {symbols.InputBaseTypeAttributeT?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// InputBaseTypeAttribute: {symbols.InputBaseTypeAttribute?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// OutputTypeAttributeT: {symbols.OutputTypeAttributeT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// OutputTypeAttribute: {symbols.OutputTypeAttribute?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// OutputBaseTypeAttributeT: {symbols.OutputBaseTypeAttributeT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// OutputBaseTypeAttribute: {symbols.OutputBaseTypeAttribute?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// BaseGraphTypeAttributeT: {symbols.BaseGraphTypeAttributeT?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// BaseGraphTypeAttribute: {symbols.BaseGraphTypeAttribute?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// IEnumerableT: {symbols.IEnumerableT?.ToDisplayString() ?? "NULL"}");
@@ -54,6 +58,10 @@ public partial class KnownSymbolsProviderTests
                 sb.AppendLine($"// IReadOnlyListT: {symbols.IReadOnlyListT?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// HashSetT: {symbols.HashSetT?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// ISetT: {symbols.ISetT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// Task: {symbols.Task?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// TaskT: {symbols.TaskT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// ValueTaskT: {symbols.ValueTaskT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// IDataLoaderResultT: {symbols.IDataLoaderResultT?.ToDisplayString() ?? "NULL"}");
 
                 spc.AddSource("AttributeSymbolsReport.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
             });

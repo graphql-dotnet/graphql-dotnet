@@ -26,6 +26,10 @@ public readonly record struct KnownSymbols
     public INamedTypeSymbol? InputTypeAttribute { get; init; }
     public INamedTypeSymbol? InputBaseTypeAttributeT { get; init; }
     public INamedTypeSymbol? InputBaseTypeAttribute { get; init; }
+    public INamedTypeSymbol? OutputTypeAttributeT { get; init; }
+    public INamedTypeSymbol? OutputTypeAttribute { get; init; }
+    public INamedTypeSymbol? OutputBaseTypeAttributeT { get; init; }
+    public INamedTypeSymbol? OutputBaseTypeAttribute { get; init; }
     public INamedTypeSymbol? BaseGraphTypeAttributeT { get; init; }
     public INamedTypeSymbol? BaseGraphTypeAttribute { get; init; }
     public INamedTypeSymbol? IEnumerableT { get; init; }
@@ -36,4 +40,8 @@ public readonly record struct KnownSymbols
     public INamedTypeSymbol? IReadOnlyListT { get; init; }
     public INamedTypeSymbol? HashSetT { get; init; }
     public INamedTypeSymbol? ISetT { get; init; }
+    public INamedTypeSymbol? Task { get; init; }
+    public INamedTypeSymbol? TaskT { get; init; }
+    public INamedTypeSymbol? ValueTaskT { get; init; }
+    public INamedTypeSymbol? IDataLoaderResultT { get; init; }
 }
