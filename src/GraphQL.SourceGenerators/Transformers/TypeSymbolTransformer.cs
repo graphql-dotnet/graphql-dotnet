@@ -32,7 +32,9 @@ public static class TypeSymbolTransformer
         // Get members to scan based on MemberScan attribute
         var membersToScan = GetMembersToScan(typeSymbol, isInputType, knownSymbols);
 
-        var discoveredClrTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
+        // Create separate builders for input and output discovered types
+        var outputDiscoveredClrTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
+        var inputDiscoveredClrTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
         var discoveredGraphTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
         var inputListTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
 
@@ -65,8 +67,11 @@ public static class TypeSymbolTransformer
                     // Unwrap the extracted CLR type to handle nullable types and other wrappers (invalid anyway; SchemaTypes will throw)
                     var unwrappedClrType2 = UnwrapClrType(clrType, knownSymbols);
 
-                    // Extract T and add to discoveredClrTypes (with deduplication)
-                    AddIfNotExists(discoveredClrTypes, unwrappedClrType2);
+                    // Extract T and add to appropriate discovered CLR types (with deduplication)
+                    if (isInputType)
+                        AddIfNotExists(inputDiscoveredClrTypes, unwrappedClrType2);
+                    else
+                        AddIfNotExists(outputDiscoveredClrTypes, unwrappedClrType2);
                 }
                 else
                 {
@@ -79,20 +84,62 @@ public static class TypeSymbolTransformer
                 // Unwrap nested generic wrappers (recursively)
                 var unwrappedClrType = UnwrapClrType(memberClrType, knownSymbols);
 
-                // Discover nested input types - only add if not already in the list
-                AddIfNotExists(discoveredClrTypes, unwrappedClrType);
+                // Discover nested types - only add if not already in the list
+                if (isInputType)
+                    AddIfNotExists(inputDiscoveredClrTypes, unwrappedClrType);
+                else
+                    AddIfNotExists(outputDiscoveredClrTypes, unwrappedClrType);
             }
 
-            if (member is IMethodSymbol methodSymbol)
+            // Inspect method parameters to discover input types (only for output types)
+            if (!isInputType && member is IMethodSymbol methodSymbol)
             {
-                // todo: scan method parameters for input types
+                foreach (var parameter in methodSymbol.Parameters)
+                {
+                    // Skip parameters that are injected from context (not GraphQL arguments)
+                    if (ShouldSkipParameterProcessing(parameter, knownSymbols))
+                        continue;
+
+                    var parameterClrType = parameter.Type;
+
+                    // Check if parameter type is a list type BEFORE unwrapping
+                    CollectListTypes(parameterClrType, inputListTypes, knownSymbols);
+
+                    // Check if parameter has explicit GraphType override
+                    var parameterGraphType = GetMemberGraphType(parameter, true, knownSymbols);
+                    if (parameterGraphType != null)
+                    {
+                        // Check if it's a GraphQLClrInputTypeReference<T>
+                        if (TryExtractClrTypeReference(parameterGraphType, knownSymbols.GraphQLClrInputTypeReference, out var clrType))
+                        {
+                            // Unwrap the extracted CLR type
+                            var unwrappedClrType2 = UnwrapClrType(clrType, knownSymbols);
+
+                            // Extract T and add to inputDiscoveredClrTypes (with deduplication)
+                            AddIfNotExists(inputDiscoveredClrTypes, unwrappedClrType2);
+                        }
+                        else
+                        {
+                            // Add unwrapped GraphType to discoveredGraphTypes (with deduplication)
+                            AddIfNotExists(discoveredGraphTypes, parameterGraphType);
+                        }
+                    }
+                    else
+                    {
+                        // Unwrap nested generic wrappers
+                        var unwrappedParamType = UnwrapClrType(parameterClrType, knownSymbols);
+
+                        // Method parameters are input types
+                        AddIfNotExists(inputDiscoveredClrTypes, unwrappedParamType);
+                    }
+                }
             }
         }
 
         return new TypeScanResult(
             ScannedType: typeSymbol,
-            DiscoveredInputClrTypes: isInputType ? discoveredClrTypes.ToImmutable() : ImmutableArray<ITypeSymbol>.Empty,
-            DiscoveredOutputClrTypes: isInputType ? ImmutableArray<ITypeSymbol>.Empty : discoveredClrTypes.ToImmutable(),
+            DiscoveredInputClrTypes: inputDiscoveredClrTypes.ToImmutable(),
+            DiscoveredOutputClrTypes: outputDiscoveredClrTypes.ToImmutable(),
             DiscoveredGraphTypes: discoveredGraphTypes.ToImmutable(),
             InputListTypes: inputListTypes.ToImmutable());
     }
@@ -410,6 +457,45 @@ public static class TypeSymbolTransformer
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Determines if a parameter should be skipped during processing (i.e., injected from context).
+    /// </summary>
+    private static bool ShouldSkipParameterProcessing(IParameterSymbol parameter, KnownSymbols knownSymbols)
+    {
+        var parameterType = parameter.Type;
+
+        // Check if parameter type is IResolveFieldContext (non-generic)
+        if (knownSymbols.IResolveFieldContext != null &&
+            SymbolEqualityComparer.Default.Equals(parameterType, knownSymbols.IResolveFieldContext))
+            return true;
+
+        // Check if parameter type is CancellationToken
+        if (knownSymbols.CancellationToken != null &&
+            SymbolEqualityComparer.Default.Equals(parameterType, knownSymbols.CancellationToken))
+            return true;
+
+        // Check for attributes that derive from ParameterAttribute
+        foreach (var attribute in parameter.GetAttributes())
+        {
+            if (attribute.AttributeClass == null)
+                continue;
+
+            // Check for ParameterAttribute or derived classes (e.g., FromServicesAttribute)
+            if (knownSymbols.ParameterAttribute != null)
+            {
+                var current = attribute.AttributeClass;
+                while (current != null)
+                {
+                    if (SymbolEqualityComparer.Default.Equals(current, knownSymbols.ParameterAttribute))
+                        return true;
+                    current = current.BaseType;
+                }
+            }
+        }
+
+        return false;
     }
 
     /// <summary>

@@ -44,6 +44,7 @@ public partial class KnownSymbolsProviderTests
             // GraphQLClrOutputTypeReference: GraphQL.Types.GraphQLClrOutputTypeReference<T>
             // IgnoreAttribute: GraphQL.IgnoreAttribute
             // MemberScanAttribute: GraphQL.MemberScanAttribute
+            // ParameterAttribute: GraphQL.ParameterAttribute
             // InputTypeAttributeT: GraphQL.InputTypeAttribute<TGraphType>
             // InputTypeAttribute: GraphQL.InputTypeAttribute
             // InputBaseTypeAttributeT: GraphQL.InputBaseTypeAttribute<TGraphType>
@@ -66,6 +67,8 @@ public partial class KnownSymbolsProviderTests
             // TaskT: System.Threading.Tasks.Task<TResult>
             // ValueTaskT: System.Threading.Tasks.ValueTask<TResult>
             // IDataLoaderResultT: GraphQL.DataLoader.IDataLoaderResult<T>
+            // IResolveFieldContext: GraphQL.IResolveFieldContext
+            // CancellationToken: System.Threading.CancellationToken
 
             """);
     }

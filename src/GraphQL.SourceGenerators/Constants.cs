@@ -19,6 +19,7 @@ internal static class Constants
         internal const string AOT_REMAP_TYPE = "GraphQL.AotRemapTypeAttribute`2";  // 2 type parameters
         internal const string IGNORE = "GraphQL.IgnoreAttribute";
         internal const string MEMBER_SCAN = "GraphQL.MemberScanAttribute";
+        internal const string PARAMETER_ATTRIBUTE = "GraphQL.ParameterAttribute";
         internal const string INPUT_TYPE = "GraphQL.InputTypeAttribute`1";
         internal const string INPUT_TYPE_NON_GENERIC = "GraphQL.InputTypeAttribute";
         internal const string INPUT_BASE_TYPE = "GraphQL.InputBaseTypeAttribute`1";
@@ -55,5 +56,7 @@ internal static class Constants
         internal const string LIST_GRAPH_TYPE = "GraphQL.Types.ListGraphType`1";
         internal const string GRAPHQL_CLR_INPUT_TYPE_REFERENCE = "GraphQL.Types.GraphQLClrInputTypeReference`1";
         internal const string GRAPHQL_CLR_OUTPUT_TYPE_REFERENCE = "GraphQL.Types.GraphQLClrOutputTypeReference`1";
+        internal const string IRESOLVE_FIELD_CONTEXT = "GraphQL.IResolveFieldContext";
+        internal const string CANCELLATION_TOKEN = "System.Threading.CancellationToken";
     }
 }
