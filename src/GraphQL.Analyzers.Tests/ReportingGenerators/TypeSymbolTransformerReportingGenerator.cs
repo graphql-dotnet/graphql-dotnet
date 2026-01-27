@@ -97,6 +97,22 @@ public class TypeSymbolTransformerReportingGenerator : IIncrementalGenerator
                 {
                     sb.AppendLine($"//   [{i}] {scanResult.InputListTypes[i].ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}");
                 }
+                sb.AppendLine("//");
+
+                // Selected Members
+                sb.AppendLine($"// SelectedMembers: {scanResult.SelectedMembers.Count}");
+                for (int i = 0; i < scanResult.SelectedMembers.Count; i++)
+                {
+                    var member = scanResult.SelectedMembers[i];
+                    var memberType = member switch
+                    {
+                        IPropertySymbol => "Property",
+                        IFieldSymbol => "Field",
+                        IMethodSymbol => "Method",
+                        _ => "Unknown"
+                    };
+                    sb.AppendLine($"//   [{i}] {memberType}: {member.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}");
+                }
             }
 
             spc.AddSource("TypeScanReport.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));

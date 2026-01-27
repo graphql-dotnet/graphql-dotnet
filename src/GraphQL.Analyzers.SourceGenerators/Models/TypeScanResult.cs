@@ -10,4 +10,5 @@ public readonly record struct TypeScanResult(
     ImmutableEquatableArray<ISymbol> DiscoveredInputClrTypes,
     ImmutableEquatableArray<ISymbol> DiscoveredOutputClrTypes,
     ImmutableEquatableArray<ISymbol> DiscoveredGraphTypes,
-    ImmutableEquatableArray<ISymbol> InputListTypes);
+    ImmutableEquatableArray<ISymbol> InputListTypes,
+    ImmutableEquatableArray<ISymbol> SelectedMembers);

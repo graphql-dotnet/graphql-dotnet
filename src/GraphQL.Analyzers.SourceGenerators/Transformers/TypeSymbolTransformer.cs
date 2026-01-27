@@ -133,7 +133,8 @@ public static class TypeSymbolTransformer
             DiscoveredInputClrTypes: inputDiscoveredClrTypes.ToImmutableEquatableArray(),
             DiscoveredOutputClrTypes: outputDiscoveredClrTypes.ToImmutableEquatableArray(),
             DiscoveredGraphTypes: discoveredGraphTypes.ToImmutableEquatableArray(),
-            InputListTypes: inputListTypes.ToImmutableEquatableArray());
+            InputListTypes: inputListTypes.ToImmutableEquatableArray(),
+            SelectedMembers: membersToScan.ToImmutableEquatableArray());
     }
 
     /// <summary>

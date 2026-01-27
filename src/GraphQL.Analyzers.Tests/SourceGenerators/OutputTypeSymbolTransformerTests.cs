@@ -128,6 +128,44 @@ public partial class OutputTypeSymbolTransformerTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 36
+            //   [0] Property: string AllCollectionsOutput.Name
+            //   [1] Property: byte AllCollectionsOutput.Quantity
+            //   [2] Property: decimal AllCollectionsOutput.Price
+            //   [3] Property: int? AllCollectionsOutput.OptionalInt
+            //   [4] Property: DateTime? AllCollectionsOutput.OptionalDate
+            //   [5] Property: string? AllCollectionsOutput.OptionalString
+            //   [6] Property: int?[] AllCollectionsOutput.OptionalIntArray
+            //   [7] Property: List<long?> AllCollectionsOutput.NullableLongList
+            //   [8] Property: List<Class1?> AllCollectionsOutput.NullableClass1List
+            //   [9] Property: Class2 AllCollectionsOutput.Class2Prop
+            //   [10] Property: List<Class2?> AllCollectionsOutput.NullableClass2List
+            //   [11] Property: List<Class2> AllCollectionsOutput.Class2List
+            //   [12] Property: IEnumerable<string> AllCollectionsOutput.IEnumerableStrings
+            //   [13] Property: IList<int> AllCollectionsOutput.IListInts
+            //   [14] Property: List<bool> AllCollectionsOutput.ListBools
+            //   [15] Property: ICollection<decimal> AllCollectionsOutput.ICollectionDecimals
+            //   [16] Property: IReadOnlyCollection<long> AllCollectionsOutput.IReadOnlyCollectionLongs
+            //   [17] Property: IReadOnlyList<short> AllCollectionsOutput.IReadOnlyListShorts
+            //   [18] Property: HashSet<byte> AllCollectionsOutput.HashSetBytes
+            //   [19] Property: ISet<double> AllCollectionsOutput.ISetDoubles
+            //   [20] Property: string[] AllCollectionsOutput.StringArray
+            //   [21] Property: int[] AllCollectionsOutput.IntArray
+            //   [22] Property: Queue<string> AllCollectionsOutput.QueueStrings
+            //   [23] Property: Stack<int> AllCollectionsOutput.StackInts
+            //   [24] Property: LinkedList<bool> AllCollectionsOutput.LinkedListBools
+            //   [25] Property: string[][] AllCollectionsOutput.NestedStringArray
+            //   [26] Property: List<short[]> AllCollectionsOutput.ListOfStringArrays
+            //   [27] Property: IEnumerable<List<int>> AllCollectionsOutput.EnumerableOfListOfInts
+            //   [28] Property: int[] AllCollectionsOutput.FirstIntArray
+            //   [29] Property: int[] AllCollectionsOutput.SecondIntArray
+            //   [30] Property: List<int[]> AllCollectionsOutput.ListOfIntArrays
+            //   [31] Property: List<string> AllCollectionsOutput.FirstStringList
+            //   [32] Property: List<string> AllCollectionsOutput.SecondStringList
+            //   [33] Property: List<int> AllCollectionsOutput.DirectListOfInts
+            //   [34] Method: Guid AllCollectionsOutput.GetIdentifier()
+            //   [35] Method: float AllCollectionsOutput.CalculateDiscount()
 
             """);
     }
@@ -173,6 +211,11 @@ public partial class OutputTypeSymbolTransformerTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 3
+            //   [0] Property: int? CreateProductOutput.Quantity
+            //   [1] Property: decimal? CreateProductOutput.Price
+            //   [2] Property: DateTime? CreateProductOutput.ReleaseDate
 
             """);
     }
@@ -221,6 +264,10 @@ public partial class OutputTypeSymbolTransformerTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 2
+            //   [0] Property: string CreateProductOutput.Name
+            //   [1] Property: decimal CreateProductOutput.Price
 
             """);
     }
@@ -276,6 +323,11 @@ public partial class OutputTypeSymbolTransformerTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 3
+            //   [0] Property: string CreateProductOutput.Name
+            //   [1] Property: decimal CreateProductOutput.Price
+            //   [2] Method: byte CreateProductOutput.GetInfo()
 
             """);
     }
@@ -337,6 +389,14 @@ public partial class OutputTypeSymbolTransformerTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 6
+            //   [0] Field: Guid CreateProductOutput.Identifier
+            //   [1] Field: sbyte? CreateProductOutput.ReadOnlyField
+            //   [2] Property: string CreateProductOutput.Name
+            //   [3] Property: int CreateProductOutput.ComputedValue
+            //   [4] Property: decimal CreateProductOutput.Price
+            //   [5] Method: short CreateProductOutput.GetInfo()
 
             """);
     }
@@ -392,6 +452,8 @@ public partial class OutputTypeSymbolTransformerTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 0
 
             """);
     }
@@ -471,6 +533,19 @@ public partial class OutputTypeSymbolTransformerTests
             //   [4] IdGraphType
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 11
+            //   [0] Property: string CreateProductOutput.StringValue
+            //   [1] Property: int CreateProductOutput.IntValue
+            //   [2] Property: byte CreateProductOutput.ByteValue
+            //   [3] Property: long CreateProductOutput.LongValue
+            //   [4] Property: DateTime[] CreateProductOutput.DateTimeValue
+            //   [5] Property: Guid CreateProductOutput.IdValue
+            //   [6] Property: int CreateProductOutput.IntValue2
+            //   [7] Property: byte CreateProductOutput.ByteValue2
+            //   [8] Property: long CreateProductOutput.LongValue2
+            //   [9] Property: DateTime[] CreateProductOutput.DateTimeValue2
+            //   [10] Property: Guid CreateProductOutput.IdValue2
 
             """);
     }
@@ -554,6 +629,20 @@ public partial class OutputTypeSymbolTransformerTests
             //   [5] SByteGraphType
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 12
+            //   [0] Property: string CreateProductOutput.StringValue
+            //   [1] Property: int CreateProductOutput.IntValue
+            //   [2] Property: byte CreateProductOutput.ByteValue
+            //   [3] Property: long CreateProductOutput.LongValue
+            //   [4] Property: DateTime[] CreateProductOutput.DateTimeValue
+            //   [5] Property: Guid CreateProductOutput.IdValue
+            //   [6] Property: int CreateProductOutput.IntValue2
+            //   [7] Property: byte CreateProductOutput.ByteValue2
+            //   [8] Property: long CreateProductOutput.LongValue2
+            //   [9] Property: DateTime[] CreateProductOutput.DateTimeValue2
+            //   [10] Property: Guid CreateProductOutput.IdValue2
+            //   [11] Property: sbyte CreateProductOutput.SByteValue
 
             """);
     }
@@ -633,6 +722,19 @@ public partial class OutputTypeSymbolTransformerTests
             //   [4] IdGraphType
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 11
+            //   [0] Property: string CreateProductOutput.StringValue
+            //   [1] Property: int CreateProductOutput.IntValue
+            //   [2] Property: byte CreateProductOutput.ByteValue
+            //   [3] Property: long CreateProductOutput.LongValue
+            //   [4] Property: DateTime[] CreateProductOutput.DateTimeValue
+            //   [5] Property: Guid CreateProductOutput.IdValue
+            //   [6] Property: int CreateProductOutput.IntValue2
+            //   [7] Property: byte CreateProductOutput.ByteValue2
+            //   [8] Property: long CreateProductOutput.LongValue2
+            //   [9] Property: DateTime[] CreateProductOutput.DateTimeValue2
+            //   [10] Property: Guid CreateProductOutput.IdValue2
 
             """);
     }
@@ -706,6 +808,8 @@ public partial class OutputTypeSymbolTransformerTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 0
 
             """);
     }
@@ -756,6 +860,10 @@ public partial class OutputTypeSymbolTransformerTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 2
+            //   [0] Property: string CreateOrderOutput.OrderNumber
+            //   [1] Property: int CreateOrderOutput.Quantity
             
             // Type: CreateProductOutput
             //
@@ -768,6 +876,10 @@ public partial class OutputTypeSymbolTransformerTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 2
+            //   [0] Property: string CreateProductOutput.Name
+            //   [1] Property: decimal CreateProductOutput.Price
 
             """);
     }
@@ -812,6 +924,10 @@ public partial class OutputTypeSymbolTransformerTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 2
+            //   [0] Property: Task<string> AsyncOutput.Name
+            //   [1] Property: ValueTask<int> AsyncOutput.Count
 
             """);
     }
@@ -852,6 +968,11 @@ public partial class OutputTypeSymbolTransformerTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 3
+            //   [0] Property: string CreateProductOutput.Name
+            //   [1] Property: decimal CreateProductOutput.Price
+            //   [2] Property: int CreateProductOutput.Quantity
 
             """);
     }
@@ -912,6 +1033,13 @@ public partial class OutputTypeSymbolTransformerTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 5
+            //   [0] Property: string CreateProductOutput.Name
+            //   [1] Property: int CreateProductOutput.Quantity
+            //   [2] Property: int CreateProductOutput.Quantity2
+            //   [3] Property: decimal CreateProductOutput.Price
+            //   [4] Property: decimal CreateProductOutput.Test1
 
             """);
     }
@@ -963,6 +1091,10 @@ public partial class OutputTypeSymbolTransformerTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 2
+            //   [0] Property: double DerivedOutput.PublicDerivedProp
+            //   [1] Property: int BaseOutput.PublicBaseProp
 
             """);
     }
@@ -1022,6 +1154,14 @@ public partial class OutputTypeSymbolTransformerTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 6
+            //   [0] Property: double IMainInterface.Property5
+            //   [1] Property: long IMainInterface.Property6
+            //   [2] Property: string IBaseInterface1.Property1
+            //   [3] Property: int IBaseInterface1.Property2
+            //   [4] Property: decimal IBaseInterface2.Property3
+            //   [5] Property: byte IBaseInterface2.Property4
 
             """);
     }
@@ -1071,6 +1211,12 @@ public partial class OutputTypeSymbolTransformerTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 4
+            //   [0] Property: string CreateProductOutput.Name
+            //   [1] Property: int CreateProductOutput.GlobalCounter
+            //   [2] Property: decimal CreateProductOutput.DefaultPrice
+            //   [3] Property: int CreateProductOutput.Quantity
 
             """);
     }

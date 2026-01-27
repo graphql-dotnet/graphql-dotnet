@@ -142,6 +142,21 @@ public partial class OutputTypeMethodParametersTests
             //   [18] List<int>
             //   [19] List<int[]>
             //   [20] List<string>
+            //
+            // SelectedMembers: 13
+            //   [0] Method: ulong AllCollectionsOutput.GetName(string name, byte quantity, decimal price)
+            //   [1] Method: ulong AllCollectionsOutput.ProcessOptional(int? optionalInt, DateTime? optionalDate, string? optionalString)
+            //   [2] Method: ulong AllCollectionsOutput.HandleArrays(int?[] optionalIntArray, List<long?> nullableLongList, List<Class1?> nullableClass1List, Class2 class2Prop, List<Class2?> nullableClass2List, List<Class2> class2List)
+            //   [3] Method: ulong AllCollectionsOutput.ProcessCollections(IEnumerable<string> iEnumerableStrings, IList<int> iListInts, List<bool> listBools, ICollection<decimal> iCollectionDecimals, IReadOnlyCollection<long> iReadOnlyCollectionLongs, IReadOnlyList<short> iReadOnlyListShorts, HashSet<byte> hashSetBytes, ISet<double> iSetDoubles)
+            //   [4] Method: ulong AllCollectionsOutput.ProcessArrays(string[] stringArray, int[] intArray)
+            //   [5] Method: ulong AllCollectionsOutput.ProcessNonWhitelisted(Queue<string> queueStrings, Stack<int> stackInts, LinkedList<bool> linkedListBools)
+            //   [6] Method: ulong AllCollectionsOutput.ProcessNested(string[][] nestedStringArray, List<short[]> listOfStringArrays, IEnumerable<List<int>> enumerableOfListOfInts)
+            //   [7] Method: ulong AllCollectionsOutput.FirstMethod(int[] intArray)
+            //   [8] Method: ulong AllCollectionsOutput.SecondMethod(int[] intArray)
+            //   [9] Method: ulong AllCollectionsOutput.ListOfArrays(List<int[]> listOfIntArrays)
+            //   [10] Method: ulong AllCollectionsOutput.FirstStringList(List<string> stringList)
+            //   [11] Method: ulong AllCollectionsOutput.SecondStringList(List<string> stringList)
+            //   [12] Method: ulong AllCollectionsOutput.DirectListMethod(List<int> directListOfInts)
 
             """);
     }
@@ -186,6 +201,9 @@ public partial class OutputTypeMethodParametersTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 1
+            //   [0] Method: ulong CreateProductOutput.ProcessOrder(int? quantity, decimal? price, DateTime? releaseDate)
 
             """);
     }
@@ -230,6 +248,9 @@ public partial class OutputTypeMethodParametersTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 1
+            //   [0] Method: ulong CreateProductOutput.ProcessProduct(string name, int internalId, decimal price)
 
             """);
     }
@@ -282,6 +303,9 @@ public partial class OutputTypeMethodParametersTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 1
+            //   [0] Method: ulong CreateProductOutput.ProcessData(decimal price, int quantity)
 
             """);
     }
@@ -331,6 +355,8 @@ public partial class OutputTypeMethodParametersTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 0
 
             """);
     }
@@ -395,6 +421,10 @@ public partial class OutputTypeMethodParametersTests
             //
             // InputListTypes: 1
             //   [0] DateTime[]
+            //
+            // SelectedMembers: 2
+            //   [0] Method: ulong CreateProductOutput.ProcessData(string stringValue, int intValue, byte byteValue, long longValue, DateTime[] dateTimeValue, Guid idValue)
+            //   [1] Method: ulong CreateProductOutput.ProcessMore(int intValue2, byte byteValue2, long longValue2, DateTime[] dateTimeValue2, Guid idValue2)
 
             """);
     }
@@ -461,6 +491,10 @@ public partial class OutputTypeMethodParametersTests
             //
             // InputListTypes: 1
             //   [0] DateTime[]
+            //
+            // SelectedMembers: 2
+            //   [0] Method: ulong CreateProductOutput.ProcessData(string stringValue, int intValue, byte byteValue, long longValue, DateTime[] dateTimeValue, Guid idValue)
+            //   [1] Method: ulong CreateProductOutput.ProcessMore(int intValue2, byte byteValue2, long longValue2, DateTime[] dateTimeValue2, Guid idValue2, sbyte sByteValue)
 
             """);
     }
@@ -525,6 +559,10 @@ public partial class OutputTypeMethodParametersTests
             //
             // InputListTypes: 1
             //   [0] DateTime[]
+            //
+            // SelectedMembers: 2
+            //   [0] Method: ulong CreateProductOutput.ProcessData(string stringValue, int intValue, byte byteValue, long longValue, DateTime[] dateTimeValue, Guid idValue)
+            //   [1] Method: ulong CreateProductOutput.ProcessMore(int intValue2, byte byteValue2, long longValue2, DateTime[] dateTimeValue2, Guid idValue2)
 
             """);
     }
@@ -601,6 +639,9 @@ public partial class OutputTypeMethodParametersTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 1
+            //   [0] Method: ulong EmptyOutput.GetValue()
 
             """);
     }
@@ -650,6 +691,9 @@ public partial class OutputTypeMethodParametersTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 1
+            //   [0] Method: ulong CreateOrderOutput.CreateOrder(string orderNumber, int quantity)
             
             // Type: CreateProductOutput
             //
@@ -663,6 +707,9 @@ public partial class OutputTypeMethodParametersTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 1
+            //   [0] Method: ulong CreateProductOutput.CreateProduct(string name, decimal price)
 
             """);
     }
@@ -707,6 +754,9 @@ public partial class OutputTypeMethodParametersTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 1
+            //   [0] Method: Task<ulong> AsyncOutput.GetNameAsync(Task<string> name, ValueTask<int> count)
 
             """);
     }
@@ -751,6 +801,9 @@ public partial class OutputTypeMethodParametersTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 1
+            //   [0] Method: ulong CreateProductOutput.CreateProduct(string name, decimal price, int quantity)
 
             """);
     }
@@ -805,6 +858,9 @@ public partial class OutputTypeMethodParametersTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 1
+            //   [0] Method: ulong CreateProductOutput.CreateProduct(string name, int quantity, int quantity2, decimal price, decimal test1)
 
             """);
     }
@@ -857,6 +913,10 @@ public partial class OutputTypeMethodParametersTests
             // DiscoveredGraphTypes: 0
             //
             // InputListTypes: 0
+            //
+            // SelectedMembers: 2
+            //   [0] Method: ulong DerivedOutput.PublicDerivedMethod(double value)
+            //   [1] Method: ulong BaseOutput.PublicBaseMethod(int value)
 
             """);
     }
@@ -918,6 +978,9 @@ public partial class OutputTypeMethodParametersTests
             // InputListTypes: 2
             //   [0] List<ContactInput>
             //   [1] string[]
+            //
+            // SelectedMembers: 1
+            //   [0] Method: ulong UserOutput.CreateUser(string firstName, string lastName, int age, decimal salary, AddressInput address, List<ContactInput> contacts, string[] emails, Dictionary<string, string> metadata)
 
             """);
     }
