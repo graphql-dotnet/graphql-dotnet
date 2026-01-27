@@ -1,5 +1,5 @@
 using VerifyTestSG = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpIncrementalGeneratorVerifier<
-    GraphQL.Analyzers.Tests.SourceGenerators.InputTypeSymbolTransformerTests.ReportingGenerator>;
+    GraphQL.Analyzers.Tests.SourceGenerators.TypeSymbolTransformerReportingGenerator>;
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators;
 
