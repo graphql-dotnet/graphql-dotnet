@@ -13,8 +13,6 @@ public partial class SampleAotSchema : AotSchema
         private readonly Dictionary<MemberInfo, Action<FieldType, MemberInfo>> _members;
         public AutoOutputGraphType_Connection_IStarWarsCharacter()
         {
-            Name = "CharacterConnection";
-
             _members = new()
             {
                 { typeof(GraphQL.Types.Relay.DataObjects.Connection<IStarWarsCharacter>).GetProperty(nameof(GraphQL.Types.Relay.DataObjects.Connection<IStarWarsCharacter>.TotalCount))!, ConstructField_TotalCount },

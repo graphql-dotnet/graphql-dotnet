@@ -13,8 +13,6 @@ public partial class SampleAotSchema : AotSchema
         private readonly Dictionary<MemberInfo, Action<FieldType, MemberInfo>> _members;
         public AutoOutputGraphType_Edge_IStarWarsCharacter()
         {
-            Name = "CharacterEdge";
-
             _members = new()
             {
                 { typeof(Edge<IStarWarsCharacter>).GetProperty(nameof(Edge<IStarWarsCharacter>.Cursor))!, ConstructField_Cursor },
