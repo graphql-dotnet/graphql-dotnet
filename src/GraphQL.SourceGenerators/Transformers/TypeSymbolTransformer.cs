@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using GraphQL.SourceGenerators.Models;
 using Microsoft.CodeAnalysis;
 
@@ -33,10 +32,10 @@ public static class TypeSymbolTransformer
         var membersToScan = GetMembersToScan(typeSymbol, isInputType, knownSymbols);
 
         // Create separate builders for input and output discovered types
-        var outputDiscoveredClrTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
-        var inputDiscoveredClrTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
-        var discoveredGraphTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
-        var inputListTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
+        var outputDiscoveredClrTypes = new List<ISymbol>();
+        var inputDiscoveredClrTypes = new List<ISymbol>();
+        var discoveredGraphTypes = new List<ISymbol>();
+        var inputListTypes = new List<ISymbol>();
 
         // Inspect members to discover types
         foreach (var member in membersToScan)
@@ -138,16 +137,16 @@ public static class TypeSymbolTransformer
 
         return new TypeScanResult(
             ScannedType: typeSymbol,
-            DiscoveredInputClrTypes: inputDiscoveredClrTypes.ToImmutable(),
-            DiscoveredOutputClrTypes: outputDiscoveredClrTypes.ToImmutable(),
-            DiscoveredGraphTypes: discoveredGraphTypes.ToImmutable(),
-            InputListTypes: inputListTypes.ToImmutable());
+            DiscoveredInputClrTypes: inputDiscoveredClrTypes.ToImmutableEquatableArray(),
+            DiscoveredOutputClrTypes: outputDiscoveredClrTypes.ToImmutableEquatableArray(),
+            DiscoveredGraphTypes: discoveredGraphTypes.ToImmutableEquatableArray(),
+            InputListTypes: inputListTypes.ToImmutableEquatableArray());
     }
 
     /// <summary>
     /// Recursively collects all list types at each level of nesting.
     /// </summary>
-    private static void CollectListTypes(ITypeSymbol type, ImmutableArray<ITypeSymbol>.Builder listTypes, KnownSymbols knownSymbols)
+    private static void CollectListTypes(ITypeSymbol type, List<ISymbol> listTypes, KnownSymbols knownSymbols)
     {
         if (IsListType(type, knownSymbols))
         {
@@ -262,9 +261,9 @@ public static class TypeSymbolTransformer
     /// <summary>
     /// Collects members (fields, properties, methods) that should be scanned for a CLR type.
     /// </summary>
-    private static ImmutableArray<ISymbol> GetMembersToScan(ITypeSymbol clrType, bool isInputType, KnownSymbols knownSymbols)
+    private static List<ISymbol> GetMembersToScan(ITypeSymbol clrType, bool isInputType, KnownSymbols knownSymbols)
     {
-        var membersToScan = ImmutableArray.CreateBuilder<ISymbol>();
+        var membersToScan = new List<ISymbol>();
 
         // Check for MemberScan attribute on the type
         var memberScanAttribute = clrType.GetAttributes()
@@ -394,7 +393,7 @@ public static class TypeSymbolTransformer
             currentType = currentType.BaseType;
         }
 
-        return membersToScan.ToImmutable();
+        return membersToScan;
     }
 
     /// <summary>
@@ -596,18 +595,17 @@ public static class TypeSymbolTransformer
     }
 
     /// <summary>
-    /// Adds a type symbol to the builder if it doesn't already exist.
+    /// Adds a type symbol to the list if it doesn't already exist.
     /// Uses SymbolEqualityComparer for comparison.
     /// </summary>
-    private static void AddIfNotExists<T>(ImmutableArray<T>.Builder builder, T typeToAdd)
-        where T : ISymbol
+    private static void AddIfNotExists(List<ISymbol> list, ISymbol typeToAdd)
     {
-        foreach (var existingType in builder)
+        foreach (var existingType in list)
         {
             if (SymbolEqualityComparer.Default.Equals(existingType, typeToAdd))
                 return;
         }
 
-        builder.Add(typeToAdd);
+        list.Add(typeToAdd);
     }
 }

@@ -68,32 +68,32 @@ public class TypeSymbolTransformerReportingGenerator : IIncrementalGenerator
                 sb.AppendLine("//");
 
                 // Discovered CLR Types
-                sb.AppendLine($"// DiscoveredInputClrTypes: {scanResult.DiscoveredInputClrTypes.Length}");
-                for (int i = 0; i < scanResult.DiscoveredInputClrTypes.Length; i++)
+                sb.AppendLine($"// DiscoveredInputClrTypes: {scanResult.DiscoveredInputClrTypes.Count}");
+                for (int i = 0; i < scanResult.DiscoveredInputClrTypes.Count; i++)
                 {
                     sb.AppendLine($"//   [{i}] {scanResult.DiscoveredInputClrTypes[i].ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}");
                 }
                 sb.AppendLine("//");
 
                 // Discovered Output CLR Types
-                sb.AppendLine($"// DiscoveredOutputClrTypes: {scanResult.DiscoveredOutputClrTypes.Length}");
-                for (int i = 0; i < scanResult.DiscoveredOutputClrTypes.Length; i++)
+                sb.AppendLine($"// DiscoveredOutputClrTypes: {scanResult.DiscoveredOutputClrTypes.Count}");
+                for (int i = 0; i < scanResult.DiscoveredOutputClrTypes.Count; i++)
                 {
                     sb.AppendLine($"//   [{i}] {scanResult.DiscoveredOutputClrTypes[i].ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}");
                 }
                 sb.AppendLine("//");
 
                 // Discovered GraphTypes
-                sb.AppendLine($"// DiscoveredGraphTypes: {scanResult.DiscoveredGraphTypes.Length}");
-                for (int i = 0; i < scanResult.DiscoveredGraphTypes.Length; i++)
+                sb.AppendLine($"// DiscoveredGraphTypes: {scanResult.DiscoveredGraphTypes.Count}");
+                for (int i = 0; i < scanResult.DiscoveredGraphTypes.Count; i++)
                 {
                     sb.AppendLine($"//   [{i}] {scanResult.DiscoveredGraphTypes[i].ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}");
                 }
                 sb.AppendLine("//");
 
                 // Input List Types
-                sb.AppendLine($"// InputListTypes: {scanResult.InputListTypes.Length}");
-                for (int i = 0; i < scanResult.InputListTypes.Length; i++)
+                sb.AppendLine($"// InputListTypes: {scanResult.InputListTypes.Count}");
+                for (int i = 0; i < scanResult.InputListTypes.Count; i++)
                 {
                     sb.AppendLine($"//   [{i}] {scanResult.InputListTypes[i].ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}");
                 }

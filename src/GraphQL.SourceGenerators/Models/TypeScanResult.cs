@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 
 namespace GraphQL.SourceGenerators.Models;
@@ -8,7 +7,7 @@ namespace GraphQL.SourceGenerators.Models;
 /// </summary>
 public readonly record struct TypeScanResult(
     ITypeSymbol ScannedType,
-    ImmutableArray<ITypeSymbol> DiscoveredInputClrTypes,
-    ImmutableArray<ITypeSymbol> DiscoveredOutputClrTypes,
-    ImmutableArray<ITypeSymbol> DiscoveredGraphTypes,
-    ImmutableArray<ITypeSymbol> InputListTypes);
+    ImmutableEquatableArray<ISymbol> DiscoveredInputClrTypes,
+    ImmutableEquatableArray<ISymbol> DiscoveredOutputClrTypes,
+    ImmutableEquatableArray<ISymbol> DiscoveredGraphTypes,
+    ImmutableEquatableArray<ISymbol> InputListTypes);
