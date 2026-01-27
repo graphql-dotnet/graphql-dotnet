@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace GraphQL.SourceGenerators.Models;
+namespace GraphQL.Analyzers.SourceGenerators.Models;
 
 /// <summary>
 /// Holds resolved INamedTypeSymbol for each AOT attribute type and key interface types.

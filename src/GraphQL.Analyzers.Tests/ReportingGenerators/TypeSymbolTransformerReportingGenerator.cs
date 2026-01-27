@@ -1,6 +1,6 @@
 using System.Text;
-using GraphQL.SourceGenerators.Providers;
-using GraphQL.SourceGenerators.Transformers;
+using GraphQL.Analyzers.SourceGenerators.Providers;
+using GraphQL.Analyzers.SourceGenerators.Transformers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;

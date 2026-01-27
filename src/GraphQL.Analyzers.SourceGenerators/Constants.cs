@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace GraphQL.SourceGenerators;
+namespace GraphQL.Analyzers.SourceGenerators;
 
 internal static class Constants
 {

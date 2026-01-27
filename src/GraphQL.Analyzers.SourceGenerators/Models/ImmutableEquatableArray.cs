@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace GraphQL.SourceGenerators.Models;
+namespace GraphQL.Analyzers.SourceGenerators.Models;
 
 /// <summary>
 /// Provides an immutable list implementation which implements sequence equality.

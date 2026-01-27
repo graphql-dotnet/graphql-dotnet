@@ -1,7 +1,7 @@
-using GraphQL.SourceGenerators.Models;
+using GraphQL.Analyzers.SourceGenerators.Models;
 using Microsoft.CodeAnalysis;
 
-namespace GraphQL.SourceGenerators.Transformers;
+namespace GraphQL.Analyzers.SourceGenerators.Transformers;
 
 /// <summary>
 /// Scans a CLR input or output type and discovers its dependencies by examining properties, fields, and methods.

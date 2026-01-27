@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace GraphQL.SourceGenerators.Models;
+namespace GraphQL.Analyzers.SourceGenerators.Models;
 
 /// <summary>
 /// Represents a two-argument AOT attribute (TypeMapping or RemapType) with both generic type parameters.

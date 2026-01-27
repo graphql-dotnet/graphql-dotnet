@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 
-namespace GraphQL.SourceGenerators.Models;
+namespace GraphQL.Analyzers.SourceGenerators.Models;
 
 /// <summary>
 /// Immutable record containing all AOT attribute data extracted from a candidate schema class.

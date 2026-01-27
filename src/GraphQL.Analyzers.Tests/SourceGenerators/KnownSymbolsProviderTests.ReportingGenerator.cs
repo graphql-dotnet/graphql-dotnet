@@ -1,5 +1,5 @@
 using System.Text;
-using GraphQL.SourceGenerators.Providers;
+using GraphQL.Analyzers.SourceGenerators.Providers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 

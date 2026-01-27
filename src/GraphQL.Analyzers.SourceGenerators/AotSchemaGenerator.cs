@@ -1,10 +1,10 @@
 using System.Text;
-using GraphQL.SourceGenerators.Models;
-using GraphQL.SourceGenerators.Providers;
+using GraphQL.Analyzers.SourceGenerators.Models;
+using GraphQL.Analyzers.SourceGenerators.Providers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
-namespace GraphQL.SourceGenerators;
+namespace GraphQL.Analyzers.SourceGenerators;
 
 /// <summary>
 /// Incremental source generator for AOT-compiled GraphQL schemas.

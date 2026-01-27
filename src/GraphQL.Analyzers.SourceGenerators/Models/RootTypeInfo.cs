@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace GraphQL.SourceGenerators.Models;
+namespace GraphQL.Analyzers.SourceGenerators.Models;
 
 /// <summary>
 /// Represents a single-argument AOT attribute with its generic type parameter.

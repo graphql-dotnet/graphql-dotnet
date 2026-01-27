@@ -1,10 +1,10 @@
 using System.Collections.Immutable;
-using GraphQL.SourceGenerators.Models;
+using GraphQL.Analyzers.SourceGenerators.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace GraphQL.SourceGenerators.Providers;
+namespace GraphQL.Analyzers.SourceGenerators.Providers;
 
 /// <summary>
 /// Identifies candidate class declarations that have AOT-related attributes.

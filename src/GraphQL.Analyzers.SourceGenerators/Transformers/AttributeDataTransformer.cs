@@ -1,8 +1,8 @@
 using System.Collections.Immutable;
-using GraphQL.SourceGenerators.Models;
+using GraphQL.Analyzers.SourceGenerators.Models;
 using Microsoft.CodeAnalysis;
 
-namespace GraphQL.SourceGenerators.Transformers;
+namespace GraphQL.Analyzers.SourceGenerators.Transformers;
 
 /// <summary>
 /// Transforms a CandidateClass into SchemaAttributeData by extracting and categorizing

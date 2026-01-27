@@ -1,7 +1,7 @@
-using GraphQL.SourceGenerators.Models;
+using GraphQL.Analyzers.SourceGenerators.Models;
 using Microsoft.CodeAnalysis;
 
-namespace GraphQL.SourceGenerators.Providers;
+namespace GraphQL.Analyzers.SourceGenerators.Providers;
 
 /// <summary>
 /// Provides a way to resolve attribute symbols for AOT compilation.

@@ -23,7 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.csproj" />
     <ProjectReference Include="..\GraphQL.Analyzers\GraphQL.Analyzers.csproj" />
-    <ProjectReference Include="..\GraphQL.SourceGenerators\GraphQL.SourceGenerators.csproj" />
+    <ProjectReference Include="..\GraphQL.Analyzers.SourceGenerators\GraphQL.Analyzers.SourceGenerators.csproj" />
     <ProjectReference Include="..\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj" />
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
   </ItemGroup>
