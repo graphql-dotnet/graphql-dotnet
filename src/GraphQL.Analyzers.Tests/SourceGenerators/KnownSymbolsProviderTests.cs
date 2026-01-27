@@ -73,6 +73,9 @@ public partial class KnownSymbolsProviderTests
             // IObjectGraphType: GraphQL.Types.IObjectGraphType
             // IInterfaceGraphType: GraphQL.Types.IInterfaceGraphType
             // ScalarGraphType: GraphQL.Types.ScalarGraphType
+            // AutoRegisteringObjectGraphType: GraphQL.Types.AutoRegisteringObjectGraphType<TSourceType>
+            // AutoRegisteringInputObjectGraphType: GraphQL.Types.AutoRegisteringInputObjectGraphType<TSourceType>
+            // AutoRegisteringInterfaceGraphType: GraphQL.Types.AutoRegisteringInterfaceGraphType<TSourceType>
 
             """);
     }

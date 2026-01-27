@@ -52,4 +52,7 @@ public readonly record struct KnownSymbols
     public INamedTypeSymbol? IObjectGraphType { get; init; }
     public INamedTypeSymbol? IInterfaceGraphType { get; init; }
     public INamedTypeSymbol? ScalarGraphType { get; init; }
+    public INamedTypeSymbol? AutoRegisteringObjectGraphType { get; init; }
+    public INamedTypeSymbol? AutoRegisteringInputObjectGraphType { get; init; }
+    public INamedTypeSymbol? AutoRegisteringInterfaceGraphType { get; init; }
 }

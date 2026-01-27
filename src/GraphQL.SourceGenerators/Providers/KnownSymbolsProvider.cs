@@ -63,6 +63,9 @@ public static class KnownSymbolsProvider
                 IObjectGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.IOBJECT_GRAPH_TYPE),
                 IInterfaceGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.IINTERFACE_GRAPH_TYPE),
                 ScalarGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.SCALAR_GRAPH_TYPE),
+                AutoRegisteringObjectGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.AUTO_REGISTERING_OBJECT_GRAPH_TYPE),
+                AutoRegisteringInputObjectGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.AUTO_REGISTERING_INPUT_OBJECT_GRAPH_TYPE),
+                AutoRegisteringInterfaceGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.AUTO_REGISTERING_INTERFACE_GRAPH_TYPE),
             };
         });
     }
