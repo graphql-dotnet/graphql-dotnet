@@ -8,10 +8,7 @@ namespace GraphQL;
 public sealed class AotOutputTypeAttribute<[NotAGraphType] T> : AotSchemaAttribute
 {
     /// <summary>
-    /// Gets or sets whether the CLR type should be treated as an interface type.
-    /// When <see langword="true"/>, generates an <see cref="Types.InterfaceGraphType{TSourceType}"/>.
-    /// When <see langword="false"/>, generates an <see cref="Types.ObjectGraphType{TSourceType}"/>.
-    /// When <see langword="null"/> (default), the type will be auto-detected based on whether the CLR type is an interface.
+    /// Gets or sets how the CLR type should be represented as a GraphQL output type.
     /// </summary>
-    public bool? IsInterface { get; set; }
+    public OutputTypeKind Kind { get; set; } = OutputTypeKind.Auto;
 }
