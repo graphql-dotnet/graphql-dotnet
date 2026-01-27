@@ -928,4 +928,55 @@ public partial class InputTypeSymbolTransformerTests
 
             """);
     }
+
+    [Fact]
+    public async Task OnlyScansPublicPropertiesFromDerivedClass()
+    {
+        const string source =
+            """
+            using System;
+
+            namespace Sample;
+
+            [AttributeUsage(AttributeTargets.Class)]
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
+
+            public class BaseInput
+            {
+                private byte PrivateBaseProp { get; set; }
+                protected short ProtectedBaseProp { get; set; }
+                public int PublicBaseProp { get; set; }
+            }
+
+            [ScanMe(true)]
+            public class DerivedInput : BaseInput
+            {
+                private long PrivateDerivedProp { get; set; }
+                protected float ProtectedDerivedProp { get; set; }
+                public double PublicDerivedProp { get; set; }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= TypeScanReport.g.cs ============
+
+            // Type: DerivedInput
+            //
+            // DiscoveredInputClrTypes: 2
+            //   [0] double
+            //   [1] int
+            //
+            // DiscoveredOutputClrTypes: 0
+            //
+            // DiscoveredGraphTypes: 0
+            //
+            // InputListTypes: 0
+
+            """);
+    }
 }
