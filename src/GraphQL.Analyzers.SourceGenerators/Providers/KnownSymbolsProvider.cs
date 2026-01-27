@@ -16,6 +16,59 @@ public static class KnownSymbolsProvider
     {
         return context.CompilationProvider.Select(static (compilation, _) =>
         {
+            // Build the built-in scalar mappings
+            var builtInMappings = new List<(INamedTypeSymbol ClrType, INamedTypeSymbol GraphType)>();
+
+            // Local helper method to add a scalar mapping using SpecialType
+            void AddScalarMappingSpecial(SpecialType specialType, string graphTypeName)
+            {
+                var clrType = compilation.GetSpecialType(specialType);
+                var graphType = compilation.GetTypeByMetadataName(graphTypeName);
+
+                if (clrType != null && graphType != null)
+                {
+                    builtInMappings.Add((clrType, graphType));
+                }
+            }
+
+            // Local helper method to add a scalar mapping from metadata names
+            void AddScalarMapping(string clrTypeName, string graphTypeName)
+            {
+                var clrType = compilation.GetTypeByMetadataName(clrTypeName);
+                var graphType = compilation.GetTypeByMetadataName(graphTypeName);
+
+                if (clrType != null && graphType != null)
+                {
+                    builtInMappings.Add((clrType, graphType));
+                }
+            }
+
+            // Primitive types using GetSpecialType
+            AddScalarMappingSpecial(SpecialType.System_Int32, Constants.TypeNames.INT_GRAPH_TYPE);
+            AddScalarMappingSpecial(SpecialType.System_Int64, Constants.TypeNames.LONG_GRAPH_TYPE);
+            AddScalarMappingSpecial(SpecialType.System_Double, Constants.TypeNames.FLOAT_GRAPH_TYPE);
+            AddScalarMappingSpecial(SpecialType.System_Single, Constants.TypeNames.FLOAT_GRAPH_TYPE);
+            AddScalarMappingSpecial(SpecialType.System_Decimal, Constants.TypeNames.DECIMAL_GRAPH_TYPE);
+            AddScalarMappingSpecial(SpecialType.System_String, Constants.TypeNames.STRING_GRAPH_TYPE);
+            AddScalarMappingSpecial(SpecialType.System_Boolean, Constants.TypeNames.BOOLEAN_GRAPH_TYPE);
+            AddScalarMappingSpecial(SpecialType.System_DateTime, Constants.TypeNames.DATETIME_GRAPH_TYPE);
+            AddScalarMappingSpecial(SpecialType.System_Int16, Constants.TypeNames.SHORT_GRAPH_TYPE);
+            AddScalarMappingSpecial(SpecialType.System_UInt16, Constants.TypeNames.USHORT_GRAPH_TYPE);
+            AddScalarMappingSpecial(SpecialType.System_UInt64, Constants.TypeNames.ULONG_GRAPH_TYPE);
+            AddScalarMappingSpecial(SpecialType.System_UInt32, Constants.TypeNames.UINT_GRAPH_TYPE);
+            AddScalarMappingSpecial(SpecialType.System_Byte, Constants.TypeNames.BYTE_GRAPH_TYPE);
+            AddScalarMappingSpecial(SpecialType.System_SByte, Constants.TypeNames.SBYTE_GRAPH_TYPE);
+
+            // Non-primitive types using GetTypeByMetadataName
+            AddScalarMapping(Constants.TypeNames.BIG_INTEGER, Constants.TypeNames.BIGINT_GRAPH_TYPE);
+            AddScalarMapping(Constants.TypeNames.HALF, Constants.TypeNames.HALF_GRAPH_TYPE);
+            AddScalarMapping(Constants.TypeNames.DATE_ONLY, Constants.TypeNames.DATEONLY_GRAPH_TYPE);
+            AddScalarMapping(Constants.TypeNames.TIME_ONLY, Constants.TypeNames.TIMEONLY_GRAPH_TYPE);
+            AddScalarMapping(Constants.TypeNames.DATETIMEOFFSET, Constants.TypeNames.DATETIMEOFFSET_GRAPH_TYPE);
+            AddScalarMapping(Constants.TypeNames.TIMESPAN, Constants.TypeNames.TIMESPAN_SECONDS_GRAPH_TYPE);
+            AddScalarMapping(Constants.TypeNames.GUID, Constants.TypeNames.ID_GRAPH_TYPE);
+            AddScalarMapping(Constants.TypeNames.URI, Constants.TypeNames.URI_GRAPH_TYPE);
+
             return new KnownSymbols
             {
                 AotQueryType = compilation.GetTypeByMetadataName(Constants.AttributeNames.AOT_QUERY_TYPE),
@@ -33,6 +86,8 @@ public static class KnownSymbolsProvider
                 GraphQLClrInputTypeReference = compilation.GetTypeByMetadataName(Constants.TypeNames.GRAPHQL_CLR_INPUT_TYPE_REFERENCE),
                 GraphQLClrOutputTypeReference = compilation.GetTypeByMetadataName(Constants.TypeNames.GRAPHQL_CLR_OUTPUT_TYPE_REFERENCE),
                 IgnoreAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.IGNORE),
+                DoNotMapClrTypeAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.DO_NOT_MAP_CLR_TYPE),
+                ClrTypeMappingAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.CLR_TYPE_MAPPING),
                 MemberScanAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.MEMBER_SCAN),
                 ParameterAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.PARAMETER_ATTRIBUTE),
                 InputTypeAttributeT = compilation.GetTypeByMetadataName(Constants.AttributeNames.INPUT_TYPE),
@@ -63,9 +118,11 @@ public static class KnownSymbolsProvider
                 IObjectGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.IOBJECT_GRAPH_TYPE),
                 IInterfaceGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.IINTERFACE_GRAPH_TYPE),
                 ScalarGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.SCALAR_GRAPH_TYPE),
+                ComplexGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.COMPLEX_GRAPH_TYPE),
                 AutoRegisteringObjectGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.AUTO_REGISTERING_OBJECT_GRAPH_TYPE),
                 AutoRegisteringInputObjectGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.AUTO_REGISTERING_INPUT_OBJECT_GRAPH_TYPE),
                 AutoRegisteringInterfaceGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.AUTO_REGISTERING_INTERFACE_GRAPH_TYPE),
+                BuiltInScalarMappings = builtInMappings.ToImmutableEquatableArray(),
             };
         });
     }

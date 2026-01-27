@@ -40,6 +40,8 @@ public partial class KnownSymbolsProviderTests
                 sb.AppendLine($"// GraphQLClrInputTypeReference: {symbols.GraphQLClrInputTypeReference?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// GraphQLClrOutputTypeReference: {symbols.GraphQLClrOutputTypeReference?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// IgnoreAttribute: {symbols.IgnoreAttribute?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// DoNotMapClrTypeAttribute: {symbols.DoNotMapClrTypeAttribute?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// ClrTypeMappingAttribute: {symbols.ClrTypeMappingAttribute?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// MemberScanAttribute: {symbols.MemberScanAttribute?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// ParameterAttribute: {symbols.ParameterAttribute?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// InputTypeAttributeT: {symbols.InputTypeAttributeT?.ToDisplayString() ?? "NULL"}");
@@ -70,9 +72,17 @@ public partial class KnownSymbolsProviderTests
                 sb.AppendLine($"// IObjectGraphType: {symbols.IObjectGraphType?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// IInterfaceGraphType: {symbols.IInterfaceGraphType?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// ScalarGraphType: {symbols.ScalarGraphType?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// ComplexGraphType: {symbols.ComplexGraphType?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// AutoRegisteringObjectGraphType: {symbols.AutoRegisteringObjectGraphType?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// AutoRegisteringInputObjectGraphType: {symbols.AutoRegisteringInputObjectGraphType?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// AutoRegisteringInterfaceGraphType: {symbols.AutoRegisteringInterfaceGraphType?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine("//");
+                sb.AppendLine($"// BuiltInScalarMappings ({symbols.BuiltInScalarMappings.Count} mappings):");
+                for (int i = 0; i < symbols.BuiltInScalarMappings.Count; i++)
+                {
+                    var (clrType, graphType) = symbols.BuiltInScalarMappings[i];
+                    sb.AppendLine($"//   {clrType?.ToDisplayString() ?? "NULL"} -> {graphType?.ToDisplayString() ?? "NULL"}");
+                }
 
                 spc.AddSource("AttributeSymbolsReport.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
             });

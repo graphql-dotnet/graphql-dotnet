@@ -22,6 +22,8 @@ public readonly record struct KnownSymbols
     public INamedTypeSymbol? GraphQLClrInputTypeReference { get; init; }
     public INamedTypeSymbol? GraphQLClrOutputTypeReference { get; init; }
     public INamedTypeSymbol? IgnoreAttribute { get; init; }
+    public INamedTypeSymbol? DoNotMapClrTypeAttribute { get; init; }
+    public INamedTypeSymbol? ClrTypeMappingAttribute { get; init; }
     public INamedTypeSymbol? MemberScanAttribute { get; init; }
     public INamedTypeSymbol? ParameterAttribute { get; init; }
     public INamedTypeSymbol? InputTypeAttributeT { get; init; }
@@ -52,7 +54,14 @@ public readonly record struct KnownSymbols
     public INamedTypeSymbol? IObjectGraphType { get; init; }
     public INamedTypeSymbol? IInterfaceGraphType { get; init; }
     public INamedTypeSymbol? ScalarGraphType { get; init; }
+    public INamedTypeSymbol? ComplexGraphType { get; init; }
     public INamedTypeSymbol? AutoRegisteringObjectGraphType { get; init; }
     public INamedTypeSymbol? AutoRegisteringInputObjectGraphType { get; init; }
     public INamedTypeSymbol? AutoRegisteringInterfaceGraphType { get; init; }
+
+    /// <summary>
+    /// Built-in scalar type mappings from CLR types to GraphTypes, matching BuiltInScalarMappingProvider.
+    /// Each tuple contains (CLR type symbol, GraphType symbol).
+    /// </summary>
+    public ImmutableEquatableArray<(INamedTypeSymbol ClrType, INamedTypeSymbol GraphType)> BuiltInScalarMappings { get; init; }
 }

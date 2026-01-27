@@ -43,6 +43,8 @@ public partial class KnownSymbolsProviderTests
             // GraphQLClrInputTypeReference: GraphQL.Types.GraphQLClrInputTypeReference<T>
             // GraphQLClrOutputTypeReference: GraphQL.Types.GraphQLClrOutputTypeReference<T>
             // IgnoreAttribute: GraphQL.IgnoreAttribute
+            // DoNotMapClrTypeAttribute: GraphQL.DoNotMapClrTypeAttribute
+            // ClrTypeMappingAttribute: GraphQL.ClrTypeMappingAttribute
             // MemberScanAttribute: GraphQL.MemberScanAttribute
             // ParameterAttribute: GraphQL.ParameterAttribute
             // InputTypeAttributeT: GraphQL.InputTypeAttribute<TGraphType>
@@ -73,9 +75,34 @@ public partial class KnownSymbolsProviderTests
             // IObjectGraphType: GraphQL.Types.IObjectGraphType
             // IInterfaceGraphType: GraphQL.Types.IInterfaceGraphType
             // ScalarGraphType: GraphQL.Types.ScalarGraphType
+            // ComplexGraphType: GraphQL.Types.ComplexGraphType<TSourceType>
             // AutoRegisteringObjectGraphType: GraphQL.Types.AutoRegisteringObjectGraphType<TSourceType>
             // AutoRegisteringInputObjectGraphType: GraphQL.Types.AutoRegisteringInputObjectGraphType<TSourceType>
             // AutoRegisteringInterfaceGraphType: GraphQL.Types.AutoRegisteringInterfaceGraphType<TSourceType>
+            //
+            // BuiltInScalarMappings (22 mappings):
+            //   int -> GraphQL.Types.IntGraphType
+            //   long -> GraphQL.Types.LongGraphType
+            //   double -> GraphQL.Types.FloatGraphType
+            //   float -> GraphQL.Types.FloatGraphType
+            //   decimal -> GraphQL.Types.DecimalGraphType
+            //   string -> GraphQL.Types.StringGraphType
+            //   bool -> GraphQL.Types.BooleanGraphType
+            //   System.DateTime -> GraphQL.Types.DateTimeGraphType
+            //   short -> GraphQL.Types.ShortGraphType
+            //   ushort -> GraphQL.Types.UShortGraphType
+            //   ulong -> GraphQL.Types.ULongGraphType
+            //   uint -> GraphQL.Types.UIntGraphType
+            //   byte -> GraphQL.Types.ByteGraphType
+            //   sbyte -> GraphQL.Types.SByteGraphType
+            //   System.Numerics.BigInteger -> GraphQL.Types.BigIntGraphType
+            //   System.Half -> GraphQL.Types.HalfGraphType
+            //   System.DateOnly -> GraphQL.Types.DateOnlyGraphType
+            //   System.TimeOnly -> GraphQL.Types.TimeOnlyGraphType
+            //   System.DateTimeOffset -> GraphQL.Types.DateTimeOffsetGraphType
+            //   System.TimeSpan -> GraphQL.Types.TimeSpanSecondsGraphType
+            //   System.Guid -> GraphQL.Types.IdGraphType
+            //   System.Uri -> GraphQL.Types.UriGraphType
 
             """);
     }
