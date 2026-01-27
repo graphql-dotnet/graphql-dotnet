@@ -749,7 +749,7 @@ namespace GraphQL
     {
         public MapAutoClrTypeAttribute() { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=true)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct, AllowMultiple=false, Inherited=true)]
     public sealed class MemberScanAttribute : GraphQL.GraphQLAttribute
     {
         public MemberScanAttribute(GraphQL.ScanMemberTypes memberTypes) { }

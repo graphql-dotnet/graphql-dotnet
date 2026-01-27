@@ -1375,6 +1375,36 @@ public class AutoRegisteringObjectGraphTypeTests
         graphType.Fields.Find("Method1").ShouldBeNull();
     }
 
+    [Fact]
+    public void MemberScanAttribute_Struct_PropertiesOnly()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<PropertiesOnlyStruct>();
+        graphType.Fields.Find("Property1").ShouldNotBeNull();
+        graphType.Fields.Find("Property2").ShouldNotBeNull();
+        graphType.Fields.Find("Field1").ShouldBeNull();
+        graphType.Fields.Find("Method1").ShouldBeNull();
+    }
+
+    [Fact]
+    public void MemberScanAttribute_Struct_FieldsOnly()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<FieldsOnlyStruct>();
+        graphType.Fields.Find("Property1").ShouldBeNull();
+        graphType.Fields.Find("Field1").ShouldNotBeNull();
+        graphType.Fields.Find("Field2").ShouldNotBeNull();
+        graphType.Fields.Find("Method1").ShouldBeNull();
+    }
+
+    [Fact]
+    public void MemberScanAttribute_Struct_MethodsOnly()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<MethodsOnlyStruct>();
+        graphType.Fields.Find("Property1").ShouldBeNull();
+        graphType.Fields.Find("Field1").ShouldBeNull();
+        graphType.Fields.Find("Method1").ShouldNotBeNull();
+        graphType.Fields.Find("Method2").ShouldNotBeNull();
+    }
+
     [MemberScan(ScanMemberTypes.Properties)]
     private class PropertiesOnlyClass
     {
@@ -1437,5 +1467,52 @@ public class AutoRegisteringObjectGraphTypeTests
     private class DerivedPropertiesOnlyClass : BasePropertiesOnlyClass
     {
         public string Property2 { get; set; } = "prop2";
+    }
+
+    [MemberScan(ScanMemberTypes.Properties)]
+    private struct PropertiesOnlyStruct
+    {
+        public string Property1 { get; set; }
+        public string Property2 { get; set; }
+        public string Field1;
+        public string Method1() => "method1";
+
+        public PropertiesOnlyStruct()
+        {
+            Property1 = "prop1";
+            Property2 = "prop2";
+            Field1 = "field1";
+        }
+    }
+
+    [MemberScan(ScanMemberTypes.Fields)]
+    private struct FieldsOnlyStruct
+    {
+        public string Property1 { get; set; }
+        public string Field1;
+        public string Field2;
+        public string Method1() => "method1";
+
+        public FieldsOnlyStruct()
+        {
+            Property1 = "prop1";
+            Field1 = "field1";
+            Field2 = "field2";
+        }
+    }
+
+    [MemberScan(ScanMemberTypes.Methods)]
+    private struct MethodsOnlyStruct
+    {
+        public string Property1 { get; set; }
+        public string Field1;
+        public string Method1() => "method1";
+        public string Method2() => "method2";
+
+        public MethodsOnlyStruct()
+        {
+            Property1 = "prop1";
+            Field1 = "field1";
+        }
     }
 }
