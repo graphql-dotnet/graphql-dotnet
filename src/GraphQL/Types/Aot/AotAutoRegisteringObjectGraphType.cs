@@ -48,7 +48,7 @@ public abstract class AotAutoRegisteringObjectGraphType<TSource> : AutoRegisteri
     /// <summary>
     /// Gets a parameter resolver for a given source constructor parameter type.
     /// </summary>
-    protected virtual Func<IResolveFieldContext, TParameterType>? BuildConstructorParameter<TParameterType>()
+    protected virtual Func<IResolveFieldContext, TParameterType> BuildConstructorParameter<TParameterType>()
     {
         if (typeof(TParameterType) == typeof(IResolveFieldContext))
         {
