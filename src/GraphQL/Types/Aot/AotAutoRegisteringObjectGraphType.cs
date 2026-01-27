@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using GraphQL.Resolvers;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types.Aot;
 
@@ -41,6 +42,19 @@ public abstract class AotAutoRegisteringObjectGraphType<TSource> : AutoRegisteri
             return context => context.GetArgument<TParameterType>(queryArgument.Name);
         }
         return resolver;
+    }
+
+    private static readonly Func<IResolveFieldContext, IResolveFieldContext> _contextFactory = context => context;
+    /// <summary>
+    /// Gets a parameter resolver for a given source constructor parameter type.
+    /// </summary>
+    protected virtual Func<IResolveFieldContext, TParameterType>? BuildConstructorParameter<TParameterType>()
+    {
+        if (typeof(TParameterType) == typeof(IResolveFieldContext))
+        {
+            return (Func<IResolveFieldContext, TParameterType>)(object)_contextFactory;
+        }
+        return context => context.RequestServicesOrThrow().GetRequiredService<TParameterType>();
     }
 
     /// <summary>

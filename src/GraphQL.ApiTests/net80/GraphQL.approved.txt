@@ -3529,6 +3529,7 @@ namespace GraphQL.Types.Aot
     {
         public AotAutoRegisteringObjectGraphType() { }
         protected virtual System.Func<GraphQL.IResolveFieldContext, TParameterType> BuildArgument<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
+        protected virtual System.Func<GraphQL.IResolveFieldContext, TParameterType>? BuildConstructorParameter<TParameterType>() { }
         protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<T>> fn, bool requiresAccessor) { }
         protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<T>> fn, bool requiresAccessor) { }
         protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, T> fn, bool requiresAccessor) { }
