@@ -18,6 +18,7 @@ internal static class Constants
         internal const string AOT_LIST_TYPE = "GraphQL.AotListTypeAttribute`1";
         internal const string AOT_REMAP_TYPE = "GraphQL.AotRemapTypeAttribute`2";  // 2 type parameters
         internal const string IGNORE = "GraphQL.IgnoreAttribute";
+        internal const string MEMBER_SCAN = "GraphQL.MemberScanAttribute";
         internal const string INPUT_TYPE = "GraphQL.InputTypeAttribute`1";
         internal const string INPUT_TYPE_NON_GENERIC = "GraphQL.InputTypeAttribute";
         internal const string INPUT_BASE_TYPE = "GraphQL.InputBaseTypeAttribute`1";

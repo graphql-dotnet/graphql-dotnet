@@ -33,6 +33,7 @@ public static class KnownSymbolsProvider
                 GraphQLClrInputTypeReference = compilation.GetTypeByMetadataName(Constants.TypeNames.GRAPHQL_CLR_INPUT_TYPE_REFERENCE),
                 GraphQLClrOutputTypeReference = compilation.GetTypeByMetadataName(Constants.TypeNames.GRAPHQL_CLR_OUTPUT_TYPE_REFERENCE),
                 IgnoreAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.IGNORE),
+                MemberScanAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.MEMBER_SCAN),
                 InputTypeAttributeT = compilation.GetTypeByMetadataName(Constants.AttributeNames.INPUT_TYPE),
                 InputTypeAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.INPUT_TYPE_NON_GENERIC),
                 InputBaseTypeAttributeT = compilation.GetTypeByMetadataName(Constants.AttributeNames.INPUT_BASE_TYPE),

@@ -73,15 +73,20 @@ public static class TypeSymbolTransformer
                     // Add unwrapped GraphType to discoveredGraphTypes (with deduplication)
                     AddIfNotExists(discoveredGraphTypes, memberGraphType);
                 }
+            }
+            else
+            {
+                // Unwrap nested generic wrappers (recursively)
+                var unwrappedClrType = UnwrapClrType(memberClrType, knownSymbols);
 
-                continue;
+                // Discover nested input types - only add if not already in the list
+                AddIfNotExists(discoveredClrTypes, unwrappedClrType);
             }
 
-            // Unwrap nested generic wrappers (recursively)
-            var unwrappedClrType = UnwrapClrType(memberClrType, knownSymbols);
-
-            // Discover nested input types - only add if not already in the list
-            AddIfNotExists(discoveredClrTypes, unwrappedClrType);
+            if (member is IMethodSymbol methodSymbol)
+            {
+                // todo: scan method parameters for input types
+            }
         }
 
         return new TypeScanResult(
@@ -149,6 +154,9 @@ public static class TypeSymbolTransformer
             return UnwrapClrType(type.WithNullableAnnotation(NullableAnnotation.NotAnnotated), knownSymbols);
         }
 
+        if (type is IArrayTypeSymbol arrayType)
+            return UnwrapClrType(arrayType.ElementType, knownSymbols);
+
         if (type is INamedTypeSymbol namedType && namedType.IsGenericType)
         {
             var originalDef = namedType.OriginalDefinition;
@@ -173,9 +181,6 @@ public static class TypeSymbolTransformer
             if (IsListType(type, knownSymbols) && namedType.TypeArguments.Length == 1)
                 return UnwrapClrType(namedType.TypeArguments[0], knownSymbols);
         }
-
-        if (type is IArrayTypeSymbol arrayType)
-            return UnwrapClrType(arrayType.ElementType, knownSymbols);
 
         // Base case: return the unwrapped type
         return type;
@@ -216,7 +221,7 @@ public static class TypeSymbolTransformer
 
         // Check for MemberScan attribute on the type
         var memberScanAttribute = clrType.GetAttributes()
-            .FirstOrDefault(a => a.AttributeClass?.Name == "MemberScanAttribute");
+            .FirstOrDefault(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, knownSymbols.MemberScanAttribute));
 
         // Determine which member types to scan
         // Default: properties (and methods for output types only)
@@ -298,10 +303,6 @@ public static class TypeSymbolTransformer
                     if (ShouldSkipMember(method, knownSymbols))
                         continue;
 
-                    // Skip methods with parameters (only parameterless methods)
-                    if (method.Parameters.Length > 0)
-                        continue;
-
                     // Skip special methods (constructors, property accessors, etc.)
                     if (method.MethodKind != MethodKind.Ordinary)
                         continue;
@@ -315,13 +316,8 @@ public static class TypeSymbolTransformer
                         continue;
 
                     // Skip methods inherited from System.Object (e.g., GetHashCode, GetType, ToString, Equals)
-                    // For inherited (non-overridden) methods, check if they're declared in System.Object
-                    if (!SymbolEqualityComparer.Default.Equals(method.ContainingType, clrType))
-                    {
-                        // This is an inherited method; skip if from System.Object
-                        if (method.ContainingType?.SpecialType == SpecialType.System_Object)
-                            continue;
-                    }
+                    if (method.ContainingType?.SpecialType == SpecialType.System_Object)
+                        continue;
 
                     // For overridden methods, check if the base definition is from System.Object
                     if (method.IsOverride && method.OverriddenMethod != null)
@@ -374,66 +370,41 @@ public static class TypeSymbolTransformer
     /// </summary>
     private static ITypeSymbol? GetMemberGraphType(ISymbol member, bool isInputType, KnownSymbols knownSymbols)
     {
+        // Define which attributes to check based on input/output type
+        INamedTypeSymbol? typeAttributeT, typeAttribute, baseTypeAttributeT, baseTypeAttribute;
+        if (isInputType)
+        {
+            typeAttributeT = knownSymbols.InputTypeAttributeT;
+            typeAttribute = knownSymbols.InputTypeAttribute;
+            baseTypeAttributeT = knownSymbols.InputBaseTypeAttributeT;
+            baseTypeAttribute = knownSymbols.InputBaseTypeAttribute;
+        }
+        else
+        {
+            typeAttributeT = knownSymbols.OutputTypeAttributeT;
+            typeAttribute = knownSymbols.OutputTypeAttribute;
+            baseTypeAttributeT = knownSymbols.OutputBaseTypeAttributeT;
+            baseTypeAttribute = knownSymbols.OutputBaseTypeAttribute;
+        }
+
         foreach (var attribute in member.GetAttributes())
         {
             var attributeClass = attribute.AttributeClass;
             if (attributeClass == null)
                 continue;
 
-            ITypeSymbol? memberGraphType;
+            // Check type-specific Type attribute (generic or non-generic, including derived types)
+            var memberGraphType = TryGetGraphTypeFromAttribute(attributeClass, attribute, typeAttributeT, typeAttribute);
+            if (memberGraphType != null)
+                return UnwrapGraphType(memberGraphType, knownSymbols);
 
-            if (isInputType)
-            {
-                // Check InputType attribute (generic or non-generic, including derived types)
-                memberGraphType = TryGetGraphTypeFromAttribute(
-                    attributeClass,
-                    attribute,
-                    knownSymbols.InputTypeAttributeT,
-                    knownSymbols.InputTypeAttribute);
-
-                if (memberGraphType != null)
-                    return UnwrapGraphType(memberGraphType, knownSymbols);
-
-                // Check InputBaseType attribute (generic or non-generic, including derived types)
-                memberGraphType = TryGetGraphTypeFromAttribute(
-                    attributeClass,
-                    attribute,
-                    knownSymbols.InputBaseTypeAttributeT,
-                    knownSymbols.InputBaseTypeAttribute);
-
-                if (memberGraphType != null)
-                    return UnwrapGraphType(memberGraphType, knownSymbols);
-            }
-            else
-            {
-                // Check OutputType attribute (generic or non-generic, including derived types)
-                memberGraphType = TryGetGraphTypeFromAttribute(
-                    attributeClass,
-                    attribute,
-                    knownSymbols.OutputTypeAttributeT,
-                    knownSymbols.OutputTypeAttribute);
-
-                if (memberGraphType != null)
-                    return UnwrapGraphType(memberGraphType, knownSymbols);
-
-                // Check OutputBaseType attribute (generic or non-generic, including derived types)
-                memberGraphType = TryGetGraphTypeFromAttribute(
-                    attributeClass,
-                    attribute,
-                    knownSymbols.OutputBaseTypeAttributeT,
-                    knownSymbols.OutputBaseTypeAttribute);
-
-                if (memberGraphType != null)
-                    return UnwrapGraphType(memberGraphType, knownSymbols);
-            }
+            // Check type-specific BaseType attribute (generic or non-generic, including derived types)
+            memberGraphType = TryGetGraphTypeFromAttribute(attributeClass, attribute, baseTypeAttributeT, baseTypeAttribute);
+            if (memberGraphType != null)
+                return UnwrapGraphType(memberGraphType, knownSymbols);
 
             // Check BaseGraphType attribute (generic or non-generic, including derived types) - for both input and output types
-            memberGraphType = TryGetGraphTypeFromAttribute(
-                attributeClass,
-                attribute,
-                knownSymbols.BaseGraphTypeAttributeT,
-                knownSymbols.BaseGraphTypeAttribute);
-
+            memberGraphType = TryGetGraphTypeFromAttribute(attributeClass, attribute, knownSymbols.BaseGraphTypeAttributeT, knownSymbols.BaseGraphTypeAttribute);
             if (memberGraphType != null)
                 return UnwrapGraphType(memberGraphType, knownSymbols);
         }
