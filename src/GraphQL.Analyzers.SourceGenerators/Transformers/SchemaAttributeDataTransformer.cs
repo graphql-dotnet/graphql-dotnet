@@ -231,6 +231,19 @@ public readonly ref struct SchemaAttributeDataTransformer
             return existingGraphType;
         }
 
+        // Check if this is an enum type - wrap with EnumerationGraphType<T>
+        if (clrType.TypeKind == TypeKind.Enum)
+        {
+            var wrappedEnumGraphType = CreateEnumerationGraphType(clrType);
+            if (wrappedEnumGraphType != null)
+            {
+                _outputClrTypeMappings[clrType] = wrappedEnumGraphType;
+                _inputClrTypeMappings[clrType] = wrappedEnumGraphType;
+                _discoveredGraphTypes.Add(wrappedEnumGraphType);
+            }
+            return wrappedEnumGraphType;
+        }
+
         // Check if this is a known built-in scalar type
         if (TryGetBuiltInScalarGraphType(clrType, out var builtInScalarGraphType))
         {
@@ -373,6 +386,22 @@ public readonly ref struct SchemaAttributeDataTransformer
 
         // Construct the generic type with the CLR type as the type argument
         return genericTypeDefinition.Construct(clrType);
+    }
+
+    /// <summary>
+    /// Creates an EnumerationGraphType&lt;T&gt; for an enum type.
+    /// Returns null if the EnumerationGraphType is not available.
+    /// </summary>
+    private ITypeSymbol? CreateEnumerationGraphType(ITypeSymbol enumType)
+    {
+        var genericTypeDefinition = _knownSymbols.EnumerationGraphType;
+
+        // Return null if the generic type definition is not available
+        if (genericTypeDefinition == null)
+            return null;
+
+        // Construct the generic type with the enum type as the type argument
+        return genericTypeDefinition.Construct(enumType);
     }
 
     /// <summary>

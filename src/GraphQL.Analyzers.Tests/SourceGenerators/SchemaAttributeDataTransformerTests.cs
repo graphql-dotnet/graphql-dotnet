@@ -1801,4 +1801,76 @@ public partial class SchemaAttributeDataTransformerTests
 
             """);
     }
+
+    [Fact]
+    public async Task EnumType_AutomaticallyWrappedWithEnumerationGraphType()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public enum ProductStatus
+            {
+                Active,
+                Inactive,
+                Discontinued
+            }
+
+            public class Product
+            {
+                public string Name { get; set; }
+                public ProductStatus Status { get; set; }
+            }
+
+            public class Query
+            {
+                public Product GetProduct() => new Product();
+            }
+
+            [AotQueryType<Query>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= SchemaTransformationReport.g.cs ============
+
+            // Schema: MySchema
+            //
+            // QueryRootGraphType: AutoRegisteringObjectGraphType<Query>
+            //
+            // MutationRootGraphType: (none)
+            //
+            // SubscriptionRootGraphType: (none)
+            //
+            // DiscoveredGraphTypes: 4
+            //   [0] AutoRegisteringObjectGraphType<Query>
+            //   [1] AutoRegisteringObjectGraphType<Product>
+            //   [2] StringGraphType
+            //   [3] EnumerationGraphType<ProductStatus>
+            //
+            // OutputClrTypeMappings: 4
+            //   [0] Query -> AutoRegisteringObjectGraphType<Query>
+            //   [1] Product -> AutoRegisteringObjectGraphType<Product>
+            //   [2] string -> StringGraphType
+            //   [3] ProductStatus -> EnumerationGraphType<ProductStatus>
+            //
+            // InputClrTypeMappings: 2
+            //   [0] string -> StringGraphType
+            //   [1] ProductStatus -> EnumerationGraphType<ProductStatus>
+            //
+            // InputListTypes: 0
+
+            """);
+    }
 }
