@@ -21,7 +21,7 @@ public partial class InputTypeSymbolTransformerTests
             namespace Sample;
 
             [AttributeUsage(AttributeTargets.Class)]
-            public class ScanMeAttribute : Attribute { }
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
             public class Class1 { }
             public class Class2
@@ -29,7 +29,7 @@ public partial class InputTypeSymbolTransformerTests
                 public sbyte Value { get; set; }
             }
 
-            [ScanMe]
+            [ScanMe(true)]
             public class AllCollectionsInput
             {
                 // Primitive properties
@@ -157,9 +157,9 @@ public partial class InputTypeSymbolTransformerTests
             namespace Sample;
 
             [AttributeUsage(AttributeTargets.Class)]
-            public class ScanMeAttribute : Attribute { }
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe]
+            [ScanMe(true)]
             public class CreateProductInput
             {
                 public int? Quantity { get; set; }
@@ -203,9 +203,9 @@ public partial class InputTypeSymbolTransformerTests
             namespace Sample;
 
             [AttributeUsage(AttributeTargets.Class)]
-            public class ScanMeAttribute : Attribute { }
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe]
+            [ScanMe(true)]
             public class CreateProductInput
             {
                 public string Name { get; set; }
@@ -250,9 +250,9 @@ public partial class InputTypeSymbolTransformerTests
             namespace Sample;
 
             [AttributeUsage(AttributeTargets.Class)]
-            public class ScanMeAttribute : Attribute { }
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe]
+            [ScanMe(true)]
             public class CreateProductInput
             {
                 public string Name { get; set; }
@@ -304,9 +304,9 @@ public partial class InputTypeSymbolTransformerTests
             namespace Sample;
 
             [AttributeUsage(AttributeTargets.Class)]
-            public class ScanMeAttribute : Attribute { }
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe]
+            [ScanMe(true)]
             [MemberScan(ScanMemberTypes.Fields | ScanMemberTypes.Properties | ScanMemberTypes.Methods)]
             public class CreateProductInput
             {
@@ -362,9 +362,9 @@ public partial class InputTypeSymbolTransformerTests
             namespace Sample;
 
             [AttributeUsage(AttributeTargets.Class)]
-            public class ScanMeAttribute : Attribute { }
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe]
+            [ScanMe(true)]
             [MemberScan(0)]
             public class CreateProductInput
             {
@@ -418,9 +418,9 @@ public partial class InputTypeSymbolTransformerTests
             namespace Sample;
 
             [AttributeUsage(AttributeTargets.Class)]
-            public class ScanMeAttribute : Attribute { }
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe]
+            [ScanMe(true)]
             public class CreateProductInput
             {
                 public string StringValue { get; set; }
@@ -498,9 +498,9 @@ public partial class InputTypeSymbolTransformerTests
             namespace Sample;
 
             [AttributeUsage(AttributeTargets.Class)]
-            public class ScanMeAttribute : Attribute { }
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe]
+            [ScanMe(true)]
             public class CreateProductInput
             {
                 public string StringValue { get; set; }
@@ -582,9 +582,9 @@ public partial class InputTypeSymbolTransformerTests
             namespace Sample;
 
             [AttributeUsage(AttributeTargets.Class)]
-            public class ScanMeAttribute : Attribute { }
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe]
+            [ScanMe(true)]
             public class CreateProductInput
             {
                 public string StringValue { get; set; }
@@ -660,9 +660,9 @@ public partial class InputTypeSymbolTransformerTests
             namespace Sample;
 
             [AttributeUsage(AttributeTargets.Class)]
-            public class ScanMeAttribute : Attribute { }
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe]
+            [ScanMe(true)]
             public class GenericInput<T>
             {
                 public T Value { get; set; }
@@ -694,9 +694,9 @@ public partial class InputTypeSymbolTransformerTests
             namespace Sample;
 
             [AttributeUsage(AttributeTargets.Class)]
-            public class ScanMeAttribute : Attribute { }
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe]
+            [ScanMe(true)]
             public class EmptyInput
             {
             }
@@ -733,16 +733,16 @@ public partial class InputTypeSymbolTransformerTests
             namespace Sample;
 
             [AttributeUsage(AttributeTargets.Class)]
-            public class ScanMeAttribute : Attribute { }
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe]
+            [ScanMe(true)]
             public class CreateProductInput
             {
                 public string Name { get; set; }
                 public decimal Price { get; set; }
             }
 
-            [ScanMe]
+            [ScanMe(true)]
             public class CreateOrderInput
             {
                 public string OrderNumber { get; set; }
@@ -796,9 +796,9 @@ public partial class InputTypeSymbolTransformerTests
             namespace Sample;
 
             [AttributeUsage(AttributeTargets.Class)]
-            public class ScanMeAttribute : Attribute { }
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe]
+            [ScanMe(true)]
             public class AsyncInput
             {
                 public Task<string> Name { get; set; }
@@ -839,9 +839,9 @@ public partial class InputTypeSymbolTransformerTests
             namespace Sample;
 
             [AttributeUsage(AttributeTargets.Class)]
-            public class ScanMeAttribute : Attribute { }
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
-            [ScanMe]
+            [ScanMe(true)]
             public record CreateProductInput(string Name, decimal Price, int Quantity);
             """;
 
@@ -881,11 +881,11 @@ public partial class InputTypeSymbolTransformerTests
             namespace Sample;
 
             [AttributeUsage(AttributeTargets.Class)]
-            public class ScanMeAttribute : Attribute { }
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
 
             public class Class1 { }
 
-            [ScanMe]
+            [ScanMe(true)]
             public class CreateProductInput
             {
                 public string Name { get; set; }

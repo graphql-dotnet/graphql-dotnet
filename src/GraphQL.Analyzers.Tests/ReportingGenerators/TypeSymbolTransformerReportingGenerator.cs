@@ -16,12 +16,13 @@ public class TypeSymbolTransformerReportingGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // Find classes marked with [ScanInputType] attribute
+        // Find classes marked with [ScanMe] attribute
         var typesToScan = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: static (s, _) => IsScanCandidate(s),
                 transform: static (ctx, _) => GetTypeToScan(ctx))
-            .Where(static t => t != null)
+            .Where(static t => t.HasValue)
+            .Select(static (t, _) => t!.Value)
             .Collect();
 
         // Resolve known symbols using AttributeSymbolsProvider
@@ -40,10 +41,10 @@ public class TypeSymbolTransformerReportingGenerator : IIncrementalGenerator
             var sb = new StringBuilder();
 
             bool isFirst = true;
-            foreach (var typeSymbol in types.OrderBy(t => t!.Name))
+            foreach (var item in types.OrderBy(t => t.TypeSymbol.Name))
             {
-                if (typeSymbol == null)
-                    continue;
+                var typeSymbol = item.TypeSymbol;
+                var isInputType = item.IsInputType;
 
                 // Add blank line between types
                 if (!isFirst)
@@ -51,7 +52,7 @@ public class TypeSymbolTransformerReportingGenerator : IIncrementalGenerator
 
                 isFirst = false;
 
-                var result = TypeSymbolTransformer.Transform(typeSymbol, attributeSymbols, true);
+                var result = TypeSymbolTransformer.Transform(typeSymbol, attributeSymbols, isInputType);
 
                 if (result == null)
                 {
@@ -107,7 +108,7 @@ public class TypeSymbolTransformerReportingGenerator : IIncrementalGenerator
         return node is ClassDeclarationSyntax or RecordDeclarationSyntax;
     }
 
-    private static ITypeSymbol? GetTypeToScan(GeneratorSyntaxContext context)
+    private static (ITypeSymbol TypeSymbol, bool IsInputType)? GetTypeToScan(GeneratorSyntaxContext context)
     {
         var typeDeclaration = (TypeDeclarationSyntax)context.Node;
         if (context.SemanticModel.GetDeclaredSymbol(typeDeclaration) is not ITypeSymbol symbol)
@@ -117,7 +118,19 @@ public class TypeSymbolTransformerReportingGenerator : IIncrementalGenerator
         foreach (var attribute in symbol.GetAttributes())
         {
             if (attribute.AttributeClass?.Name == "ScanMeAttribute")
-                return symbol;
+            {
+                // Extract the boolean constructor parameter
+                bool isInputType = true; // Default value
+                if (attribute.ConstructorArguments.Length > 0)
+                {
+                    var arg = attribute.ConstructorArguments[0];
+                    if (arg.Value is bool boolValue)
+                    {
+                        isInputType = boolValue;
+                    }
+                }
+                return (symbol, isInputType);
+            }
         }
 
         return null;
