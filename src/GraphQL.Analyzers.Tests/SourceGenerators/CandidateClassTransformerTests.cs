@@ -1,5 +1,5 @@
 using VerifyTestSG = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpIncrementalGeneratorVerifier<
-    GraphQL.Analyzers.Tests.SourceGenerators.AttributeDataTransformerTests.ReportingGenerator>;
+    GraphQL.Analyzers.Tests.SourceGenerators.CandidateClassTransformerTests.ReportingGenerator>;
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators;
 
@@ -8,7 +8,7 @@ namespace GraphQL.Analyzers.Tests.SourceGenerators;
 /// These tests verify that the transformer correctly extracts and categorizes AOT attributes.
 /// Uses TestAttributeDataReportingGenerator to isolate testing of AttributeDataTransformer from the full pipeline.
 /// </summary>
-public partial class AttributeDataTransformerTests
+public partial class CandidateClassTransformerTests
 {
     [Fact]
     public async Task TransformsSingleQueryTypeAttribute()

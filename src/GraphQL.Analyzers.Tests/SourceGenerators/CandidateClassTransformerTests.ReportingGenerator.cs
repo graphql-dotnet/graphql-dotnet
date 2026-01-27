@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators;
 
-public partial class AttributeDataTransformerTests
+public partial class CandidateClassTransformerTests
 {
     /// <summary>
     /// A minimal test generator that uses CandidateProvider and AttributeDataTransformer to report 
@@ -37,7 +37,7 @@ public partial class AttributeDataTransformerTests
 
                 foreach (var (candidate, symbols) in items.OrderBy(x => x.Left.ClassSymbol.Name))
                 {
-                    var schemaData = AttributeDataTransformer.Transform(candidate, symbols);
+                    var schemaData = CandidateClassTransformer.Transform(candidate, symbols);
 
                     if (schemaData == null)
                         continue;

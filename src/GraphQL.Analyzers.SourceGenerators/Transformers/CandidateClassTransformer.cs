@@ -8,7 +8,7 @@ namespace GraphQL.Analyzers.SourceGenerators.Transformers;
 /// Transforms a CandidateClass into SchemaAttributeData by extracting and categorizing
 /// all AOT-related attributes and their generic type arguments.
 /// </summary>
-public static class AttributeDataTransformer
+public static class CandidateClassTransformer
 {
     /// <summary>
     /// Extracts all AOT attribute data from a candidate class and assembles it into
