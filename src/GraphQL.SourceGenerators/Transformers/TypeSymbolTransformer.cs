@@ -17,13 +17,6 @@ public static class TypeSymbolTransformer
     /// <param name="isInputType">Indicates whether the type is being scanned as an input type (true) or output type (false).</param>
     public static TypeScanResult? Transform(ITypeSymbol typeSymbol, KnownSymbols knownSymbols, bool isInputType)
     {
-        // Return null for types that cannot be examined
-        if (typeSymbol is INamedTypeSymbol namedType && namedType.IsUnboundGenericType)
-            return null;
-
-        if (typeSymbol is ITypeParameterSymbol)
-            return null;
-
         // Return null if type has unbound type parameters
         if (typeSymbol is INamedTypeSymbol named && named.TypeArguments.Any(arg => arg is ITypeParameterSymbol))
             return null;
