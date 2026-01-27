@@ -66,38 +66,12 @@ public static class TypeSymbolTransformer
                     var unwrappedClrType2 = UnwrapClrType(clrType, knownSymbols);
 
                     // Extract T and add to discoveredClrTypes (with deduplication)
-                    bool clrRefTypeExists = false;
-                    foreach (var existingClrType in discoveredClrTypes)
-                    {
-                        if (SymbolEqualityComparer.Default.Equals(existingClrType, unwrappedClrType2))
-                        {
-                            clrRefTypeExists = true;
-                            break;
-                        }
-                    }
-
-                    if (!clrRefTypeExists)
-                    {
-                        discoveredClrTypes.Add(unwrappedClrType2);
-                    }
+                    AddIfNotExists(discoveredClrTypes, unwrappedClrType2);
                 }
                 else
                 {
                     // Add unwrapped GraphType to discoveredGraphTypes (with deduplication)
-                    bool graphTypeExists = false;
-                    foreach (var existingGraphType in discoveredGraphTypes)
-                    {
-                        if (SymbolEqualityComparer.Default.Equals(existingGraphType, memberGraphType))
-                        {
-                            graphTypeExists = true;
-                            break;
-                        }
-                    }
-
-                    if (!graphTypeExists)
-                    {
-                        discoveredGraphTypes.Add(memberGraphType);
-                    }
+                    AddIfNotExists(discoveredGraphTypes, memberGraphType);
                 }
 
                 continue;
@@ -107,20 +81,7 @@ public static class TypeSymbolTransformer
             var unwrappedClrType = UnwrapClrType(memberClrType, knownSymbols);
 
             // Discover nested input types - only add if not already in the list
-            bool clrTypeExists = false;
-            foreach (var existingClrType in discoveredClrTypes)
-            {
-                if (SymbolEqualityComparer.Default.Equals(existingClrType, unwrappedClrType))
-                {
-                    clrTypeExists = true;
-                    break;
-                }
-            }
-
-            if (!clrTypeExists)
-            {
-                discoveredClrTypes.Add(unwrappedClrType);
-            }
+            AddIfNotExists(discoveredClrTypes, unwrappedClrType);
         }
 
         return new TypeScanResult(
@@ -139,20 +100,7 @@ public static class TypeSymbolTransformer
         if (IsListType(type, knownSymbols))
         {
             // Only add if not already in the list
-            bool alreadyExists = false;
-            foreach (var existingType in listTypes)
-            {
-                if (SymbolEqualityComparer.Default.Equals(existingType, type))
-                {
-                    alreadyExists = true;
-                    break;
-                }
-            }
-
-            if (!alreadyExists)
-            {
-                listTypes.Add(type);
-            }
+            AddIfNotExists(listTypes, type);
 
             // Get the element type and recursively check for nested lists
             if (type is IArrayTypeSymbol arrayType)
@@ -588,5 +536,21 @@ public static class TypeSymbolTransformer
             paramType = paramType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
 
         return SymbolEqualityComparer.Default.Equals(paramType, recordType);
+    }
+
+    /// <summary>
+    /// Adds a type symbol to the builder if it doesn't already exist.
+    /// Uses SymbolEqualityComparer for comparison.
+    /// </summary>
+    private static void AddIfNotExists<T>(ImmutableArray<T>.Builder builder, T typeToAdd)
+        where T : ISymbol
+    {
+        foreach (var existingType in builder)
+        {
+            if (SymbolEqualityComparer.Default.Equals(existingType, typeToAdd))
+                return;
+        }
+
+        builder.Add(typeToAdd);
     }
 }
