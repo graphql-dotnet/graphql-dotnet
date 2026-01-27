@@ -979,4 +979,108 @@ public partial class InputTypeSymbolTransformerTests
 
             """);
     }
+
+    [Fact]
+    public async Task SkipsStaticPropertiesForInputTypes()
+    {
+        const string source =
+            """
+            using System;
+
+            namespace Sample;
+
+            [AttributeUsage(AttributeTargets.Class)]
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
+
+            [ScanMe(true)]
+            public class CreateProductInput
+            {
+                public string Name { get; set; }
+                
+                // Static properties should be skipped for input types
+                public static int GlobalCounter { get; set; }
+                public static decimal DefaultPrice { get; set; }
+                
+                public int Quantity { get; set; }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= TypeScanReport.g.cs ============
+
+            // Type: CreateProductInput
+            //
+            // DiscoveredInputClrTypes: 2
+            //   [0] string
+            //   [1] int
+            //
+            // DiscoveredOutputClrTypes: 0
+            //
+            // DiscoveredGraphTypes: 0
+            //
+            // InputListTypes: 0
+
+            """);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task IncludesReadOnlyFieldWithMatchingConstructorParameter(bool isClass)
+    {
+        string source =
+            $$"""
+            using System;
+            using GraphQL;
+
+            namespace Sample;
+
+            [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
+
+            [ScanMe(true)]
+            [MemberScan(ScanMemberTypes.Fields | ScanMemberTypes.Properties)]
+            public {{(isClass ? "class" : "struct")}} CreateProductInput
+            {
+                // Readonly property with matching constructor parameter should be included
+                public string Name { get; }
+                
+                // Readonly field with matching constructor parameter should be included
+                public readonly int Quantity;
+
+                public CreateProductInput(string name, int quantity)
+                {
+                    Name = name;
+                    Quantity = quantity;
+                }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= TypeScanReport.g.cs ============
+
+            // Type: CreateProductInput
+            //
+            // DiscoveredInputClrTypes: 2
+            //   [0] int
+            //   [1] string
+            //
+            // DiscoveredOutputClrTypes: 0
+            //
+            // DiscoveredGraphTypes: 0
+            //
+            // InputListTypes: 0
+
+            """);
+    }
 }

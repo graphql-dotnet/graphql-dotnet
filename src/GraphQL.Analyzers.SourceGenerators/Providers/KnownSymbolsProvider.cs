@@ -90,6 +90,7 @@ public static class KnownSymbolsProvider
                 ClrTypeMappingAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.CLR_TYPE_MAPPING),
                 MemberScanAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.MEMBER_SCAN),
                 ParameterAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.PARAMETER_ATTRIBUTE),
+                GraphQLConstructorAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.GRAPHQL_CONSTRUCTOR),
                 InputTypeAttributeT = compilation.GetTypeByMetadataName(Constants.AttributeNames.INPUT_TYPE),
                 InputTypeAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.INPUT_TYPE_NON_GENERIC),
                 InputBaseTypeAttributeT = compilation.GetTypeByMetadataName(Constants.AttributeNames.INPUT_BASE_TYPE),

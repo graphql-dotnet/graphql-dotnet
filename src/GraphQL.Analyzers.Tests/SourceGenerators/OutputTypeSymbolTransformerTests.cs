@@ -1025,4 +1025,53 @@ public partial class OutputTypeSymbolTransformerTests
 
             """);
     }
+
+    [Fact]
+    public async Task IncludesStaticPropertiesForOutputTypes()
+    {
+        const string source =
+            """
+            using System;
+
+            namespace Sample;
+
+            [AttributeUsage(AttributeTargets.Class)]
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
+
+            [ScanMe(false)]
+            public class CreateProductOutput
+            {
+                public string Name { get; set; }
+                
+                // Static properties should be included for output types
+                public static int GlobalCounter { get; set; }
+                public static decimal DefaultPrice { get; set; }
+                
+                public int Quantity { get; set; }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= TypeScanReport.g.cs ============
+
+            // Type: CreateProductOutput
+            //
+            // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 3
+            //   [0] string
+            //   [1] int
+            //   [2] decimal
+            //
+            // DiscoveredGraphTypes: 0
+            //
+            // InputListTypes: 0
+
+            """);
+    }
 }

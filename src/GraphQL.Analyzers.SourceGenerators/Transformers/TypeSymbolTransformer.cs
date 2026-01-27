@@ -309,6 +309,21 @@ public static class TypeSymbolTransformer
     /// </summary>
     private static void ScanTypeMembers(ITypeSymbol typeToScan, List<ISymbol> membersToScan, bool scanFields, bool scanProperties, bool scanMethods, bool isInputType, KnownSymbols knownSymbols, ITypeSymbol originalType)
     {
+        // For input types, collect constructor parameters to check for matching readonly members
+        HashSet<string>? constructorParameterNames = null;
+        if (isInputType && typeToScan is INamedTypeSymbol namedTypeToScan)
+        {
+            var constructor = IdentifyConstructor(namedTypeToScan, knownSymbols);
+            if (constructor != null)
+            {
+                constructorParameterNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var parameter in constructor.Parameters)
+                {
+                    constructorParameterNames.Add(parameter.Name);
+                }
+            }
+        }
+
         // Collect fields if requested
         if (scanFields)
         {
@@ -321,9 +336,16 @@ public static class TypeSymbolTransformer
                 if (ShouldSkipMember(field, knownSymbols))
                     continue;
 
-                // Skip readonly fields for input types (can't be set)
-                if (isInputType && field.IsReadOnly)
+                // Skip static fields for input types (can't be set on instances)
+                if (isInputType && field.IsStatic)
                     continue;
+
+                // Skip readonly fields for input types unless they have a matching constructor parameter
+                if (isInputType && field.IsReadOnly)
+                {
+                    if (constructorParameterNames == null || !constructorParameterNames.Contains(field.Name))
+                        continue;
+                }
 
                 membersToScan.Add(field);
             }
@@ -341,9 +363,16 @@ public static class TypeSymbolTransformer
                 if (ShouldSkipMember(property, knownSymbols))
                     continue;
 
-                // Skip read-only properties for input types (can't be set)
-                if (isInputType && property.IsReadOnly)
+                // Skip static properties for input types (can't be set on instances)
+                if (isInputType && property.IsStatic)
                     continue;
+
+                // Skip read-only properties for input types unless they have a matching constructor parameter
+                if (isInputType && property.IsReadOnly)
+                {
+                    if (constructorParameterNames == null || !constructorParameterNames.Contains(property.Name))
+                        continue;
+                }
 
                 // Skip write-only properties for output types (can't be read)
                 if (!isInputType && property.IsWriteOnly)
@@ -617,5 +646,53 @@ public static class TypeSymbolTransformer
         }
 
         list.Add(typeToAdd);
+    }
+
+    /// <summary>
+    /// Identifies the constructor to use when constructing instances of the type.
+    /// Selects any public constructor marked with GraphQLConstructorAttribute, or the public
+    /// parameterless constructor, or the only public constructor, or returns null otherwise.
+    /// For structs, returns the implicit parameterless constructor as a fallback.
+    /// </summary>
+    private static IMethodSymbol? IdentifyConstructor(INamedTypeSymbol typeSymbol, KnownSymbols knownSymbols)
+    {
+        // Get public constructors, excluding implicit struct constructors for now
+        var publicConstructors = typeSymbol.Constructors
+            .Where(c => c.DeclaredAccessibility == Accessibility.Public && !c.IsImplicitlyDeclared)
+            .ToList();
+
+        // Check for constructor marked with GraphQLConstructorAttribute
+        if (knownSymbols.GraphQLConstructorAttribute != null)
+        {
+            var markedConstructor = publicConstructors.FirstOrDefault(c =>
+                c.GetAttributes().Any(a =>
+                    SymbolEqualityComparer.Default.Equals(a.AttributeClass, knownSymbols.GraphQLConstructorAttribute)));
+
+            if (markedConstructor != null)
+                return markedConstructor;
+        }
+
+        // Check for public parameterless constructor
+        var parameterlessConstructor = publicConstructors.FirstOrDefault(c => c.Parameters.Length == 0);
+        if (parameterlessConstructor != null)
+            return parameterlessConstructor;
+
+        // If there is only one explicit public constructor, use it
+        if (publicConstructors.Count == 1)
+            return publicConstructors[0];
+
+        // For structs, fall back to implicit parameterless constructor
+        if (typeSymbol.TypeKind == TypeKind.Struct)
+        {
+            var implicitConstructor = typeSymbol.Constructors
+                .FirstOrDefault(c => c.DeclaredAccessibility == Accessibility.Public &&
+                                     c.IsImplicitlyDeclared &&
+                                     c.Parameters.Length == 0);
+            if (implicitConstructor != null)
+                return implicitConstructor;
+        }
+
+        // Otherwise, return null
+        return null;
     }
 }

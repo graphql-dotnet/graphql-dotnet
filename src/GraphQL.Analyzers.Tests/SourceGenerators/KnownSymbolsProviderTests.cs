@@ -47,6 +47,7 @@ public partial class KnownSymbolsProviderTests
             // ClrTypeMappingAttribute: GraphQL.ClrTypeMappingAttribute
             // MemberScanAttribute: GraphQL.MemberScanAttribute
             // ParameterAttribute: GraphQL.ParameterAttribute
+            // GraphQLConstructorAttribute: GraphQL.GraphQLConstructorAttribute
             // InputTypeAttributeT: GraphQL.InputTypeAttribute<TGraphType>
             // InputTypeAttribute: GraphQL.InputTypeAttribute
             // InputBaseTypeAttributeT: GraphQL.InputBaseTypeAttribute<TGraphType>
