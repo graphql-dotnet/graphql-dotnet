@@ -60,6 +60,11 @@ public partial class SchemaAttributeDataTransformerTests
             //   [0] string -> StringGraphType
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 1
+            //   [0] AutoRegisteringObjectGraphType<Query>
+            //       Members: 1
+            //         [0] Hello
 
             """);
     }
@@ -113,6 +118,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputClrTypeMappings: 0
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 0
 
             """);
     }
@@ -178,6 +185,15 @@ public partial class SchemaAttributeDataTransformerTests
             //   [1] decimal -> DecimalGraphType
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 2
+            //   [0] AutoRegisteringObjectGraphType<Query>
+            //       Members: 1
+            //         [0] GetProduct
+            //   [1] AutoRegisteringObjectGraphType<Product>
+            //       Members: 2
+            //         [0] Name
+            //         [1] Price
 
             """);
     }
@@ -248,6 +264,19 @@ public partial class SchemaAttributeDataTransformerTests
             //   [0] string -> StringGraphType
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 3
+            //   [0] AutoRegisteringObjectGraphType<Query>
+            //       Members: 1
+            //         [0] GetCustomer
+            //   [1] AutoRegisteringObjectGraphType<Customer>
+            //       Members: 2
+            //         [0] Name
+            //         [1] Address
+            //   [2] AutoRegisteringObjectGraphType<Address>
+            //       Members: 2
+            //         [0] Street
+            //         [1] City
 
             """);
     }
@@ -322,6 +351,19 @@ public partial class SchemaAttributeDataTransformerTests
             //   [2] decimal -> DecimalGraphType
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 3
+            //   [0] AutoRegisteringInputObjectGraphType<CreateProductInput>
+            //       Members: 2
+            //         [0] Name
+            //         [1] Price
+            //   [1] AutoRegisteringObjectGraphType<Mutation>
+            //       Members: 1
+            //         [0] CreateProduct
+            //   [2] AutoRegisteringObjectGraphType<Product>
+            //       Members: 2
+            //         [0] Name
+            //         [1] Price
 
             """);
     }
@@ -377,6 +419,11 @@ public partial class SchemaAttributeDataTransformerTests
             //   [0] DateTime -> DateTimeGraphType
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 1
+            //   [0] AutoRegisteringObjectGraphType<Query>
+            //       Members: 1
+            //         [0] GetCurrentTime
 
             """);
     }
@@ -430,6 +477,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputClrTypeMappings: 0
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 0
 
             """);
     }
@@ -489,6 +538,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputClrTypeMappings: 0
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 0
 
             """);
     }
@@ -535,6 +586,8 @@ public partial class SchemaAttributeDataTransformerTests
             //
             // InputListTypes: 1
             //   [0] List<string>
+            //
+            // GeneratedGraphTypesWithMembers: 0
 
             """);
     }
@@ -596,6 +649,12 @@ public partial class SchemaAttributeDataTransformerTests
             // InputListTypes: 2
             //   [0] List<string>
             //   [1] List<int>
+            //
+            // GeneratedGraphTypesWithMembers: 1
+            //   [0] AutoRegisteringInputObjectGraphType<CreateOrderInput>
+            //       Members: 2
+            //         [0] Tags
+            //         [1] Quantities
 
             """);
     }
@@ -665,6 +724,14 @@ public partial class SchemaAttributeDataTransformerTests
             //   [0] string -> StringGraphType
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 2
+            //   [0] AutoRegisteringInterfaceGraphType<IProduct>
+            //       Members: 1
+            //         [0] Name
+            //   [1] AutoRegisteringObjectGraphType<Query>
+            //       Members: 1
+            //         [0] GetProduct
 
             """);
     }
@@ -750,6 +817,23 @@ public partial class SchemaAttributeDataTransformerTests
             //   [1] string -> StringGraphType
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 5
+            //   [0] AutoRegisteringInputObjectGraphType<CreateProductInput>
+            //       Members: 1
+            //         [0] Name
+            //   [1] AutoRegisteringObjectGraphType<Query>
+            //       Members: 1
+            //         [0] GetProduct
+            //   [2] AutoRegisteringObjectGraphType<Mutation>
+            //       Members: 1
+            //         [0] CreateProduct
+            //   [3] AutoRegisteringObjectGraphType<Subscription>
+            //       Members: 1
+            //         [0] OnProductCreated
+            //   [4] AutoRegisteringObjectGraphType<Product>
+            //       Members: 1
+            //         [0] Name
 
             """);
     }
@@ -813,6 +897,16 @@ public partial class SchemaAttributeDataTransformerTests
             //   [2] AddressInput -> AutoRegisteringInputObjectGraphType<AddressInput>
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 2
+            //   [0] AutoRegisteringInputObjectGraphType<CreateCustomerInput>
+            //       Members: 2
+            //         [0] Name
+            //         [1] Address
+            //   [1] AutoRegisteringInputObjectGraphType<AddressInput>
+            //       Members: 2
+            //         [0] Street
+            //         [1] City
 
             """);
     }
@@ -871,6 +965,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputClrTypeMappings: 0
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 0
 
             """);
     }
@@ -934,6 +1030,15 @@ public partial class SchemaAttributeDataTransformerTests
             //   [0] string -> StringGraphType
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 2
+            //   [0] AutoRegisteringObjectGraphType<Product>
+            //       Members: 1
+            //         [0] Name
+            //   [1] AutoRegisteringObjectGraphType<Query>
+            //       Members: 2
+            //         [0] GetProduct
+            //         [1] GetAnotherProduct
 
             """);
     }
@@ -988,6 +1093,11 @@ public partial class SchemaAttributeDataTransformerTests
             //   [0] string -> StringGraphType
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 1
+            //   [0] AutoRegisteringObjectGraphType<Product>
+            //       Members: 1
+            //         [0] Name
 
             """);
     }
@@ -1074,6 +1184,15 @@ public partial class SchemaAttributeDataTransformerTests
             //   [1] string -> StringGraphType
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 2
+            //   [0] AutoRegisteringObjectGraphType<Query>
+            //       Members: 1
+            //         [0] GetProduct
+            //   [1] AutoRegisteringObjectGraphType<Product>
+            //       Members: 2
+            //         [0] Name
+            //         [1] CreatedAt
 
             """);
     }
@@ -1138,6 +1257,14 @@ public partial class SchemaAttributeDataTransformerTests
             // InputClrTypeMappings: 0
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 2
+            //   [0] AutoRegisteringObjectGraphType<Query>
+            //       Members: 1
+            //         [0] GetProduct
+            //   [1] AutoRegisteringObjectGraphType<Product>
+            //       Members: 1
+            //         [0] Name
 
             """);
     }
@@ -1216,6 +1343,18 @@ public partial class SchemaAttributeDataTransformerTests
             //   [4] Guid -> IdGraphType
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 2
+            //   [0] AutoRegisteringObjectGraphType<Query>
+            //       Members: 1
+            //         [0] GetProduct
+            //   [1] AutoRegisteringObjectGraphType<Product>
+            //       Members: 5
+            //         [0] Name
+            //         [1] Quantity
+            //         [2] Price
+            //         [3] CreatedAt
+            //         [4] Id
 
             """);
     }
@@ -1287,6 +1426,15 @@ public partial class SchemaAttributeDataTransformerTests
             //   [5] bool -> BooleanGraphType
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 1
+            //   [0] AutoRegisteringInputObjectGraphType<CreateProductInput>
+            //       Members: 5
+            //         [0] Name
+            //         [1] Quantity
+            //         [2] Price
+            //         [3] CreatedAt
+            //         [4] IsActive
 
             """);
     }
@@ -1370,6 +1518,22 @@ public partial class SchemaAttributeDataTransformerTests
             //   [2] double -> FloatGraphType
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 4
+            //   [0] AutoRegisteringInputObjectGraphType<UpdateProductInput>
+            //       Members: 2
+            //         [0] Id
+            //         [1] Rating
+            //   [1] AutoRegisteringObjectGraphType<Query>
+            //       Members: 1
+            //         [0] GetProduct
+            //   [2] AutoRegisteringObjectGraphType<Mutation>
+            //       Members: 1
+            //         [0] UpdateProduct
+            //   [3] AutoRegisteringObjectGraphType<Product>
+            //       Members: 2
+            //         [0] Id
+            //         [1] Rating
 
             """);
     }
@@ -1499,7 +1663,32 @@ public partial class SchemaAttributeDataTransformerTests
             //   [17] Uri -> UriGraphType
             //
             // InputListTypes: 0
-            
+            //
+            // GeneratedGraphTypesWithMembers: 2
+            //   [0] AutoRegisteringObjectGraphType<Query>
+            //       Members: 1
+            //         [0] GetAllScalars
+            //   [1] AutoRegisteringObjectGraphType<AllScalarsType>
+            //       Members: 18
+            //         [0] IntValue
+            //         [1] LongValue
+            //         [2] DoubleValue
+            //         [3] FloatValue
+            //         [4] DecimalValue
+            //         [5] StringValue
+            //         [6] BoolValue
+            //         [7] DateTimeValue
+            //         [8] DateTimeOffsetValue
+            //         [9] TimeSpanValue
+            //         [10] GuidValue
+            //         [11] ShortValue
+            //         [12] UShortValue
+            //         [13] ULongValue
+            //         [14] UIntValue
+            //         [15] ByteValue
+            //         [16] SByteValue
+            //         [17] UriValue
+
             """);
     }
 
@@ -1558,6 +1747,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputClrTypeMappings: 0
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 0
 
             """);
     }
@@ -1623,6 +1814,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputClrTypeMappings: 0
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 0
 
             """);
     }
@@ -1688,6 +1881,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputClrTypeMappings: 0
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 0
 
             """);
     }
@@ -1741,6 +1936,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputClrTypeMappings: 0
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 0
 
             """);
     }
@@ -1798,6 +1995,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputClrTypeMappings: 0
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 0
 
             """);
     }
@@ -1870,6 +2069,15 @@ public partial class SchemaAttributeDataTransformerTests
             //   [1] ProductStatus -> EnumerationGraphType<ProductStatus>
             //
             // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 2
+            //   [0] AutoRegisteringObjectGraphType<Query>
+            //       Members: 1
+            //         [0] GetProduct
+            //   [1] AutoRegisteringObjectGraphType<Product>
+            //       Members: 2
+            //         [0] Name
+            //         [1] Status
 
             """);
     }

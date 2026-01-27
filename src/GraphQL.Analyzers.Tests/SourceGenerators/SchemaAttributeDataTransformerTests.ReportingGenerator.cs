@@ -129,6 +129,30 @@ public partial class SchemaAttributeDataTransformerTests
                         var listType = (ITypeSymbol)processedData.InputListTypes[i];
                         sb.AppendLine($"//   [{i}] {listType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}");
                     }
+                    sb.AppendLine("//");
+
+                    // Generated GraphTypes with Members
+                    sb.AppendLine($"// GeneratedGraphTypesWithMembers: {processedData.GeneratedGraphTypesWithMembers.Count}");
+                    for (int i = 0; i < processedData.GeneratedGraphTypesWithMembers.Count; i++)
+                    {
+                        var entry = processedData.GeneratedGraphTypesWithMembers[i];
+                        var graphType = (ITypeSymbol)entry.GraphType;
+                        sb.AppendLine($"//   [{i}] {graphType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}");
+
+                        if (entry.Members.Count > 0)
+                        {
+                            sb.AppendLine($"//       Members: {entry.Members.Count}");
+                            for (int j = 0; j < entry.Members.Count; j++)
+                            {
+                                var member = entry.Members[j];
+                                sb.AppendLine($"//         [{j}] {member.Name}");
+                            }
+                        }
+                        else
+                        {
+                            sb.AppendLine("//       Members: (none)");
+                        }
+                    }
                 }
 
                 spc.AddSource("SchemaTransformationReport.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));

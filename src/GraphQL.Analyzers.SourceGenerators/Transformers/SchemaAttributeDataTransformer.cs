@@ -15,6 +15,7 @@ public readonly ref struct SchemaAttributeDataTransformer
     private readonly Dictionary<ITypeSymbol, ITypeSymbol> _inputClrTypeMappings;
     private readonly HashSet<ITypeSymbol> _inputListTypes;
     private readonly Queue<(ITypeSymbol Type, bool IsInputType)> _clrTypesToProcess;
+    private readonly Dictionary<ITypeSymbol, ImmutableEquatableArray<ISymbol>> _graphTypeMembers;
 
     /// <summary>
     /// Processes attribute data and walks the type graph to discover all referenced types.
@@ -36,6 +37,7 @@ public readonly ref struct SchemaAttributeDataTransformer
         _inputClrTypeMappings = new Dictionary<ITypeSymbol, ITypeSymbol>(SymbolEqualityComparer.Default);
         _inputListTypes = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
         _clrTypesToProcess = new Queue<(ITypeSymbol Type, bool IsInputType)>();
+        _graphTypeMembers = new Dictionary<ITypeSymbol, ImmutableEquatableArray<ISymbol>>(SymbolEqualityComparer.Default);
     }
 
     /// <inheritdoc cref="Transform(SchemaAttributeData, KnownSymbols)"/>
@@ -153,6 +155,9 @@ public readonly ref struct SchemaAttributeDataTransformer
 
             var result = scanResult.Value;
 
+            // Store the members for the graph type that corresponds to this CLR type
+            StoreGraphTypeMembers(currentClrType, isInputType, result.SelectedMembers);
+
             // Collect input list types discovered during scanning
             foreach (var listType in result.InputListTypes)
             {
@@ -186,7 +191,8 @@ public readonly ref struct SchemaAttributeDataTransformer
             DiscoveredGraphTypes: _discoveredGraphTypes.ToImmutableEquatableArray<ISymbol>(),
             OutputClrTypeMappings: _outputClrTypeMappings.Select(kvp => ((ISymbol)kvp.Key, (ISymbol)kvp.Value)).ToImmutableEquatableArray(),
             InputClrTypeMappings: _inputClrTypeMappings.Select(kvp => ((ISymbol)kvp.Key, (ISymbol)kvp.Value)).ToImmutableEquatableArray(),
-            InputListTypes: _inputListTypes.ToImmutableEquatableArray<ISymbol>());
+            InputListTypes: _inputListTypes.ToImmutableEquatableArray<ISymbol>(),
+            GeneratedGraphTypesWithMembers: _graphTypeMembers.Select(kvp => ((ISymbol)kvp.Key, kvp.Value)).ToImmutableEquatableArray());
     }
 
     /// <summary>
@@ -521,5 +527,28 @@ public readonly ref struct SchemaAttributeDataTransformer
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Stores the members for the graph type that corresponds to the given CLR type.
+    /// </summary>
+    private void StoreGraphTypeMembers(ITypeSymbol currentClrType, bool isInputType, ImmutableEquatableArray<ISymbol> selectedMembers)
+    {
+        // Get the graph type that corresponds to this CLR type
+        ITypeSymbol? graphType = null;
+        if (isInputType)
+        {
+            _inputClrTypeMappings.TryGetValue(currentClrType, out graphType);
+        }
+        else
+        {
+            _outputClrTypeMappings.TryGetValue(currentClrType, out graphType);
+        }
+
+        // Store members if graph type exists and has members
+        if (graphType != null && selectedMembers.Count > 0)
+        {
+            _graphTypeMembers[graphType] = selectedMembers;
+        }
     }
 }
