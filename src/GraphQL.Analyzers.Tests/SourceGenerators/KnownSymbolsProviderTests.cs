@@ -48,6 +48,7 @@ public partial class KnownSymbolsProviderTests
             // MemberScanAttribute: GraphQL.MemberScanAttribute
             // ParameterAttribute: GraphQL.ParameterAttribute
             // GraphQLConstructorAttribute: GraphQL.GraphQLConstructorAttribute
+            // InstanceSourceAttribute: GraphQL.InstanceSourceAttribute
             // InputTypeAttributeT: GraphQL.InputTypeAttribute<TGraphType>
             // InputTypeAttribute: GraphQL.InputTypeAttribute
             // InputBaseTypeAttributeT: GraphQL.InputBaseTypeAttribute<TGraphType>

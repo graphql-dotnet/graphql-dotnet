@@ -27,6 +27,7 @@ public readonly record struct KnownSymbols
     public INamedTypeSymbol? MemberScanAttribute { get; init; }
     public INamedTypeSymbol? ParameterAttribute { get; init; }
     public INamedTypeSymbol? GraphQLConstructorAttribute { get; init; }
+    public INamedTypeSymbol? InstanceSourceAttribute { get; init; }
     public INamedTypeSymbol? InputTypeAttributeT { get; init; }
     public INamedTypeSymbol? InputTypeAttribute { get; init; }
     public INamedTypeSymbol? InputBaseTypeAttributeT { get; init; }

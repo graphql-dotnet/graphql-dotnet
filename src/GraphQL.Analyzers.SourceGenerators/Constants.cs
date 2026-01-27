@@ -33,6 +33,7 @@ internal static class Constants
         internal const string BASE_GRAPH_TYPE = "GraphQL.BaseGraphTypeAttribute`1";
         internal const string BASE_GRAPH_TYPE_NON_GENERIC = "GraphQL.BaseGraphTypeAttribute";
         internal const string GRAPHQL_CONSTRUCTOR = "GraphQL.GraphQLConstructorAttribute";
+        internal const string INSTANCE_SOURCE = "GraphQL.InstanceSourceAttribute";
 
         /// <summary>
         /// Includes AotQueryType, AotMutationType, AotSubscriptionType, AotOutputType, AotInputType,

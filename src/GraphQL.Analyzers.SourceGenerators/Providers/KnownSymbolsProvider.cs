@@ -91,6 +91,7 @@ public static class KnownSymbolsProvider
                 MemberScanAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.MEMBER_SCAN),
                 ParameterAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.PARAMETER_ATTRIBUTE),
                 GraphQLConstructorAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.GRAPHQL_CONSTRUCTOR),
+                InstanceSourceAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.INSTANCE_SOURCE),
                 InputTypeAttributeT = compilation.GetTypeByMetadataName(Constants.AttributeNames.INPUT_TYPE),
                 InputTypeAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.INPUT_TYPE_NON_GENERIC),
                 InputBaseTypeAttributeT = compilation.GetTypeByMetadataName(Constants.AttributeNames.INPUT_BASE_TYPE),
