@@ -878,4 +878,121 @@ public partial class AttributeDataTransformerTests
 
             """);
     }
+
+    [Fact]
+    public async Task TransformsOutputTypesWithVariousKindSettings()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public interface IProduct { }
+            public class Order { }
+            public interface ICustomer { }
+            public class Address { }
+
+            [AotOutputType<IProduct>(Kind = OutputTypeKind.Interface)]
+            [AotOutputType<Order>(Kind = OutputTypeKind.Object)]
+            [AotOutputType<ICustomer>(Kind = OutputTypeKind.Auto)]
+            [AotOutputType<Address>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= AttributeDataReport.g.cs ============
+
+            // Schema: MySchema
+            //
+            // QueryType: (none)
+            //
+            // MutationType: (none)
+            //
+            // SubscriptionType: (none)
+            //
+            // OutputTypes: 4
+            //   [0] IProduct (IsInterface: true)
+            //   [1] Order (IsInterface: false)
+            //   [2] ICustomer
+            //   [3] Address
+            //
+            // InputTypes: 0
+            //
+            // GraphTypes: 0
+            //
+            // TypeMappings: 0
+            //
+            // ListTypes: 0
+            //
+            // RemapTypes: 0
+
+            """);
+    }
+
+    [Fact]
+    public async Task TransformsGraphTypesWithVariousAutoRegisterClrMappingSettings()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class ProductGraphType : ObjectGraphType { }
+            public class OrderGraphType : ObjectGraphType { }
+            public class CustomerGraphType : ObjectGraphType { }
+
+            [AotGraphType<ProductGraphType>(AutoRegisterClrMapping = false)]
+            [AotGraphType<OrderGraphType>(AutoRegisterClrMapping = true)]
+            [AotGraphType<CustomerGraphType>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= AttributeDataReport.g.cs ============
+
+            // Schema: MySchema
+            //
+            // QueryType: (none)
+            //
+            // MutationType: (none)
+            //
+            // SubscriptionType: (none)
+            //
+            // OutputTypes: 0
+            //
+            // InputTypes: 0
+            //
+            // GraphTypes: 3
+            //   [0] ProductGraphType (AutoRegisterClrMapping: false)
+            //   [1] OrderGraphType
+            //   [2] CustomerGraphType
+            //
+            // TypeMappings: 0
+            //
+            // ListTypes: 0
+            //
+            // RemapTypes: 0
+
+            """);
+    }
 }

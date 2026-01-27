@@ -49,6 +49,12 @@ internal static class Constants
         ]);
     }
 
+    internal static class PropertyNames
+    {
+        internal const string KIND = "Kind";
+        internal const string AUTO_REGISTER_CLR_MAPPING = "AutoRegisterClrMapping";
+    }
+
     internal static class TypeNames
     {
         internal const string IGRAPH_TYPE = "GraphQL.Types.IGraphType";

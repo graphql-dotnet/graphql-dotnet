@@ -26,9 +26,9 @@ public static class AttributeDataTransformer
         RootTypeInfo? subscriptionType = null;
 
         // Prepare builders for collection types
-        var outputTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
+        var outputTypes = ImmutableArray.CreateBuilder<OutputTypeInfo>();
         var inputTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
-        var graphTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
+        var graphTypes = ImmutableArray.CreateBuilder<GraphTypeInfo>();
         var typeMappings = ImmutableArray.CreateBuilder<TypeMappingInfo>();
         var listTypes = ImmutableArray.CreateBuilder<ITypeSymbol>();
         var remapTypes = ImmutableArray.CreateBuilder<TypeMappingInfo>();
@@ -63,8 +63,8 @@ public static class AttributeDataTransformer
             }
             else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotOutputType))
             {
-                if (TryExtractSingleTypeArgument(attributeClass, out var typeArg))
-                    outputTypes.Add(typeArg);
+                if (TryExtractOutputTypeInfo(attribute, attributeClass, out var info))
+                    outputTypes.Add(info);
             }
             else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotInputType))
             {
@@ -73,8 +73,8 @@ public static class AttributeDataTransformer
             }
             else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotGraphType))
             {
-                if (TryExtractSingleTypeArgument(attributeClass, out var typeArg))
-                    graphTypes.Add(typeArg);
+                if (TryExtractGraphTypeInfo(attribute, attributeClass, out var info))
+                    graphTypes.Add(info);
             }
             else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotTypeMapping))
             {
@@ -151,6 +151,67 @@ public static class AttributeDataTransformer
             FromType: attributeClass.TypeArguments[0],
             ToType: attributeClass.TypeArguments[1]);
 
+        return true;
+    }
+
+    /// <summary>
+    /// Extracts type info for AotOutputType attributes, including the optional IsInterface property.
+    /// </summary>
+    private static bool TryExtractOutputTypeInfo(AttributeData attribute, INamedTypeSymbol attributeClass, out OutputTypeInfo info)
+    {
+        info = default;
+
+        if (attributeClass.TypeArguments.Length != 1)
+            return false;
+
+        var typeArg = attributeClass.TypeArguments[0];
+
+        // Try to extract the Kind enum property value and convert to bool?
+        // OutputTypeKind: Auto = 0 (null), Object = 1 (false), Interface = 2 (true)
+        bool? isInterface = null;
+        foreach (var namedArg in attribute.NamedArguments)
+        {
+            if (namedArg.Key == Constants.PropertyNames.KIND && namedArg.Value.Value is int kindValue)
+            {
+                isInterface = kindValue switch
+                {
+                    0 => null,    // OutputTypeKind.Auto
+                    1 => false,   // OutputTypeKind.Object
+                    2 => true,    // OutputTypeKind.Interface
+                    _ => null
+                };
+                break;
+            }
+        }
+
+        info = new OutputTypeInfo(typeArg, isInterface);
+        return true;
+    }
+
+    /// <summary>
+    /// Extracts type info for AotGraphType attributes, including the AutoRegisterClrMapping property.
+    /// </summary>
+    private static bool TryExtractGraphTypeInfo(AttributeData attribute, INamedTypeSymbol attributeClass, out GraphTypeInfo info)
+    {
+        info = default;
+
+        if (attributeClass.TypeArguments.Length != 1)
+            return false;
+
+        var typeArg = attributeClass.TypeArguments[0];
+
+        // Try to extract the AutoRegisterClrMapping property value (default is true)
+        bool autoRegisterClrMapping = true;
+        foreach (var namedArg in attribute.NamedArguments)
+        {
+            if (namedArg.Key == Constants.PropertyNames.AUTO_REGISTER_CLR_MAPPING && namedArg.Value.Value is bool boolValue)
+            {
+                autoRegisterClrMapping = boolValue;
+                break;
+            }
+        }
+
+        info = new GraphTypeInfo(typeArg, autoRegisterClrMapping);
         return true;
     }
 

@@ -39,7 +39,7 @@ namespace GraphQL
     public sealed class AotOutputTypeAttribute<T> : GraphQL.AotSchemaAttribute
     {
         public AotOutputTypeAttribute() { }
-        public bool? IsInterface { get; set; }
+        public GraphQL.OutputTypeKind Kind { get; set; }
     }
     [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=false)]
     public sealed class AotQueryTypeAttribute<T> : GraphQL.AotSchemaAttribute
@@ -859,6 +859,12 @@ namespace GraphQL
         where TGraphType : GraphQL.Types.IGraphType
     {
         public OutputTypeAttribute() { }
+    }
+    public enum OutputTypeKind
+    {
+        Auto = 0,
+        Object = 1,
+        Interface = 2,
     }
     [System.AttributeUsage(System.AttributeTargets.Parameter)]
     public abstract class ParameterAttribute : System.Attribute

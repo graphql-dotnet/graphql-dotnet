@@ -11,9 +11,9 @@ public readonly record struct SchemaAttributeData(
     RootTypeInfo? QueryType,
     RootTypeInfo? MutationType,
     RootTypeInfo? SubscriptionType,
-    ImmutableArray<ITypeSymbol> OutputTypes,
+    ImmutableArray<OutputTypeInfo> OutputTypes,
     ImmutableArray<ITypeSymbol> InputTypes,
-    ImmutableArray<ITypeSymbol> GraphTypes,
+    ImmutableArray<GraphTypeInfo> GraphTypes,
     ImmutableArray<TypeMappingInfo> TypeMappings,
     ImmutableArray<ITypeSymbol> ListTypes,
     ImmutableArray<TypeMappingInfo> RemapTypes);

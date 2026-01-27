@@ -90,7 +90,12 @@ public partial class AttributeDataTransformerTests
                     sb.AppendLine($"// OutputTypes: {data.OutputTypes.Length}");
                     for (int i = 0; i < data.OutputTypes.Length; i++)
                     {
-                        sb.AppendLine($"//   [{i}] {data.OutputTypes[i].ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}");
+                        var outputTypeInfo = data.OutputTypes[i];
+                        var typeName = outputTypeInfo.TypeArgument.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                        var isInterfaceStr = outputTypeInfo.IsInterface.HasValue
+                            ? $" (IsInterface: {(outputTypeInfo.IsInterface.Value ? "true" : "false")})"
+                            : "";
+                        sb.AppendLine($"//   [{i}] {typeName}{isInterfaceStr}");
                     }
                     sb.AppendLine("//");
 
@@ -106,7 +111,12 @@ public partial class AttributeDataTransformerTests
                     sb.AppendLine($"// GraphTypes: {data.GraphTypes.Length}");
                     for (int i = 0; i < data.GraphTypes.Length; i++)
                     {
-                        sb.AppendLine($"//   [{i}] {data.GraphTypes[i].ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}");
+                        var graphTypeInfo = data.GraphTypes[i];
+                        var typeName = graphTypeInfo.TypeArgument.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                        var autoRegisterStr = !graphTypeInfo.AutoRegisterClrMapping
+                            ? " (AutoRegisterClrMapping: false)"
+                            : "";
+                        sb.AppendLine($"//   [{i}] {typeName}{autoRegisterStr}");
                     }
                     sb.AppendLine("//");
 
