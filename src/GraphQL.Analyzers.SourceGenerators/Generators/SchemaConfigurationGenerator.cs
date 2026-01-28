@@ -51,7 +51,6 @@ public static class SchemaConfigurationGenerator
         SchemaClassData schemaClass)
     {
         var rootClass = partialClassHierarchy[partialClassHierarchy.Count - 1];
-        var accessibility = rootClass.IsPublic ? "public" : "internal";
 
         // Generate nested partial classes from outermost to innermost
         int indentLevel = 0;
