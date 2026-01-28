@@ -102,7 +102,8 @@ public record class InputGraphTypeData(
 /// </summary>
 public record class InputMemberData(
     string? DeclaringTypeFullyQualifiedName,
-    string MemberName);
+    string MemberName,
+    string FullyQualifiedTypeName);
 
 /// <summary>
 /// Data for an input type constructor parameter.

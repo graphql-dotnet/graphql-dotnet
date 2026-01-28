@@ -166,7 +166,7 @@ public partial class GeneratedTypeDataTransformerTests
             sb.AppendLine($"// Members ({data.Members.Count}):");
             foreach (var member in data.Members)
             {
-                sb.AppendLine($"//   - {member.MemberName}");
+                sb.AppendLine($"//   - {member.MemberName}: {member.FullyQualifiedTypeName}");
                 sb.AppendLine($"//     DeclaringType: {member.DeclaringTypeFullyQualifiedName ?? "same as CLR type"}");
             }
 

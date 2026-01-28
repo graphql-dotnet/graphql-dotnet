@@ -122,9 +122,9 @@
 // FullyQualifiedClrTypeName: global::PersonInput
 // GraphTypeClassName: PersonInputGraphType
 // Members (2):
-//   - Name
+//   - Name: string
 //     DeclaringType: same as CLR type
-//   - Age
+//   - Age: int
 //     DeclaringType: same as CLR type
 // ConstructorParameters (2):
 //   - name
@@ -137,11 +137,11 @@
 // FullyQualifiedClrTypeName: global::SearchInput
 // GraphTypeClassName: SearchInputGraphType
 // Members (3):
-//   - Query
+//   - Query: string
 //     DeclaringType: same as CLR type
-//   - Tags
+//   - Tags: int[]
 //     DeclaringType: same as CLR type
-//   - Categories
+//   - Categories: global::System.Collections.Generic.HashSet<string>
 //     DeclaringType: same as CLR type
 // ConstructorParameters (0):
 //

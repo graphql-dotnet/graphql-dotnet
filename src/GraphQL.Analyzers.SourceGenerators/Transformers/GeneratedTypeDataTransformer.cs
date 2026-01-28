@@ -364,9 +364,22 @@ public static class GeneratedTypeDataTransformer
                 declaringTypeName = GetFullyQualifiedTypeName(member.ContainingType);
             }
 
+            // Get the type of the member
+            ITypeSymbol? memberType = member switch
+            {
+                IPropertySymbol property => property.Type,
+                IFieldSymbol field => field.Type,
+                _ => null
+            };
+
+            string fullyQualifiedTypeName = memberType != null
+                ? GetFullyQualifiedTypeName(memberType)
+                : "object";
+
             result.Add(new InputMemberData(
                 DeclaringTypeFullyQualifiedName: declaringTypeName,
-                MemberName: member.Name));
+                MemberName: member.Name,
+                FullyQualifiedTypeName: fullyQualifiedTypeName));
         }
 
         return result;
