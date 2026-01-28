@@ -102,6 +102,7 @@ public static class SchemaConfigurationGenerator
     {
         var indent = new string(' ', indentLevel * 4);
 
+        sb.AppendLine($"{indent}[global::GraphQL.GraphQLConstructor]");
         sb.AppendLine($"{indent}public {className}(global::System.IServiceProvider services, global::System.Collections.Generic.IEnumerable<global::GraphQL.DI.IConfigureSchema> configurations) : base(services, configurations)");
         sb.AppendLine($"{indent}{{");
         sb.AppendLine($"{indent}    Configure();");

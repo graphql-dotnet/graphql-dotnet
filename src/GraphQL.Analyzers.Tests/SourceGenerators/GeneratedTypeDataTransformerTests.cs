@@ -177,4 +177,95 @@ public partial class GeneratedTypeDataTransformerTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
         output.ShouldMatchApproved(o => o.NoDiff());
     }
+
+    [Fact]
+    public async Task HasConstructor_WithPublicConstructor_ReturnsTrue()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.DI;
+            using GraphQL.Types;
+            using System;
+            using System.Collections.Generic;
+
+            namespace MyApp.GraphQL;
+
+            public class MyType
+            {
+                public string Name { get; set; }
+            }
+
+            [AotGraphType<MyType>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public async Task HasConstructor_WithNoConstructor_ReturnsFalse()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.DI;
+            using GraphQL.Types;
+            using System;
+            using System.Collections.Generic;
+
+            namespace MyApp.GraphQL;
+
+            public class MyType
+            {
+                public string Name { get; set; }
+            }
+
+            [AotGraphType<MyType>]
+            public partial class MySchema : AotSchema
+            {
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public async Task HasConstructor_WithGraphQLConstructorAttribute_ReturnsFalse()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.DI;
+            using GraphQL.Types;
+            using System;
+            using System.Collections.Generic;
+
+            namespace MyApp.GraphQL;
+
+            public class MyType
+            {
+                public string Name { get; set; }
+            }
+
+            public partial class MySchema : AotSchema
+            {
+                [GraphQLConstructor]
+                public MySchema() : base(null!, null!) { }
+            }
+
+            [AotGraphType<MyType>]
+            public partial class MySchema : AotSchema
+            {
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
 }

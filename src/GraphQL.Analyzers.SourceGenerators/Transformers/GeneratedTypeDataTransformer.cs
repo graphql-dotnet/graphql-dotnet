@@ -92,10 +92,8 @@ public static class GeneratedTypeDataTransformer
     {
         var schemaClass = schemaData.SchemaClass;
 
-        // Check if schema class has a constructor
-        bool hasConstructor = schemaClass.Constructors.Any(c =>
-            c.DeclaredAccessibility == Accessibility.Public &&
-            !c.IsImplicitlyDeclared);
+        // Check if schema class has a constructor defined in a class declaration with AOT attributes
+        bool hasConstructor = HasConstructor(schemaClass, knownSymbols);
 
         // Transform registered graph types
         var registeredGraphTypes = new List<RegisteredGraphTypeData>();
@@ -703,5 +701,19 @@ public static class GeneratedTypeDataTransformer
         // Cache this name for this graph type symbol
         nameCache[graphType] = uniqueName;
         return uniqueName;
+    }
+
+    /// <summary>
+    /// Checks if the schema class has public constructors that are not marked with GraphQLConstructorAttribute.
+    /// </summary>
+    private static bool HasConstructor(INamedTypeSymbol schemaClass, KnownSymbols knownSymbols)
+    {
+        // Count all public constructors (excluding implicit ones) that are NOT marked with GraphQLConstructorAttribute
+        var count = schemaClass.Constructors
+            .Where(c => c.DeclaredAccessibility == Accessibility.Public && !c.IsImplicitlyDeclared)
+            .Count(c => knownSymbols.GraphQLConstructorAttribute == null ||
+                        !c.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, knownSymbols.GraphQLConstructorAttribute)));
+
+        return count > 0;
     }
 }

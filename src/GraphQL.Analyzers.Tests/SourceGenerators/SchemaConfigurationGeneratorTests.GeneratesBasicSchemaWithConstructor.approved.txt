@@ -5,6 +5,7 @@ namespace AotSample;
 
 public partial class SampleAotSchema : global::GraphQL.Conversion.IListConverterFactory
 {
+    [global::GraphQL.GraphQLConstructor]
     public SampleAotSchema(global::System.IServiceProvider services, global::System.Collections.Generic.IEnumerable<global::GraphQL.DI.IConfigureSchema> configurations) : base(services, configurations)
     {
         Configure();

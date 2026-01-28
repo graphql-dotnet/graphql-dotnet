@@ -57,4 +57,32 @@ public class SchemaConfigurationGeneratorTests
         // Assert
         result.ShouldMatchApproved(o => o.NoDiff());
     }
+
+    [Fact]
+    public void GeneratesEmptySchemaWithNoConstructor()
+    {
+        // Arrange
+        var @namespace = "AotSample";
+        var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
+        {
+            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+        });
+
+        var schemaClass = new SchemaClassData(
+            HasConstructor: true,
+            RegisteredGraphTypes: ImmutableEquatableArray<RegisteredGraphTypeData>.Empty,
+            TypeMappings: ImmutableEquatableArray<TypeMappingData>.Empty,
+            QueryRootTypeName: null,
+            MutationRootTypeName: null,
+            SubscriptionRootTypeName: null,
+            ArrayListTypes: ImmutableEquatableArray<ListElementTypeData>.Empty,
+            GenericListTypes: ImmutableEquatableArray<ListElementTypeData>.Empty,
+            HashSetTypes: ImmutableEquatableArray<ListElementTypeData>.Empty);
+
+        // Act
+        var result = SchemaConfigurationGenerator.Generate(@namespace, partialClassHierarchy, schemaClass);
+
+        // Assert
+        result.ShouldMatchApproved(o => o.NoDiff());
+    }
 }
