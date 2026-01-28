@@ -593,33 +593,6 @@ public static class GeneratedTypeDataTransformer
     }
 
     /// <summary>
-    /// Extracts the CLR type from a graph type (e.g., AutoRegisteringObjectGraphType&lt;T&gt; returns T).
-    /// </summary>
-    private static ITypeSymbol? ExtractClrTypeFromGraphType(ITypeSymbol graphType, KnownSymbols knownSymbols)
-    {
-        if (graphType is not INamedTypeSymbol namedType || !namedType.IsGenericType)
-            return null;
-
-        var originalDef = namedType.OriginalDefinition;
-
-        // Check if it's one of the auto-registering types
-        bool isAutoRegistering =
-            (knownSymbols.AutoRegisteringObjectGraphType != null &&
-             SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.AutoRegisteringObjectGraphType)) ||
-            (knownSymbols.AutoRegisteringInterfaceGraphType != null &&
-             SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.AutoRegisteringInterfaceGraphType)) ||
-            (knownSymbols.AutoRegisteringInputObjectGraphType != null &&
-             SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.AutoRegisteringInputObjectGraphType));
-
-        if (isAutoRegistering && namedType.TypeArguments.Length == 1)
-        {
-            return namedType.TypeArguments[0];
-        }
-
-        return null;
-    }
-
-    /// <summary>
     /// Gets the partial class hierarchy for a type (innermost to outermost) with visibility information.
     /// </summary>
     private static List<PartialClassInfo> GetPartialClassHierarchy(ITypeSymbol type)
