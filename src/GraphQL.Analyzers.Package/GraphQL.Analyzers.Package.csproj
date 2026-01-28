@@ -29,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.csproj" />
     <ProjectReference Include="..\GraphQL.Analyzers\GraphQL.Analyzers.csproj" />
+    <ProjectReference Include="..\GraphQL.SourceGenerators\GraphQL.SourceGenerators.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,6 +40,7 @@
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(OutputPath)\GraphQL.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
       <TfmSpecificPackageFile Include="$(OutputPath)\GraphQL.Analyzers.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\GraphQL.SourceGenerators.dll" PackagePath="analyzers/dotnet/cs" />
       <TfmSpecificPackageFile Include="..\GraphQL.Analyzers\bin\$(Configuration)\netstandard2.0\GraphQLParser.dll" PackagePath="analyzers/dotnet/cs" />
     </ItemGroup>
   </Target>

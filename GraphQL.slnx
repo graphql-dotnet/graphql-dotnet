@@ -26,6 +26,7 @@
     <Project Path="src/GraphQL.Analyzers.CodeFixes/GraphQL.Analyzers.CodeFixes.csproj" />
     <Project Path="src/GraphQL.Analyzers.Package/GraphQL.Analyzers.Package.csproj" />
     <Project Path="src/GraphQL.Analyzers/GraphQL.Analyzers.csproj" />
+    <Project Path="src/GraphQL.SourceGenerators/GraphQL.SourceGenerators.csproj" />
   </Folder>
   <Folder Name="/Caching/">
     <Project Path="src/GraphQL.MemoryCache/GraphQL.MemoryCache.csproj" />
@@ -149,6 +150,7 @@
     <Project Path="src/GraphQL.MicrosoftDI.Tests/GraphQL.MicrosoftDI.Tests.csproj" />
     <Project Path="src/GraphQL.Tests/GraphQL.Tests.csproj" />
   </Folder>
+  <Project Path="samples/AotTypeFirstSample/AotTypeFirstSample.csproj" />
   <Project Path="src/GraphQL.Benchmarks.Merge/GraphQL.Benchmarks.Merge.csproj" />
   <Project Path="src/GraphQL.Benchmarks/GraphQL.Benchmarks.csproj" />
   <Project Path="src/GraphQL.DataLoader/GraphQL.DataLoader.csproj" />
