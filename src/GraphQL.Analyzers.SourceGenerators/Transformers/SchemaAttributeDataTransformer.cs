@@ -546,7 +546,7 @@ public readonly ref struct SchemaAttributeDataTransformer
         }
 
         // Store members if graph type exists and has members
-        if (graphType != null && selectedMembers.Count > 0)
+        if (graphType != null)
         {
             _graphTypeMembers[graphType] = selectedMembers;
         }

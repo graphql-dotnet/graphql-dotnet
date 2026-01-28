@@ -1,0 +1,163 @@
+// SUCCESS:
+
+// ========= GeneratedTypeDataReport.g.cs ============
+
+// Schema: MySchema
+// Total Entries: 7
+//
+// ========== Entry 1 ==========
+// Namespace: null
+// PartialClassHierarchy: public MySchema
+// Type: SchemaClass
+// HasConstructor: True
+// QueryRootTypeName: global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Query>
+// MutationRootTypeName: null
+// SubscriptionRootTypeName: null
+// RegisteredGraphTypes (9):
+//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Person>
+//     AotGenerated: PersonGraphType
+//     Override: null
+//   - global::GraphQL.Types.AutoRegisteringInterfaceGraphType<global::IEntity>
+//     AotGenerated: IEntityGraphType
+//     Override: null
+//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Product>
+//     AotGenerated: ProductGraphType
+//     Override: null
+//   - global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::PersonInput>
+//     AotGenerated: PersonInputGraphType
+//     Override: null
+//   - global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::SearchInput>
+//     AotGenerated: SearchInputGraphType
+//     Override: null
+//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Query>
+//     AotGenerated: QueryGraphType
+//     Override: null
+//   - global::GraphQL.Types.StringGraphType
+//     AotGenerated: null
+//     Override: null
+//   - global::GraphQL.Types.IntGraphType
+//     AotGenerated: null
+//     Override: null
+//   - global::GraphQL.Types.DecimalGraphType
+//     AotGenerated: null
+//     Override: null
+// TypeMappings (9):
+//   global::Person -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Person>
+//   global::IEntity -> global::GraphQL.Types.AutoRegisteringInterfaceGraphType<global::IEntity>
+//   global::Product -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Product>
+//   global::Query -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Query>
+//   string -> global::GraphQL.Types.StringGraphType
+//   int -> global::GraphQL.Types.IntGraphType
+//   decimal -> global::GraphQL.Types.DecimalGraphType
+//   global::PersonInput -> global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::PersonInput>
+//   global::SearchInput -> global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::SearchInput>
+// ArrayListTypes (1): int
+// GenericListTypes (0): 
+// HashSetTypes (1): string
+//
+// ========== Entry 2 ==========
+// Namespace: null
+// PartialClassHierarchy: public Person
+// Type: OutputGraphType
+// IsInterface: False
+// FullyQualifiedClrTypeName: global::Person
+// GraphTypeClassName: PersonGraphType
+// InstanceSource: ContextSource
+// SelectedMembers (3):
+//   - Property Name
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//   - Property Tags
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//   - Method GetFullName
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     Parameters (1):
+//       - string
+//
+// ========== Entry 3 ==========
+// Namespace: null
+// PartialClassHierarchy: public IEntity
+// Type: OutputGraphType
+// IsInterface: True
+// FullyQualifiedClrTypeName: global::IEntity
+// GraphTypeClassName: IEntityGraphType
+// InstanceSource: ContextSource
+// SelectedMembers (1):
+//   - Property Id
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//
+// ========== Entry 4 ==========
+// Namespace: null
+// PartialClassHierarchy: public Product
+// Type: OutputGraphType
+// IsInterface: False
+// FullyQualifiedClrTypeName: global::Product
+// GraphTypeClassName: ProductGraphType
+// InstanceSource: NewInstance
+// SelectedMembers (3):
+//   - Property Name
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//   - Property Price
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//   - Property Category
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+// ConstructorData:
+//   Parameters (2):
+//     - string
+//     - decimal
+//   RequiredProperties (2):
+//     - Name: string
+//     - Price: decimal
+//
+// ========== Entry 5 ==========
+// Namespace: null
+// PartialClassHierarchy: public PersonInput
+// Type: InputGraphType
+// FullyQualifiedClrTypeName: global::PersonInput
+// GraphTypeClassName: PersonInputGraphType
+// Members (2):
+//   - Name
+//     DeclaringType: same as CLR type
+//   - Age
+//     DeclaringType: same as CLR type
+// ConstructorParameters (2):
+//   - name
+//   - age
+//
+// ========== Entry 6 ==========
+// Namespace: null
+// PartialClassHierarchy: public SearchInput
+// Type: InputGraphType
+// FullyQualifiedClrTypeName: global::SearchInput
+// GraphTypeClassName: SearchInputGraphType
+// Members (3):
+//   - Query
+//     DeclaringType: same as CLR type
+//   - Tags
+//     DeclaringType: same as CLR type
+//   - Categories
+//     DeclaringType: same as CLR type
+// ConstructorParameters (0):
+//
+// ========== Entry 7 ==========
+// Namespace: null
+// PartialClassHierarchy: public Query
+// Type: OutputGraphType
+// IsInterface: False
+// FullyQualifiedClrTypeName: global::Query
+// GraphTypeClassName: QueryGraphType
+// InstanceSource: ContextSource
+// SelectedMembers (2):
+//   - Method GetPerson
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//   - Method GetEntity
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//

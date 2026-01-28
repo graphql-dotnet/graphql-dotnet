@@ -1,0 +1,180 @@
+using VerifyTestSG = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpIncrementalGeneratorVerifier<
+    GraphQL.Analyzers.Tests.SourceGenerators.GeneratedTypeDataTransformerTests.ReportingGenerator>;
+
+namespace GraphQL.Analyzers.Tests.SourceGenerators;
+
+/// <summary>
+/// Tests for GeneratedTypeDataTransformer that converts ISymbol-based data to primitive-only data.
+/// </summary>
+public partial class GeneratedTypeDataTransformerTests
+{
+    [Fact]
+    public async Task TransformsAllDataTypes()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.DI;
+            using GraphQL.Types;
+            using System;
+            using System.Collections.Generic;
+            
+            // Output types
+            public class Person
+            {
+                public string Name { get; set; }
+                public int Age;
+                public List<string> Tags { get; set; }
+                public string GetFullName(string title) => title + " " + Name;
+            }
+
+            public interface IEntity
+            {
+                int Id { get; }
+            }
+
+            [InstanceSource(InstanceSource.NewInstance)]
+            public class Product
+            {
+                public Product(string name, decimal price)
+                {
+                    Name = name;
+                    Price = price;
+                }
+                
+                public string Name { get; init; }
+                public decimal Price { get; init; }
+                public string Category { get; set; }
+            }
+
+            // Input types
+            public class PersonInput
+            {
+                public PersonInput(string name, int age)
+                {
+                    Name = name;
+                    Age = age;
+                }
+                
+                public string Name { get; init; }
+                public int Age { get; init; }
+            }
+
+            public class SearchInput
+            {
+                public string Query { get; set; }
+                public int[]? Tags { get; set; }
+                public HashSet<string>? Categories { get; set; }
+            }
+
+            // Query root
+            public class Query
+            {
+                public Person GetPerson() => new Person();
+                public IEntity GetEntity() => null;
+            }
+
+            [AotQueryType<Query>]
+            [AotOutputType<Person>]
+            [AotOutputType<IEntity>(Kind = OutputTypeKind.Interface)]
+            [AotOutputType<Product>]
+            [AotInputType<PersonInput>]
+            [AotInputType<SearchInput>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations)
+                    : base(services, configurations)
+                {
+                }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public async Task WorksForNestedClasses()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.DI;
+            using GraphQL.Types;
+            using System;
+            using System.Collections.Generic;
+
+            namespace MyApp.GraphQL;
+
+            public partial class Outer
+            {
+                internal partial class Inner
+                {
+                    public class Query
+                    {
+                    }
+            
+                    [AotQueryType<Query>]
+                    internal partial class MySchema : AotSchema
+                    {
+                        public MySchema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations)
+                            : base(services, configurations)
+                        {
+                        }
+                    }
+                }
+            }
+
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public async Task NoDuplicateNames()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.DI;
+            using GraphQL.Types;
+            using System;
+            using System.Collections.Generic;
+
+            namespace MyApp.GraphQL;
+
+            public class Product
+            {
+            }
+
+            public static class MyStatic
+            {
+                public class Product
+                {
+                }
+            }
+
+            public class Item<T>
+            {
+            }
+
+            [AotOutputType<Product>]
+            [AotOutputType<MyStatic.Product>]
+            [AotInputType<Product>]
+            [AotOutputType<Item<int>>]
+            [AotOutputType<Item<long>>]
+            internal partial class MySchema : AotSchema
+            {
+                public MySchema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations)
+                    : base(services, configurations)
+                {
+                }
+            }
+
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
+}

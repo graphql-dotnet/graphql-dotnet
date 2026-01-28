@@ -1,0 +1,35 @@
+// SUCCESS:
+
+// ========= GeneratedTypeDataReport.g.cs ============
+
+// Schema: MySchema
+// Total Entries: 2
+//
+// ========== Entry 1 ==========
+// Namespace: MyApp.GraphQL
+// PartialClassHierarchy: public Outer > internal Inner > internal MySchema
+// Type: SchemaClass
+// HasConstructor: True
+// QueryRootTypeName: global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Outer.Inner.Query>
+// MutationRootTypeName: null
+// SubscriptionRootTypeName: null
+// RegisteredGraphTypes (1):
+//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Outer.Inner.Query>
+//     AotGenerated: QueryGraphType
+//     Override: null
+// TypeMappings (1):
+//   global::MyApp.GraphQL.Outer.Inner.Query -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Outer.Inner.Query>
+// ArrayListTypes (0): 
+// GenericListTypes (0): 
+// HashSetTypes (0): 
+//
+// ========== Entry 2 ==========
+// Namespace: MyApp.GraphQL
+// PartialClassHierarchy: public Outer > internal Inner > public Query
+// Type: OutputGraphType
+// IsInterface: False
+// FullyQualifiedClrTypeName: global::MyApp.GraphQL.Outer.Inner.Query
+// GraphTypeClassName: QueryGraphType
+// InstanceSource: ContextSource
+// SelectedMembers (0):
+//
