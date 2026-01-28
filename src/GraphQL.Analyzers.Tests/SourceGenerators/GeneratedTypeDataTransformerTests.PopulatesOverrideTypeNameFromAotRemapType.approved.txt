@@ -1,0 +1,48 @@
+// SUCCESS:
+
+// ========= GeneratedTypeDataReport.g.cs ============
+
+// Schema: MySchema
+// Total Entries: 2
+//
+// ========== Entry 1 ==========
+// Namespace: MyApp.GraphQL
+// PartialClassHierarchy: public MySchema
+// Type: SchemaClass
+// HasConstructor: True
+// QueryRootTypeName: global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Query>
+// MutationRootTypeName: null
+// SubscriptionRootTypeName: null
+// RegisteredGraphTypes (4):
+//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Query>
+//     AotGenerated: QueryGraphType
+//     Override: null
+//   - global::GraphQL.Types.IdGraphType
+//     AotGenerated: null
+//     Override: global::GraphQL.Types.GuidGraphType
+//   - global::GraphQL.Types.DateGraphType
+//     AotGenerated: null
+//     Override: global::GraphQL.Types.DateOnlyGraphType
+//   - global::GraphQL.Types.StringGraphType
+//     AotGenerated: null
+//     Override: null
+// TypeMappings (2):
+//   global::MyApp.GraphQL.Query -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Query>
+//   string -> global::GraphQL.Types.StringGraphType
+// ArrayListTypes (0): 
+// GenericListTypes (0): 
+// HashSetTypes (0): 
+//
+// ========== Entry 2 ==========
+// Namespace: MyApp.GraphQL
+// PartialClassHierarchy: public Query
+// Type: OutputGraphType
+// IsInterface: False
+// FullyQualifiedClrTypeName: global::MyApp.GraphQL.Query
+// GraphTypeClassName: QueryGraphType
+// InstanceSource: ContextSource
+// SelectedMembers (1):
+//   - Method GetData
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//

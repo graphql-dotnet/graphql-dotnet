@@ -95,6 +95,13 @@ public static class GeneratedTypeDataTransformer
         // Check if schema class has a constructor defined in a class declaration with AOT attributes
         bool hasConstructor = HasConstructor(schemaClass, knownSymbols);
 
+        // Build a lookup dictionary for RemapTypes
+        var remapTypeLookup = new Dictionary<ITypeSymbol, ITypeSymbol>(SymbolEqualityComparer.Default);
+        foreach (var (fromType, toType) in processedData.RemapTypes)
+        {
+            remapTypeLookup[(ITypeSymbol)fromType] = (ITypeSymbol)toType;
+        }
+
         // Transform registered graph types
         var registeredGraphTypes = new List<RegisteredGraphTypeData>();
         foreach (var discoveredGraphType in processedData.DiscoveredGraphTypes)
@@ -109,8 +116,12 @@ public static class GeneratedTypeDataTransformer
                 aotGeneratedTypeName = GetUniqueGraphTypeName(graphTypeSymbol, nameCache, usedNames);
             }
 
-            // Note: Override type information is not available in the current data structure
+            // Check if this graph type has a remap override
             string? overrideTypeName = null;
+            if (remapTypeLookup.TryGetValue(graphTypeSymbol, out var remappedToType))
+            {
+                overrideTypeName = GetFullyQualifiedTypeName(remappedToType);
+            }
 
             registeredGraphTypes.Add(new RegisteredGraphTypeData(
                 FullyQualifiedGraphTypeName: fullyQualifiedName,

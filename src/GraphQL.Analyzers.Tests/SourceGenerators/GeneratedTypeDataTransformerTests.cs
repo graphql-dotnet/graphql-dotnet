@@ -268,4 +268,39 @@ public partial class GeneratedTypeDataTransformerTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
         output.ShouldMatchApproved(o => o.NoDiff());
     }
+
+    [Fact]
+    public async Task PopulatesOverrideTypeNameFromAotRemapType()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.DI;
+            using GraphQL.Types;
+            using System;
+            using System.Collections.Generic;
+
+            namespace MyApp.GraphQL;
+
+            public class Query
+            {
+                public string GetData() => "test";
+            }
+
+            [AotQueryType<Query>]
+            [AotGraphType<IdGraphType>]
+            [AotRemapType<IdGraphType, GuidGraphType>]
+            [AotRemapType<DateGraphType, DateOnlyGraphType>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations)
+                    : base(services, configurations)
+                {
+                }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
 }

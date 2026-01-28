@@ -96,7 +96,7 @@ public readonly ref struct SchemaAttributeDataTransformer
             else
             {
                 queryRootGraphType = info.TypeArgument;
-                TryAddGraphType(info.TypeArgument, false);
+                TryAddGraphType(info.TypeArgument, false, false);
             }
         }
 
@@ -110,7 +110,7 @@ public readonly ref struct SchemaAttributeDataTransformer
             else
             {
                 mutationRootGraphType = info.TypeArgument;
-                TryAddGraphType(info.TypeArgument, false);
+                TryAddGraphType(info.TypeArgument, false, false);
             }
         }
 
@@ -124,15 +124,21 @@ public readonly ref struct SchemaAttributeDataTransformer
             else
             {
                 subscriptionRootGraphType = info.TypeArgument;
-                TryAddGraphType(info.TypeArgument, false);
+                TryAddGraphType(info.TypeArgument, false, false);
             }
+        }
+
+        // Process AotRemapType<TFrom, TTo> attributes
+        foreach (var mapping in schemaData.RemapTypes)
+        {
+            TryAddGraphType(mapping.FromType, false, true);
         }
 
         // Process AotGraphType<T> attributes
         foreach (var graphTypeInfo in schemaData.GraphTypes)
         {
             bool ignoreClrMapping = !graphTypeInfo.AutoRegisterClrMapping;
-            TryAddGraphType(graphTypeInfo.TypeArgument, ignoreClrMapping);
+            TryAddGraphType(graphTypeInfo.TypeArgument, ignoreClrMapping, false);
         }
 
         // Process explicit list types from AotListType<T>
@@ -167,7 +173,7 @@ public readonly ref struct SchemaAttributeDataTransformer
             // Process discovered GraphTypes
             foreach (var discoveredGraphType in result.DiscoveredGraphTypes)
             {
-                TryAddGraphType((ITypeSymbol)discoveredGraphType, true);
+                TryAddGraphType((ITypeSymbol)discoveredGraphType, true, false);
             }
 
             // Process discovered input CLR types
@@ -192,25 +198,29 @@ public readonly ref struct SchemaAttributeDataTransformer
             OutputClrTypeMappings: _outputClrTypeMappings.Select(kvp => ((ISymbol)kvp.Key, (ISymbol)kvp.Value)).ToImmutableEquatableArray(),
             InputClrTypeMappings: _inputClrTypeMappings.Select(kvp => ((ISymbol)kvp.Key, (ISymbol)kvp.Value)).ToImmutableEquatableArray(),
             InputListTypes: _inputListTypes.ToImmutableEquatableArray<ISymbol>(),
-            GeneratedGraphTypesWithMembers: _graphTypeMembers.Select(kvp => ((ISymbol)kvp.Key, kvp.Value)).ToImmutableEquatableArray());
+            GeneratedGraphTypesWithMembers: _graphTypeMembers.Select(kvp => ((ISymbol)kvp.Key, kvp.Value)).ToImmutableEquatableArray(),
+            RemapTypes: schemaData.RemapTypes.Select(remap => ((ISymbol)remap.FromType, (ISymbol)remap.ToType)).ToImmutableEquatableArray());
     }
 
     /// <summary>
     /// Tries to add a GraphType if not already discovered.
     /// </summary>
-    private void TryAddGraphType(ITypeSymbol graphType, bool ignoreClrMapping)
+    private void TryAddGraphType(ITypeSymbol graphType, bool ignoreClrMapping, bool remapped)
     {
         if (_discoveredGraphTypes.Add(graphType))
         {
-            // Check if this is an AutoRegistering type and enqueue the CLR type for processing
-            if (TryExtractAutoRegisteringType(graphType, _knownSymbols.AutoRegisteringInputObjectGraphType, out var inputClrType))
+            if (!remapped)
             {
-                _clrTypesToProcess.Enqueue((inputClrType, true));
-            }
-            else if (TryExtractAutoRegisteringType(graphType, _knownSymbols.AutoRegisteringObjectGraphType, out var outputClrType) ||
-                     TryExtractAutoRegisteringType(graphType, _knownSymbols.AutoRegisteringInterfaceGraphType, out outputClrType))
-            {
-                _clrTypesToProcess.Enqueue((outputClrType, false));
+                // Check if this is an AutoRegistering type and enqueue the CLR type for processing
+                if (TryExtractAutoRegisteringType(graphType, _knownSymbols.AutoRegisteringInputObjectGraphType, out var inputClrType))
+                {
+                    _clrTypesToProcess.Enqueue((inputClrType, true));
+                }
+                else if (TryExtractAutoRegisteringType(graphType, _knownSymbols.AutoRegisteringObjectGraphType, out var outputClrType) ||
+                        TryExtractAutoRegisteringType(graphType, _knownSymbols.AutoRegisteringInterfaceGraphType, out outputClrType))
+                {
+                    _clrTypesToProcess.Enqueue((outputClrType, false));
+                }
             }
 
             // Original mapping logic

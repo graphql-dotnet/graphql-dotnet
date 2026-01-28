@@ -15,4 +15,5 @@ public readonly record struct ProcessedSchemaData(
     ImmutableEquatableArray<(ISymbol ClrType, ISymbol GraphType)> OutputClrTypeMappings,
     ImmutableEquatableArray<(ISymbol ClrType, ISymbol GraphType)> InputClrTypeMappings,
     ImmutableEquatableArray<ISymbol> InputListTypes,
-    ImmutableEquatableArray<(ISymbol GraphType, ImmutableEquatableArray<ISymbol> Members)> GeneratedGraphTypesWithMembers);
+    ImmutableEquatableArray<(ISymbol GraphType, ImmutableEquatableArray<ISymbol> Members)> GeneratedGraphTypesWithMembers,
+    ImmutableEquatableArray<(ISymbol FromType, ISymbol ToType)> RemapTypes);

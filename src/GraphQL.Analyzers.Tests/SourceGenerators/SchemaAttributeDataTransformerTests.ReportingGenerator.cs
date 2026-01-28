@@ -153,6 +153,17 @@ public partial class SchemaAttributeDataTransformerTests
                             sb.AppendLine("//       Members: (none)");
                         }
                     }
+                    sb.AppendLine("//");
+
+                    // Remap Types
+                    sb.AppendLine($"// RemapTypes: {processedData.RemapTypes.Count}");
+                    for (int i = 0; i < processedData.RemapTypes.Count; i++)
+                    {
+                        var mapping = processedData.RemapTypes[i];
+                        var fromType = (ITypeSymbol)mapping.FromType;
+                        var toType = (ITypeSymbol)mapping.ToType;
+                        sb.AppendLine($"//   [{i}] {fromType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)} -> {toType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}");
+                    }
                 }
 
                 spc.AddSource("SchemaTransformationReport.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));

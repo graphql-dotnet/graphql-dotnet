@@ -65,6 +65,8 @@ public partial class SchemaAttributeDataTransformerTests
             //   [0] AutoRegisteringObjectGraphType<Query>
             //       Members: 1
             //         [0] Hello
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -120,6 +122,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputListTypes: 0
             //
             // GeneratedGraphTypesWithMembers: 0
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -194,6 +198,8 @@ public partial class SchemaAttributeDataTransformerTests
             //       Members: 2
             //         [0] Name
             //         [1] Price
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -277,6 +283,8 @@ public partial class SchemaAttributeDataTransformerTests
             //       Members: 2
             //         [0] Street
             //         [1] City
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -364,6 +372,8 @@ public partial class SchemaAttributeDataTransformerTests
             //       Members: 2
             //         [0] Name
             //         [1] Price
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -424,6 +434,8 @@ public partial class SchemaAttributeDataTransformerTests
             //   [0] AutoRegisteringObjectGraphType<Query>
             //       Members: 1
             //         [0] GetCurrentTime
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -479,6 +491,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputListTypes: 0
             //
             // GeneratedGraphTypesWithMembers: 0
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -540,6 +554,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputListTypes: 0
             //
             // GeneratedGraphTypesWithMembers: 0
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -588,6 +604,8 @@ public partial class SchemaAttributeDataTransformerTests
             //   [0] List<string>
             //
             // GeneratedGraphTypesWithMembers: 0
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -655,6 +673,8 @@ public partial class SchemaAttributeDataTransformerTests
             //       Members: 2
             //         [0] Tags
             //         [1] Quantities
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -732,6 +752,8 @@ public partial class SchemaAttributeDataTransformerTests
             //   [1] AutoRegisteringObjectGraphType<Query>
             //       Members: 1
             //         [0] GetProduct
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -834,6 +856,8 @@ public partial class SchemaAttributeDataTransformerTests
             //   [4] AutoRegisteringObjectGraphType<Product>
             //       Members: 1
             //         [0] Name
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -907,6 +931,8 @@ public partial class SchemaAttributeDataTransformerTests
             //       Members: 2
             //         [0] Street
             //         [1] City
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -967,6 +993,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputListTypes: 0
             //
             // GeneratedGraphTypesWithMembers: 0
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -1039,6 +1067,8 @@ public partial class SchemaAttributeDataTransformerTests
             //       Members: 2
             //         [0] GetProduct
             //         [1] GetAnotherProduct
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -1098,6 +1128,8 @@ public partial class SchemaAttributeDataTransformerTests
             //   [0] AutoRegisteringObjectGraphType<Product>
             //       Members: 1
             //         [0] Name
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -1193,6 +1225,8 @@ public partial class SchemaAttributeDataTransformerTests
             //       Members: 2
             //         [0] Name
             //         [1] CreatedAt
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -1265,6 +1299,8 @@ public partial class SchemaAttributeDataTransformerTests
             //   [1] AutoRegisteringObjectGraphType<Product>
             //       Members: 1
             //         [0] Name
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -1355,6 +1391,8 @@ public partial class SchemaAttributeDataTransformerTests
             //         [2] Price
             //         [3] CreatedAt
             //         [4] Id
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -1435,6 +1473,8 @@ public partial class SchemaAttributeDataTransformerTests
             //         [2] Price
             //         [3] CreatedAt
             //         [4] IsActive
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -1534,6 +1574,8 @@ public partial class SchemaAttributeDataTransformerTests
             //       Members: 2
             //         [0] Id
             //         [1] Rating
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -1688,6 +1730,8 @@ public partial class SchemaAttributeDataTransformerTests
             //         [15] ByteValue
             //         [16] SByteValue
             //         [17] UriValue
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -1749,6 +1793,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputListTypes: 0
             //
             // GeneratedGraphTypesWithMembers: 0
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -1816,6 +1862,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputListTypes: 0
             //
             // GeneratedGraphTypesWithMembers: 0
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -1883,6 +1931,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputListTypes: 0
             //
             // GeneratedGraphTypesWithMembers: 0
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -1938,6 +1988,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputListTypes: 0
             //
             // GeneratedGraphTypesWithMembers: 0
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -1997,6 +2049,8 @@ public partial class SchemaAttributeDataTransformerTests
             // InputListTypes: 0
             //
             // GeneratedGraphTypesWithMembers: 0
+            //
+            // RemapTypes: 0
 
             """);
     }
@@ -2078,6 +2132,71 @@ public partial class SchemaAttributeDataTransformerTests
             //       Members: 2
             //         [0] Name
             //         [1] Status
+            //
+            // RemapTypes: 0
+
+            """);
+    }
+
+    [Fact]
+    public async Task ProcessesAotRemapTypeAttribute()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query
+            {
+            }
+
+            [AotQueryType<Query>]
+            [AotGraphType<IdGraphType>]
+            [AotRemapType<IdGraphType, GuidGraphType>]
+            [AotRemapType<DateGraphType, DateOnlyGraphType>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= SchemaTransformationReport.g.cs ============
+
+            // Schema: MySchema
+            //
+            // QueryRootGraphType: AutoRegisteringObjectGraphType<Query>
+            //
+            // MutationRootGraphType: (none)
+            //
+            // SubscriptionRootGraphType: (none)
+            //
+            // DiscoveredGraphTypes: 3
+            //   [0] AutoRegisteringObjectGraphType<Query>
+            //   [1] IdGraphType
+            //   [2] DateGraphType
+            //
+            // OutputClrTypeMappings: 1
+            //   [0] Query -> AutoRegisteringObjectGraphType<Query>
+            //
+            // InputClrTypeMappings: 0
+            //
+            // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 1
+            //   [0] AutoRegisteringObjectGraphType<Query>
+            //       Members: (none)
+            //
+            // RemapTypes: 2
+            //   [0] IdGraphType -> GuidGraphType
+            //   [1] DateGraphType -> DateOnlyGraphType
 
             """);
     }
