@@ -1,4 +1,5 @@
 using GraphQL.DI;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types;
 
@@ -40,6 +41,12 @@ public abstract class AotSchema : Schema, IServiceProvider
     {
         AotTypes.Add(typeof(TGraphType), () => new TGraphTypeImplementation());
     }
+
+    /// <summary>
+    /// Gets a required service of the specified type.
+    /// </summary>
+    protected T GetRequiredService<T>()
+        => ((IServiceProvider)this).GetRequiredService<T>();
 
     object? IServiceProvider.GetService(Type serviceType)
     {
