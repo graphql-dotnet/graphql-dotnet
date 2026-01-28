@@ -2,10 +2,10 @@ namespace GraphQL;
 
 /// <summary>
 /// Specifies which member types should be scanned when building a GraphQL graph type.
-/// This attribute can be applied to classes to control whether properties, fields, and/or methods
+/// This attribute can be applied to classes or structs to control whether properties, fields, and/or methods
 /// are scanned during auto-registration.
 /// </summary>
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
 public sealed class MemberScanAttribute : GraphQLAttribute
 {
     /// <summary>

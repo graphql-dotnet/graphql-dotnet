@@ -681,6 +681,24 @@ public class AutoRegisteringInputObjectGraphTypeTests
         graphType.Fields.Find("GetData").ShouldBeNull(); // Method should be skipped
     }
 
+    [Fact]
+    public void MemberScanAttribute_InputType_Struct_PropertiesOnly()
+    {
+        var graphType = new AutoRegisteringInputObjectGraphType<InputPropertiesOnlyStruct>();
+        graphType.Fields.Find("Property1").ShouldNotBeNull();
+        graphType.Fields.Find("Property2").ShouldNotBeNull();
+        graphType.Fields.Find("Field1").ShouldBeNull();
+    }
+
+    [Fact]
+    public void MemberScanAttribute_InputType_Struct_FieldsOnly()
+    {
+        var graphType = new AutoRegisteringInputObjectGraphType<InputFieldsOnlyStruct>();
+        graphType.Fields.Find("Property1").ShouldBeNull();
+        graphType.Fields.Find("Field1").ShouldNotBeNull();
+        graphType.Fields.Find("Field2").ShouldNotBeNull();
+    }
+
     [MemberScan(ScanMemberTypes.Properties)]
     private class InputPropertiesOnlyClass
     {
@@ -733,6 +751,36 @@ public class AutoRegisteringInputObjectGraphTypeTests
     {
         public string Property2 { get; set; } = "prop1";
         public string Field3 = "field1";
+    }
+
+    [MemberScan(ScanMemberTypes.Properties)]
+    private struct InputPropertiesOnlyStruct
+    {
+        public string Property1 { get; set; }
+        public string Property2 { get; set; }
+        public string Field1;
+
+        public InputPropertiesOnlyStruct()
+        {
+            Property1 = "prop1";
+            Property2 = "prop2";
+            Field1 = "field1";
+        }
+    }
+
+    [MemberScan(ScanMemberTypes.Fields)]
+    private struct InputFieldsOnlyStruct
+    {
+        public string Property1 { get; set; }
+        public string Field1;
+        public string Field2;
+
+        public InputFieldsOnlyStruct()
+        {
+            Property1 = "prop1";
+            Field1 = "field1";
+            Field2 = "field2";
+        }
     }
 
 }
