@@ -68,7 +68,7 @@ public sealed class ImmutableEquatableArray<T> : IEquatable<ImmutableEquatableAr
     }
 }
 
-internal static class ImmutableEquatableArray
+public static class ImmutableEquatableArray
 {
     public static ImmutableEquatableArray<T> ToImmutableEquatableArray<T>(this IEnumerable<T> values) where T : IEquatable<T>
         => new(values);

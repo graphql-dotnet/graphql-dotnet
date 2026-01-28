@@ -111,6 +111,13 @@ public record class InputConstructorParameterData(
     string MemberName);
 
 /// <summary>
+/// Data for a list element type, including nullability information.
+/// </summary>
+public record struct ListElementTypeData(
+    string ElementTypeName,
+    bool IsNullable);
+
+/// <summary>
 /// Primitive-only data for the schema class.
 /// Contains all information needed for source generation without requiring ISymbol access.
 /// </summary>
@@ -121,9 +128,9 @@ public record class SchemaClassData(
     string? QueryRootTypeName,
     string? MutationRootTypeName,
     string? SubscriptionRootTypeName,
-    ImmutableEquatableArray<string> ArrayListTypes,
-    ImmutableEquatableArray<string> GenericListTypes,
-    ImmutableEquatableArray<string> HashSetTypes);
+    ImmutableEquatableArray<ListElementTypeData> ArrayListTypes,
+    ImmutableEquatableArray<ListElementTypeData> GenericListTypes,
+    ImmutableEquatableArray<ListElementTypeData> HashSetTypes);
 
 /// <summary>
 /// Data for a registered graph type.

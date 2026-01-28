@@ -153,9 +153,9 @@ public static class GeneratedTypeDataTransformer
             : null;
 
         // Categorize list types (using HashSet to avoid duplicates)
-        var arrayListTypes = new HashSet<string>();
-        var genericListTypes = new HashSet<string>();
-        var hashSetTypes = new HashSet<string>();
+        var arrayListTypes = new HashSet<ListElementTypeData>();
+        var genericListTypes = new HashSet<ListElementTypeData>();
+        var hashSetTypes = new HashSet<ListElementTypeData>();
 
         foreach (var listType in processedData.InputListTypes)
         {
@@ -163,26 +163,26 @@ public static class GeneratedTypeDataTransformer
 
             if (listTypeSymbol is IArrayTypeSymbol arrayType)
             {
-                var itemTypeName = GetFullyQualifiedTypeName(arrayType.ElementType);
-                arrayListTypes.Add(itemTypeName);
+                var elementTypeData = CreateListElementTypeData(arrayType.ElementType);
+                arrayListTypes.Add(elementTypeData);
             }
             else if (listTypeSymbol is INamedTypeSymbol namedType && namedType.IsGenericType)
             {
                 var originalDef = namedType.OriginalDefinition;
-                var itemTypeName = GetFullyQualifiedTypeName(namedType.TypeArguments[0]);
+                var elementTypeData = CreateListElementTypeData(namedType.TypeArguments[0]);
 
                 if (SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.HashSetT) ||
                     SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.ISetT))
                 {
-                    hashSetTypes.Add(itemTypeName);
+                    hashSetTypes.Add(elementTypeData);
                 }
                 else if (SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.ListT))
                 {
-                    genericListTypes.Add(itemTypeName);
+                    genericListTypes.Add(elementTypeData);
                 }
                 else
                 {
-                    arrayListTypes.Add(itemTypeName);
+                    arrayListTypes.Add(elementTypeData);
                 }
             }
         }
@@ -637,6 +637,32 @@ public static class GeneratedTypeDataTransformer
         // Reverse to get outermost to innermost
         hierarchy.Reverse();
         return hierarchy;
+    }
+
+    /// <summary>
+    /// Creates a ListElementTypeData from a type symbol, handling nullability based on whether it's a value or reference type.
+    /// </summary>
+    private static ListElementTypeData CreateListElementTypeData(ITypeSymbol elementType)
+    {
+        string elementTypeName;
+        bool isNullable;
+
+        // Check if the element type is a value type
+        if (elementType.IsValueType)
+        {
+            // For value types, check if it's already nullable (e.g., int? which is Nullable<int>)
+            elementTypeName = GetFullyQualifiedTypeName(elementType);
+            isNullable = elementType is INamedTypeSymbol namedType &&
+                namedType.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T;
+        }
+        else
+        {
+            // For reference types, convert to nullable reference type by appending '?'
+            elementTypeName = GetFullyQualifiedTypeName(elementType.WithNullableAnnotation(NullableAnnotation.Annotated));
+            isNullable = true;
+        }
+
+        return new ListElementTypeData(elementTypeName, isNullable);
     }
 
     /// <summary>

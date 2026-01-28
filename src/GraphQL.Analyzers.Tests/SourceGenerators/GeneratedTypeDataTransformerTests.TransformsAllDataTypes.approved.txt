@@ -51,9 +51,9 @@
 //   decimal -> global::GraphQL.Types.DecimalGraphType
 //   global::PersonInput -> global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::PersonInput>
 //   global::SearchInput -> global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::SearchInput>
-// ArrayListTypes (1): int
+// ArrayListTypes (1): ListElementTypeData { ElementTypeName = int, IsNullable = False }
 // GenericListTypes (0): 
-// HashSetTypes (1): string
+// HashSetTypes (1): ListElementTypeData { ElementTypeName = string, IsNullable = True }
 //
 // ========== Entry 2 ==========
 // Namespace: null
