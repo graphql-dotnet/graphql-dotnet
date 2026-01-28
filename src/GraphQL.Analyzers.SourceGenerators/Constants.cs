@@ -39,7 +39,7 @@ internal static class Constants
         /// Includes AotQueryType, AotMutationType, AotSubscriptionType, AotOutputType, AotInputType,
         /// AotGraphType, AotTypeMapping, AotListType, and AotRemapType.
         /// </summary>
-        internal static readonly ImmutableArray<string> All = ImmutableArray.Create(
+        internal static readonly ImmutableArray<string> AllAot = ImmutableArray.Create(
         [
             AOT_QUERY_TYPE,
             AOT_MUTATION_TYPE,
@@ -61,6 +61,7 @@ internal static class Constants
 
     internal static class TypeNames
     {
+        internal const string AOT_SCHEMA = "GraphQL.Types.AotSchema";
         internal const string IGRAPH_TYPE = "GraphQL.Types.IGraphType";
         internal const string NON_NULL_GRAPH_TYPE = "GraphQL.Types.NonNullGraphType`1";
         internal const string LIST_GRAPH_TYPE = "GraphQL.Types.ListGraphType`1";

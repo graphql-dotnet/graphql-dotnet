@@ -30,14 +30,14 @@ public static class CandidateProvider
     {
         // Create a provider for the AotSchema symbol to use in filtering
         var aotSchemaSymbolProvider = context.CompilationProvider
-            .Select(static (compilation, _) => compilation.GetTypeByMetadataName("GraphQL.Types.AotSchema"));
+            .Select(static (compilation, _) => compilation.GetTypeByMetadataName(Constants.TypeNames.AOT_SCHEMA));
 
         // Create a collected provider for each AOT attribute type
         var collectedProviders =
-            new IncrementalValueProvider<ImmutableArray<CandidateClass>>[Constants.AttributeNames.All.Length];
+            new IncrementalValueProvider<ImmutableArray<CandidateClass>>[Constants.AttributeNames.AllAot.Length];
 
-        for (int i = 0; i < Constants.AttributeNames.All.Length; i++)
-            collectedProviders[i] = CreateProviderForAttribute(context, Constants.AttributeNames.All[i]).Collect();
+        for (int i = 0; i < Constants.AttributeNames.AllAot.Length; i++)
+            collectedProviders[i] = CreateProviderForAttribute(context, Constants.AttributeNames.AllAot[i]).Collect();
 
         // Combine all collected providers into a single array provider
         var combined = collectedProviders[0];
