@@ -8,8 +8,10 @@ namespace GraphQL.Analyzers.Tests.SourceGenerators;
 /// </summary>
 public class OutputGraphTypeGeneratorTests
 {
-    [Fact]
-    public void GeneratesComprehensiveOutputGraphTypes()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void GeneratesComprehensiveOutputGraphTypes(bool isInterface)
     {
         // Arrange
         var @namespace = "AotSample";
@@ -181,17 +183,11 @@ public class OutputGraphTypeGeneratorTests
             InstanceSource: GraphQL.Analyzers.SourceGenerators.Models.InstanceSource.ContextSource,
             ConstructorData: null);
 
-        // Act - Generate interface type
-        var interfaceResult = OutputGraphTypeGenerator.Generate(@namespace, partialClassHierarchy, interfaceType);
+        // Act - Generate type
+        var result = OutputGraphTypeGenerator.Generate(@namespace, partialClassHierarchy, isInterface ? interfaceType : objectType);
 
         // Assert - Interface type
-        interfaceResult.ShouldMatchApproved(o => o.NoDiff().WithDiscriminator("Interface"));
-
-        // Act - Generate object type
-        var objectResult = OutputGraphTypeGenerator.Generate(@namespace, partialClassHierarchy, objectType);
-
-        // Assert - Object type
-        objectResult.ShouldMatchApproved(o => o.NoDiff().WithDiscriminator("Object"));
+        result.ShouldMatchApproved(o => o.NoDiff().WithDiscriminator(isInterface ? "Interface" : "Object"));
     }
 
     [Fact]
@@ -364,5 +360,148 @@ public class OutputGraphTypeGeneratorTests
 
         // Assert
         result.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public void GeneratesGetRequiredServiceInstance()
+    {
+        // Arrange
+        var @namespace = "AotSample";
+        var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
+        {
+            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+        });
+
+        var members = new ImmutableEquatableArray<OutputMemberData>(new[]
+        {
+            new OutputMemberData(
+                DeclaringTypeFullyQualifiedName: "global::Sample.Person",
+                MemberName: "Name",
+                MemberKind: MemberKind.Property,
+                IsStatic: false,
+                MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
+        });
+
+        var outputType = new OutputGraphTypeData(
+            IsInterface: false,
+            FullyQualifiedClrTypeName: "global::Sample.Person",
+            GraphTypeClassName: "AutoOutputGraphType_Person",
+            SelectedMembers: members,
+            InstanceSource: GraphQL.Analyzers.SourceGenerators.Models.InstanceSource.GetRequiredService,
+            ConstructorData: null);
+
+        // Act
+        var result = OutputGraphTypeGenerator.Generate(@namespace, partialClassHierarchy, outputType);
+
+        // Assert
+        result.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void GeneratesNewInstanceWithConstructor(bool hasRequiredProperties)
+    {
+        // Arrange
+        var @namespace = "AotSample";
+        var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
+        {
+            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+        });
+
+        var members = new ImmutableEquatableArray<OutputMemberData>(new[]
+        {
+            new OutputMemberData(
+                DeclaringTypeFullyQualifiedName: "global::Sample.Person",
+                MemberName: "Name",
+                MemberKind: MemberKind.Property,
+                IsStatic: false,
+                MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
+        });
+
+        var constructorParams = new ImmutableEquatableArray<ConstructorParameterData>(new[]
+        {
+            new ConstructorParameterData("global::System.String"),
+            new ConstructorParameterData("global::System.Int32")
+        });
+
+        var requiredProperties = hasRequiredProperties
+            ? new ImmutableEquatableArray<RequiredPropertyData>(new[]
+            {
+                new RequiredPropertyData("Email", "global::System.String"),
+                new RequiredPropertyData("Age", "global::System.Int32")
+            })
+            : ImmutableEquatableArray<RequiredPropertyData>.Empty;
+
+        var constructorData = new ConstructorData(constructorParams, requiredProperties);
+
+        var outputType = new OutputGraphTypeData(
+            IsInterface: false,
+            FullyQualifiedClrTypeName: "global::Sample.Person",
+            GraphTypeClassName: "AutoOutputGraphType_Person",
+            SelectedMembers: members,
+            InstanceSource: GraphQL.Analyzers.SourceGenerators.Models.InstanceSource.NewInstance,
+            ConstructorData: constructorData);
+
+        // Act
+        var result = OutputGraphTypeGenerator.Generate(@namespace, partialClassHierarchy, outputType);
+
+        // Assert
+        var discriminator = hasRequiredProperties ? "WithRequiredProperties" : "WithoutRequiredProperties";
+        result.ShouldMatchApproved(o => o.NoDiff().WithDiscriminator(discriminator));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void GeneratesGetServiceOrCreateInstance(bool hasRequiredProperties)
+    {
+        // Arrange
+        var @namespace = "AotSample";
+        var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
+        {
+            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+        });
+
+        var members = new ImmutableEquatableArray<OutputMemberData>(new[]
+        {
+            new OutputMemberData(
+                DeclaringTypeFullyQualifiedName: "global::Sample.Person",
+                MemberName: "Name",
+                MemberKind: MemberKind.Property,
+                IsStatic: false,
+                MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
+        });
+
+        var constructorParams = new ImmutableEquatableArray<ConstructorParameterData>(new[]
+        {
+            new ConstructorParameterData("global::System.String"),
+            new ConstructorParameterData("global::System.Int32")
+        });
+
+        var requiredProperties = hasRequiredProperties
+            ? new ImmutableEquatableArray<RequiredPropertyData>(new[]
+            {
+                new RequiredPropertyData("Email", "global::System.String"),
+                new RequiredPropertyData("Age", "global::System.Int32")
+            })
+            : ImmutableEquatableArray<RequiredPropertyData>.Empty;
+
+        var constructorData = new ConstructorData(constructorParams, requiredProperties);
+
+        var outputType = new OutputGraphTypeData(
+            IsInterface: false,
+            FullyQualifiedClrTypeName: "global::Sample.Person",
+            GraphTypeClassName: "AutoOutputGraphType_Person",
+            SelectedMembers: members,
+            InstanceSource: GraphQL.Analyzers.SourceGenerators.Models.InstanceSource.GetServiceOrCreateInstance,
+            ConstructorData: constructorData);
+
+        // Act
+        var result = OutputGraphTypeGenerator.Generate(@namespace, partialClassHierarchy, outputType);
+
+        // Assert
+        var discriminator = hasRequiredProperties ? "WithRequiredProperties" : "WithoutRequiredProperties";
+        result.ShouldMatchApproved(o => o.NoDiff().WithDiscriminator(discriminator));
     }
 }

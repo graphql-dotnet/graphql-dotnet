@@ -16,7 +16,7 @@ public partial class OuterClass
                 {
                     _members = new()
                     {
-                        { typeof(global::Sample.Person).GetProperty(nameof(global::Sample.Person.Name))!, ConstructField_Name },
+                        { typeof(global::Sample.Person).GetProperty(nameof(global::Sample.Person.Name))!, ConstructField0_Name },
                     };
                     foreach (var fieldType in ProvideFields())
                     {
@@ -30,7 +30,7 @@ public partial class OuterClass
                     _members[memberInfo](fieldType, memberInfo);
                 }
 
-                public void ConstructField_Name(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+                public void ConstructField0_Name(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
                 {
                     fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).Name, false);
                 }

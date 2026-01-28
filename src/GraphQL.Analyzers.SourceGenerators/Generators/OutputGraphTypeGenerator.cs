@@ -102,6 +102,9 @@ public static class OutputGraphTypeGenerator
         // Generate BuildFieldType method
         GenerateBuildFieldTypeMethod(sb, indentLevel + 1, outputGraphType);
 
+        // Generate GetMemberInstance override if needed
+        GenerateGetMemberInstanceOverride(sb, indentLevel + 1, outputGraphType);
+
         // Generate ConstructField methods for object types
         GenerateConstructFieldMethods(sb, indentLevel + 1, outputGraphType);
 
@@ -119,6 +122,12 @@ public static class OutputGraphTypeGenerator
             : "global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>";
 
         sb.AppendLine($"{indent}private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, {actionType}> _members;");
+
+        // Add _getMemberInstance field if needed
+        if (outputGraphType.InstanceSource != InstanceSource.ContextSource)
+        {
+            sb.AppendLine($"{indent}private readonly global::System.Func<global::GraphQL.IResolveFieldContext, {outputGraphType.FullyQualifiedClrTypeName}> _getMemberInstance;");
+        }
     }
 
     private static void GenerateConstructor(
@@ -131,13 +140,20 @@ public static class OutputGraphTypeGenerator
         sb.AppendLine($"{indent}public {outputGraphType.GraphTypeClassName}()");
         sb.AppendLine($"{indent}{{");
 
+        // Initialize _getMemberInstance if needed
+        if (outputGraphType.InstanceSource != InstanceSource.ContextSource)
+        {
+            GenerateGetMemberInstanceInitialization(sb, indentLevel + 1, outputGraphType);
+            sb.AppendLine();
+        }
+
         // Initialize _members dictionary
         sb.AppendLine($"{indent}    _members = new()");
         sb.AppendLine($"{indent}    {{");
 
-        foreach (var member in outputGraphType.SelectedMembers)
+        for (int i = 0; i < outputGraphType.SelectedMembers.Count; i++)
         {
-            GenerateMemberDictionaryEntry(sb, indentLevel + 2, member, outputGraphType);
+            GenerateMemberDictionaryEntry(sb, indentLevel + 2, i, outputGraphType.SelectedMembers[i], outputGraphType);
         }
 
         sb.AppendLine($"{indent}    }};");
@@ -152,9 +168,173 @@ public static class OutputGraphTypeGenerator
         sb.AppendLine();
     }
 
+    private static void GenerateGetMemberInstanceInitialization(
+        StringBuilder sb,
+        int indentLevel,
+        OutputGraphTypeData outputGraphType)
+    {
+        var indent = new string(' ', indentLevel * 4);
+
+        switch (outputGraphType.InstanceSource)
+        {
+            case InstanceSource.GetRequiredService:
+                sb.AppendLine($"{indent}_getMemberInstance = BuildConstructorParameter<{outputGraphType.FullyQualifiedClrTypeName}>();");
+                break;
+
+            case InstanceSource.NewInstance:
+                GenerateNewInstanceInitialization(sb, indentLevel, outputGraphType);
+                break;
+
+            case InstanceSource.GetServiceOrCreateInstance:
+                GenerateGetServiceOrCreateInstanceInitialization(sb, indentLevel, outputGraphType);
+                break;
+        }
+    }
+
+    private static void GenerateNewInstanceInitialization(
+        StringBuilder sb,
+        int indentLevel,
+        OutputGraphTypeData outputGraphType)
+    {
+        var indent = new string(' ', indentLevel * 4);
+        var constructorData = outputGraphType.ConstructorData;
+
+        if (constructorData == null || (constructorData.Parameters.Count == 0 && constructorData.RequiredProperties.Count == 0))
+        {
+            // No parameters, simple constructor
+            sb.AppendLine($"{indent}_getMemberInstance = context => new {outputGraphType.FullyQualifiedClrTypeName}();");
+            return;
+        }
+
+        // Generate parameter builders
+        for (int i = 0; i < constructorData.Parameters.Count; i++)
+        {
+            var param = constructorData.Parameters[i];
+            if (param.FullyQualifiedTypeName != null)
+            {
+                sb.AppendLine($"{indent}var ctorParam{i} = BuildConstructorParameter<{param.FullyQualifiedTypeName}>();");
+            }
+        }
+
+        // Generate required property builders
+        for (int i = 0; i < constructorData.RequiredProperties.Count; i++)
+        {
+            var prop = constructorData.RequiredProperties[i];
+            sb.AppendLine($"{indent}var reqProp{i} = BuildConstructorParameter<{prop.FullyQualifiedTypeName}>();");
+        }
+
+        // Generate lambda
+        sb.AppendLine($"{indent}_getMemberInstance = context => new {outputGraphType.FullyQualifiedClrTypeName}(");
+
+        // Constructor parameters
+        for (int i = 0; i < constructorData.Parameters.Count; i++)
+        {
+            var comma = i < constructorData.Parameters.Count - 1 ? "," : "";
+            if (constructorData.Parameters[i].FullyQualifiedTypeName != null)
+            {
+                sb.AppendLine($"{indent}    ctorParam{i}(context){comma}");
+            }
+        }
+
+        if (constructorData.RequiredProperties.Count > 0)
+        {
+            sb.AppendLine($"{indent})");
+            sb.AppendLine($"{indent}{{");
+
+            for (int i = 0; i < constructorData.RequiredProperties.Count; i++)
+            {
+                var prop = constructorData.RequiredProperties[i];
+                var comma = i < constructorData.RequiredProperties.Count - 1 ? "," : "";
+                sb.AppendLine($"{indent}    {prop.Name} = reqProp{i}(context){comma}");
+            }
+
+            sb.AppendLine($"{indent}}};");
+        }
+        else
+        {
+            sb.AppendLine($"{indent});");
+        }
+    }
+
+    private static void GenerateGetServiceOrCreateInstanceInitialization(
+        StringBuilder sb,
+        int indentLevel,
+        OutputGraphTypeData outputGraphType)
+    {
+        var indent = new string(' ', indentLevel * 4);
+        var constructorData = outputGraphType.ConstructorData;
+
+        // Generate parameter builders for constructor
+        if (constructorData != null)
+        {
+            for (int i = 0; i < constructorData.Parameters.Count; i++)
+            {
+                var param = constructorData.Parameters[i];
+                if (param.FullyQualifiedTypeName != null)
+                {
+                    sb.AppendLine($"{indent}var ctorParam{i} = BuildConstructorParameter<{param.FullyQualifiedTypeName}>();");
+                }
+            }
+
+            for (int i = 0; i < constructorData.RequiredProperties.Count; i++)
+            {
+                var prop = constructorData.RequiredProperties[i];
+                sb.AppendLine($"{indent}var reqProp{i} = BuildConstructorParameter<{prop.FullyQualifiedTypeName}>();");
+            }
+        }
+
+        // Generate lambda that tries service first, then creates
+        sb.AppendLine($"{indent}_getMemberInstance = context =>");
+        sb.AppendLine($"{indent}{{");
+        sb.AppendLine($"{indent}    var obj = ({outputGraphType.FullyQualifiedClrTypeName}?)context.RequestServices?.GetService(typeof({outputGraphType.FullyQualifiedClrTypeName}));");
+        sb.AppendLine($"{indent}    if (obj != null)");
+        sb.AppendLine($"{indent}        return obj;");
+
+        // Generate new instance creation
+        if (constructorData == null || (constructorData.Parameters.Count == 0 && constructorData.RequiredProperties.Count == 0))
+        {
+            sb.AppendLine($"{indent}    return new {outputGraphType.FullyQualifiedClrTypeName}();");
+        }
+        else
+        {
+            sb.AppendLine($"{indent}    return new {outputGraphType.FullyQualifiedClrTypeName}(");
+
+            for (int i = 0; i < constructorData.Parameters.Count; i++)
+            {
+                var comma = i < constructorData.Parameters.Count - 1 ? "," : "";
+                if (constructorData.Parameters[i].FullyQualifiedTypeName != null)
+                {
+                    sb.AppendLine($"{indent}        ctorParam{i}(context){comma}");
+                }
+            }
+
+            if (constructorData.RequiredProperties.Count > 0)
+            {
+                sb.AppendLine($"{indent}    )");
+                sb.AppendLine($"{indent}    {{");
+
+                for (int i = 0; i < constructorData.RequiredProperties.Count; i++)
+                {
+                    var prop = constructorData.RequiredProperties[i];
+                    var comma = i < constructorData.RequiredProperties.Count - 1 ? "," : "";
+                    sb.AppendLine($"{indent}        {prop.Name} = reqProp{i}(context){comma}");
+                }
+
+                sb.AppendLine($"{indent}    }};");
+            }
+            else
+            {
+                sb.AppendLine($"{indent}    );");
+            }
+        }
+
+        sb.AppendLine($"{indent}}};");
+    }
+
     private static void GenerateMemberDictionaryEntry(
         StringBuilder sb,
         int indentLevel,
+        int memberIndex,
         OutputMemberData member,
         OutputGraphTypeData outputGraphType)
     {
@@ -175,7 +355,7 @@ public static class OutputGraphTypeGenerator
             memberAccessExpression = $"typeof({declaringType}).{memberTypeString}(nameof({declaringType}.{member.MemberName}))!";
         }
 
-        var actionValue = outputGraphType.IsInterface && !member.IsStatic ? "null" : $"ConstructField_{member.MemberName}";
+        var actionValue = outputGraphType.IsInterface && !member.IsStatic ? "null" : $"ConstructField{memberIndex}_{member.MemberName}";
 
         sb.AppendLine($"{indent}{{ {memberAccessExpression}, {actionValue} }},");
     }
@@ -217,6 +397,22 @@ public static class OutputGraphTypeGenerator
         sb.AppendLine();
     }
 
+    private static void GenerateGetMemberInstanceOverride(
+        StringBuilder sb,
+        int indentLevel,
+        OutputGraphTypeData outputGraphType)
+    {
+        if (outputGraphType.InstanceSource == InstanceSource.ContextSource)
+        {
+            return; // No override needed for ContextSource
+        }
+
+        var indent = new string(' ', indentLevel * 4);
+
+        sb.AppendLine($"{indent}protected override {outputGraphType.FullyQualifiedClrTypeName} GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);");
+        sb.AppendLine();
+    }
+
     private static void GenerateConstructFieldMethods(
         StringBuilder sb,
         int indentLevel,
@@ -224,15 +420,17 @@ public static class OutputGraphTypeGenerator
     {
         var indent = new string(' ', indentLevel * 4);
 
-        foreach (var member in outputGraphType.SelectedMembers)
+        for (int i = 0; i < outputGraphType.SelectedMembers.Count; i++)
         {
+            var member = outputGraphType.SelectedMembers[i];
+
             if (!member.IsStatic && outputGraphType.IsInterface)
             {
                 // Skip instance members for interfaces
                 continue;
             }
 
-            sb.AppendLine($"{indent}public void ConstructField_{member.MemberName}(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)");
+            sb.AppendLine($"{indent}public void ConstructField{i}_{member.MemberName}(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)");
             sb.AppendLine($"{indent}{{");
 
             if (member.MemberKind == MemberKind.Method)

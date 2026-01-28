@@ -17,8 +17,8 @@ public partial class SampleAotSchema
                 { typeof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter.GetFriends), [typeof(global::GraphQL.StarWars.TypeFirst.StarWarsData)])!, null },
                 { typeof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter.GetFriendsConnection), [typeof(global::GraphQL.StarWars.TypeFirst.StarWarsData), typeof(int?)])!, null },
                 { typeof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter.AppearsIn))!, null },
-                { typeof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter.Version))!, ConstructField_Version },
-                { typeof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter.GetAllCharacterTypes), [])!, ConstructField_GetAllCharacterTypes },
+                { typeof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter.Version))!, ConstructField5_Version },
+                { typeof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter.GetAllCharacterTypes), [])!, ConstructField6_GetAllCharacterTypes },
             };
             foreach (var fieldType in ProvideFields())
             {
@@ -37,12 +37,12 @@ public partial class SampleAotSchema
             }
         }
 
-        public void ConstructField_Version(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public void ConstructField5_Version(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter.Version, false);
         }
 
-        public void ConstructField_GetAllCharacterTypes(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public void ConstructField6_GetAllCharacterTypes(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context =>
             {
