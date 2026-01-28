@@ -31,7 +31,11 @@ public class SchemaConfigurationGeneratorTests
             new RegisteredGraphTypeData(
                 "global::GraphQL.Types.StringGraphType",
                 null,
-                null)
+                null),
+            new RegisteredGraphTypeData(
+                "global::GraphQL.Types.IdGraphType",
+                null,
+                "global::GraphQL.Types.GuidGraphType"),
         });
 
         var typeMappings = new ImmutableEquatableArray<TypeMappingData>(new[]

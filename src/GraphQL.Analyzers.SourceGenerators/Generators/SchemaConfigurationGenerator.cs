@@ -51,6 +51,7 @@ public static class SchemaConfigurationGenerator
         SchemaClassData schemaClass)
     {
         var rootClass = partialClassHierarchy[partialClassHierarchy.Count - 1];
+        var hasListTypes = HasListTypes(schemaClass);
 
         // Generate nested partial classes from outermost to innermost
         int indentLevel = 0;
@@ -62,8 +63,8 @@ public static class SchemaConfigurationGenerator
             sb.Append(new string(' ', indentLevel * 4));
             sb.Append($"{classAccessibility} partial class {classInfo.ClassName}");
 
-            // Add interface implementation only on the innermost class
-            if (i == partialClassHierarchy.Count - 1)
+            // Add interface implementation only on the innermost class and only if there are list types
+            if (i == partialClassHierarchy.Count - 1 && hasListTypes)
             {
                 sb.AppendLine(" : global::GraphQL.Conversion.IListConverterFactory");
             }
@@ -86,8 +87,11 @@ public static class SchemaConfigurationGenerator
         // Generate Configure method
         GenerateConfigureMethod(sb, indentLevel, schemaClass);
 
-        // Generate list converter infrastructure
-        GenerateListConverterInfrastructure(sb, indentLevel);
+        // Generate list converter infrastructure only if there are list types
+        if (hasListTypes)
+        {
+            GenerateListConverterInfrastructure(sb, indentLevel);
+        }
 
         // Close all class declarations
         for (int i = partialClassHierarchy.Count - 1; i >= 0; i--)
@@ -96,6 +100,13 @@ public static class SchemaConfigurationGenerator
             sb.Append(new string(' ', indentLevel * 4));
             sb.AppendLine("}");
         }
+    }
+
+    private static bool HasListTypes(SchemaClassData schemaClass)
+    {
+        return schemaClass.ArrayListTypes.Count > 0
+            || schemaClass.GenericListTypes.Count > 0
+            || schemaClass.HashSetTypes.Count > 0;
     }
 
     private static void GenerateConstructor(StringBuilder sb, int indentLevel, string className)
@@ -132,7 +143,8 @@ public static class SchemaConfigurationGenerator
             sb.AppendLine(">();");
         }
 
-        sb.AppendLine();
+        if (schemaClass.RegisteredGraphTypes.Count > 0)
+            sb.AppendLine();
 
         // Generate RegisterType calls
         foreach (var registeredType in schemaClass.RegisteredGraphTypes)
@@ -140,7 +152,8 @@ public static class SchemaConfigurationGenerator
             sb.AppendLine($"{indent}    RegisterType(typeof({registeredType.FullyQualifiedGraphTypeName}));");
         }
 
-        sb.AppendLine();
+        if (schemaClass.RegisteredGraphTypes.Count > 0)
+            sb.AppendLine();
 
         // Generate RegisterTypeMapping calls
         foreach (var typeMapping in schemaClass.TypeMappings)
@@ -148,7 +161,8 @@ public static class SchemaConfigurationGenerator
             sb.AppendLine($"{indent}    RegisterTypeMapping(typeof({typeMapping.FullyQualifiedClrTypeName}), typeof({typeMapping.FullyQualifiedGraphTypeName}));");
         }
 
-        sb.AppendLine();
+        if (schemaClass.TypeMappings.Count > 0)
+            sb.AppendLine();
 
         // Configure root types
         if (!string.IsNullOrEmpty(schemaClass.QueryRootTypeName))
@@ -164,18 +178,25 @@ public static class SchemaConfigurationGenerator
             sb.AppendLine($"{indent}    Subscription = GetRequiredService<{schemaClass.SubscriptionRootTypeName}>();");
         }
 
-        sb.AppendLine();
+        if (!string.IsNullOrEmpty(schemaClass.QueryRootTypeName)
+            || !string.IsNullOrEmpty(schemaClass.MutationRootTypeName)
+            || !string.IsNullOrEmpty(schemaClass.SubscriptionRootTypeName))
+        {
+            sb.AppendLine();
+        }
 
-        // Generate list converter registrations
-        GenerateListConverterRegistrations(sb, indentLevel, schemaClass);
+        // Generate list converter registrations only if there are list types
+        if (HasListTypes(schemaClass))
+        {
+            GenerateListConverterRegistrations(sb, indentLevel, schemaClass);
 
-        sb.AppendLine($"{indent}    foreach (var listType in _listConverters.Keys)");
-        sb.AppendLine($"{indent}    {{");
-        sb.AppendLine($"{indent}        ValueConverter.RegisterListConverterFactory(listType, this);");
-        sb.AppendLine($"{indent}    }}");
+            sb.AppendLine($"{indent}    foreach (var listType in _listConverters.Keys)");
+            sb.AppendLine($"{indent}    {{");
+            sb.AppendLine($"{indent}        ValueConverter.RegisterListConverterFactory(listType, this);");
+            sb.AppendLine($"{indent}    }}");
+        }
 
         sb.AppendLine($"{indent}}}");
-        sb.AppendLine();
     }
 
     private static void GenerateListConverterRegistrations(StringBuilder sb, int indentLevel, SchemaClassData schemaClass)
@@ -237,6 +258,7 @@ public static class SchemaConfigurationGenerator
     {
         var indent = new string(' ', indentLevel * 4);
 
+        sb.AppendLine();
         sb.AppendLine($"{indent}private readonly global::System.Collections.Generic.Dictionary<global::System.Type, global::GraphQL.Conversion.IListConverter> _listConverters = new();");
         sb.AppendLine();
         sb.AppendLine($"{indent}public global::GraphQL.Conversion.IListConverter Create(global::System.Type listType)");

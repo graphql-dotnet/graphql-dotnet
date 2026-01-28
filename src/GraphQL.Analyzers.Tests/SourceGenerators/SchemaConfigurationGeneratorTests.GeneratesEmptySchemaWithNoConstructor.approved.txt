@@ -3,24 +3,9 @@
 
 namespace AotSample;
 
-public partial class SampleAotSchema : global::GraphQL.Conversion.IListConverterFactory
+public partial class SampleAotSchema
 {
     private void Configure()
     {
-
-
-
-
-        foreach (var listType in _listConverters.Keys)
-        {
-            ValueConverter.RegisterListConverterFactory(listType, this);
-        }
-    }
-
-    private readonly global::System.Collections.Generic.Dictionary<global::System.Type, global::GraphQL.Conversion.IListConverter> _listConverters = new();
-
-    public global::GraphQL.Conversion.IListConverter Create(global::System.Type listType)
-    {
-        return _listConverters[listType];
     }
 }
