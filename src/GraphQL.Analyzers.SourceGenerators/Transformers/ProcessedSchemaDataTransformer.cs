@@ -778,6 +778,13 @@ public static class ProcessedSchemaDataTransformer
         if (type is not INamedTypeSymbol namedType)
             return false;
 
+        if (namedType.IsGenericType &&
+            knownSymbols.EnumerationGraphType != null &&
+            SymbolEqualityComparer.Default.Equals(namedType.OriginalDefinition, knownSymbols.EnumerationGraphType))
+        {
+            return true;
+        }
+
         return knownSymbols.BuiltInScalars.Contains(type, SymbolEqualityComparer.Default);
     }
 }
