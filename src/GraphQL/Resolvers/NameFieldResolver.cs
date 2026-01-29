@@ -72,6 +72,8 @@ public class NameFieldResolver : IFieldResolver, IRequiresResolveFieldContextAcc
         Justification = "The Instance property getter is marked with RequiresDynamicCodeAttribute.")]
     [UnconditionalSuppressMessage("AOT", "IL2070:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
         Justification = "The Instance property getter is marked with RequiresUnreferencedCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2026:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
+        Justification = "The Instance property getter is marked with RequiresUnreferencedCodeAttribute.")]
     private static IFieldResolver CreateResolver(Type target, string name)
     {
         var param = Expression.Parameter(typeof(IResolveFieldContext), "context");

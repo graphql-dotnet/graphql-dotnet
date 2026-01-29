@@ -327,6 +327,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
         Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2026:Calling method marked with RequiresUnreferencedCodeAttribute",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     private void InitializeField(FieldConfig config, Type? parentType)
     {
         config.ResolverAccessor ??= parentType.ToAccessor(config.Name, ResolverType.Resolver);
@@ -351,6 +353,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
     [UnconditionalSuppressMessage("AOT", "IL2067:Calling members with arguments having 'DynamicallyAccessedMembersAttribute' may break functionality when trimming application code.",
         Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2026:Calling method marked with RequiresUnreferencedCodeAttribute",
         Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     private void InitializeSubscriptionField(FieldConfig config, Type? parentType)
     {

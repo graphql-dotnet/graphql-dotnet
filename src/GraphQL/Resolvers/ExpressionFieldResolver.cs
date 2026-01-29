@@ -20,6 +20,7 @@ public class ExpressionFieldResolver<TSourceType, TProperty> : IFieldResolver, I
     /// <see cref="Task{TResult}"/> and <see cref="ValueTask{TResult}"/> return types are also supported.
     /// </summary>
     [RequiresDynamicCode("Calls MemberResolver.BuildFieldResolverInternal which calls a generic method and compiles a lambda at runtime.")]
+    [RequiresUnreferencedCode("Calls MemberResolver.BuildFieldResolverInternal which calls a generic method and compiles a lambda at runtime.")]
     public ExpressionFieldResolver(Expression<Func<TSourceType, TProperty>> property)
     {
         var param = Expression.Parameter(typeof(IResolveFieldContext), "context");

@@ -43,6 +43,7 @@ public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(Dyn
     /// so that the instance will be cached with the customizations.
     /// </summary>
     [RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
+    [RequiresUnreferencedCode("Uses reflection to get property values at runtime.")]
     public AutoRegisteringInputObjectGraphType() : this(null) { }
 
     /// <summary>
@@ -50,6 +51,7 @@ public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(Dyn
     /// </summary>
     /// <param name="excludedProperties">Expressions for excluding fields, for example 'o => o.Age'.</param>
     [RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
+    [RequiresUnreferencedCode("Uses reflection to get property values at runtime.")]
     public AutoRegisteringInputObjectGraphType(params Expression<Func<TSourceType, object?>>[]? excludedProperties)
         : this(
             GlobalSwitches.EnableReflectionCaching && excludedProperties == null && AutoRegisteringInputObjectGraphType.ReflectionCache.TryGetValue(typeof(TSourceType), out var cacheEntry)
@@ -61,6 +63,7 @@ public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(Dyn
     }
 
     [RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
+    [RequiresUnreferencedCode("Uses reflection to get property values at runtime.")]
     private AutoRegisteringInputObjectGraphType(AutoRegisteringInputObjectGraphType<TSourceType>? cloneFrom, Expression<Func<TSourceType, object?>>[]? excludedProperties, bool cache)
         : base(cloneFrom)
     {
