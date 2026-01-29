@@ -3,6 +3,17 @@ using VerifyTestSG = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpIncrement
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators;
 
+/*
+ * 
+ * These tests rely on the following dependencies working properly:
+ *   - CandidateProvider
+ *   - KnownSymbolsProvider
+ *   - CandidateClassTransformer
+ *   - TypeSymbolTransformer
+ *   - SchemaAttributeDataTransformer
+ * 
+ */
+
 /// <summary>
 /// Tests for GeneratedTypeDataTransformer that converts ISymbol-based data to primitive-only data.
 /// </summary>

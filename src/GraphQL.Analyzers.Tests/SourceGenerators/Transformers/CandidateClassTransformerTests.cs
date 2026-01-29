@@ -3,10 +3,16 @@ using VerifyTestSG = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpIncrement
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators;
 
+/*
+ * 
+ * These tests rely on CandidateProvider and KnownSymbolsProvider working properly
+ * 
+ */
+
 /// <summary>
-/// Tests for AttributeDataTransformer transformation logic.
+/// Tests for CandidateClassTransformer transformation logic.
 /// These tests verify that the transformer correctly extracts and categorizes AOT attributes.
-/// Uses TestAttributeDataReportingGenerator to isolate testing of AttributeDataTransformer from the full pipeline.
+/// Uses CandidateClassTransformerTests.ReportingGenerator to isolate testing of CandidateClassTransformer from the full pipeline.
 /// </summary>
 public partial class CandidateClassTransformerTests
 {

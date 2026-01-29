@@ -3,6 +3,12 @@ using VerifyTestSG = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpIncrement
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators.Transformers;
 
+/*
+ * 
+ * These tests rely on KnownSymbolsProvider working properly
+ * 
+ */
+
 /// <summary>
 /// Tests for TypeSymbolTransformer transformation logic for output types with method parameters.
 /// These tests verify that the transformer correctly scans method parameters as input types.

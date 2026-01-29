@@ -3,6 +3,12 @@ using GraphQL.Analyzers.SourceGenerators.Models;
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators.Generators;
 
+/*
+ * 
+ * These tests do not rely on other components
+ * 
+ */
+
 /// <summary>
 /// Unit tests for SchemaConfigurationGenerator that generates AOT schema configuration code.
 /// </summary>

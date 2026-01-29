@@ -3,6 +3,12 @@ using VerifySG = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpIncrementalGe
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators.Generators;
 
+/*
+ * 
+ * These tests do not rely on other components
+ * 
+ */
+
 public class AotSchemaGeneratorTests
 {
     [Fact]

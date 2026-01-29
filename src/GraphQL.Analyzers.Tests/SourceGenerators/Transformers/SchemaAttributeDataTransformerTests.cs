@@ -3,6 +3,16 @@ using VerifyTestSG = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpIncrement
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators;
 
+/*
+ * 
+ * These tests rely on the following dependencies working properly:
+ *   - CandidateProvider
+ *   - KnownSymbolsProvider
+ *   - CandidateClassTransformer
+ *   - TypeSymbolTransformer
+ * 
+ */
+
 /// <summary>
 /// Tests for SchemaAttributeDataTransformer's type graph walking and discovery logic.
 /// These tests verify that the transformer correctly discovers all types referenced through

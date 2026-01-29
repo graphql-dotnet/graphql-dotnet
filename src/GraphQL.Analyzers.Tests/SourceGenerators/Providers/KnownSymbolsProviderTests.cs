@@ -3,6 +3,12 @@ using VerifyTestSG = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpIncrement
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators;
 
+/*
+ * 
+ * These tests do not rely on other components
+ * 
+ */
+
 /// <summary>
 /// Tests for AttributeSymbolsProvider symbol resolution logic.
 /// These tests verify that the provider correctly resolves all AOT attribute type symbols.

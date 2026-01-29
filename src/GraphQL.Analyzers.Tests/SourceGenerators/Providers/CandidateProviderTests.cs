@@ -3,6 +3,12 @@ using VerifyTestSG = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpIncrement
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators;
 
+/*
+ * 
+ * These tests do not rely on other components
+ * 
+ */
+
 /// <summary>
 /// Tests for CandidateProvider filtering logic.
 /// These tests verify that the provider correctly identifies candidate classes based on AOT attributes.
