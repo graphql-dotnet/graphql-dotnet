@@ -54,4 +54,30 @@ public abstract class AotAutoRegisteringInterfaceGraphType<TSource> : AutoRegist
         => requiresAccessor
         ? new FuncFieldResolver<T>(fn!)
         : new FuncFieldResolverNoAccessor<T>(fn!);
+
+    /// <summary>
+    /// Builds a source stream resolver using the provided function.
+    /// </summary>
+    protected ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, IObservable<T>> fn)
+        => new SourceStreamResolver<T>(fn);
+
+    /// <inheritdoc cref="BuildSourceStreamResolver{T}(Func{IResolveFieldContext, IObservable{T}})"/>
+    protected ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, Task<IObservable<T>>> fn)
+        => new SourceStreamResolver<T>(context => new ValueTask<IObservable<T>>(fn(context))!);
+
+    /// <inheritdoc cref="BuildSourceStreamResolver{T}(Func{IResolveFieldContext, IObservable{T}})"/>
+    protected ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, ValueTask<IObservable<T>>> fn)
+        => new SourceStreamResolver<T>(fn!);
+
+    /// <inheritdoc cref="BuildSourceStreamResolver{T}(Func{IResolveFieldContext, IObservable{T}})"/>
+    protected ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, IAsyncEnumerable<T>> fn)
+        => new SourceStreamResolver<object?>(ObservableFromAsyncEnumerable<T>.Create(fn));
+
+    /// <inheritdoc cref="BuildSourceStreamResolver{T}(Func{IResolveFieldContext, IObservable{T}})"/>
+    protected ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, Task<IAsyncEnumerable<T>>> fn)
+        => new SourceStreamResolver<object?>(ObservableFromAsyncEnumerable<T>.Create(fn));
+
+    /// <inheritdoc cref="BuildSourceStreamResolver{T}(Func{IResolveFieldContext, IObservable{T}})"/>
+    protected ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, ValueTask<IAsyncEnumerable<T>>> fn)
+        => new SourceStreamResolver<object?>(ObservableFromAsyncEnumerable<T>.Create(fn));
 }
