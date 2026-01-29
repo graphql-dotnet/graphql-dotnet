@@ -132,8 +132,13 @@ public class AutoRegisteringInterfaceGraphType<[NotAGraphType] TSourceType> : In
     /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.BuildFieldType(FieldType, MemberInfo)"/>
     [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
         Justification = "The constructor is marked with RequiresDynamicCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2060:Call to 'System.Reflection.MethodInfo.MakeGenericMethod' cannot be statically analyzed by the trimmer",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2026:Calling method marked with RequiresUnreferencedCodeAttribute",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     protected virtual void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
     {
+        _getParameterResolverInternalMethodInfo ??= typeof(AutoRegisteringInterfaceGraphType<TSourceType>).GetMethod(nameof(GetParameterResolverInternal), BindingFlags.NonPublic | BindingFlags.Instance)!;
         Func<Type, Func<ArgumentInformation, LambdaExpression?>> getTypedParameterResolverMethod =
             parameterType =>
             {
@@ -161,7 +166,7 @@ public class AutoRegisteringInterfaceGraphType<[NotAGraphType] TSourceType> : In
     protected virtual Func<IResolveFieldContext, TParameterType>? GetParameterResolver<TParameterType>(ArgumentInformation argumentInformation)
         => AutoRegisteringHelper.GetParameterResolver<TParameterType>(argumentInformation);
 
-    private static readonly MethodInfo _getParameterResolverInternalMethodInfo = typeof(AutoRegisteringInterfaceGraphType<TSourceType>).GetMethod(nameof(GetParameterResolverInternal), BindingFlags.NonPublic | BindingFlags.Instance)!;
+    private static MethodInfo? _getParameterResolverInternalMethodInfo;
     [RequiresDynamicCode("Uses Expression.Lambda which requires dynamic code generation.")]
     private LambdaExpression? GetParameterResolverInternal<TParameterType>(ArgumentInformation argumentInformation)
     {
