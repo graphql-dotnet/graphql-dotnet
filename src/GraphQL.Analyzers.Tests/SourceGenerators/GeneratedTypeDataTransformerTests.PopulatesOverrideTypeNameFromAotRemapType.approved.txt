@@ -35,7 +35,7 @@
 //
 // ========== Entry 2 ==========
 // Namespace: MyApp.GraphQL
-// PartialClassHierarchy: public Query
+// PartialClassHierarchy: public MySchema
 // Type: OutputGraphType
 // IsInterface: False
 // FullyQualifiedClrTypeName: global::MyApp.GraphQL.Query

@@ -57,7 +57,7 @@
 //
 // ========== Entry 2 ==========
 // Namespace: null
-// PartialClassHierarchy: public Person
+// PartialClassHierarchy: public MySchema
 // Type: OutputGraphType
 // IsInterface: False
 // FullyQualifiedClrTypeName: global::Person
@@ -78,7 +78,7 @@
 //
 // ========== Entry 3 ==========
 // Namespace: null
-// PartialClassHierarchy: public IEntity
+// PartialClassHierarchy: public MySchema
 // Type: OutputGraphType
 // IsInterface: True
 // FullyQualifiedClrTypeName: global::IEntity
@@ -91,7 +91,7 @@
 //
 // ========== Entry 4 ==========
 // Namespace: null
-// PartialClassHierarchy: public Product
+// PartialClassHierarchy: public MySchema
 // Type: OutputGraphType
 // IsInterface: False
 // FullyQualifiedClrTypeName: global::Product
@@ -117,7 +117,7 @@
 //
 // ========== Entry 5 ==========
 // Namespace: null
-// PartialClassHierarchy: public PersonInput
+// PartialClassHierarchy: public MySchema
 // Type: InputGraphType
 // FullyQualifiedClrTypeName: global::PersonInput
 // GraphTypeClassName: PersonInputGraphType
@@ -132,7 +132,7 @@
 //
 // ========== Entry 6 ==========
 // Namespace: null
-// PartialClassHierarchy: public SearchInput
+// PartialClassHierarchy: public MySchema
 // Type: InputGraphType
 // FullyQualifiedClrTypeName: global::SearchInput
 // GraphTypeClassName: SearchInputGraphType
@@ -147,7 +147,7 @@
 //
 // ========== Entry 7 ==========
 // Namespace: null
-// PartialClassHierarchy: public Query
+// PartialClassHierarchy: public MySchema
 // Type: OutputGraphType
 // IsInterface: False
 // FullyQualifiedClrTypeName: global::Query

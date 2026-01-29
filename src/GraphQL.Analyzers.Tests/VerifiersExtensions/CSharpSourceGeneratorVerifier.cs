@@ -58,7 +58,8 @@ public static partial class CSharpIncrementalGeneratorVerifier<TIncrementalGener
             syntaxTrees: new[] { syntaxTree },
             references: references.Concat(new[]
             {
-                MetadataReference.CreateFromFile(typeof(GraphQL.Types.Schema).Assembly.Location)
+                MetadataReference.CreateFromFile(typeof(GraphQL.Types.Schema).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(GraphQLParser.ROM).Assembly.Location),
             }),
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 

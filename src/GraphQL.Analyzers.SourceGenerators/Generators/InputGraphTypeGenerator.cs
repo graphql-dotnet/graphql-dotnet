@@ -147,7 +147,7 @@ public static class InputGraphTypeGenerator
         sb.AppendLine($"{indent}    ];");
 
         // Initialize _fields array
-        sb.AppendLine($"{indent}    _fields = ProvideFields().ToArray();");
+        sb.AppendLine($"{indent}    _fields = global::System.Linq.Enumerable.ToArray(ProvideFields());");
 
         // Add fields
         sb.AppendLine($"{indent}    foreach (var fieldType in _fields)");
@@ -250,7 +250,7 @@ public static class InputGraphTypeGenerator
         sb.AppendLine($"{indent}    {{");
         sb.AppendLine($"{indent}        if (value.TryGetValue(fieldType.Name, out var fieldValue))");
         sb.AppendLine($"{indent}        {{");
-        sb.AppendLine($"{indent}            return (TFieldType)valueConverter.GetPropertyValue(fieldValue, typeof(TFieldType), fieldType.ResolvedType!)!;");
+        sb.AppendLine($"{indent}            return (TFieldType)global::GraphQL.ValueConverterExtensions.GetPropertyValue(valueConverter, fieldValue, typeof(TFieldType), fieldType.ResolvedType!)!;");
         sb.AppendLine($"{indent}        }}");
         sb.AppendLine($"{indent}        return default!;");
         sb.AppendLine($"{indent}    }}");
@@ -275,7 +275,7 @@ public static class InputGraphTypeGenerator
         for (int i = 0; i < inputGraphType.Members.Count; i++)
         {
             var member = inputGraphType.Members[i];
-            sb.AppendLine($"{indent}    if (_fields[{i}].ResolvedType!.IsValidDefault(obj.{member.MemberName}))");
+            sb.AppendLine($"{indent}    if (global::GraphQL.GraphQLExtensions.IsValidDefault(_fields[{i}].ResolvedType!, obj.{member.MemberName}))");
             sb.AppendLine($"{indent}        return false;");
         }
 
@@ -317,7 +317,7 @@ public static class InputGraphTypeGenerator
         sb.AppendLine();
         sb.AppendLine($"{indent}    void ProcessField(global::GraphQL.Types.FieldType fieldType, object? fieldValue)");
         sb.AppendLine($"{indent}    {{");
-        sb.AppendLine($"{indent}        var ast = fieldType.ResolvedType!.ToAST(fieldValue)");
+        sb.AppendLine($"{indent}        var ast = global::GraphQL.GraphQLExtensions.ToAST(fieldType.ResolvedType!, fieldValue)");
         sb.AppendLine($"{indent}            ?? throw new global::System.InvalidOperationException($\"Could not convert value in {inputGraphType.FullyQualifiedClrTypeName}.{{fieldType.Name}} to AST\");");
         sb.AppendLine($"{indent}        if (ast is not global::GraphQLParser.AST.GraphQLNullValue || fieldType.DefaultValue != null)");
         sb.AppendLine($"{indent}            objectValue.Fields.Add(new(new(fieldType.Name), ast));");

@@ -17,7 +17,7 @@ public partial class SampleAotSchema
                 typeof(global::Sample.DerivedInput).GetProperty(nameof(global::Sample.DerivedInput.DerivedProperty))!,
                 typeof(global::Sample.DerivedInput).GetProperty(nameof(global::Sample.DerivedInput.LocalProperty))!
             ];
-            _fields = ProvideFields().ToArray();
+            _fields = global::System.Linq.Enumerable.ToArray(ProvideFields());
             foreach (var fieldType in _fields)
             {
                 AddField(fieldType);
@@ -39,7 +39,7 @@ public partial class SampleAotSchema
             {
                 if (value.TryGetValue(fieldType.Name, out var fieldValue))
                 {
-                    return (TFieldType)valueConverter.GetPropertyValue(fieldValue, typeof(TFieldType), fieldType.ResolvedType!)!;
+                    return (TFieldType)global::GraphQL.ValueConverterExtensions.GetPropertyValue(valueConverter, fieldValue, typeof(TFieldType), fieldType.ResolvedType!)!;
                 }
                 return default!;
             }
@@ -50,11 +50,11 @@ public partial class SampleAotSchema
             if (value is not global::Sample.DerivedInput obj)
                 return false;
 
-            if (_fields[0].ResolvedType!.IsValidDefault(obj.BaseProperty))
+            if (global::GraphQL.GraphQLExtensions.IsValidDefault(_fields[0].ResolvedType!, obj.BaseProperty))
                 return false;
-            if (_fields[1].ResolvedType!.IsValidDefault(obj.DerivedProperty))
+            if (global::GraphQL.GraphQLExtensions.IsValidDefault(_fields[1].ResolvedType!, obj.DerivedProperty))
                 return false;
-            if (_fields[2].ResolvedType!.IsValidDefault(obj.LocalProperty))
+            if (global::GraphQL.GraphQLExtensions.IsValidDefault(_fields[2].ResolvedType!, obj.LocalProperty))
                 return false;
 
             return true;
@@ -81,7 +81,7 @@ public partial class SampleAotSchema
 
             void ProcessField(global::GraphQL.Types.FieldType fieldType, object? fieldValue)
             {
-                var ast = fieldType.ResolvedType!.ToAST(fieldValue)
+                var ast = global::GraphQL.GraphQLExtensions.ToAST(fieldType.ResolvedType!, fieldValue)
                     ?? throw new global::System.InvalidOperationException($"Could not convert value in global::Sample.DerivedInput.{fieldType.Name} to AST");
                 if (ast is not global::GraphQLParser.AST.GraphQLNullValue || fieldType.DefaultValue != null)
                     objectValue.Fields.Add(new(new(fieldType.Name), ast));

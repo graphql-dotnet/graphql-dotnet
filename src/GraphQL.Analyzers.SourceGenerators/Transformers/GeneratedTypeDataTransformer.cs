@@ -28,7 +28,7 @@ public static class GeneratedTypeDataTransformer
         string? schemaNamespace = schemaClass.ContainingNamespace?.ToDisplayString();
         if (schemaNamespace == "<global namespace>")
             schemaNamespace = null;
-        var schemaHierarchy = GetPartialClassHierarchy(schemaClass);
+        var schemaHierarchy = GetPartialClassHierarchy(schemaClass).ToImmutableEquatableArray();
 
         // First, yield the schema class entry
         yield return new GeneratedTypeEntry(
@@ -36,7 +36,7 @@ public static class GeneratedTypeDataTransformer
             OutputGraphType: null,
             InputGraphType: null,
             Namespace: schemaNamespace,
-            PartialClassHierarchy: schemaHierarchy.ToImmutableEquatableArray());
+            PartialClassHierarchy: schemaHierarchy);
 
         // Then, yield entries for each generated graph type
         foreach (var (graphType, members) in processedData.GeneratedGraphTypesWithMembers)
@@ -46,34 +46,22 @@ public static class GeneratedTypeDataTransformer
             // Check if this is an AutoRegistering type and extract the CLR type
             if (TryExtractAutoRegisteringType(graphTypeSymbol, knownSymbols.AutoRegisteringInputObjectGraphType, out var inputClrType))
             {
-                // Get namespace and hierarchy for input type
-                string? inputNamespace = inputClrType.ContainingNamespace?.ToDisplayString();
-                if (inputNamespace == "<global namespace>")
-                    inputNamespace = null;
-                var inputHierarchy = GetPartialClassHierarchy(inputClrType);
-
                 yield return new GeneratedTypeEntry(
                     SchemaClass: null,
                     OutputGraphType: null,
                     InputGraphType: TransformInputGraphType(graphTypeSymbol, inputClrType, members, knownSymbols, nameCache, usedNames),
-                    Namespace: inputNamespace,
-                    PartialClassHierarchy: inputHierarchy.ToImmutableEquatableArray());
+                    Namespace: schemaNamespace,
+                    PartialClassHierarchy: schemaHierarchy);
             }
             else if (TryExtractAutoRegisteringType(graphTypeSymbol, knownSymbols.AutoRegisteringObjectGraphType, out var outputClrType) ||
                      TryExtractAutoRegisteringType(graphTypeSymbol, knownSymbols.AutoRegisteringInterfaceGraphType, out outputClrType))
             {
-                // Get namespace and hierarchy for output type
-                string? outputNamespace = outputClrType.ContainingNamespace?.ToDisplayString();
-                if (outputNamespace == "<global namespace>")
-                    outputNamespace = null;
-                var outputHierarchy = GetPartialClassHierarchy(outputClrType);
-
                 yield return new GeneratedTypeEntry(
                     SchemaClass: null,
                     OutputGraphType: TransformOutputGraphType(graphTypeSymbol, outputClrType, members, knownSymbols, nameCache, usedNames),
                     InputGraphType: null,
-                    Namespace: outputNamespace,
-                    PartialClassHierarchy: outputHierarchy.ToImmutableEquatableArray());
+                    Namespace: schemaNamespace,
+                    PartialClassHierarchy: schemaHierarchy);
             }
         }
     }

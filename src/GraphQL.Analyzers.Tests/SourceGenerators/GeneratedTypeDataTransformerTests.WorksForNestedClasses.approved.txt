@@ -25,7 +25,7 @@
 //
 // ========== Entry 2 ==========
 // Namespace: MyApp.GraphQL
-// PartialClassHierarchy: public Outer > internal Inner > public Query
+// PartialClassHierarchy: public Outer > internal Inner > internal MySchema
 // Type: OutputGraphType
 // IsInterface: False
 // FullyQualifiedClrTypeName: global::MyApp.GraphQL.Outer.Inner.Query

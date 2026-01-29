@@ -41,7 +41,7 @@
 //
 // ========== Entry 2 ==========
 // Namespace: MyApp.GraphQL
-// PartialClassHierarchy: public Product
+// PartialClassHierarchy: internal MySchema
 // Type: OutputGraphType
 // IsInterface: False
 // FullyQualifiedClrTypeName: global::MyApp.GraphQL.Product
@@ -51,7 +51,7 @@
 //
 // ========== Entry 3 ==========
 // Namespace: MyApp.GraphQL
-// PartialClassHierarchy: public MyStatic > public Product
+// PartialClassHierarchy: internal MySchema
 // Type: OutputGraphType
 // IsInterface: False
 // FullyQualifiedClrTypeName: global::MyApp.GraphQL.MyStatic.Product
@@ -61,7 +61,7 @@
 //
 // ========== Entry 4 ==========
 // Namespace: MyApp.GraphQL
-// PartialClassHierarchy: public Item
+// PartialClassHierarchy: internal MySchema
 // Type: OutputGraphType
 // IsInterface: False
 // FullyQualifiedClrTypeName: global::MyApp.GraphQL.Item<int>
@@ -71,7 +71,7 @@
 //
 // ========== Entry 5 ==========
 // Namespace: MyApp.GraphQL
-// PartialClassHierarchy: public Item
+// PartialClassHierarchy: internal MySchema
 // Type: OutputGraphType
 // IsInterface: False
 // FullyQualifiedClrTypeName: global::MyApp.GraphQL.Item<long>
@@ -81,7 +81,7 @@
 //
 // ========== Entry 6 ==========
 // Namespace: MyApp.GraphQL
-// PartialClassHierarchy: public Product
+// PartialClassHierarchy: internal MySchema
 // Type: InputGraphType
 // FullyQualifiedClrTypeName: global::MyApp.GraphQL.Product
 // GraphTypeClassName: ProductGraphType3

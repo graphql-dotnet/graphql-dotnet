@@ -20,7 +20,7 @@ public partial class OuterClass
                         typeof(global::Sample.AddressInput).GetProperty(nameof(global::Sample.AddressInput.Street))!,
                         typeof(global::Sample.AddressInput).GetProperty(nameof(global::Sample.AddressInput.City))!
                     ];
-                    _fields = ProvideFields().ToArray();
+                    _fields = global::System.Linq.Enumerable.ToArray(ProvideFields());
                     foreach (var fieldType in _fields)
                     {
                         AddField(fieldType);
@@ -41,7 +41,7 @@ public partial class OuterClass
                     {
                         if (value.TryGetValue(fieldType.Name, out var fieldValue))
                         {
-                            return (TFieldType)valueConverter.GetPropertyValue(fieldValue, typeof(TFieldType), fieldType.ResolvedType!)!;
+                            return (TFieldType)global::GraphQL.ValueConverterExtensions.GetPropertyValue(valueConverter, fieldValue, typeof(TFieldType), fieldType.ResolvedType!)!;
                         }
                         return default!;
                     }
@@ -52,9 +52,9 @@ public partial class OuterClass
                     if (value is not global::Sample.AddressInput obj)
                         return false;
 
-                    if (_fields[0].ResolvedType!.IsValidDefault(obj.Street))
+                    if (global::GraphQL.GraphQLExtensions.IsValidDefault(_fields[0].ResolvedType!, obj.Street))
                         return false;
-                    if (_fields[1].ResolvedType!.IsValidDefault(obj.City))
+                    if (global::GraphQL.GraphQLExtensions.IsValidDefault(_fields[1].ResolvedType!, obj.City))
                         return false;
 
                     return true;
@@ -80,7 +80,7 @@ public partial class OuterClass
 
                     void ProcessField(global::GraphQL.Types.FieldType fieldType, object? fieldValue)
                     {
-                        var ast = fieldType.ResolvedType!.ToAST(fieldValue)
+                        var ast = global::GraphQL.GraphQLExtensions.ToAST(fieldType.ResolvedType!, fieldValue)
                             ?? throw new global::System.InvalidOperationException($"Could not convert value in global::Sample.AddressInput.{fieldType.Name} to AST");
                         if (ast is not global::GraphQLParser.AST.GraphQLNullValue || fieldType.DefaultValue != null)
                             objectValue.Fields.Add(new(new(fieldType.Name), ast));

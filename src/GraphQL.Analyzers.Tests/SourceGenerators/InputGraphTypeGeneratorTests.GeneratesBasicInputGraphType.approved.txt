@@ -16,7 +16,7 @@ public partial class SampleAotSchema
                 typeof(global::GraphQL.StarWars.TypeFirst.Types.HumanInput).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.Types.HumanInput.Name))!,
                 typeof(global::GraphQL.StarWars.TypeFirst.Types.HumanInput).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.Types.HumanInput.HomePlanet))!
             ];
-            _fields = ProvideFields().ToArray();
+            _fields = global::System.Linq.Enumerable.ToArray(ProvideFields());
             foreach (var fieldType in _fields)
             {
                 AddField(fieldType);
@@ -37,7 +37,7 @@ public partial class SampleAotSchema
             {
                 if (value.TryGetValue(fieldType.Name, out var fieldValue))
                 {
-                    return (TFieldType)valueConverter.GetPropertyValue(fieldValue, typeof(TFieldType), fieldType.ResolvedType!)!;
+                    return (TFieldType)global::GraphQL.ValueConverterExtensions.GetPropertyValue(valueConverter, fieldValue, typeof(TFieldType), fieldType.ResolvedType!)!;
                 }
                 return default!;
             }
@@ -48,9 +48,9 @@ public partial class SampleAotSchema
             if (value is not global::GraphQL.StarWars.TypeFirst.Types.HumanInput obj)
                 return false;
 
-            if (_fields[0].ResolvedType!.IsValidDefault(obj.Name))
+            if (global::GraphQL.GraphQLExtensions.IsValidDefault(_fields[0].ResolvedType!, obj.Name))
                 return false;
-            if (_fields[1].ResolvedType!.IsValidDefault(obj.HomePlanet))
+            if (global::GraphQL.GraphQLExtensions.IsValidDefault(_fields[1].ResolvedType!, obj.HomePlanet))
                 return false;
 
             return true;
@@ -76,7 +76,7 @@ public partial class SampleAotSchema
 
             void ProcessField(global::GraphQL.Types.FieldType fieldType, object? fieldValue)
             {
-                var ast = fieldType.ResolvedType!.ToAST(fieldValue)
+                var ast = global::GraphQL.GraphQLExtensions.ToAST(fieldType.ResolvedType!, fieldValue)
                     ?? throw new global::System.InvalidOperationException($"Could not convert value in global::GraphQL.StarWars.TypeFirst.Types.HumanInput.{fieldType.Name} to AST");
                 if (ast is not global::GraphQLParser.AST.GraphQLNullValue || fieldType.DefaultValue != null)
                     objectValue.Fields.Add(new(new(fieldType.Name), ast));

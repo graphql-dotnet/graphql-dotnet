@@ -19,7 +19,7 @@ public partial class SampleAotSchema
                 typeof(global::Sample.ComplexInput).GetProperty(nameof(global::Sample.ComplexInput.Tags))!,
                 typeof(global::Sample.ComplexInput).GetProperty(nameof(global::Sample.ComplexInput.Metadata))!
             ];
-            _fields = ProvideFields().ToArray();
+            _fields = global::System.Linq.Enumerable.ToArray(ProvideFields());
             foreach (var fieldType in _fields)
             {
                 AddField(fieldType);
@@ -43,7 +43,7 @@ public partial class SampleAotSchema
             {
                 if (value.TryGetValue(fieldType.Name, out var fieldValue))
                 {
-                    return (TFieldType)valueConverter.GetPropertyValue(fieldValue, typeof(TFieldType), fieldType.ResolvedType!)!;
+                    return (TFieldType)global::GraphQL.ValueConverterExtensions.GetPropertyValue(valueConverter, fieldValue, typeof(TFieldType), fieldType.ResolvedType!)!;
                 }
                 return default!;
             }
@@ -54,15 +54,15 @@ public partial class SampleAotSchema
             if (value is not global::Sample.ComplexInput obj)
                 return false;
 
-            if (_fields[0].ResolvedType!.IsValidDefault(obj.Id))
+            if (global::GraphQL.GraphQLExtensions.IsValidDefault(_fields[0].ResolvedType!, obj.Id))
                 return false;
-            if (_fields[1].ResolvedType!.IsValidDefault(obj.Name))
+            if (global::GraphQL.GraphQLExtensions.IsValidDefault(_fields[1].ResolvedType!, obj.Name))
                 return false;
-            if (_fields[2].ResolvedType!.IsValidDefault(obj.Description))
+            if (global::GraphQL.GraphQLExtensions.IsValidDefault(_fields[2].ResolvedType!, obj.Description))
                 return false;
-            if (_fields[3].ResolvedType!.IsValidDefault(obj.Tags))
+            if (global::GraphQL.GraphQLExtensions.IsValidDefault(_fields[3].ResolvedType!, obj.Tags))
                 return false;
-            if (_fields[4].ResolvedType!.IsValidDefault(obj.Metadata))
+            if (global::GraphQL.GraphQLExtensions.IsValidDefault(_fields[4].ResolvedType!, obj.Metadata))
                 return false;
 
             return true;
@@ -91,7 +91,7 @@ public partial class SampleAotSchema
 
             void ProcessField(global::GraphQL.Types.FieldType fieldType, object? fieldValue)
             {
-                var ast = fieldType.ResolvedType!.ToAST(fieldValue)
+                var ast = global::GraphQL.GraphQLExtensions.ToAST(fieldType.ResolvedType!, fieldValue)
                     ?? throw new global::System.InvalidOperationException($"Could not convert value in global::Sample.ComplexInput.{fieldType.Name} to AST");
                 if (ast is not global::GraphQLParser.AST.GraphQLNullValue || fieldType.DefaultValue != null)
                     objectValue.Fields.Add(new(new(fieldType.Name), ast));
