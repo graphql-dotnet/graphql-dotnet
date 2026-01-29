@@ -1,12 +1,12 @@
 using VerifyTestSG = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpIncrementalGeneratorVerifier<
-    GraphQL.Analyzers.Tests.SourceGenerators.GeneratedTypeDataTransformerTests.ReportingGenerator>;
+    GraphQL.Analyzers.Tests.SourceGenerators.ProcessedSchemaDataTransformerTests.ReportingGenerator>;
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators;
 
 /// <summary>
 /// Tests for GeneratedTypeDataTransformer that converts ISymbol-based data to primitive-only data.
 /// </summary>
-public partial class GeneratedTypeDataTransformerTests
+public partial class ProcessedSchemaDataTransformerTests
 {
     [Fact]
     public async Task TransformsAllDataTypes()

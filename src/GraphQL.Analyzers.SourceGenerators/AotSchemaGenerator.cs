@@ -33,7 +33,7 @@ public class AotSchemaGenerator : IIncrementalGenerator
             if (!schemaData.HasValue)
                 return Array.Empty<GeneratedTypeEntry>();
             var data = SchemaAttributeDataTransformer.Transform(schemaData.Value, symbols);
-            var generatedTypeData = GeneratedTypeDataTransformer.Transform(data, symbols);
+            var generatedTypeData = ProcessedSchemaDataTransformer.Transform(data, symbols);
             if (generatedTypeData == null)
                 return Array.Empty<GeneratedTypeEntry>();
             return generatedTypeData;

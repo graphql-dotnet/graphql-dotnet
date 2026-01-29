@@ -7,7 +7,7 @@ namespace GraphQL.Analyzers.SourceGenerators.Transformers;
 /// Transforms SchemaAttributeData and ProcessedSchemaData into primitive-only GeneratedTypeEntry instances.
 /// This transformer yields one entry for the schema class itself, then one entry for each generated graph type.
 /// </summary>
-public static class GeneratedTypeDataTransformer
+public static class ProcessedSchemaDataTransformer
 {
     /// <summary>
     /// Transforms schema data into a collection of GeneratedTypeEntry instances containing only primitive data.

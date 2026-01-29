@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace GraphQL.Analyzers.Tests.SourceGenerators;
 
-public partial class GeneratedTypeDataTransformerTests
+public partial class ProcessedSchemaDataTransformerTests
 {
     /// <summary>
     /// A test generator that uses GeneratedTypeDataTransformer to report the primitive-only data.
@@ -52,7 +52,7 @@ public partial class GeneratedTypeDataTransformerTests
                     var processedData = SchemaAttributeDataTransformer.Transform(attributeData, symbols);
 
                     // Transform to primitive-only data
-                    var entries = GeneratedTypeDataTransformer.Transform(processedData, symbols).ToList();
+                    var entries = ProcessedSchemaDataTransformer.Transform(processedData, symbols).ToList();
 
                     sb.AppendLine($"// Schema: {attributeData.SchemaClass.Name}");
                     sb.AppendLine($"// Total Entries: {entries.Count}");

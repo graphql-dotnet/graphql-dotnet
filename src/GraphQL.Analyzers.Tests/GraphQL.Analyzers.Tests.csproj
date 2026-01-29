@@ -28,4 +28,10 @@
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="**\*.approved.*;**\*.received.*">
+      <DependentUpon>$([System.String]::Copy('%(Filename)').Split('.')[0]).cs</DependentUpon>
+    </None>
+  </ItemGroup>
+
 </Project>
