@@ -73,7 +73,6 @@ static string LoadResource(string resourceName)
 
 [AotQueryType<StarWarsQuery>]
 [AotMutationType<StarWarsMutation>]
-[AotOutputType<IStarWarsCharacter>]
 internal partial class StarWarsSchema : AotSchema
 {
 }
