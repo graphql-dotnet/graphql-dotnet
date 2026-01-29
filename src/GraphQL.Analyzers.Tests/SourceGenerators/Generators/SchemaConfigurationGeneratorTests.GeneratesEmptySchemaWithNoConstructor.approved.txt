@@ -5,7 +5,7 @@ namespace AotSample;
 
 public partial class SampleAotSchema
 {
-    private void Configure()
+    protected override void Configure()
     {
     }
 }

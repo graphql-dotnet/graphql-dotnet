@@ -59,7 +59,7 @@ public partial class MySchema
         Configure();
     }
 
-    private void Configure()
+    protected override void Configure()
     {
         AddAotType<global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Sample.Subscription>, SubscriptionGraphType>();
         AddAotType<global::GraphQL.Types.StringGraphType>();

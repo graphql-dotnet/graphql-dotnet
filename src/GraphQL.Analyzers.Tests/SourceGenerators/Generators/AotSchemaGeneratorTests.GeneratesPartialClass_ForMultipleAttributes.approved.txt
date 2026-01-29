@@ -133,7 +133,7 @@ namespace Sample;
 
 public partial class MySchema
 {
-    private void Configure()
+    protected override void Configure()
     {
         AddAotType<global::GraphQL.Types.DateTimeGraphType>();
         AddAotType<global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::Sample.MyInput>, MyInputGraphType>();

@@ -11,7 +11,7 @@ public partial class SampleAotSchema
         Configure();
     }
 
-    private void Configure()
+    protected override void Configure()
     {
         AddAotType<global::GraphQL.Types.AutoRegisteringObjectGraphType<Query>, QueryGraphType>();
         AddAotType<global::GraphQL.Types.StringGraphType>();

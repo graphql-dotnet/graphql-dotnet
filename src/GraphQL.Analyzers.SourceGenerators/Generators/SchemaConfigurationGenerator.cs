@@ -130,7 +130,7 @@ public static class SchemaConfigurationGenerator
     {
         var indent = new string(' ', indentLevel * 4);
 
-        sb.AppendLine($"{indent}private void Configure()");
+        sb.AppendLine($"{indent}protected override void Configure()");
         sb.AppendLine($"{indent}{{");
 
         // Generate AddAotType calls

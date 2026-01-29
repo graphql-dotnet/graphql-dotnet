@@ -11,7 +11,7 @@ public partial class SampleAotSchema : global::GraphQL.Conversion.IListConverter
         Configure();
     }
 
-    private void Configure()
+    protected override void Configure()
     {
         AddAotType<global::GraphQL.Types.AutoRegisteringObjectGraphType<StarWarsQuery>, StarWarsQuery>();
         AddAotType<global::GraphQL.Types.IntGraphType>();

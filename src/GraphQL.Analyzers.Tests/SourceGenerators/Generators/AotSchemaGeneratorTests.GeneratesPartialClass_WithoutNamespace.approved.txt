@@ -44,7 +44,7 @@ public partial class MySchema
 
 public partial class MySchema
 {
-    private void Configure()
+    protected override void Configure()
     {
         AddAotType<global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Query>, QueryGraphType>();
         AddAotType<global::GraphQL.Types.StringGraphType>();

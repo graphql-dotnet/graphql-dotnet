@@ -94,16 +94,6 @@ static string LoadResource(string resourceName)
     return reader.ReadToEnd();
 }
 
-[AotGraphType<StarWarsQuery>]
-[AotGraphType<StarWarsMutation>]
-[AotGraphType<CharacterInterface>]
-[AotGraphType<DroidType>]
-[AotGraphType<HumanInputType>]
-[AotGraphType<HumanType>]
-[AotGraphType<ConnectionType<CharacterInterface, EdgeType<CharacterInterface>>>]
-[AotGraphType<EdgeType<CharacterInterface>>]
-[AotTypeMapping<Episodes, EpisodeEnum>]
-[AotGraphType<PageInfoType>]
 internal partial class StarWarsAotSchema : AotSchema
 {
     public StarWarsAotSchema(IServiceProvider serviceProvider, IEnumerable<GraphQL.DI.IConfigureSchema> configurations)
