@@ -1,6 +1,7 @@
 using System.Text;
 using GraphQL.Analyzers.SourceGenerators.Models;
 using GraphQL.Analyzers.SourceGenerators.Providers;
+using GraphQL.Analyzers.SourceGenerators.Transformers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
@@ -15,8 +16,27 @@ public class AotSchemaGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // Provider D: Get all candidate class declarations with AOT attributes
-        var candidateClasses = CandidateProvider.CreateCandidateProvider(context);
+        // Get all candidate classes
+        var candidateClasses = CandidateProvider.Create(context);
+
+        // Combine with known symbols if needed
+        var knownSymbols = KnownSymbolsProvider.Create(context);
+
+        var candidatesWithSymbols = candidateClasses.Combine(knownSymbols);
+
+        var processedCandidates = candidatesWithSymbols.SelectMany((pair, _) =>
+        {
+            var candidate = pair.Left;
+            var symbols = pair.Right;
+            var schemaData = CandidateClassTransformer.Transform(candidate, symbols);
+            if (!schemaData.HasValue)
+                return Array.Empty<GeneratedTypeEntry>();
+            var data = SchemaAttributeDataTransformer.Transform(schemaData.Value, symbols);
+            var generatedTypeData = GeneratedTypeDataTransformer.Transform(data, symbols);
+            if (generatedTypeData == null)
+                return Array.Empty<GeneratedTypeEntry>();
+            return generatedTypeData;
+        });
 
         // Register source output for each candidate class
         context.RegisterSourceOutput(candidateClasses, GenerateSource);

@@ -58,7 +58,12 @@ public static class SchemaConfigurationGenerator
         for (int i = 0; i < partialClassHierarchy.Count; i++)
         {
             var classInfo = partialClassHierarchy[i];
-            var classAccessibility = classInfo.IsPublic ? "public" : "internal";
+            var classAccessibility = classInfo.Accessibility switch
+            {
+                ClassAccessibility.Public => "public",
+                ClassAccessibility.Private => "private",
+                _ => "internal"
+            };
 
             sb.Append(new string(' ', indentLevel * 4));
             sb.Append($"{classAccessibility} partial class {classInfo.ClassName}");

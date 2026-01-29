@@ -17,7 +17,7 @@ public class OutputGraphTypeGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
         });
 
         // Test both interface and object types with comprehensive member sets
@@ -197,7 +197,7 @@ public class OutputGraphTypeGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
         });
 
         var outputType = new OutputGraphTypeData(
@@ -222,9 +222,9 @@ public class OutputGraphTypeGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("OuterClass", IsPublic: true),
-            new PartialClassInfo("InnerClass", IsPublic: false),
-            new PartialClassInfo("DeepestClass", IsPublic: true)
+            new PartialClassInfo("OuterClass", Accessibility: ClassAccessibility.Public),
+            new PartialClassInfo("InnerClass", Accessibility: ClassAccessibility.Internal),
+            new PartialClassInfo("DeepestClass", Accessibility: ClassAccessibility.Public)
         });
 
         var members = new ImmutableEquatableArray<OutputMemberData>(new[]
@@ -259,7 +259,7 @@ public class OutputGraphTypeGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
         });
 
         // Act
@@ -297,7 +297,7 @@ public class OutputGraphTypeGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
         });
 
         // Droid object type matching the user's example
@@ -369,7 +369,7 @@ public class OutputGraphTypeGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
         });
 
         var members = new ImmutableEquatableArray<OutputMemberData>(new[]
@@ -406,7 +406,7 @@ public class OutputGraphTypeGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
         });
 
         var members = new ImmutableEquatableArray<OutputMemberData>(new[]
@@ -460,7 +460,7 @@ public class OutputGraphTypeGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
         });
 
         var members = new ImmutableEquatableArray<OutputMemberData>(new[]

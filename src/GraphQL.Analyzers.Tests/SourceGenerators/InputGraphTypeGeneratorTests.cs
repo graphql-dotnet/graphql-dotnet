@@ -15,7 +15,7 @@ public class InputGraphTypeGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
         });
 
         var members = new ImmutableEquatableArray<InputMemberData>(new[]
@@ -50,7 +50,7 @@ public class InputGraphTypeGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
         });
 
         var members = new ImmutableEquatableArray<InputMemberData>(new[]
@@ -95,7 +95,7 @@ public class InputGraphTypeGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
         });
 
         var inputType = new InputGraphTypeData(
@@ -118,9 +118,9 @@ public class InputGraphTypeGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("OuterClass", IsPublic: true),
-            new PartialClassInfo("InnerClass", IsPublic: false),
-            new PartialClassInfo("DeepestClass", IsPublic: true)
+            new PartialClassInfo("OuterClass", Accessibility: ClassAccessibility.Public),
+            new PartialClassInfo("InnerClass", Accessibility: ClassAccessibility.Internal),
+            new PartialClassInfo("DeepestClass", Accessibility: ClassAccessibility.Public)
         });
 
         var members = new ImmutableEquatableArray<InputMemberData>(new[]
@@ -155,7 +155,7 @@ public class InputGraphTypeGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
         });
 
         // Act
@@ -191,7 +191,7 @@ public class InputGraphTypeGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
         });
 
         var members = new ImmutableEquatableArray<InputMemberData>(new[]
@@ -238,7 +238,7 @@ public class InputGraphTypeGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
         });
 
         var members = new ImmutableEquatableArray<InputMemberData>(new[]
@@ -279,7 +279,7 @@ public class InputGraphTypeGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
         });
 
         var members = new ImmutableEquatableArray<InputMemberData>(new[]

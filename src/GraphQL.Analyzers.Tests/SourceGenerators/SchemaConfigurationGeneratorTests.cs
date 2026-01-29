@@ -15,7 +15,7 @@ public class SchemaConfigurationGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
         });
 
         var registeredTypes = new ImmutableEquatableArray<RegisteredGraphTypeData>(new[]
@@ -69,7 +69,7 @@ public class SchemaConfigurationGeneratorTests
         var @namespace = "AotSample";
         var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
         {
-            new PartialClassInfo("SampleAotSchema", IsPublic: true)
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
         });
 
         var schemaClass = new SchemaClassData(

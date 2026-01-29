@@ -11,7 +11,7 @@ public static class KnownSymbolsProvider
     /// <summary>
     /// Creates a provider that resolves INamedTypeSymbol for all AOT attribute types.
     /// </summary>
-    public static IncrementalValueProvider<KnownSymbols> CreateAttributeSymbolsProvider(
+    public static IncrementalValueProvider<KnownSymbols> Create(
         IncrementalGeneratorInitializationContext context)
     {
         return context.CompilationProvider.Select(static (compilation, _) =>

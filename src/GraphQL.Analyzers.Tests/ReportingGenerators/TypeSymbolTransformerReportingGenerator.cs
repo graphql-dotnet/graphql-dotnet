@@ -26,7 +26,7 @@ public class TypeSymbolTransformerReportingGenerator : IIncrementalGenerator
             .Collect();
 
         // Resolve known symbols using AttributeSymbolsProvider
-        var attributeSymbols = KnownSymbolsProvider.CreateAttributeSymbolsProvider(context);
+        var attributeSymbols = KnownSymbolsProvider.Create(context);
 
         // Combine and transform
         var combined = typesToScan.Combine(attributeSymbols);

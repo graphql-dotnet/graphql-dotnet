@@ -12,11 +12,21 @@ public readonly record struct GeneratedTypeEntry(
     ImmutableEquatableArray<PartialClassInfo> PartialClassHierarchy);
 
 /// <summary>
+/// Accessibility level for a class.
+/// </summary>
+public enum ClassAccessibility
+{
+    Public = 0,
+    Internal = 1,
+    Private = 2
+}
+
+/// <summary>
 /// Information about a partial class in the hierarchy, including its name and accessibility.
 /// </summary>
 public readonly record struct PartialClassInfo(
     string ClassName,
-    bool IsPublic);
+    ClassAccessibility Accessibility);
 
 /// <summary>
 /// Primitive-only data for an output (object/interface) graph type.

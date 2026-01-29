@@ -18,8 +18,8 @@ public partial class CandidateClassTransformerTests
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             // Get candidates and attribute symbols
-            var candidateClasses = CandidateProvider.CreateCandidateProvider(context);
-            var attributeSymbols = KnownSymbolsProvider.CreateAttributeSymbolsProvider(context);
+            var candidateClasses = CandidateProvider.Create(context);
+            var attributeSymbols = KnownSymbolsProvider.Create(context);
 
             // Combine them for transformation
             var candidatesWithSymbols = candidateClasses.Combine(attributeSymbols);

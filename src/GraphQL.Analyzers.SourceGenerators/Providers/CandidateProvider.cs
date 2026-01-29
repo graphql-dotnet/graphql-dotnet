@@ -25,7 +25,7 @@ public static class CandidateProvider
     ///
     /// Returns CandidateClass containing both syntax and semantic model for code generation.
     /// </remarks>
-    public static IncrementalValuesProvider<CandidateClass> CreateCandidateProvider(
+    public static IncrementalValuesProvider<CandidateClass> Create(
         IncrementalGeneratorInitializationContext context)
     {
         // Create a provider for the AotSchema symbol to use in filtering

@@ -12,12 +12,10 @@ public static class GeneratedTypeDataTransformer
     /// <summary>
     /// Transforms schema data into a collection of GeneratedTypeEntry instances containing only primitive data.
     /// </summary>
-    /// <param name="schemaData">The schema attribute data containing the schema class.</param>
     /// <param name="processedData">The processed schema data containing discovered types and mappings.</param>
     /// <param name="knownSymbols">Known GraphQL symbol references for comparison.</param>
     /// <returns>An enumerable of GeneratedTypeEntry instances.</returns>
     public static IEnumerable<GeneratedTypeEntry> Transform(
-        SchemaAttributeData schemaData,
         ProcessedSchemaData processedData,
         KnownSymbols knownSymbols)
     {
@@ -26,7 +24,7 @@ public static class GeneratedTypeDataTransformer
         var usedNames = new Dictionary<string, int>(StringComparer.Ordinal);
 
         // Get schema class namespace and hierarchy
-        var schemaClass = schemaData.SchemaClass;
+        var schemaClass = processedData.SchemaClass;
         string? schemaNamespace = schemaClass.ContainingNamespace?.ToDisplayString();
         if (schemaNamespace == "<global namespace>")
             schemaNamespace = null;
@@ -34,7 +32,7 @@ public static class GeneratedTypeDataTransformer
 
         // First, yield the schema class entry
         yield return new GeneratedTypeEntry(
-            SchemaClass: TransformSchemaClass(schemaData, processedData, knownSymbols, nameCache, usedNames),
+            SchemaClass: TransformSchemaClass(processedData, knownSymbols, nameCache, usedNames),
             OutputGraphType: null,
             InputGraphType: null,
             Namespace: schemaNamespace,
@@ -84,13 +82,12 @@ public static class GeneratedTypeDataTransformer
     /// Transforms the schema class data into primitive-only SchemaClassData.
     /// </summary>
     private static SchemaClassData TransformSchemaClass(
-        SchemaAttributeData schemaData,
         ProcessedSchemaData processedData,
         KnownSymbols knownSymbols,
         Dictionary<ISymbol, string> nameCache,
         Dictionary<string, int> usedNames)
     {
-        var schemaClass = schemaData.SchemaClass;
+        var schemaClass = processedData.SchemaClass;
 
         // Check if schema class has a constructor defined in a class declaration with AOT attributes
         bool hasConstructor = HasConstructor(schemaClass, knownSymbols);
@@ -570,33 +567,6 @@ public static class GeneratedTypeDataTransformer
     }
 
     /// <summary>
-    /// Determines if a graph type is an input type based on the mappings.
-    /// </summary>
-    private static bool IsInputGraphType(
-        ITypeSymbol graphType,
-        ProcessedSchemaData processedData,
-        KnownSymbols knownSymbols)
-    {
-        // Check if it's in the input mappings
-        foreach (var (_, mappedGraphType) in processedData.InputClrTypeMappings)
-        {
-            if (SymbolEqualityComparer.Default.Equals(graphType, mappedGraphType))
-                return true;
-        }
-
-        // Check if it's an AutoRegisteringInputObjectGraphType
-        if (knownSymbols.AutoRegisteringInputObjectGraphType != null &&
-            graphType is INamedTypeSymbol namedType &&
-            namedType.IsGenericType &&
-            SymbolEqualityComparer.Default.Equals(namedType.OriginalDefinition, knownSymbols.AutoRegisteringInputObjectGraphType))
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    /// <summary>
     /// Checks if a graph type is an auto-registering type.
     /// </summary>
     private static bool IsAutoRegisteringType(ITypeSymbol graphType, KnownSymbols knownSymbols)
@@ -624,8 +594,13 @@ public static class GeneratedTypeDataTransformer
 
         while (current != null)
         {
-            bool isPublic = current.DeclaredAccessibility == Accessibility.Public;
-            hierarchy.Add(new PartialClassInfo(current.Name, isPublic));
+            var accessibility = current.DeclaredAccessibility switch
+            {
+                Accessibility.Public => ClassAccessibility.Public,
+                Accessibility.Private => ClassAccessibility.Private,
+                _ => ClassAccessibility.Internal
+            };
+            hierarchy.Add(new PartialClassInfo(current.Name, accessibility));
             current = current.ContainingType;
         }
 

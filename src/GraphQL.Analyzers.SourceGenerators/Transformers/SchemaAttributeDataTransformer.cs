@@ -191,6 +191,7 @@ public readonly ref struct SchemaAttributeDataTransformer
 
         // Return the processed schema data
         return new ProcessedSchemaData(
+            SchemaClass: schemaData.SchemaClass,
             QueryRootGraphType: queryRootGraphType,
             MutationRootGraphType: mutationRootGraphType,
             SubscriptionRootGraphType: subscriptionRootGraphType,

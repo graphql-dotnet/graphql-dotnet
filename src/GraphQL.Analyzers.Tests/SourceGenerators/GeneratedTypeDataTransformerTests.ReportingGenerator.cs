@@ -18,8 +18,8 @@ public partial class GeneratedTypeDataTransformerTests
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             // Get candidates and attribute symbols
-            var candidateClasses = CandidateProvider.CreateCandidateProvider(context);
-            var attributeSymbols = KnownSymbolsProvider.CreateAttributeSymbolsProvider(context);
+            var candidateClasses = CandidateProvider.Create(context);
+            var attributeSymbols = KnownSymbolsProvider.Create(context);
 
             // Combine them for transformation
             var candidatesWithSymbols = candidateClasses.Combine(attributeSymbols);
@@ -52,10 +52,7 @@ public partial class GeneratedTypeDataTransformerTests
                     var processedData = SchemaAttributeDataTransformer.Transform(attributeData, symbols);
 
                     // Transform to primitive-only data
-                    var entries = GeneratedTypeDataTransformer.Transform(
-                        attributeData,
-                        processedData,
-                        symbols).ToList();
+                    var entries = GeneratedTypeDataTransformer.Transform(processedData, symbols).ToList();
 
                     sb.AppendLine($"// Schema: {attributeData.SchemaClass.Name}");
                     sb.AppendLine($"// Total Entries: {entries.Count}");
@@ -66,7 +63,7 @@ public partial class GeneratedTypeDataTransformerTests
                         var entry = entries[i];
                         sb.AppendLine($"// ========== Entry {i + 1} ==========");
                         sb.AppendLine($"// Namespace: {entry.Namespace ?? "null"}");
-                        sb.AppendLine($"// PartialClassHierarchy: {string.Join(" > ", entry.PartialClassHierarchy.Select(p => p.IsPublic ? $"public {p.ClassName}" : $"internal {p.ClassName}"))}");
+                        sb.AppendLine($"// PartialClassHierarchy: {string.Join(" > ", entry.PartialClassHierarchy.Select(p => p.Accessibility == ClassAccessibility.Public ? $"public {p.ClassName}" : p.Accessibility == ClassAccessibility.Private ? $"private {p.ClassName}" : $"internal {p.ClassName}"))}");
 
                         if (entry.SchemaClass is not null)
                         {

@@ -17,7 +17,7 @@ public partial class CandidateProviderTests
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             // Use the real CandidateProvider - this is what we're testing
-            var candidateClasses = CandidateProvider.CreateCandidateProvider(context);
+            var candidateClasses = CandidateProvider.Create(context);
 
             // Collect all candidates and generate a report
             context.RegisterSourceOutput(candidateClasses.Collect(), (spc, candidates) =>

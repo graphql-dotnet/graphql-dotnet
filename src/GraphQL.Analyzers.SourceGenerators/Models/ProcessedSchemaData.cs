@@ -8,6 +8,7 @@ namespace GraphQL.Analyzers.SourceGenerators.Models;
 /// as well as mappings from CLR types to their corresponding wrapped GraphTypes.
 /// </summary>
 public readonly record struct ProcessedSchemaData(
+    INamedTypeSymbol SchemaClass,
     ITypeSymbol? QueryRootGraphType,
     ITypeSymbol? MutationRootGraphType,
     ITypeSymbol? SubscriptionRootGraphType,
