@@ -104,6 +104,7 @@ internal static class Constants
         internal const string DATETIME_GRAPH_TYPE = "GraphQL.Types.DateTimeGraphType";
         internal const string DATETIMEOFFSET_GRAPH_TYPE = "GraphQL.Types.DateTimeOffsetGraphType";
         internal const string TIMESPAN_SECONDS_GRAPH_TYPE = "GraphQL.Types.TimeSpanSecondsGraphType";
+        internal const string TIMESPAN_MILLISECONDS_GRAPH_TYPE = "GraphQL.Types.TimeSpanMillisecondsGraphType";
         internal const string ID_GRAPH_TYPE = "GraphQL.Types.IdGraphType";
         internal const string SHORT_GRAPH_TYPE = "GraphQL.Types.ShortGraphType";
         internal const string USHORT_GRAPH_TYPE = "GraphQL.Types.UShortGraphType";
@@ -115,6 +116,9 @@ internal static class Constants
         internal const string DATEONLY_GRAPH_TYPE = "GraphQL.Types.DateOnlyGraphType";
         internal const string TIMEONLY_GRAPH_TYPE = "GraphQL.Types.TimeOnlyGraphType";
         internal const string HALF_GRAPH_TYPE = "GraphQL.Types.HalfGraphType";
+        internal const string COMPLEX_SCALAR_GRAPH_TYPE = "GraphQL.Types.ComplexScalarGraphType";
+        internal const string DATE_GRAPH_TYPE = "GraphQL.Types.DateGraphType";
+        internal const string GUID_GRAPH_TYPE = "GraphQL.Types.GuidGraphType";
 
         // Built-in CLR types (not available via GetSpecialType)
         internal const string BIG_INTEGER = "System.Numerics.BigInteger";

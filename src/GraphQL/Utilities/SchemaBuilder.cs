@@ -554,6 +554,10 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
     /// <summary>
     /// Returns an <see cref="InputObjectGraphType"/> from the specified <see cref="GraphQLInputObjectTypeDefinition"/>.
     /// </summary>
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+    [UnconditionalSuppressMessage("AOT", "IL2026:Calling method marked with RequiresUnreferencedCodeAttribute",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     protected virtual InputObjectGraphType ToInputObjectType(GraphQLInputObjectTypeDefinition inputDef)
     {
         var name = (string)inputDef.Name; //TODO:alloc

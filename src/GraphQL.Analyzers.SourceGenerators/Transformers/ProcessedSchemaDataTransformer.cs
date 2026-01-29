@@ -19,6 +19,9 @@ public static class ProcessedSchemaDataTransformer
         ProcessedSchemaData processedData,
         KnownSymbols knownSymbols)
     {
+        //
+        var createGraphTypeConstructors = false;
+
         // Create a name cache to ensure each graph type symbol gets a consistent unique name
         var nameCache = new Dictionary<ISymbol, string>(SymbolEqualityComparer.Default);
         var usedNames = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -32,7 +35,7 @@ public static class ProcessedSchemaDataTransformer
 
         // First, yield the schema class entry
         yield return new GeneratedTypeEntry(
-            SchemaClass: TransformSchemaClass(processedData, knownSymbols, nameCache, usedNames),
+            SchemaClass: TransformSchemaClass(processedData, knownSymbols, nameCache, usedNames, createGraphTypeConstructors),
             OutputGraphType: null,
             InputGraphType: null,
             Namespace: schemaNamespace,
@@ -73,7 +76,8 @@ public static class ProcessedSchemaDataTransformer
         ProcessedSchemaData processedData,
         KnownSymbols knownSymbols,
         Dictionary<ISymbol, string> nameCache,
-        Dictionary<string, int> usedNames)
+        Dictionary<string, int> usedNames,
+        bool createGraphTypeConstructors)
     {
         var schemaClass = processedData.SchemaClass;
 
@@ -110,7 +114,7 @@ public static class ProcessedSchemaDataTransformer
 
             // Get constructor data for non-AOT-generated types
             ConstructorData? constructorData = null;
-            if (aotGeneratedTypeName == null)
+            if (aotGeneratedTypeName == null && (createGraphTypeConstructors || IsBuiltInGraphType(remappedToType ?? graphTypeSymbol, knownSymbols)))
             {
                 // Use the remapped type symbol if available, otherwise use the original graph type symbol
                 var symbolForConstructor = remappedToType ?? graphTypeSymbol;
@@ -764,5 +768,16 @@ public static class ProcessedSchemaDataTransformer
 
         return (knownSymbols.IObservableT != null && SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.IObservableT)) ||
                (knownSymbols.IAsyncEnumerableT != null && SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.IAsyncEnumerableT));
+    }
+
+    /// <summary>
+    /// Helper method to check if a scalar is a built-in GraphQL type.
+    /// </summary>
+    private static bool IsBuiltInGraphType(ITypeSymbol type, KnownSymbols knownSymbols)
+    {
+        if (type is not INamedTypeSymbol namedType)
+            return false;
+
+        return knownSymbols.BuiltInScalars.Contains(type, SymbolEqualityComparer.Default);
     }
 }

@@ -82,11 +82,18 @@ public partial class KnownSymbolsProviderTests
                 sb.AppendLine($"// AutoRegisteringInputObjectGraphType: {symbols.AutoRegisteringInputObjectGraphType?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// AutoRegisteringInterfaceGraphType: {symbols.AutoRegisteringInterfaceGraphType?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine("//");
-                sb.AppendLine($"// BuiltInScalarMappings ({symbols.BuiltInScalarMappings.Count} mappings):");
-                for (int i = 0; i < symbols.BuiltInScalarMappings.Count; i++)
+                sb.AppendLine($"// BuiltInScalarMappings ({symbols.BuiltInScalarMappings.Length} mappings):");
+                for (int i = 0; i < symbols.BuiltInScalarMappings.Length; i++)
                 {
                     var (clrType, graphType) = symbols.BuiltInScalarMappings[i];
                     sb.AppendLine($"//   {clrType?.ToDisplayString() ?? "NULL"} -> {graphType?.ToDisplayString() ?? "NULL"}");
+                }
+                sb.AppendLine("//");
+                sb.AppendLine($"// BuiltInScalars ({symbols.BuiltInScalars.Length} mappings):");
+                for (int i = 0; i < symbols.BuiltInScalars.Length; i++)
+                {
+                    var scalarType = symbols.BuiltInScalars[i];
+                    sb.AppendLine($"//   {scalarType?.ToDisplayString() ?? "NULL"}");
                 }
 
                 spc.AddSource("AttributeSymbolsReport.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));

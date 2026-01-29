@@ -21,10 +21,17 @@ serviceCollection.AddGraphQLAot(b => b
 
 serviceCollection.AddSingleton<StarWarsData>();
 
-// must manually register the query and mutation types or AOT will trim their constructors
-// all other graph types' constructors are preserved via calls to Field<T>
+// must manually register the required types or AOT will trim their constructors
 serviceCollection.AddTransient<StarWarsQuery>();
 serviceCollection.AddTransient<StarWarsMutation>();
+serviceCollection.AddTransient<CharacterInterface>();
+serviceCollection.AddTransient<DroidType>();
+serviceCollection.AddTransient<HumanType>();
+serviceCollection.AddTransient<HumanInputType>();
+serviceCollection.AddTransient<ConnectionType<CharacterInterface, EdgeType<CharacterInterface>>>();
+serviceCollection.AddTransient<EdgeType<CharacterInterface>>();
+serviceCollection.AddTransient<PageInfoType>();
+serviceCollection.AddTransient<EpisodeEnum>();
 
 // other notes:
 // - auto clr type mappings are generally not supported

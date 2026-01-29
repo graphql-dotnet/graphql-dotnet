@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using GraphQL.Analyzers.SourceGenerators.Models;
 using Microsoft.CodeAnalysis;
 
@@ -75,6 +76,15 @@ public static class KnownSymbolsProvider
         AddScalarMapping(Constants.TypeNames.GUID, Constants.TypeNames.ID_GRAPH_TYPE);
         AddScalarMapping(Constants.TypeNames.URI, Constants.TypeNames.URI_GRAPH_TYPE);
 
+        // Collect built-in scalar types
+        List<INamedTypeSymbol?> builtInScalars = [
+            compilation.GetTypeByMetadataName(Constants.TypeNames.COMPLEX_SCALAR_GRAPH_TYPE),
+            compilation.GetTypeByMetadataName(Constants.TypeNames.DATE_GRAPH_TYPE),
+            compilation.GetTypeByMetadataName(Constants.TypeNames.GUID_GRAPH_TYPE),
+            compilation.GetTypeByMetadataName(Constants.TypeNames.TIMESPAN_MILLISECONDS_GRAPH_TYPE),
+        ];
+        builtInScalars.AddRange(builtInMappings.Select(m => m.GraphType).Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default));
+
         return new KnownSymbols
         {
             AotQueryType = compilation.GetTypeByMetadataName(Constants.AttributeNames.AOT_QUERY_TYPE),
@@ -133,7 +143,8 @@ public static class KnownSymbolsProvider
             AutoRegisteringObjectGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.AUTO_REGISTERING_OBJECT_GRAPH_TYPE),
             AutoRegisteringInputObjectGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.AUTO_REGISTERING_INPUT_OBJECT_GRAPH_TYPE),
             AutoRegisteringInterfaceGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.AUTO_REGISTERING_INTERFACE_GRAPH_TYPE),
-            BuiltInScalarMappings = builtInMappings.ToImmutableEquatableArray(),
+            BuiltInScalarMappings = builtInMappings.ToImmutableArray(),
+            BuiltInScalars = builtInScalars.Where(x => x != null).Select(x => x!).ToImmutableArray(),
         };
     }
 }

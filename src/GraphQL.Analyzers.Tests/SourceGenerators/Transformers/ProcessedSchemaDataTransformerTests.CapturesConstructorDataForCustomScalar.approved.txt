@@ -23,19 +23,9 @@
 //   - global::MyApp.GraphQL.CustomScalarGraphType
 //     AotGenerated: null
 //     Override: null
-//     ConstructorData:
-//       Parameters (1):
-//         - string
-//       RequiredProperties (0):
 //   - global::MyApp.GraphQL.ComplexScalarGraphType
 //     AotGenerated: null
 //     Override: null
-//     ConstructorData:
-//       Parameters (3):
-//         - string
-//         - string
-//         - global::System.IServiceProvider
-//       RequiredProperties (0):
 //   - global::GraphQL.Types.StringGraphType
 //     AotGenerated: null
 //     Override: null

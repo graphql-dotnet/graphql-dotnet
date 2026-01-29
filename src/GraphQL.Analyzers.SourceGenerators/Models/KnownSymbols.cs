@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 
 namespace GraphQL.Analyzers.SourceGenerators.Models;
@@ -68,5 +69,10 @@ public readonly record struct KnownSymbols
     /// Built-in scalar type mappings from CLR types to GraphTypes, matching BuiltInScalarMappingProvider.
     /// Each tuple contains (CLR type symbol, GraphType symbol).
     /// </summary>
-    public ImmutableEquatableArray<(INamedTypeSymbol ClrType, INamedTypeSymbol GraphType)> BuiltInScalarMappings { get; init; }
+    public ImmutableArray<(INamedTypeSymbol ClrType, INamedTypeSymbol GraphType)> BuiltInScalarMappings { get; init; }
+
+    /// <summary>
+    /// Built-in scalar GraphType symbols.
+    /// </summary>
+    public ImmutableArray<INamedTypeSymbol> BuiltInScalars { get; init; }
 }

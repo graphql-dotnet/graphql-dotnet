@@ -529,7 +529,7 @@ public readonly ref struct SchemaAttributeDataTransformer
         graphType = null!;
 
         // Check the built-in scalar mappings from KnownSymbols
-        for (int i = 0; i < _knownSymbols.BuiltInScalarMappings.Count; i++)
+        for (int i = 0; i < _knownSymbols.BuiltInScalarMappings.Length; i++)
         {
             var (mappedClrType, mappedGraphType) = _knownSymbols.BuiltInScalarMappings[i];
             if (SymbolEqualityComparer.Default.Equals(clrType, mappedClrType))
