@@ -114,6 +114,8 @@ public static class KnownSymbolsProvider
                 TaskT = compilation.GetTypeByMetadataName(Constants.TypeNames.TASK_T),
                 ValueTaskT = compilation.GetTypeByMetadataName(Constants.TypeNames.VALUE_TASK_T),
                 IDataLoaderResultT = compilation.GetTypeByMetadataName(Constants.TypeNames.IDATA_LOADER_RESULT_T),
+                IObservableT = compilation.GetTypeByMetadataName(Constants.TypeNames.IOBSERVABLE_T),
+                IAsyncEnumerableT = compilation.GetTypeByMetadataName(Constants.TypeNames.IASYNC_ENUMERABLE_T),
                 IResolveFieldContext = compilation.GetTypeByMetadataName(Constants.TypeNames.IRESOLVE_FIELD_CONTEXT),
                 CancellationToken = compilation.GetTypeByMetadataName(Constants.TypeNames.CANCELLATION_TOKEN),
                 IInputObjectGraphType = compilation.GetTypeByMetadataName(Constants.TypeNames.IINPUT_OBJECT_GRAPH_TYPE),

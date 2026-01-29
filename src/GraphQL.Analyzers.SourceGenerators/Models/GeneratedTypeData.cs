@@ -48,6 +48,7 @@ public record class OutputMemberData(
     string MemberName,
     MemberKind MemberKind,
     bool IsStatic,
+    bool IsSourceStreamResolver,
     ImmutableEquatableArray<MethodParameterData> MethodParameters);
 
 /// <summary>

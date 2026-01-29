@@ -90,6 +90,8 @@ internal static class Constants
         internal const string TASK_T = "System.Threading.Tasks.Task`1";
         internal const string VALUE_TASK_T = "System.Threading.Tasks.ValueTask`1";
         internal const string IDATA_LOADER_RESULT_T = "GraphQL.DataLoader.IDataLoaderResult`1";
+        internal const string IOBSERVABLE_T = "System.IObservable`1";
+        internal const string IASYNC_ENUMERABLE_T = "System.Collections.Generic.IAsyncEnumerable`1";
 
         // Built-in scalar GraphTypes
         internal const string INT_GRAPH_TYPE = "GraphQL.Types.IntGraphType";

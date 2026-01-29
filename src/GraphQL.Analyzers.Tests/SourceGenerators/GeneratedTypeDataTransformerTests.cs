@@ -303,4 +303,64 @@ public partial class GeneratedTypeDataTransformerTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
         output.ShouldMatchApproved(o => o.NoDiff());
     }
+
+    [Fact]
+    public async Task IdentifiesSourceStreamResolvers()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.DI;
+            using GraphQL.Types;
+            using System;
+            using System.Collections.Generic;
+            using System.Threading.Tasks;
+
+            namespace MyApp.GraphQL;
+
+            public class Message
+            {
+                public string Text { get; set; }
+            }
+
+            public class Subscription
+            {
+                // IObservable<T>
+                public IObservable<Message> OnMessage1() => null!;
+                
+                // Task<IObservable<T>>
+                public Task<IObservable<Message>> OnMessage2() => null!;
+                
+                // ValueTask<IObservable<T>>
+                public ValueTask<IObservable<Message>> OnMessage3() => default!;
+                
+                // IAsyncEnumerable<T>
+                public IAsyncEnumerable<Message> OnMessage4() => null!;
+                
+                // Task<IAsyncEnumerable<T>>
+                public Task<IAsyncEnumerable<Message>> OnMessage5() => null!;
+                
+                // ValueTask<IAsyncEnumerable<T>>
+                public ValueTask<IAsyncEnumerable<Message>> OnMessage6() => default!;
+                
+                // Regular method (not a stream resolver)
+                public Message GetMessage() => null!;
+                
+                // Task<T> (not a stream resolver)
+                public Task<Message> GetMessageAsync() => null!;
+            }
+
+            [AotSubscriptionType<Subscription>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations)
+                    : base(services, configurations)
+                {
+                }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
 }

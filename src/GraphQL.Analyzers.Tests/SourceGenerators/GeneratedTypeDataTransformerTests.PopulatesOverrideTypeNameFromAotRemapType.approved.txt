@@ -45,4 +45,5 @@
 //   - Method GetData
 //     DeclaringType: same as CLR type
 //     IsStatic: False
+//     IsSourceStreamResolver: False
 //

@@ -71,6 +71,8 @@ public partial class KnownSymbolsProviderTests
             // TaskT: System.Threading.Tasks.Task<TResult>
             // ValueTaskT: System.Threading.Tasks.ValueTask<TResult>
             // IDataLoaderResultT: GraphQL.DataLoader.IDataLoaderResult<T>
+            // IObservableT: System.IObservable<T>
+            // IAsyncEnumerableT: System.Collections.Generic.IAsyncEnumerable<T>
             // IResolveFieldContext: GraphQL.IResolveFieldContext
             // CancellationToken: System.Threading.CancellationToken
             // IInputObjectGraphType: GraphQL.Types.IInputObjectGraphType

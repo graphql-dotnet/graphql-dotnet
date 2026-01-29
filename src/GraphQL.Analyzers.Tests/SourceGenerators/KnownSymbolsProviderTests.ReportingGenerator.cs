@@ -68,6 +68,8 @@ public partial class KnownSymbolsProviderTests
                 sb.AppendLine($"// TaskT: {symbols.TaskT?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// ValueTaskT: {symbols.ValueTaskT?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// IDataLoaderResultT: {symbols.IDataLoaderResultT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// IObservableT: {symbols.IObservableT?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// IAsyncEnumerableT: {symbols.IAsyncEnumerableT?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// IResolveFieldContext: {symbols.IResolveFieldContext?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// CancellationToken: {symbols.CancellationToken?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// IInputObjectGraphType: {symbols.IInputObjectGraphType?.ToDisplayString() ?? "NULL"}");

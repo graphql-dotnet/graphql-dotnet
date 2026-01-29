@@ -217,6 +217,14 @@ public static class TypeSymbolTransformer
             if (knownSymbols.IDataLoaderResultT != null && SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.IDataLoaderResultT) && namedType.TypeArguments.Length == 1)
                 return UnwrapClrType(namedType.TypeArguments[0], knownSymbols);
 
+            // Handle IObservable<T> (stream resolvers)
+            if (knownSymbols.IObservableT != null && SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.IObservableT) && namedType.TypeArguments.Length == 1)
+                return UnwrapClrType(namedType.TypeArguments[0], knownSymbols);
+
+            // Handle IAsyncEnumerable<T> (stream resolvers)
+            if (knownSymbols.IAsyncEnumerableT != null && SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.IAsyncEnumerableT) && namedType.TypeArguments.Length == 1)
+                return UnwrapClrType(namedType.TypeArguments[0], knownSymbols);
+
             // Handle recognized list types
             if (IsListType(type, knownSymbols) && namedType.TypeArguments.Length == 1)
                 return UnwrapClrType(namedType.TypeArguments[0], knownSymbols);

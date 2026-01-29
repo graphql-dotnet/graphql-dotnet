@@ -214,7 +214,7 @@ public static class GeneratedTypeDataTransformer
         string graphTypeClassName = GetUniqueGraphTypeName(graphTypeSymbol, nameCache, usedNames);
 
         // Transform members
-        var selectedMembers = TransformOutputMembers(members, clrType);
+        var selectedMembers = TransformOutputMembers(members, clrType, knownSymbols);
 
         // Get instance source
         var instanceSource = GetInstanceSource(clrType, knownSymbols);
@@ -270,7 +270,8 @@ public static class GeneratedTypeDataTransformer
     /// </summary>
     private static List<OutputMemberData> TransformOutputMembers(
         ImmutableEquatableArray<ISymbol> members,
-        ITypeSymbol clrType)
+        ITypeSymbol clrType,
+        KnownSymbols knownSymbols)
     {
         var result = new List<OutputMemberData>();
 
@@ -284,6 +285,7 @@ public static class GeneratedTypeDataTransformer
 
             MemberKind memberKind;
             bool isStatic;
+            bool isSourceStreamResolver = false;
             var methodParameters = ImmutableEquatableArray<MethodParameterData>.Empty;
 
             switch (member)
@@ -299,6 +301,7 @@ public static class GeneratedTypeDataTransformer
                 case IMethodSymbol method:
                     memberKind = MemberKind.Method;
                     isStatic = method.IsStatic;
+                    isSourceStreamResolver = IsSourceStreamResolver(method, knownSymbols);
                     methodParameters = TransformMethodParameters(method);
                     break;
                 default:
@@ -310,6 +313,7 @@ public static class GeneratedTypeDataTransformer
                 MemberName: member.Name,
                 MemberKind: memberKind,
                 IsStatic: isStatic,
+                IsSourceStreamResolver: isSourceStreamResolver,
                 MethodParameters: methodParameters));
         }
 
@@ -702,5 +706,53 @@ public static class GeneratedTypeDataTransformer
                         !c.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, knownSymbols.GraphQLConstructorAttribute)));
 
         return count > 0;
+    }
+
+    /// <summary>
+    /// Checks if a method is a source stream resolver based on its return type.
+    /// Returns true if the return type matches:
+    /// IObservable&lt;T&gt;, Task&lt;IObservable&lt;T&gt;&gt;, ValueTask&lt;IObservable&lt;T&gt;&gt;,
+    /// IAsyncEnumerable&lt;T&gt;, Task&lt;IAsyncEnumerable&lt;T&gt;&gt;, ValueTask&lt;IAsyncEnumerable&lt;T&gt;&gt;
+    /// </summary>
+    private static bool IsSourceStreamResolver(IMethodSymbol method, KnownSymbols knownSymbols)
+    {
+        var returnType = method.ReturnType;
+
+        // Check direct match: IObservable<T> or IAsyncEnumerable<T>
+        if (IsStreamType(returnType, knownSymbols))
+            return true;
+
+        // Check wrapped in Task<T> or ValueTask<T>
+        if (returnType is INamedTypeSymbol namedReturnType && namedReturnType.IsGenericType)
+        {
+            var originalDef = namedReturnType.OriginalDefinition;
+
+            // Check if it's Task<T> or ValueTask<T>
+            if ((knownSymbols.TaskT != null && SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.TaskT)) ||
+                (knownSymbols.ValueTaskT != null && SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.ValueTaskT)))
+            {
+                // Check if the type argument is IObservable<T> or IAsyncEnumerable<T>
+                if (namedReturnType.TypeArguments.Length == 1)
+                {
+                    return IsStreamType(namedReturnType.TypeArguments[0], knownSymbols);
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Helper method to check if a type is IObservable&lt;T&gt; or IAsyncEnumerable&lt;T&gt;.
+    /// </summary>
+    private static bool IsStreamType(ITypeSymbol type, KnownSymbols knownSymbols)
+    {
+        if (type is not INamedTypeSymbol namedType || !namedType.IsGenericType)
+            return false;
+
+        var originalDef = namedType.OriginalDefinition;
+
+        return (knownSymbols.IObservableT != null && SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.IObservableT)) ||
+               (knownSymbols.IAsyncEnumerableT != null && SymbolEqualityComparer.Default.Equals(originalDef, knownSymbols.IAsyncEnumerableT));
     }
 }

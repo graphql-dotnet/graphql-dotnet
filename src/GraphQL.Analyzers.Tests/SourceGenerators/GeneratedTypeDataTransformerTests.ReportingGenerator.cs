@@ -127,6 +127,7 @@ public partial class GeneratedTypeDataTransformerTests
                 sb.AppendLine($"//   - {member.MemberKind} {member.MemberName}");
                 sb.AppendLine($"//     DeclaringType: {member.DeclaringTypeFullyQualifiedName ?? "same as CLR type"}");
                 sb.AppendLine($"//     IsStatic: {member.IsStatic}");
+                sb.AppendLine($"//     IsSourceStreamResolver: {member.IsSourceStreamResolver}");
                 if (member.MethodParameters.Count > 0)
                 {
                     sb.AppendLine($"//     Parameters ({member.MethodParameters.Count}):");

@@ -473,8 +473,17 @@ public static class OutputGraphTypeGenerator
             }
         }
 
-        // Build resolver
-        sb.AppendLine($"{indent}fieldType.Resolver = BuildFieldResolver(context =>");
+        // Build resolver - different for source stream resolvers
+        if (member.IsSourceStreamResolver)
+        {
+            sb.AppendLine($"{indent}fieldType.Resolver = global::GraphQL.Resolvers.SourceFieldResolver.Instance;");
+            sb.AppendLine($"{indent}fieldType.StreamResolver = BuildSourceStreamResolver(context =>");
+        }
+        else
+        {
+            sb.AppendLine($"{indent}fieldType.Resolver = BuildFieldResolver(context =>");
+        }
+
         sb.AppendLine($"{indent}{{");
 
         if (member.IsStatic)
@@ -518,7 +527,14 @@ public static class OutputGraphTypeGenerator
             }
         }
 
-        sb.AppendLine($"{indent}}}, true);");
+        if (member.IsSourceStreamResolver)
+        {
+            sb.AppendLine($"{indent}}});");
+        }
+        else
+        {
+            sb.AppendLine($"{indent}}}, true);");
+        }
     }
 
     private static void GeneratePropertyOrFieldResolver(

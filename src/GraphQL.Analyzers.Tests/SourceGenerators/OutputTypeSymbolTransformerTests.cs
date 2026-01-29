@@ -1220,4 +1220,65 @@ public partial class OutputTypeSymbolTransformerTests
 
             """);
     }
+
+    [Fact]
+    public async Task UnwrapsStreamResolverTypes()
+    {
+        const string source =
+            """
+            using System;
+            using System.Collections.Generic;
+            using System.Threading.Tasks;
+
+            namespace Sample;
+
+            [AttributeUsage(AttributeTargets.Class)]
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
+
+            [ScanMe(false)]
+            public class SubscriptionOutput
+            {
+                public IObservable<string> OnMessage() => throw new NotImplementedException();
+                public Task<IObservable<int>> OnCount() => throw new NotImplementedException();
+                public ValueTask<IObservable<bool>> OnStatus() => throw new NotImplementedException();
+                public IAsyncEnumerable<double> OnPrice() => throw new NotImplementedException();
+                public Task<IAsyncEnumerable<long>> OnTimestamp() => throw new NotImplementedException();
+                public ValueTask<IAsyncEnumerable<DateTime>> OnEvent() => throw new NotImplementedException();
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= TypeScanReport.g.cs ============
+
+            // Type: SubscriptionOutput
+            //
+            // DiscoveredInputClrTypes: 0
+            //
+            // DiscoveredOutputClrTypes: 6
+            //   [0] string
+            //   [1] int
+            //   [2] bool
+            //   [3] double
+            //   [4] long
+            //   [5] DateTime
+            //
+            // DiscoveredGraphTypes: 0
+            //
+            // InputListTypes: 0
+            //
+            // SelectedMembers: 6
+            //   [0] Method: IObservable<string> SubscriptionOutput.OnMessage()
+            //   [1] Method: Task<IObservable<int>> SubscriptionOutput.OnCount()
+            //   [2] Method: ValueTask<IObservable<bool>> SubscriptionOutput.OnStatus()
+            //   [3] Method: IAsyncEnumerable<double> SubscriptionOutput.OnPrice()
+            //   [4] Method: Task<IAsyncEnumerable<long>> SubscriptionOutput.OnTimestamp()
+            //   [5] Method: ValueTask<IAsyncEnumerable<DateTime>> SubscriptionOutput.OnEvent()
+
+            """);
+    }
 }

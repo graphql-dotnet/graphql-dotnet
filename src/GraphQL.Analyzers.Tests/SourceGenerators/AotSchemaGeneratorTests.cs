@@ -30,7 +30,6 @@ public class AotSchemaGeneratorTests
         var output = await VerifySG.GetGeneratorOutputAsync(source);
 
         output.ShouldMatchApproved(o => o.NoDiff());
-
     }
 
     [Fact]
@@ -49,6 +48,33 @@ public class AotSchemaGeneratorTests
             }
 
             [AotMutationType<Mutation>]
+            public partial class MySchema : AotSchema
+            {
+            }
+            """;
+
+        var output = await VerifySG.GetGeneratorOutputAsync(source);
+
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public async Task GeneratesPartialClass_ForSubscriptionType()
+    {
+        const string source =
+            """
+            using System;
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Subscription
+            {
+                public IObservable<string> OnMessage() => throw new NotImplementedException();
+            }
+
+            [AotSubscriptionType<Subscription>]
             public partial class MySchema : AotSchema
             {
             }

@@ -50,6 +50,8 @@ public readonly record struct KnownSymbols
     public INamedTypeSymbol? TaskT { get; init; }
     public INamedTypeSymbol? ValueTaskT { get; init; }
     public INamedTypeSymbol? IDataLoaderResultT { get; init; }
+    public INamedTypeSymbol? IObservableT { get; init; }
+    public INamedTypeSymbol? IAsyncEnumerableT { get; init; }
     public INamedTypeSymbol? IResolveFieldContext { get; init; }
     public INamedTypeSymbol? CancellationToken { get; init; }
     public INamedTypeSymbol? IInputObjectGraphType { get; init; }

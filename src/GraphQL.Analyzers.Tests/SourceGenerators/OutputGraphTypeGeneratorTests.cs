@@ -30,12 +30,14 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "Id",
                 MemberKind: MemberKind.Property,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
             new OutputMemberData(
                 DeclaringTypeFullyQualifiedName: "global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter",
                 MemberName: "Name",
                 MemberKind: MemberKind.Property,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
             // Method with parameters
             new OutputMemberData(
@@ -43,6 +45,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "GetFriends",
                 MemberKind: MemberKind.Method,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: new ImmutableEquatableArray<MethodParameterData>(new[]
                 {
                     new MethodParameterData("global::GraphQL.StarWars.TypeFirst.StarWarsData")
@@ -53,6 +56,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "GetFriendsConnection",
                 MemberKind: MemberKind.Method,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: new ImmutableEquatableArray<MethodParameterData>(new[]
                 {
                     new MethodParameterData("global::GraphQL.StarWars.TypeFirst.StarWarsData"),
@@ -64,6 +68,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "AppearsIn",
                 MemberKind: MemberKind.Property,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
             // Static property
             new OutputMemberData(
@@ -71,6 +76,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "Version",
                 MemberKind: MemberKind.Property,
                 IsStatic: true,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
             // Static method with no parameters
             new OutputMemberData(
@@ -78,6 +84,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "GetAllCharacterTypes",
                 MemberKind: MemberKind.Method,
                 IsStatic: true,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
         });
 
@@ -98,12 +105,14 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "Id",
                 MemberKind: MemberKind.Property,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
             new OutputMemberData(
                 DeclaringTypeFullyQualifiedName: "global::GraphQL.StarWars.TypeFirst.Types.Droid",
                 MemberName: "Name",
                 MemberKind: MemberKind.Property,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
             // Method with single parameter
             new OutputMemberData(
@@ -111,6 +120,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "GetFriends",
                 MemberKind: MemberKind.Method,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: new ImmutableEquatableArray<MethodParameterData>(new[]
                 {
                     new MethodParameterData("global::GraphQL.StarWars.TypeFirst.StarWarsData")
@@ -121,6 +131,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "GetFriendsConnection",
                 MemberKind: MemberKind.Method,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: new ImmutableEquatableArray<MethodParameterData>(new[]
                 {
                     new MethodParameterData("global::GraphQL.StarWars.TypeFirst.StarWarsData"),
@@ -133,6 +144,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "AppearsIn",
                 MemberKind: MemberKind.Property,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
             // Property
             new OutputMemberData(
@@ -140,6 +152,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "PrimaryFunction",
                 MemberKind: MemberKind.Property,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
             // Field
             new OutputMemberData(
@@ -147,6 +160,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "_manufacturer",
                 MemberKind: MemberKind.Field,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
             // Static property
             new OutputMemberData(
@@ -154,6 +168,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "DefaultModel",
                 MemberKind: MemberKind.Property,
                 IsStatic: true,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
             // Static method with parameters
             new OutputMemberData(
@@ -161,6 +176,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "CreateDroid",
                 MemberKind: MemberKind.Method,
                 IsStatic: true,
+                IsSourceStreamResolver: false,
                 MethodParameters: new ImmutableEquatableArray<MethodParameterData>(new[]
                 {
                     new MethodParameterData("string"),
@@ -172,6 +188,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "GetSerialNumber",
                 MemberKind: MemberKind.Method,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
         });
 
@@ -234,6 +251,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "Name",
                 MemberKind: MemberKind.Property,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
         });
 
@@ -308,18 +326,21 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "Id",
                 MemberKind: MemberKind.Property,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
             new OutputMemberData(
                 DeclaringTypeFullyQualifiedName: "global::GraphQL.StarWars.TypeFirst.Types.Droid",
                 MemberName: "Name",
                 MemberKind: MemberKind.Property,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
             new OutputMemberData(
                 DeclaringTypeFullyQualifiedName: "global::GraphQL.StarWars.TypeFirst.Types.Droid",
                 MemberName: "GetFriends",
                 MemberKind: MemberKind.Method,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: new ImmutableEquatableArray<MethodParameterData>(new[]
                 {
                     new MethodParameterData("global::GraphQL.StarWars.TypeFirst.StarWarsData")
@@ -329,6 +350,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "GetFriendsConnection",
                 MemberKind: MemberKind.Method,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: new ImmutableEquatableArray<MethodParameterData>(new[]
                 {
                     new MethodParameterData("global::GraphQL.StarWars.TypeFirst.StarWarsData")
@@ -338,12 +360,14 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "AppearsIn",
                 MemberKind: MemberKind.Property,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
             new OutputMemberData(
                 DeclaringTypeFullyQualifiedName: "global::GraphQL.StarWars.TypeFirst.Types.Droid",
                 MemberName: "PrimaryFunction",
                 MemberKind: MemberKind.Property,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
         });
 
@@ -379,6 +403,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "Name",
                 MemberKind: MemberKind.Property,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
         });
 
@@ -416,6 +441,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "Name",
                 MemberKind: MemberKind.Property,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
         });
 
@@ -470,6 +496,7 @@ public class OutputGraphTypeGeneratorTests
                 MemberName: "Name",
                 MemberKind: MemberKind.Property,
                 IsStatic: false,
+                IsSourceStreamResolver: false,
                 MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
         });
 
@@ -503,5 +530,73 @@ public class OutputGraphTypeGeneratorTests
         // Assert
         var discriminator = hasRequiredProperties ? "WithRequiredProperties" : "WithoutRequiredProperties";
         result.ShouldMatchApproved(o => o.NoDiff().WithDiscriminator(discriminator));
+    }
+
+    [Fact]
+    public void GeneratesSubscriptionGraphType()
+    {
+        // Arrange
+        var @namespace = "AotSample";
+        var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
+        {
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
+        });
+
+        // Subscription type with source stream resolvers
+        var subscriptionMembers = new ImmutableEquatableArray<OutputMemberData>(new[]
+        {
+            // IObservable<T> - source stream resolver
+            new OutputMemberData(
+                DeclaringTypeFullyQualifiedName: "global::Sample.Subscription",
+                MemberName: "OnMessage",
+                MemberKind: MemberKind.Method,
+                IsStatic: false,
+                IsSourceStreamResolver: true,
+                MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
+            // Task<IObservable<T>> - source stream resolver
+            new OutputMemberData(
+                DeclaringTypeFullyQualifiedName: "global::Sample.Subscription",
+                MemberName: "OnNotification",
+                MemberKind: MemberKind.Method,
+                IsStatic: false,
+                IsSourceStreamResolver: true,
+                MethodParameters: new ImmutableEquatableArray<MethodParameterData>(new[]
+                {
+                    new MethodParameterData("string")
+                })),
+            // IAsyncEnumerable<T> - source stream resolver
+            new OutputMemberData(
+                DeclaringTypeFullyQualifiedName: "global::Sample.Subscription",
+                MemberName: "OnEvent",
+                MemberKind: MemberKind.Method,
+                IsStatic: false,
+                IsSourceStreamResolver: true,
+                MethodParameters: new ImmutableEquatableArray<MethodParameterData>(new[]
+                {
+                    new MethodParameterData("int")
+                })),
+            // Regular method - not a source stream resolver
+            new OutputMemberData(
+                DeclaringTypeFullyQualifiedName: "global::Sample.Subscription",
+                MemberName: "GetStatus",
+                MemberKind: MemberKind.Method,
+                IsStatic: false,
+                IsSourceStreamResolver: false,
+                MethodParameters: ImmutableEquatableArray<MethodParameterData>.Empty),
+        });
+
+        var subscriptionType = new OutputGraphTypeData(
+            IsInterface: false,
+            FullyQualifiedClrTypeName: "global::Sample.Subscription",
+            GraphTypeClassName: "AutoOutputGraphType_Subscription",
+            SelectedMembers: subscriptionMembers,
+            InstanceSource: GraphQL.Analyzers.SourceGenerators.Models.InstanceSource.ContextSource,
+            ConstructorData: null);
+
+        // Act
+        var result = OutputGraphTypeGenerator.Generate(@namespace, partialClassHierarchy, subscriptionType);
+
+        // Assert
+        result.ShouldMatchApproved(o => o.NoDiff());
     }
 }

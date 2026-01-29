@@ -67,12 +67,15 @@
 //   - Property Name
 //     DeclaringType: same as CLR type
 //     IsStatic: False
+//     IsSourceStreamResolver: False
 //   - Property Tags
 //     DeclaringType: same as CLR type
 //     IsStatic: False
+//     IsSourceStreamResolver: False
 //   - Method GetFullName
 //     DeclaringType: same as CLR type
 //     IsStatic: False
+//     IsSourceStreamResolver: False
 //     Parameters (1):
 //       - string
 //
@@ -88,6 +91,7 @@
 //   - Property Id
 //     DeclaringType: same as CLR type
 //     IsStatic: False
+//     IsSourceStreamResolver: False
 //
 // ========== Entry 4 ==========
 // Namespace: null
@@ -101,12 +105,15 @@
 //   - Property Name
 //     DeclaringType: same as CLR type
 //     IsStatic: False
+//     IsSourceStreamResolver: False
 //   - Property Price
 //     DeclaringType: same as CLR type
 //     IsStatic: False
+//     IsSourceStreamResolver: False
 //   - Property Category
 //     DeclaringType: same as CLR type
 //     IsStatic: False
+//     IsSourceStreamResolver: False
 // ConstructorData:
 //   Parameters (2):
 //     - string
@@ -157,7 +164,9 @@
 //   - Method GetPerson
 //     DeclaringType: same as CLR type
 //     IsStatic: False
+//     IsSourceStreamResolver: False
 //   - Method GetEntity
 //     DeclaringType: same as CLR type
 //     IsStatic: False
+//     IsSourceStreamResolver: False
 //
