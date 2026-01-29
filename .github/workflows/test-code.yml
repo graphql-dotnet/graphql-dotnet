@@ -69,11 +69,11 @@ jobs:
         if: ${{ startsWith(matrix.os, 'windows') }}
         working-directory: .
         run: dotnet test --no-restore --no-build
-#      - name: Test code-first AOT compilation
-#        working-directory: samples/GraphQL.AotCompilationSample.CodeFirst
-#        run: |
-#          dotnet publish -c Release -o publish
-#          publish/GraphQL.AotCompilationSample.CodeFirst
+      - name: Test code-first AOT compilation
+        working-directory: samples/GraphQL.AotCompilationSample.CodeFirst
+        run: |
+          dotnet publish -c Release -o publish
+          publish/GraphQL.AotCompilationSample.CodeFirst
       - name: Test type-first AOT compilation
         working-directory: samples/GraphQL.AotCompilationSample.TypeFirst
         run: |
