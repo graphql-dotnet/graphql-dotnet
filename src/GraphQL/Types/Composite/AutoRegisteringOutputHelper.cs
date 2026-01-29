@@ -23,6 +23,7 @@ internal static class AutoRegisteringOutputHelper
     /// a list of query arguments and expressions as necessary. Then a field resolver is built around the method.
     /// </summary>
     [RequiresDynamicCode("This code calls a generic method and compiles a lambda at runtime.")]
+    [RequiresUnreferencedCode("This code calls a generic method and compiles a lambda at runtime.")]
     public static void BuildFieldType(
         MemberInfo memberInfo,
         FieldType fieldType,

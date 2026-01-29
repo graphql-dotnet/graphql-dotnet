@@ -20,6 +20,7 @@ public class SourceStreamMethodResolver : MemberResolver, ISourceStreamResolver
     /// <code>context =&gt; (TSourceType)context.Source</code>
     /// </summary>
     [RequiresDynamicCode("Calls MemberResolver constructor which calls a generic method and compiles a lambda at runtime.")]
+    [RequiresUnreferencedCode("This code creates a generic method at runtime.")]
     public SourceStreamMethodResolver(MethodInfo methodInfo, LambdaExpression instanceExpression, IList<LambdaExpression> methodArgumentExpressions)
         : base(methodInfo, instanceExpression, methodArgumentExpressions)
     {
@@ -27,6 +28,7 @@ public class SourceStreamMethodResolver : MemberResolver, ISourceStreamResolver
 
     /// <inheritdoc/>
     [RequiresDynamicCode("Calls MakeGenericMethod and MakeGenericType. The native code for this instantiation might not be available at runtime.")]
+    [RequiresUnreferencedCode("This code creates a generic method at runtime.")]
     protected override Func<IResolveFieldContext, ValueTask<object?>> BuildFieldResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
     {
         _sourceStreamResolver = BuildSourceStreamResolver(resolveFieldContextParameter, bodyExpression);
@@ -37,6 +39,7 @@ public class SourceStreamMethodResolver : MemberResolver, ISourceStreamResolver
     /// Creates an appropriate event stream resolver function based on the return type of the expression body.
     /// </summary>
     [RequiresDynamicCode("Calls MakeGenericMethod and MakeGenericType. The native code for this instantiation might not be available at runtime.")]
+    [RequiresUnreferencedCode("This code creates a generic method at runtime.")]
     protected virtual Func<IResolveFieldContext, ValueTask<IObservable<object?>>> BuildSourceStreamResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
     {
         // ValueTask<IObservable<object?>>

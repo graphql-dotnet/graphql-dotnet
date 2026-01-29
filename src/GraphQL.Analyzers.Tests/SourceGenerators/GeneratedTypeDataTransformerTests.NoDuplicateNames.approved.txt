@@ -1,0 +1,90 @@
+// SUCCESS:
+
+// ========= GeneratedTypeDataReport.g.cs ============
+
+// Schema: MySchema
+// Total Entries: 6
+//
+// ========== Entry 1 ==========
+// Namespace: MyApp.GraphQL
+// PartialClassHierarchy: internal MySchema
+// Type: SchemaClass
+// HasConstructor: True
+// QueryRootTypeName: null
+// MutationRootTypeName: null
+// SubscriptionRootTypeName: null
+// RegisteredGraphTypes (5):
+//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Product>
+//     AotGenerated: ProductGraphType
+//     Override: null
+//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.MyStatic.Product>
+//     AotGenerated: ProductGraphType2
+//     Override: null
+//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Item<int>>
+//     AotGenerated: ItemGraphType
+//     Override: null
+//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Item<long>>
+//     AotGenerated: ItemGraphType2
+//     Override: null
+//   - global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::MyApp.GraphQL.Product>
+//     AotGenerated: ProductGraphType3
+//     Override: null
+// TypeMappings (5):
+//   global::MyApp.GraphQL.Product -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Product>
+//   global::MyApp.GraphQL.MyStatic.Product -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.MyStatic.Product>
+//   global::MyApp.GraphQL.Item<int> -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Item<int>>
+//   global::MyApp.GraphQL.Item<long> -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Item<long>>
+//   global::MyApp.GraphQL.Product -> global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::MyApp.GraphQL.Product>
+// ArrayListTypes (0): 
+// GenericListTypes (0): 
+// HashSetTypes (0): 
+//
+// ========== Entry 2 ==========
+// Namespace: MyApp.GraphQL
+// PartialClassHierarchy: internal MySchema
+// Type: OutputGraphType
+// IsInterface: False
+// FullyQualifiedClrTypeName: global::MyApp.GraphQL.Product
+// GraphTypeClassName: ProductGraphType
+// InstanceSource: ContextSource
+// SelectedMembers (0):
+//
+// ========== Entry 3 ==========
+// Namespace: MyApp.GraphQL
+// PartialClassHierarchy: internal MySchema
+// Type: OutputGraphType
+// IsInterface: False
+// FullyQualifiedClrTypeName: global::MyApp.GraphQL.MyStatic.Product
+// GraphTypeClassName: ProductGraphType2
+// InstanceSource: ContextSource
+// SelectedMembers (0):
+//
+// ========== Entry 4 ==========
+// Namespace: MyApp.GraphQL
+// PartialClassHierarchy: internal MySchema
+// Type: OutputGraphType
+// IsInterface: False
+// FullyQualifiedClrTypeName: global::MyApp.GraphQL.Item<int>
+// GraphTypeClassName: ItemGraphType
+// InstanceSource: ContextSource
+// SelectedMembers (0):
+//
+// ========== Entry 5 ==========
+// Namespace: MyApp.GraphQL
+// PartialClassHierarchy: internal MySchema
+// Type: OutputGraphType
+// IsInterface: False
+// FullyQualifiedClrTypeName: global::MyApp.GraphQL.Item<long>
+// GraphTypeClassName: ItemGraphType2
+// InstanceSource: ContextSource
+// SelectedMembers (0):
+//
+// ========== Entry 6 ==========
+// Namespace: MyApp.GraphQL
+// PartialClassHierarchy: internal MySchema
+// Type: InputGraphType
+// FullyQualifiedClrTypeName: global::MyApp.GraphQL.Product
+// GraphTypeClassName: ProductGraphType3
+// Members (0):
+// ConstructorParameters (0):
+//

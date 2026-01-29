@@ -187,6 +187,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// <inheritdoc cref="Resolve(IFieldResolver)"/>
     [AllowedOn<IObjectGraphType>]
     [RequiresDynamicCode("Uses Expression.Lambda which requires dynamic code generation.")]
+    [RequiresUnreferencedCode("Uses Expression.Lambda which requires dynamic code generation.")]
     public virtual FieldBuilder<TSourceType, TReturnType> ResolveDelegate(Delegate? resolve)
     {
         IFieldResolver? resolver = null;

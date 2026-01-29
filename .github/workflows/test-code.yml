@@ -74,11 +74,11 @@ jobs:
 #        run: |
 #          dotnet publish -c Release -o publish
 #          publish/GraphQL.AotCompilationSample.CodeFirst
-#      - name: Test type-first AOT compilation
-#        working-directory: samples/GraphQL.AotCompilationSample.TypeFirst
-#        run: |
-#          dotnet publish -c Release -o publish
-#          publish/GraphQL.AotCompilationSample.TypeFirst
+      - name: Test type-first AOT compilation
+        working-directory: samples/GraphQL.AotCompilationSample.TypeFirst
+        run: |
+          dotnet publish -c Release -o publish
+          publish/GraphQL.AotCompilationSample.TypeFirst
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         uses: codecov/codecov-action@v5
