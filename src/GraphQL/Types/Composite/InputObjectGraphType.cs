@@ -58,12 +58,14 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
     /// Initializes a new instance.
     /// </summary>
     [RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
+    [RequiresUnreferencedCode("Uses reflection to get property values at runtime.")]
     public InputObjectGraphType()
         : this(null)
     {
     }
 
     [RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
+    [RequiresUnreferencedCode("Uses reflection to get property values at runtime.")]
     internal InputObjectGraphType(InputObjectGraphType<TSourceType>? cloneFrom)
         : base(cloneFrom)
     {
@@ -201,6 +203,8 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
         return objectValue;
     }
 
+    [UnconditionalSuppressMessage("AOT", "IL2075:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to 'target method'. The return value of method 'source method' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to",
+        Justification = "The constructor is marked with RequiresUnreferencedCodeAttribute.")]
     private static (object? Value, bool Skip) GetFieldValue(FieldType field, object? value)
     {
         if (value == null)
