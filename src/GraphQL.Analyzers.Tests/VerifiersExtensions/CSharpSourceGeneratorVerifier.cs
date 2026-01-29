@@ -125,7 +125,7 @@ public static partial class CSharpIncrementalGeneratorVerifier<TIncrementalGener
         var successSources = runResult.Results.SelectMany(r => r.GeneratedSources).ToList();
         if (successSources.Count == 0)
         {
-            return "// SUCCESS:\n\n// No files generated";
+            return "// SUCCESS:" + Environment.NewLine + Environment.NewLine + "// No files generated";
         }
 
         var successBuilder = new StringBuilder();
