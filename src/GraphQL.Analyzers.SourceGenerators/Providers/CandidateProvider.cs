@@ -84,6 +84,7 @@ public static class CandidateProvider
         if (node is not ClassDeclarationSyntax)
             return false;
 
+        /*
         // Check that all containing classes are also partial
         while (node is ClassDeclarationSyntax classDecl)
         {
@@ -92,6 +93,7 @@ public static class CandidateProvider
 
             node = classDecl.Parent;
         }
+        */
 
         return true;
     }

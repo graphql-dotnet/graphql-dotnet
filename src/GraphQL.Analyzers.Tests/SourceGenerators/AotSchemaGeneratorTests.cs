@@ -219,6 +219,46 @@ public class AotSchemaGeneratorTests
     }
 
     [Fact]
+    public async Task NoGeneration_WhenNotOnAotSchema()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            [AotGraphType<StringGraphType>]
+            public class MySchema : Schema
+            {
+            }
+            """;
+
+        await VerifySG.VerifyIncrementalGeneratorAsync(source);
+    }
+
+    [Fact]
+    public async Task NoGeneration_WhenNotPartial()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            [AotGraphType<StringGraphType>]
+            public class MySchema : AotSchema
+            {
+            }
+            """;
+
+        var output = await VerifySG.GetGeneratorOutputAsync(source);
+
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
     public async Task NoGeneration_WhenNotAClass()
     {
         const string source =

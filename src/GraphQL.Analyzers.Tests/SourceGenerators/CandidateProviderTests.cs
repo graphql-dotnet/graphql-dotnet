@@ -11,30 +11,6 @@ namespace GraphQL.Analyzers.Tests.SourceGenerators;
 public partial class CandidateProviderTests
 {
     [Fact]
-    public async Task FiltersOutNonPartialClasses()
-    {
-        // Non-partial class with AOT attribute should not be matched
-        const string source =
-            """
-            using GraphQL;
-            using GraphQL.Types;
-
-            namespace Sample;
-
-            public class Query { }
-
-            [AotQueryType<Query>]
-            public class MySchema : AotSchema
-            {
-                public MySchema() : base(null!, null!) { }
-            }
-            """;
-
-        // Should not generate any code because class is not partial
-        await VerifyTestSG.VerifyIncrementalGeneratorAsync(source);
-    }
-
-    [Fact]
     public async Task FiltersOutClassesWithoutAttributes()
     {
         // Partial class without AOT attributes should not be matched
@@ -404,33 +380,6 @@ public partial class CandidateProviderTests
     }
 
     [Fact]
-    public async Task FiltersOutNestedClassWhenContainingClassIsNotPartial()
-    {
-        // Nested partial class with AOT attribute should be filtered if containing class is not partial
-        const string source =
-            """
-            using GraphQL;
-            using GraphQL.Types;
-
-            namespace Sample;
-
-            public class Query { }
-
-            public class OuterClass
-            {
-                [AotQueryType<Query>]
-                public partial class MySchema : AotSchema
-                {
-                    public MySchema() : base(null!, null!) { }
-                }
-            }
-            """;
-
-        // Should not generate any code because containing class is not partial
-        await VerifyTestSG.VerifyIncrementalGeneratorAsync(source);
-    }
-
-    [Fact]
     public async Task IncludesNestedClassWhenAllContainingClassesArePartial()
     {
         // Nested partial class with AOT attribute should be included if all containing classes are partial
@@ -469,36 +418,6 @@ public partial class CandidateProviderTests
             //   AttributeCount: 1
 
             """);
-    }
-
-    [Fact]
-    public async Task FiltersOutDeeplyNestedClassWhenAnyContainingClassIsNotPartial()
-    {
-        // Deeply nested partial class should be filtered if any containing class is not partial
-        const string source =
-            """
-            using GraphQL;
-            using GraphQL.Types;
-
-            namespace Sample;
-
-            public class Query { }
-
-            public partial class Level1
-            {
-                public class Level2
-                {
-                    [AotQueryType<Query>]
-                    public partial class MySchema : AotSchema
-                    {
-                        public MySchema() : base(null!, null!) { }
-                    }
-                }
-            }
-            """;
-
-        // Should not generate any code because Level2 is not partial
-        await VerifyTestSG.VerifyIncrementalGeneratorAsync(source);
     }
 
     [Fact]
