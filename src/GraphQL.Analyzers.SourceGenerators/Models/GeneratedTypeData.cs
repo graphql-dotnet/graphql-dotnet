@@ -54,7 +54,7 @@ public record class OutputMemberData(
 /// <summary>
 /// Data for a method parameter.
 /// </summary>
-public record class MethodParameterData(
+public record struct MethodParameterData(
     string FullyQualifiedTypeName);
 
 /// <summary>
@@ -88,13 +88,13 @@ public record class ConstructorData(
 /// <summary>
 /// Data for a constructor parameter.
 /// </summary>
-public record class ConstructorParameterData(
+public record struct ConstructorParameterData(
     string? FullyQualifiedTypeName);
 
 /// <summary>
 /// Data for a required property.
 /// </summary>
-public record class RequiredPropertyData(
+public record struct RequiredPropertyData(
     string Name,
     string FullyQualifiedTypeName);
 
@@ -111,7 +111,7 @@ public record class InputGraphTypeData(
 /// <summary>
 /// Data for a member of an input graph type.
 /// </summary>
-public record class InputMemberData(
+public record struct InputMemberData(
     string? DeclaringTypeFullyQualifiedName,
     string MemberName,
     string FullyQualifiedTypeName);
@@ -119,7 +119,7 @@ public record class InputMemberData(
 /// <summary>
 /// Data for an input type constructor parameter.
 /// </summary>
-public record class InputConstructorParameterData(
+public record struct InputConstructorParameterData(
     string MemberName);
 
 /// <summary>
@@ -156,6 +156,6 @@ public record class RegisteredGraphTypeData(
 /// <summary>
 /// Data for a CLR to GraphType mapping.
 /// </summary>
-public record class TypeMappingData(
+public record struct TypeMappingData(
     string FullyQualifiedClrTypeName,
     string FullyQualifiedGraphTypeName);
