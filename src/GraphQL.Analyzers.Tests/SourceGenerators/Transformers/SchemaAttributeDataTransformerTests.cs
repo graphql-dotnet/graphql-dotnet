@@ -418,8 +418,9 @@ public partial class SchemaAttributeDataTransformerTests
             //
             // SubscriptionRootGraphType: (none)
             //
-            // DiscoveredGraphTypes: 1
-            //   [0] AutoRegisteringObjectGraphType<Query>
+            // DiscoveredGraphTypes: 2
+            //   [0] DateTimeGraphType
+            //   [1] AutoRegisteringObjectGraphType<Query>
             //
             // OutputClrTypeMappings: 2
             //   [0] DateTime -> DateTimeGraphType
@@ -1200,10 +1201,11 @@ public partial class SchemaAttributeDataTransformerTests
             //
             // SubscriptionRootGraphType: (none)
             //
-            // DiscoveredGraphTypes: 3
-            //   [0] AutoRegisteringObjectGraphType<Query>
-            //   [1] AutoRegisteringObjectGraphType<Product>
-            //   [2] StringGraphType
+            // DiscoveredGraphTypes: 4
+            //   [0] DateTimeGraphType
+            //   [1] AutoRegisteringObjectGraphType<Query>
+            //   [2] AutoRegisteringObjectGraphType<Product>
+            //   [3] StringGraphType
             //
             // OutputClrTypeMappings: 4
             //   [0] DateTime -> DateTimeGraphType

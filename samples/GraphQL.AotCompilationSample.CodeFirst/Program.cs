@@ -1,7 +1,9 @@
 // See https://aka.ms/new-console-template for more information
 using GraphQL;
 using GraphQL.StarWars;
+using GraphQL.StarWars.Types;
 using GraphQL.Types;
+using GraphQL.Types.Relay;
 using Microsoft.Extensions.DependencyInjection;
 
 Console.WriteLine("Sample of AOT compilation of a GraphQL query");
@@ -12,11 +14,9 @@ IServiceCollection serviceCollection = new ServiceCollection();
 //   - AddClrTypeMappings
 //   - AddAutoClrMappings
 //   - AddAutoSchema
-serviceCollection.AddGraphQL(b => b
+serviceCollection.AddGraphQLAot(b => b
     .AddSystemTextJsonAot()
-    //.AddSchema<StarWarsSchema>()
-    //.AddGraphTypes(typeof(StarWarsSchema).Assembly)
-    .AddSelfActivatingSchema<StarWarsSchema>()
+    .AddSchema<StarWarsAotSchema>()
 );
 
 serviceCollection.AddSingleton<StarWarsData>();
@@ -85,4 +85,28 @@ static string LoadResource(string resourceName)
     using var stream = typeof(Program).Assembly.GetManifestResourceStream("GraphQL.AotCompilationSample.CodeFirst." + resourceName)!;
     using var reader = new StreamReader(stream);
     return reader.ReadToEnd();
+}
+
+[AotGraphType<StarWarsQuery>]
+[AotGraphType<StarWarsMutation>]
+[AotGraphType<CharacterInterface>]
+[AotGraphType<DroidType>]
+[AotGraphType<HumanInputType>]
+[AotGraphType<HumanType>]
+[AotGraphType<ConnectionType<CharacterInterface, EdgeType<CharacterInterface>>>]
+[AotGraphType<EdgeType<CharacterInterface>>]
+[AotTypeMapping<Episodes, EpisodeEnum>]
+[AotGraphType<PageInfoType>]
+internal partial class StarWarsAotSchema : AotSchema
+{
+    public StarWarsAotSchema(IServiceProvider serviceProvider, IEnumerable<GraphQL.DI.IConfigureSchema> configurations)
+        : base(serviceProvider, configurations)
+    {
+        Query = serviceProvider.GetRequiredService<StarWarsQuery>();
+        Mutation = serviceProvider.GetRequiredService<StarWarsMutation>();
+
+        Description = "Example StarWars universe schema";
+
+        Configure();
+    }
 }

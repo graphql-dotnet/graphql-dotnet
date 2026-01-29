@@ -71,6 +71,8 @@ public readonly ref struct SchemaAttributeDataTransformer
             {
                 SetOutputTypeMapping(clrType, graphType);
             }
+
+            TryAddGraphType(graphType, true, false);
         }
 
         // Process AotOutputType<T> attributes

@@ -23,6 +23,9 @@
 //   - global::GraphQL.Types.StringGraphType
 //     AotGenerated: null
 //     Override: null
+//     ConstructorData:
+//       Parameters (0):
+//       RequiredProperties (0):
 // TypeMappings (3):
 //   global::MyApp.GraphQL.Subscription -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Subscription>
 //   global::MyApp.GraphQL.Message -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Message>

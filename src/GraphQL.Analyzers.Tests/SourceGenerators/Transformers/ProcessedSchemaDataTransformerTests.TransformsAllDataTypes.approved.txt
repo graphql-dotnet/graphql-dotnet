@@ -35,12 +35,21 @@
 //   - global::GraphQL.Types.StringGraphType
 //     AotGenerated: null
 //     Override: null
+//     ConstructorData:
+//       Parameters (0):
+//       RequiredProperties (0):
 //   - global::GraphQL.Types.IntGraphType
 //     AotGenerated: null
 //     Override: null
+//     ConstructorData:
+//       Parameters (0):
+//       RequiredProperties (0):
 //   - global::GraphQL.Types.DecimalGraphType
 //     AotGenerated: null
 //     Override: null
+//     ConstructorData:
+//       Parameters (0):
+//       RequiredProperties (0):
 // TypeMappings (9):
 //   global::Person -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Person>
 //   global::IEntity -> global::GraphQL.Types.AutoRegisteringInterfaceGraphType<global::IEntity>

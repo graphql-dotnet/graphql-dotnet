@@ -363,4 +363,57 @@ public partial class ProcessedSchemaDataTransformerTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
         output.ShouldMatchApproved(o => o.NoDiff());
     }
+
+    [Fact]
+    public async Task CapturesConstructorDataForCustomScalar()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.DI;
+            using GraphQL.Types;
+            using System;
+            using System.Collections.Generic;
+
+            namespace MyApp.GraphQL;
+
+            public class Query
+            {
+                public string GetData() => "test";
+            }
+
+            // Custom scalar with constructor parameter
+            public class CustomScalarGraphType : ScalarGraphType
+            {
+                public CustomScalarGraphType(string name)
+                {
+                    Name = name;
+                }
+            }
+
+            // Custom scalar with multiple constructor parameters
+            public class ComplexScalarGraphType : ScalarGraphType
+            {
+                public ComplexScalarGraphType(string name, string description, IServiceProvider services)
+                {
+                    Name = name;
+                    Description = description;
+                }
+            }
+
+            [AotQueryType<Query>]
+            [AotGraphType<CustomScalarGraphType>]
+            [AotGraphType<ComplexScalarGraphType>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations)
+                    : base(services, configurations)
+                {
+                }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
 }

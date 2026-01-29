@@ -1,7 +1,7 @@
 using GraphQL.Analyzers.SourceGenerators.Generators;
 using GraphQL.Analyzers.SourceGenerators.Models;
 
-namespace GraphQL.Analyzers.Tests.SourceGenerators;
+namespace GraphQL.Analyzers.Tests.SourceGenerators.Generators;
 
 /// <summary>
 /// Unit tests for InputGraphTypeGenerator that generates AOT input graph type code.

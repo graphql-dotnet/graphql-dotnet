@@ -100,6 +100,21 @@ public partial class ProcessedSchemaDataTransformerTests
                 sb.AppendLine($"//   - {gt.FullyQualifiedGraphTypeName}");
                 sb.AppendLine($"//     AotGenerated: {gt.AotGeneratedTypeName ?? "null"}");
                 sb.AppendLine($"//     Override: {gt.OverrideTypeName ?? "null"}");
+                if (gt.ConstructorData is not null)
+                {
+                    var ctor = gt.ConstructorData;
+                    sb.AppendLine($"//     ConstructorData:");
+                    sb.AppendLine($"//       Parameters ({ctor.Parameters.Count}):");
+                    foreach (var param in ctor.Parameters)
+                    {
+                        sb.AppendLine($"//         - {param.FullyQualifiedTypeName ?? "IResolveFieldContext"}");
+                    }
+                    sb.AppendLine($"//       RequiredProperties ({ctor.RequiredProperties.Count}):");
+                    foreach (var prop in ctor.RequiredProperties)
+                    {
+                        sb.AppendLine($"//         - {prop.Name}: {prop.FullyQualifiedTypeName}");
+                    }
+                }
             }
 
             sb.AppendLine($"// TypeMappings ({data.TypeMappings.Count}):");

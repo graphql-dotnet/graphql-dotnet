@@ -108,10 +108,20 @@ public static class ProcessedSchemaDataTransformer
                 overrideTypeName = GetFullyQualifiedTypeName(remappedToType);
             }
 
+            // Get constructor data for non-AOT-generated types
+            ConstructorData? constructorData = null;
+            if (aotGeneratedTypeName == null)
+            {
+                // Use the remapped type symbol if available, otherwise use the original graph type symbol
+                var symbolForConstructor = remappedToType ?? graphTypeSymbol;
+                constructorData = GetConstructorData(symbolForConstructor, knownSymbols);
+            }
+
             registeredGraphTypes.Add(new RegisteredGraphTypeData(
                 FullyQualifiedGraphTypeName: fullyQualifiedName,
                 AotGeneratedTypeName: aotGeneratedTypeName,
-                OverrideTypeName: overrideTypeName));
+                OverrideTypeName: overrideTypeName,
+                ConstructorData: constructorData));
         }
 
         // Transform type mappings

@@ -20,12 +20,21 @@
 //   - global::GraphQL.Types.IdGraphType
 //     AotGenerated: null
 //     Override: global::GraphQL.Types.GuidGraphType
+//     ConstructorData:
+//       Parameters (0):
+//       RequiredProperties (0):
 //   - global::GraphQL.Types.DateGraphType
 //     AotGenerated: null
 //     Override: global::GraphQL.Types.DateOnlyGraphType
+//     ConstructorData:
+//       Parameters (0):
+//       RequiredProperties (0):
 //   - global::GraphQL.Types.StringGraphType
 //     AotGenerated: null
 //     Override: null
+//     ConstructorData:
+//       Parameters (0):
+//       RequiredProperties (0):
 // TypeMappings (2):
 //   global::MyApp.GraphQL.Query -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Query>
 //   string -> global::GraphQL.Types.StringGraphType

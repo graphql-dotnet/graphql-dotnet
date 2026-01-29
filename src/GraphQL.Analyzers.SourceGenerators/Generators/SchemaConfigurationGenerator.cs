@@ -136,16 +136,64 @@ public static class SchemaConfigurationGenerator
         // Generate AddAotType calls
         foreach (var registeredType in schemaClass.RegisteredGraphTypes)
         {
-            sb.Append($"{indent}    AddAotType<{registeredType.FullyQualifiedGraphTypeName}");
+            // Use standard AddAotType if there's an AOT-generated type name
             if (!string.IsNullOrEmpty(registeredType.AotGeneratedTypeName))
             {
-                sb.Append($", {registeredType.AotGeneratedTypeName}");
+                sb.AppendLine($"{indent}    AddAotType<{registeredType.FullyQualifiedGraphTypeName}, {registeredType.AotGeneratedTypeName}>();");
             }
-            else if (!string.IsNullOrEmpty(registeredType.OverrideTypeName))
+            // Use standard AddAotType if constructor data indicates zero parameters and zero required properties
+            else if (registeredType.ConstructorData != null
+                && registeredType.ConstructorData.Parameters.Count == 0
+                && registeredType.ConstructorData.RequiredProperties.Count == 0)
             {
-                sb.Append($", {registeredType.OverrideTypeName}");
+                sb.Append($"{indent}    AddAotType<{registeredType.FullyQualifiedGraphTypeName}");
+                if (!string.IsNullOrEmpty(registeredType.OverrideTypeName))
+                {
+                    sb.Append($", {registeredType.OverrideTypeName}");
+                }
+                sb.AppendLine(">();");
             }
-            sb.AppendLine(">();");
+            // Skip if constructor data is null
+            else if (registeredType.ConstructorData == null)
+            {
+                // Do not generate AddAotType line; user must register the type manually within their DI setup
+            }
+            // Generate factory lambda for types with constructor parameters or required properties
+            else
+            {
+                var targetTypeName = registeredType.OverrideTypeName ?? registeredType.FullyQualifiedGraphTypeName;
+                sb.Append($"{indent}    AotTypes.Add(typeof({registeredType.FullyQualifiedGraphTypeName}), () => new {targetTypeName}(");
+
+                // Generate constructor parameters
+                bool firstParam = true;
+                foreach (var param in registeredType.ConstructorData.Parameters)
+                {
+                    if (!firstParam)
+                        sb.Append(", ");
+                    firstParam = false;
+
+                    var paramTypeName = param.FullyQualifiedTypeName ?? "global::GraphQL.IResolveFieldContext";
+                    sb.Append($"GetRequiredService<{paramTypeName}>()");
+                }
+
+                sb.Append(")");
+
+                // Generate required properties initialization
+                if (registeredType.ConstructorData.RequiredProperties.Count > 0)
+                {
+                    sb.AppendLine();
+                    sb.AppendLine($"{indent}    {{");
+
+                    foreach (var prop in registeredType.ConstructorData.RequiredProperties)
+                    {
+                        sb.AppendLine($"{indent}        {prop.Name} = GetRequiredService<{prop.FullyQualifiedTypeName}>(),");
+                    }
+
+                    sb.Append($"{indent}    }}");
+                }
+
+                sb.AppendLine(");");
+            }
         }
 
         if (schemaClass.RegisteredGraphTypes.Count > 0)

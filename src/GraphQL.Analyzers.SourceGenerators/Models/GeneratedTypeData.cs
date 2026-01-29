@@ -150,7 +150,8 @@ public record class SchemaClassData(
 public record class RegisteredGraphTypeData(
     string FullyQualifiedGraphTypeName,
     string? AotGeneratedTypeName,
-    string? OverrideTypeName);
+    string? OverrideTypeName,
+    ConstructorData? ConstructorData);
 
 /// <summary>
 /// Data for a CLR to GraphType mapping.
