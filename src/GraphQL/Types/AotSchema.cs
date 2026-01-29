@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using GraphQL.DI;
 using GraphQL.Utilities;
 
@@ -48,11 +49,17 @@ public abstract class AotSchema : Schema, IServiceProvider
     protected T GetRequiredService<T>()
         => ((IServiceProvider)this).GetRequiredService<T>();
 
+    private readonly ConcurrentDictionary<Type, object> _serviceCache = new();
     object? IServiceProvider.GetService(Type serviceType)
     {
+        if (_serviceCache.TryGetValue(serviceType, out var service))
+        {
+            return service;
+        }
         if (AotTypes.TryGetValue(serviceType, out var factory))
         {
-            return factory();
+            service = factory();
+            return _serviceCache.GetOrAdd(serviceType, service);
         }
         return _services.GetService(serviceType);
     }
