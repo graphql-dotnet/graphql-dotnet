@@ -31,7 +31,11 @@ public class SourceStreamResolver<TReturnType> : ISourceStreamResolver
         if (sourceStreamResolver == null)
             throw new ArgumentNullException(nameof(sourceStreamResolver));
 
-        if (typeof(TReturnType).IsValueType)
+        if (sourceStreamResolver is Func<IResolveFieldContext, ValueTask<IObservable<object?>>> func)
+        {
+            _sourceStreamResolver = func;
+        }
+        else if (typeof(TReturnType).IsValueType)
         {
             _sourceStreamResolver = async context => new ObservableAdapter<TReturnType?>(await sourceStreamResolver(context).ConfigureAwait(false));
         }
