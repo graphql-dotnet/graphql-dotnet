@@ -40,6 +40,15 @@ public interface IInputObjectGraphType : IComplexGraphType
 /// <inheritdoc/>
 public class InputObjectGraphType : InputObjectGraphType<object>
 {
+    /// <summary>
+    /// Initializes a new instance.
+    /// </summary>
+    [RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
+    [RequiresUnreferencedCode("Uses reflection to get property values at runtime.")]
+    public InputObjectGraphType()
+        : base(null)
+    {
+    }
 }
 
 /// <inheritdoc cref="IInputObjectGraphType"/>
