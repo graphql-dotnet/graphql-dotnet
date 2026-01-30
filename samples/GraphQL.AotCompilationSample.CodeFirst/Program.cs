@@ -1,7 +1,9 @@
 // See https://aka.ms/new-console-template for more information
 using GraphQL;
 using GraphQL.StarWars;
+using GraphQL.StarWars.Types;
 using GraphQL.Types;
+using GraphQL.Types.Relay;
 using Microsoft.Extensions.DependencyInjection;
 
 Console.WriteLine("Sample of AOT compilation of a GraphQL query");
@@ -12,19 +14,24 @@ IServiceCollection serviceCollection = new ServiceCollection();
 //   - AddClrTypeMappings
 //   - AddAutoClrMappings
 //   - AddAutoSchema
-serviceCollection.AddGraphQL(b => b
+serviceCollection.AddGraphQLAot(b => b
     .AddSystemTextJsonAot()
-    //.AddSchema<StarWarsSchema>()
-    //.AddGraphTypes(typeof(StarWarsSchema).Assembly)
-    .AddSelfActivatingSchema<StarWarsSchema>()
+    .AddSchema<StarWarsAotSchema>()
 );
 
 serviceCollection.AddSingleton<StarWarsData>();
 
-// must manually register the query and mutation types or AOT will trim their constructors
-// all other graph types' constructors are preserved via calls to Field<T>
+// must manually register the required types or AOT will trim their constructors
 serviceCollection.AddTransient<StarWarsQuery>();
 serviceCollection.AddTransient<StarWarsMutation>();
+serviceCollection.AddTransient<CharacterInterface>();
+serviceCollection.AddTransient<DroidType>();
+serviceCollection.AddTransient<HumanType>();
+serviceCollection.AddTransient<HumanInputType>();
+serviceCollection.AddTransient<ConnectionType<CharacterInterface, EdgeType<CharacterInterface>>>();
+serviceCollection.AddTransient<EdgeType<CharacterInterface>>();
+serviceCollection.AddTransient<PageInfoType>();
+serviceCollection.AddTransient<EpisodeEnum>();
 
 // other notes:
 // - auto clr type mappings are generally not supported
@@ -85,4 +92,18 @@ static string LoadResource(string resourceName)
     using var stream = typeof(Program).Assembly.GetManifestResourceStream("GraphQL.AotCompilationSample.CodeFirst." + resourceName)!;
     using var reader = new StreamReader(stream);
     return reader.ReadToEnd();
+}
+
+internal partial class StarWarsAotSchema : AotSchema
+{
+    public StarWarsAotSchema(IServiceProvider serviceProvider, IEnumerable<GraphQL.DI.IConfigureSchema> configurations)
+        : base(serviceProvider, configurations)
+    {
+        Query = serviceProvider.GetRequiredService<StarWarsQuery>();
+        Mutation = serviceProvider.GetRequiredService<StarWarsMutation>();
+
+        Description = "Example StarWars universe schema";
+
+        Configure();
+    }
 }
