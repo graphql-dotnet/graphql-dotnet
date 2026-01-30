@@ -75,4 +75,11 @@ public abstract class AotSchema : Schema, IServiceProvider
     /// Built-in type mappings for AOT schemas.
     /// </summary>
     public override IEnumerable<(Type clrType, Type graphType)> BuiltInTypeMappings => _builtInTypeMappings;
+
+    /// <summary>
+    /// Configures the schema.
+    /// </summary>
+    protected virtual void Configure()
+    {
+    }
 }

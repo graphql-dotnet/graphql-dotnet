@@ -2521,6 +2521,7 @@ namespace GraphQL.Types
         protected void AddAotType<TGraphType, TGraphTypeImplementation>()
             where TGraphType : GraphQL.Types.IGraphType
             where TGraphTypeImplementation : GraphQL.Types.IGraphType, new () { }
+        protected virtual void Configure() { }
         protected T GetRequiredService<T>() { }
     }
     public class AppliedDirective : GraphQL.Utilities.MetadataProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveArgument>, System.Collections.IEnumerable
@@ -3108,6 +3109,8 @@ namespace GraphQL.Types
     }
     public class InputObjectGraphType : GraphQL.Types.InputObjectGraphType<object>
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds input resolvers at runtime, requiring dynamic code generation.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection to get property values at runtime.")]
         public InputObjectGraphType() { }
     }
     public class InputObjectGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInputObjectGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
@@ -3827,6 +3830,9 @@ namespace GraphQL.Utilities
         protected virtual GraphQL.Types.EnumerationGraphType ToEnumerationType(GraphQLParser.AST.GraphQLEnumTypeDefinition enumDef) { }
         protected virtual GraphQL.Types.FieldType ToFieldType(string parentTypeName, GraphQLParser.AST.GraphQLFieldDefinition fieldDef) { }
         protected virtual GraphQL.Types.FieldType ToFieldType(string parentTypeName, GraphQLParser.AST.GraphQLInputValueDefinition inputDef) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL2026:Calling method marked with RequiresUnreferencedCodeAttribute", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with \'RequiresDynamicCodeAttribute\' may break fu" +
+            "nctionality when AOT compiling.", Justification="The constructor is marked with RequiresUnreferencedCodeAttribute.")]
         protected virtual GraphQL.Types.InputObjectGraphType ToInputObjectType(GraphQLParser.AST.GraphQLInputObjectTypeDefinition inputDef) { }
         protected virtual GraphQL.Types.InterfaceGraphType ToInterfaceType(GraphQLParser.AST.GraphQLInterfaceTypeDefinition interfaceDef) { }
         protected virtual GraphQL.Types.IObjectGraphType ToObjectGraphType(GraphQLParser.AST.GraphQLObjectTypeDefinition astType, bool isExtensionType = false) { }
