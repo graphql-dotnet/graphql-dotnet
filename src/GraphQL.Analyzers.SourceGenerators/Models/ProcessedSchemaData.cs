@@ -7,7 +7,7 @@ namespace GraphQL.Analyzers.SourceGenerators.Models;
 /// This includes all GraphTypes discovered through attributes and type graph traversal,
 /// as well as mappings from CLR types to their corresponding wrapped GraphTypes.
 /// </summary>
-public readonly record struct ProcessedSchemaData(
+public record class ProcessedSchemaData(
     INamedTypeSymbol SchemaClass,
     ITypeSymbol? QueryRootGraphType,
     ITypeSymbol? MutationRootGraphType,
