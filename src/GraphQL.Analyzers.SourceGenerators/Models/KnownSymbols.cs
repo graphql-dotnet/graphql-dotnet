@@ -6,7 +6,7 @@ namespace GraphQL.Analyzers.SourceGenerators.Models;
 /// <summary>
 /// Holds resolved INamedTypeSymbol for each AOT attribute type and key interface types.
 /// </summary>
-public readonly record struct KnownSymbols
+public record class KnownSymbols
 {
     public INamedTypeSymbol? AotQueryType { get; init; }
     public INamedTypeSymbol? AotMutationType { get; init; }
