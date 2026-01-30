@@ -230,12 +230,21 @@ public partial class CandidateProviderTests
             """);
     }
 
-    [Fact]
-    public async Task SupportsAllNineAotAttributeTypes()
+    [Theory]
+    [InlineData("[AotQueryType<Query>]")]
+    [InlineData("[AotMutationType<Mutation>]")]
+    [InlineData("[AotSubscriptionType<Subscription>]")]
+    [InlineData("[AotInputType<MyInput>]")]
+    [InlineData("[AotOutputType<MyOutput>]")]
+    [InlineData("[AotGraphType<StringGraphType>]")]
+    [InlineData("[AotTypeMapping<DateTime, DateTimeGraphType>]")]
+    [InlineData("[AotListType<string>]")]
+    [InlineData("[AotRemapType<DateGraphType, DateOnlyGraphType>]")]
+    public async Task SupportsAllNineAotAttributeTypes(string attribute)
     {
         // Test that all 9 AOT attribute types are recognized
-        const string source =
-            """
+        string source =
+            $$"""
             using System;
             using GraphQL;
             using GraphQL.Types;
@@ -248,15 +257,7 @@ public partial class CandidateProviderTests
             public class MyInput { }
             public class MyOutput { }
 
-            [AotQueryType<Query>]
-            [AotMutationType<Mutation>]
-            [AotSubscriptionType<Subscription>]
-            [AotInputType<MyInput>]
-            [AotOutputType<MyOutput>]
-            [AotGraphType<StringGraphType>]
-            [AotTypeMapping<DateTime, DateTimeGraphType>]
-            [AotListType<string>]
-            [AotRemapType<DateGraphType, DateOnlyGraphType>]
+            {{attribute}}
             public partial class MySchema : AotSchema
             {
                 public MySchema() : base(null!, null!) { }
@@ -276,7 +277,7 @@ public partial class CandidateProviderTests
             // MySchema
             //   Namespace: Sample
             //   IsPartial: True
-            //   AttributeCount: 9
+            //   AttributeCount: 1
 
             """);
     }
