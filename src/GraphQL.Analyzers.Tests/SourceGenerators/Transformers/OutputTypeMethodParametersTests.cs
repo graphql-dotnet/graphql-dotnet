@@ -990,4 +990,71 @@ public partial class OutputTypeMethodParametersTests
 
             """);
     }
+
+    [Fact]
+    public async Task SkipsParameterAttributeT_FromAssemblyAndModule()
+    {
+        const string source =
+            """
+            using System;
+            using GraphQL;
+            using GraphQL.Types;
+
+            [assembly: Sample.SkipUShortAttribute]
+            [module: Sample.SkipSByteAttribute]
+
+            namespace Sample;
+
+            [AttributeUsage(AttributeTargets.Class)]
+            public class ScanMeAttribute : Attribute { public ScanMeAttribute(bool isInputType) { } }
+
+            // Custom ParameterAttribute<T> for ushort (assembly-level)
+            [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Module | AttributeTargets.Parameter)]
+            public class SkipUShortAttribute : ParameterAttribute<ushort>
+            {
+                public override Func<IResolveFieldContext, ushort> GetResolver(ArgumentInformation argumentInformation) => null!;
+            }
+
+            // Custom ParameterAttribute<T> for sbyte (module-level)
+            [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Module | AttributeTargets.Parameter)]
+            public class SkipSByteAttribute : ParameterAttribute<sbyte>
+            {
+                public override Func<IResolveFieldContext, sbyte> GetResolver(ArgumentInformation argumentInformation) => null!;
+            }
+
+            [ScanMe(false)]
+            public class CreateProductOutput
+            {
+                // sbyte should be skipped (module attribute)
+                // ushort should be skipped (assembly attribute)
+                // uint should NOT be skipped (no attribute)
+                public ulong ProcessData(sbyte sbyteValue, ushort ushortValue, uint uintValue) => 0UL;
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= TypeScanReport.g.cs ============
+
+            // Type: CreateProductOutput
+            //
+            // DiscoveredInputClrTypes: 1
+            //   [0] uint
+            //
+            // DiscoveredOutputClrTypes: 1
+            //   [0] ulong
+            //
+            // DiscoveredGraphTypes: 0
+            //
+            // InputListTypes: 0
+            //
+            // SelectedMembers: 1
+            //   [0] Method: ulong CreateProductOutput.ProcessData(sbyte sbyteValue, ushort ushortValue, uint uintValue)
+
+            """);
+    }
 }

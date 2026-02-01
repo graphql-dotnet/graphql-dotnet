@@ -40,6 +40,9 @@ public class TypeSymbolTransformerReportingGenerator : IIncrementalGenerator
 
             var sb = new StringBuilder();
 
+            // Create a shared cache for all types being scanned
+            var parameterAttributeCache = new ParameterAttributeTypeCache(attributeSymbols);
+
             bool isFirst = true;
             foreach (var item in types.OrderBy(t => t.TypeSymbol.Name))
             {
@@ -52,7 +55,7 @@ public class TypeSymbolTransformerReportingGenerator : IIncrementalGenerator
 
                 isFirst = false;
 
-                var result = TypeSymbolTransformer.Transform(typeSymbol, attributeSymbols, isInputType);
+                var result = TypeSymbolTransformer.Transform(typeSymbol, attributeSymbols, isInputType, parameterAttributeCache);
 
                 if (result == null)
                 {

@@ -15,7 +15,8 @@ public static class TypeSymbolTransformer
     /// <param name="typeSymbol">The CLR type to scan.</param>
     /// <param name="knownSymbols">Known GraphQL symbol references for comparison.</param>
     /// <param name="isInputType">Indicates whether the type is being scanned as an input type (true) or output type (false).</param>
-    public static TypeScanResult? Transform(ITypeSymbol typeSymbol, KnownSymbols knownSymbols, bool isInputType)
+    /// <param name="parameterAttributeCache">Optional cache for ParameterAttribute&lt;T&gt; type lookups.</param>
+    public static TypeScanResult? Transform(ITypeSymbol typeSymbol, KnownSymbols knownSymbols, bool isInputType, ParameterAttributeTypeCache parameterAttributeCache)
     {
         // Return null if type has unbound type parameters
         if (typeSymbol is INamedTypeSymbol named && named.TypeArguments.Any(arg => arg is ITypeParameterSymbol))
@@ -89,7 +90,7 @@ public static class TypeSymbolTransformer
                 foreach (var parameter in methodSymbol.Parameters)
                 {
                     // Skip parameters that are injected from context (not GraphQL arguments)
-                    if (ShouldSkipParameterProcessing(parameter, knownSymbols))
+                    if (ShouldSkipParameterProcessing(parameter, knownSymbols, parameterAttributeCache))
                         continue;
 
                     var parameterClrType = parameter.Type;
@@ -509,7 +510,7 @@ public static class TypeSymbolTransformer
     /// <summary>
     /// Determines if a parameter should be skipped during processing (i.e., injected from context).
     /// </summary>
-    private static bool ShouldSkipParameterProcessing(IParameterSymbol parameter, KnownSymbols knownSymbols)
+    private static bool ShouldSkipParameterProcessing(IParameterSymbol parameter, KnownSymbols knownSymbols, ParameterAttributeTypeCache parameterAttributeCache)
     {
         var parameterType = parameter.Type;
 
@@ -521,6 +522,10 @@ public static class TypeSymbolTransformer
         // Check if parameter type is CancellationToken
         if (knownSymbols.CancellationToken != null &&
             SymbolEqualityComparer.Default.Equals(parameterType, knownSymbols.CancellationToken))
+            return true;
+
+        // Check if parameter type is in the ParameterAttribute<T> skip list (assembly/module level)
+        if (parameterAttributeCache.ShouldSkipParameterType(parameter))
             return true;
 
         // Check for attributes that derive from ParameterAttribute
