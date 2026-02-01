@@ -27,6 +27,7 @@ public record class KnownSymbols
     public INamedTypeSymbol? ClrTypeMappingAttribute { get; init; }
     public INamedTypeSymbol? MemberScanAttribute { get; init; }
     public INamedTypeSymbol? ParameterAttribute { get; init; }
+    public INamedTypeSymbol? ParameterAttributeT { get; init; }
     public INamedTypeSymbol? GraphQLConstructorAttribute { get; init; }
     public INamedTypeSymbol? InstanceSourceAttribute { get; init; }
     public INamedTypeSymbol? InputTypeAttributeT { get; init; }
