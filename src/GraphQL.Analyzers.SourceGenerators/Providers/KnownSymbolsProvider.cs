@@ -19,7 +19,10 @@ public static class KnownSymbolsProvider
     }
 
     /// <summary>
-    /// Creates a provider that resolves INamedTypeSymbol for all AOT attribute types.
+    /// Resolves and aggregates all well-known GraphQL and AOT-related symbols from the compilation,
+    /// including attribute types, core GraphQL interfaces, collection/task abstractions, and
+    /// built-in scalar type mappings, producing a single immutable snapshot for downstream
+    /// incremental generator steps.
     /// </summary>
     public static KnownSymbols Transform(Compilation compilation)
     {
@@ -106,6 +109,7 @@ public static class KnownSymbolsProvider
             ClrTypeMappingAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.CLR_TYPE_MAPPING),
             MemberScanAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.MEMBER_SCAN),
             ParameterAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.PARAMETER_ATTRIBUTE),
+            ParameterAttributeT = compilation.GetTypeByMetadataName(Constants.AttributeNames.PARAMETER_ATTRIBUTE_T),
             GraphQLConstructorAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.GRAPHQL_CONSTRUCTOR),
             InstanceSourceAttribute = compilation.GetTypeByMetadataName(Constants.AttributeNames.INSTANCE_SOURCE),
             InputTypeAttributeT = compilation.GetTypeByMetadataName(Constants.AttributeNames.INPUT_TYPE),

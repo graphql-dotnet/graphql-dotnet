@@ -23,6 +23,7 @@
 // ClrTypeMappingAttribute: GraphQL.ClrTypeMappingAttribute
 // MemberScanAttribute: GraphQL.MemberScanAttribute
 // ParameterAttribute: GraphQL.ParameterAttribute
+// ParameterAttributeT: GraphQL.ParameterAttribute<TParameterType>
 // GraphQLConstructorAttribute: GraphQL.GraphQLConstructorAttribute
 // InstanceSourceAttribute: GraphQL.InstanceSourceAttribute
 // InputTypeAttributeT: GraphQL.InputTypeAttribute<TGraphType>
