@@ -13,7 +13,7 @@ public static partial class CSharpIncrementalGeneratorVerifier<TIncrementalGener
         public Test()
         {
             // Use default reference assemblies
-            ReferenceAssemblies = ReferenceAssemblies.Net.Net80;
+            ReferenceAssemblies = VerifiersExtensions.ReferenceResolver.ReferenceAssemblies;
 
             // Add required references for GraphQL types
             TestState.AdditionalReferences.Add(typeof(GraphQL.Types.Schema).Assembly);
