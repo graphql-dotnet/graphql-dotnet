@@ -44,6 +44,7 @@ public partial class KnownSymbolsProviderTests
                 sb.AppendLine($"// ClrTypeMappingAttribute: {symbols.ClrTypeMappingAttribute?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// MemberScanAttribute: {symbols.MemberScanAttribute?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// ParameterAttribute: {symbols.ParameterAttribute?.ToDisplayString() ?? "NULL"}");
+                sb.AppendLine($"// ParameterAttributeT: {symbols.ParameterAttributeT?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// GraphQLConstructorAttribute: {symbols.GraphQLConstructorAttribute?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// InstanceSourceAttribute: {symbols.InstanceSourceAttribute?.ToDisplayString() ?? "NULL"}");
                 sb.AppendLine($"// InputTypeAttributeT: {symbols.InputTypeAttributeT?.ToDisplayString() ?? "NULL"}");

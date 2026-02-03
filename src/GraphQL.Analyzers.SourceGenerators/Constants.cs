@@ -22,6 +22,7 @@ internal static class Constants
         internal const string CLR_TYPE_MAPPING = "GraphQL.ClrTypeMappingAttribute";
         internal const string MEMBER_SCAN = "GraphQL.MemberScanAttribute";
         internal const string PARAMETER_ATTRIBUTE = "GraphQL.ParameterAttribute";
+        internal const string PARAMETER_ATTRIBUTE_T = "GraphQL.ParameterAttribute`1";
         internal const string INPUT_TYPE = "GraphQL.InputTypeAttribute`1";
         internal const string INPUT_TYPE_NON_GENERIC = "GraphQL.InputTypeAttribute";
         internal const string INPUT_BASE_TYPE = "GraphQL.InputBaseTypeAttribute`1";
