@@ -47,17 +47,17 @@ public partial class SampleAotSchema : global::GraphQL.Conversion.IListConverter
             _listConverters[typeof(global::System.Collections.Generic.IReadOnlyList<int?>)] = converter;
         }
         {
-            var converter = new global::GraphQL.Conversion.ListConverter(typeof(string?), values => global::System.Array.ConvertAll(values, value => (string?)value));
-            _listConverters[typeof(string?[])] = converter;
-            _listConverters[typeof(global::System.Collections.Generic.IEnumerable<string?>)] = converter;
-            _listConverters[typeof(global::System.Collections.Generic.IList<string?>)] = converter;
-            _listConverters[typeof(global::System.Collections.Generic.ICollection<string?>)] = converter;
-            _listConverters[typeof(global::System.Collections.Generic.IReadOnlyCollection<string?>)] = converter;
-            _listConverters[typeof(global::System.Collections.Generic.IReadOnlyList<string?>)] = converter;
+            var converter = new global::GraphQL.Conversion.ListConverter(typeof(string), values => global::System.Array.ConvertAll(values, value => (string)value));
+            _listConverters[typeof(string[])] = converter;
+            _listConverters[typeof(global::System.Collections.Generic.IEnumerable<string>)] = converter;
+            _listConverters[typeof(global::System.Collections.Generic.IList<string>)] = converter;
+            _listConverters[typeof(global::System.Collections.Generic.ICollection<string>)] = converter;
+            _listConverters[typeof(global::System.Collections.Generic.IReadOnlyCollection<string>)] = converter;
+            _listConverters[typeof(global::System.Collections.Generic.IReadOnlyList<string>)] = converter;
         }
         _listConverters[typeof(global::System.Collections.Generic.List<int>)] = new global::GraphQL.Conversion.ListConverter(typeof(int), values => global::System.Array.ConvertAll(values, value => (int?)value ?? default));
         _listConverters[typeof(global::System.Collections.Generic.List<int?>)] = new global::GraphQL.Conversion.ListConverter(typeof(int?), values => global::System.Array.ConvertAll(values, value => (int?)value));
-        _listConverters[typeof(global::System.Collections.Generic.List<string?>)] = new global::GraphQL.Conversion.ListConverter(typeof(string?), values => global::System.Array.ConvertAll(values, value => (string?)value));
+        _listConverters[typeof(global::System.Collections.Generic.List<string>)] = new global::GraphQL.Conversion.ListConverter(typeof(string), values => global::System.Array.ConvertAll(values, value => (string)value));
         {
             var converter = new global::GraphQL.Conversion.ListConverter(typeof(int), values => global::System.Array.ConvertAll(values, value => (int?)value ?? default));
             _listConverters[typeof(global::System.Collections.Generic.HashSet<int>)] = converter;
@@ -69,9 +69,9 @@ public partial class SampleAotSchema : global::GraphQL.Conversion.IListConverter
             _listConverters[typeof(global::System.Collections.Generic.ISet<int?>)] = converter;
         }
         {
-            var converter = new global::GraphQL.Conversion.ListConverter(typeof(string?), values => global::System.Array.ConvertAll(values, value => (string?)value));
-            _listConverters[typeof(global::System.Collections.Generic.HashSet<string?>)] = converter;
-            _listConverters[typeof(global::System.Collections.Generic.ISet<string?>)] = converter;
+            var converter = new global::GraphQL.Conversion.ListConverter(typeof(string), values => global::System.Array.ConvertAll(values, value => (string)value));
+            _listConverters[typeof(global::System.Collections.Generic.HashSet<string>)] = converter;
+            _listConverters[typeof(global::System.Collections.Generic.ISet<string>)] = converter;
         }
 
         foreach (var listType in _listConverters.Keys)

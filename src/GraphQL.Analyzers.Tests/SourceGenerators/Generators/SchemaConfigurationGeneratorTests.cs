@@ -61,9 +61,9 @@ public class SchemaConfigurationGeneratorTests
             QueryRootTypeName: "global::GraphQL.Types.AutoRegisteringObjectGraphType<StarWarsQuery>",
             MutationRootTypeName: null,
             SubscriptionRootTypeName: null,
-            ArrayListTypes: new[] { new ListElementTypeData("int", false), new ListElementTypeData("int?", true), new ListElementTypeData("string?", true) }.ToImmutableEquatableArray(),
-            GenericListTypes: new[] { new ListElementTypeData("int", false), new ListElementTypeData("int?", true), new ListElementTypeData("string?", true) }.ToImmutableEquatableArray(),
-            HashSetTypes: new[] { new ListElementTypeData("int", false), new ListElementTypeData("int?", true), new ListElementTypeData("string?", true) }.ToImmutableEquatableArray());
+            ArrayListTypes: new[] { new ListElementTypeData("int", false), new ListElementTypeData("int?", true), new ListElementTypeData("string", true) }.ToImmutableEquatableArray(),
+            GenericListTypes: new[] { new ListElementTypeData("int", false), new ListElementTypeData("int?", true), new ListElementTypeData("string", true) }.ToImmutableEquatableArray(),
+            HashSetTypes: new[] { new ListElementTypeData("int", false), new ListElementTypeData("int?", true), new ListElementTypeData("string", true) }.ToImmutableEquatableArray());
 
         // Act
         var result = SchemaConfigurationGenerator.Generate(@namespace, partialClassHierarchy, schemaClass);
