@@ -1,4 +1,6 @@
-// SUCCESS:
+// FAILURE:
+
+(14,22): error CS7036: There is no argument given that corresponds to the required parameter 'services' of 'AotSchema.AotSchema(IServiceProvider, IEnumerable<IConfigureSchema>)'
 
 // ========= GeneratedTypeDataReport.g.cs ============
 
