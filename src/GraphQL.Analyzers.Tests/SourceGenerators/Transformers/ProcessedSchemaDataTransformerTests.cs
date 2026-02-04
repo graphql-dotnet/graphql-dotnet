@@ -39,9 +39,14 @@ public partial class ProcessedSchemaDataTransformerTests
                 public string GetFullName(string title) => title + " " + Name;
             }
 
-            public interface IEntity
+            public interface IEntityBase
             {
                 int Id { get; }
+            }
+
+            public interface IEntity : IEntityBase
+            {
+                string Name { get; }
             }
 
             public class MyDbContext { }

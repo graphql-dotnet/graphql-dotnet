@@ -96,9 +96,13 @@
 // FullyQualifiedClrTypeName: global::IEntity
 // GraphTypeClassName: IEntityGraphType
 // InstanceSource: ContextSource
-// SelectedMembers (1):
-//   - Property Id
+// SelectedMembers (2):
+//   - Property Name
 //     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: False
+//   - Property Id
+//     DeclaringType: global::IEntityBase
 //     IsStatic: False
 //     IsSourceStreamResolver: False
 //
