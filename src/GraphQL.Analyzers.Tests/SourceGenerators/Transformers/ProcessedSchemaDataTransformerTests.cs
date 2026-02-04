@@ -44,18 +44,28 @@ public partial class ProcessedSchemaDataTransformerTests
                 int Id { get; }
             }
 
+            public class MyDbContext { }
+
             [InstanceSource(InstanceSource.NewInstance)]
-            public class Product
+            [MemberScan(ScanMemberTypes.Methods)]
+            public class Mutation
             {
-                public Product(string name, decimal price)
+                private readonly MyDbContext _context;
+                
+                public Mutation(MyDbContext context)
                 {
-                    Name = name;
-                    Price = price;
+                    _context = context;
                 }
                 
-                public string Name { get; init; }
-                public decimal Price { get; init; }
-                public string Category { get; set; }
+                public string MyOption { get; init; }
+
+                public required IResolveFieldContext Context { get; init; }
+
+                public decimal UpdatePerson(PersonInput input)
+                {
+                    // Use _context to update person in database
+                    return 0m;
+                }
             }
 
             // Input types
@@ -88,7 +98,7 @@ public partial class ProcessedSchemaDataTransformerTests
             [AotQueryType<Query>]
             [AotOutputType<Person>]
             [AotOutputType<IEntity>(Kind = OutputTypeKind.Interface)]
-            [AotOutputType<Product>]
+            [AotOutputType<Mutation>]
             [AotInputType<PersonInput>]
             [AotInputType<SearchInput>]
             public partial class MySchema : AotSchema

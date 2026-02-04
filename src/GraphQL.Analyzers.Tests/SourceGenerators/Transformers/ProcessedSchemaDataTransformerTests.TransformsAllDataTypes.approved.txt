@@ -20,8 +20,8 @@
 //   - global::GraphQL.Types.AutoRegisteringInterfaceGraphType<global::IEntity>
 //     AotGenerated: IEntityGraphType
 //     Override: null
-//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Product>
-//     AotGenerated: ProductGraphType
+//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Mutation>
+//     AotGenerated: MutationGraphType
 //     Override: null
 //   - global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::PersonInput>
 //     AotGenerated: PersonInputGraphType
@@ -53,7 +53,7 @@
 // TypeMappings (9):
 //   global::Person -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Person>
 //   global::IEntity -> global::GraphQL.Types.AutoRegisteringInterfaceGraphType<global::IEntity>
-//   global::Product -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Product>
+//   global::Mutation -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Mutation>
 //   global::Query -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Query>
 //   string -> global::GraphQL.Types.StringGraphType
 //   int -> global::GraphQL.Types.IntGraphType
@@ -107,29 +107,22 @@
 // PartialClassHierarchy: public MySchema
 // Type: OutputGraphType
 // IsInterface: False
-// FullyQualifiedClrTypeName: global::Product
-// GraphTypeClassName: ProductGraphType
+// FullyQualifiedClrTypeName: global::Mutation
+// GraphTypeClassName: MutationGraphType
 // InstanceSource: NewInstance
-// SelectedMembers (3):
-//   - Property Name
+// SelectedMembers (1):
+//   - Method UpdatePerson
 //     DeclaringType: same as CLR type
 //     IsStatic: False
 //     IsSourceStreamResolver: False
-//   - Property Price
-//     DeclaringType: same as CLR type
-//     IsStatic: False
-//     IsSourceStreamResolver: False
-//   - Property Category
-//     DeclaringType: same as CLR type
-//     IsStatic: False
-//     IsSourceStreamResolver: False
+//     Parameters (1):
+//       - global::PersonInput
 // ConstructorData:
-//   Parameters (2):
-//     - string
-//     - decimal
+//   Parameters (1):
+//     - global::MyDbContext
 //   RequiredProperties (2):
-//     - Name: string
-//     - Price: decimal
+//     - MyOption: string
+//     - Context: global::GraphQL.IResolveFieldContext
 //
 // ========== Entry 5 ==========
 // Namespace: null
