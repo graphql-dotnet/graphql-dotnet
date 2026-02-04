@@ -1,7 +1,4 @@
-// FAILURE:
-
-(15,14): error CS0534: 'CustomScalarGraphType' does not implement inherited abstract member 'ScalarGraphType.ParseValue(object?)'
-(24,14): error CS0534: 'ComplexScalarGraphType' does not implement inherited abstract member 'ScalarGraphType.ParseValue(object?)'
+// SUCCESS:
 
 // ========= GeneratedTypeDataReport.g.cs ============
 

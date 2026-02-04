@@ -202,9 +202,8 @@ public partial class ProcessedSchemaDataTransformerTests
 
             namespace MyApp.GraphQL;
 
-            public class MyType
+            public class MyType : ObjectGraphType
             {
-                public string Name { get; set; }
             }
 
             [AotGraphType<MyType>]
@@ -231,9 +230,8 @@ public partial class ProcessedSchemaDataTransformerTests
 
             namespace MyApp.GraphQL;
 
-            public class MyType
+            public class MyType : ObjectGraphType
             {
-                public string Name { get; set; }
             }
 
             [AotGraphType<MyType>]
@@ -259,9 +257,8 @@ public partial class ProcessedSchemaDataTransformerTests
 
             namespace MyApp.GraphQL;
 
-            public class MyType
+            public class MyType : ObjectGraphType
             {
-                public string Name { get; set; }
             }
 
             public partial class MySchema : AotSchema
@@ -400,6 +397,8 @@ public partial class ProcessedSchemaDataTransformerTests
                 {
                     Name = name;
                 }
+
+                public override object? ParseValue(object? value) => value;
             }
 
             // Custom scalar with multiple constructor parameters
@@ -410,6 +409,8 @@ public partial class ProcessedSchemaDataTransformerTests
                     Name = name;
                     Description = description;
                 }
+
+                public override object? ParseValue(object? value) => value;
             }
 
             [AotQueryType<Query>]

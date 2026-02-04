@@ -1,6 +1,4 @@
-// FAILURE:
-
-(20,15): error CS0311: The type 'MyApp.GraphQL.MyType' cannot be used as type parameter 'TGraphType' in the generic type or method 'AotGraphTypeAttribute<TGraphType>'. There is no implicit reference conversion from 'MyApp.GraphQL.MyType' to 'GraphQL.Types.IGraphType'.
+// SUCCESS:
 
 // ========= GeneratedTypeDataReport.g.cs ============
 

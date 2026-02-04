@@ -1,7 +1,4 @@
-// FAILURE:
-
-(14,15): error CS0311: The type 'MyApp.GraphQL.MyType' cannot be used as type parameter 'TGraphType' in the generic type or method 'AotGraphTypeAttribute<TGraphType>'. There is no implicit reference conversion from 'MyApp.GraphQL.MyType' to 'GraphQL.Types.IGraphType'.
-(15,22): error CS7036: There is no argument given that corresponds to the required parameter 'services' of 'AotSchema.AotSchema(IServiceProvider, IEnumerable<IConfigureSchema>)'
+// SUCCESS:
 
 // ========= GeneratedTypeDataReport.g.cs ============
 
