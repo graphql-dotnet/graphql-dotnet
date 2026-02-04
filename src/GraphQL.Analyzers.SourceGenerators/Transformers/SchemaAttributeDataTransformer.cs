@@ -10,6 +10,7 @@ namespace GraphQL.Analyzers.SourceGenerators.Transformers;
 public readonly ref struct SchemaAttributeDataTransformer
 {
     private readonly KnownSymbols _knownSymbols;
+    private readonly ParameterAttributeTypeCache _parameterAttributeCache;
     private readonly HashSet<ITypeSymbol> _discoveredGraphTypes;
     private readonly Dictionary<ITypeSymbol, ITypeSymbol> _outputClrTypeMappings;
     private readonly Dictionary<ITypeSymbol, ITypeSymbol> _inputClrTypeMappings;
@@ -32,6 +33,7 @@ public readonly ref struct SchemaAttributeDataTransformer
     private SchemaAttributeDataTransformer(KnownSymbols knownSymbols)
     {
         _knownSymbols = knownSymbols;
+        _parameterAttributeCache = new ParameterAttributeTypeCache(knownSymbols);
         _discoveredGraphTypes = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
         _outputClrTypeMappings = new Dictionary<ITypeSymbol, ITypeSymbol>(SymbolEqualityComparer.Default);
         _inputClrTypeMappings = new Dictionary<ITypeSymbol, ITypeSymbol>(SymbolEqualityComparer.Default);
@@ -155,7 +157,7 @@ public readonly ref struct SchemaAttributeDataTransformer
             var (currentClrType, isInputType) = _clrTypesToProcess.Dequeue();
 
             // Use TypeSymbolTransformer to scan the type
-            var scanResult = TypeSymbolTransformer.Transform(currentClrType, _knownSymbols, isInputType);
+            var scanResult = TypeSymbolTransformer.Transform(currentClrType, _knownSymbols, isInputType, _parameterAttributeCache);
 
             // Skip if type cannot be scanned (e.g., open generic types)
             if (!scanResult.HasValue)
