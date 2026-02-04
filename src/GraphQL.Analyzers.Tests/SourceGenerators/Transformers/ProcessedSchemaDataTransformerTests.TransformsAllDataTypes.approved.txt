@@ -120,8 +120,7 @@
 // ConstructorData:
 //   Parameters (1):
 //     - global::MyDbContext
-//   RequiredProperties (2):
-//     - MyOption: string
+//   RequiredProperties (1):
 //     - Context: global::GraphQL.IResolveFieldContext
 //
 // ========== Entry 5 ==========

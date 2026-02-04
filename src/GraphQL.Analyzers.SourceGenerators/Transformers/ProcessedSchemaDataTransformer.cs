@@ -490,8 +490,8 @@ public static class ProcessedSchemaDataTransformer
             if (member.IsReadOnly)
                 continue;
 
-            // Check if it's a required property or has init accessor
-            bool isRequired = member.IsRequired || member.SetMethod?.IsInitOnly == true;
+            // Check if it's a required property
+            bool isRequired = member.IsRequired;
 
             if (isRequired)
             {
