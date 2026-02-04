@@ -13,7 +13,7 @@ namespace GraphQL.Analyzers.SourceGenerators.Providers;
 public static class CandidateProvider
 {
     /// <summary>
-    /// Creates an incremental provider that identifies all partial class declarations
+    /// Creates an incremental provider that identifies all class declarations
     /// decorated with AOT-related attributes.
     /// </summary>
     /// <remarks>
@@ -63,7 +63,7 @@ public static class CandidateProvider
     {
         return context.SyntaxProvider.ForAttributeWithMetadataName(
             fullyQualifiedMetadataName,
-            predicate: static (node, _) => IsPartialClass(node),
+            predicate: static (node, _) => IsClassDeclaration(node),
             transform: static (ctx, _) => new CandidateClass(
                 (ClassDeclarationSyntax)ctx.TargetNode,
                 ctx.SemanticModel,
@@ -71,37 +71,22 @@ public static class CandidateProvider
     }
 
     /// <summary>
-    /// Fast syntax-only check to determine if a node is a partial class.
+    /// Fast syntax-only check to determine if a node is a class declaration.
     /// </summary>
     /// <remarks>
     /// ForAttributeWithMetadataName already filters by attribute presence,
-    /// so we only need to verify the class is partial (required for code generation).
-    /// Additionally, all containing classes must also be partial.
+    /// so we only need to verify the node is a class declaration.
     /// </remarks>
-    private static bool IsPartialClass(SyntaxNode? node)
+    private static bool IsClassDeclaration(SyntaxNode? node)
     {
-        // Must be a class declaration with the partial modifier
-        if (node is not ClassDeclarationSyntax)
-            return false;
-
-        /*
-        // Check that all containing classes are also partial
-        while (node is ClassDeclarationSyntax classDecl)
-        {
-            if (!classDecl.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)))
-                return false;
-
-            node = classDecl.Parent;
-        }
-        */
-
-        return true;
+        // Must be a class declaration
+        return node is ClassDeclarationSyntax;
     }
 
     /// <summary>
     /// Manually deduplicate candidates by class symbol and filter to only include
     /// classes that inherit from GraphQL.Types.AotSchema.
-    /// For partial classes with attributes on multiple declarations, uses the first declaration.
+    /// For classes with attributes on multiple partial declarations, uses the first declaration.
     /// </summary>
     private static ImmutableArray<CandidateClass> DeduplicateAndFilter(
         ImmutableArray<CandidateClass> candidates,

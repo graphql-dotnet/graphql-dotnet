@@ -706,4 +706,44 @@ public partial class CandidateProviderTests
 
             """);
     }
+
+    [Fact]
+    public async Task IncludesNonPartialClass_WithAotAttribute()
+    {
+        // Non-partial class with AOT attribute is included as a candidate.
+        // A diagnostic will be produced later during source generation when the generator
+        // attempts to generate code for a non-partial class.
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query { }
+
+            [AotQueryType<Query>]
+            public class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= CandidatesReport.g.cs ============
+
+            // Matched Candidates:
+
+            // MySchema
+            //   Namespace: Sample
+            //   IsPartial: False
+            //   AttributeCount: 1
+
+            """);
+    }
 }
