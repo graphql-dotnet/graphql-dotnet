@@ -399,13 +399,17 @@ public partial class SchemaAttributeDataTransformerTests
 
             namespace Sample;
 
+            public class CustomDateTimeGraphType : DateTimeGraphType
+            {
+            }
+
             public class Query
             {
                 public DateTime GetCurrentTime() => DateTime.Now;
             }
 
             [AotQueryType<Query>]
-            [AotTypeMapping<DateTime, DateTimeGraphType>]
+            [AotTypeMapping<DateTime, CustomDateTimeGraphType>]
             public partial class MySchema : AotSchema
             {
                 public MySchema() : base(null!, null!) { }
@@ -429,15 +433,15 @@ public partial class SchemaAttributeDataTransformerTests
             // SubscriptionRootGraphType: (none)
             //
             // DiscoveredGraphTypes: 2
-            //   [0] DateTimeGraphType
+            //   [0] CustomDateTimeGraphType
             //   [1] AutoRegisteringObjectGraphType<Query>
             //
             // OutputClrTypeMappings: 2
-            //   [0] DateTime -> DateTimeGraphType
+            //   [0] DateTime -> CustomDateTimeGraphType
             //   [1] Query -> AutoRegisteringObjectGraphType<Query>
             //
             // InputClrTypeMappings: 1
-            //   [0] DateTime -> DateTimeGraphType
+            //   [0] DateTime -> CustomDateTimeGraphType
             //
             // InputListTypes: 0
             //
@@ -1176,6 +1180,10 @@ public partial class SchemaAttributeDataTransformerTests
 
             namespace Sample;
 
+            public class CustomDateTimeGraphType : DateTimeGraphType
+            {
+            }
+
             public class Product
             {
                 public string Name { get; set; }
@@ -1188,7 +1196,7 @@ public partial class SchemaAttributeDataTransformerTests
             }
 
             [AotQueryType<Query>]
-            [AotTypeMapping<DateTime, DateTimeGraphType>]
+            [AotTypeMapping<DateTime, CustomDateTimeGraphType>]
             public partial class MySchema : AotSchema
             {
                 public MySchema() : base(null!, null!) { }
@@ -1212,19 +1220,19 @@ public partial class SchemaAttributeDataTransformerTests
             // SubscriptionRootGraphType: (none)
             //
             // DiscoveredGraphTypes: 4
-            //   [0] DateTimeGraphType
+            //   [0] CustomDateTimeGraphType
             //   [1] AutoRegisteringObjectGraphType<Query>
             //   [2] AutoRegisteringObjectGraphType<Product>
             //   [3] StringGraphType
             //
             // OutputClrTypeMappings: 4
-            //   [0] DateTime -> DateTimeGraphType
+            //   [0] DateTime -> CustomDateTimeGraphType
             //   [1] Query -> AutoRegisteringObjectGraphType<Query>
             //   [2] Product -> AutoRegisteringObjectGraphType<Product>
             //   [3] string -> StringGraphType
             //
             // InputClrTypeMappings: 2
-            //   [0] DateTime -> DateTimeGraphType
+            //   [0] DateTime -> CustomDateTimeGraphType
             //   [1] string -> StringGraphType
             //
             // InputListTypes: 0
