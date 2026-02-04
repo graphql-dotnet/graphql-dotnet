@@ -235,7 +235,21 @@ public readonly ref struct SchemaAttributeDataTransformer
                 var clrType = ExtractClrTypeFromGraphType(graphType);
                 if (clrType != null)
                 {
-                    _outputClrTypeMappings[clrType] = graphType;
+                    // Determine if this is a scalar or input type
+                    var isScalar = IsScalarGraphType(graphType);
+                    var isInputObject = ImplementsInterface(graphType, _knownSymbols.IInputObjectGraphType);
+
+                    // Add to input mappings if it's a scalar or input object
+                    if (isScalar || isInputObject)
+                    {
+                        _inputClrTypeMappings[clrType] = graphType;
+                    }
+
+                    // Add to output mappings if it's a scalar or not an input object
+                    if (isScalar || !isInputObject)
+                    {
+                        _outputClrTypeMappings[clrType] = graphType;
+                    }
                 }
             }
         }

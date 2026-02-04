@@ -2064,7 +2064,71 @@ public partial class SchemaAttributeDataTransformerTests
             // OutputClrTypeMappings: 1
             //   [0] ProductStatus -> ProductStatusGraphType
             //
-            // InputClrTypeMappings: 0
+            // InputClrTypeMappings: 1
+            //   [0] ProductStatus -> ProductStatusGraphType
+            //
+            // InputListTypes: 0
+            //
+            // GeneratedGraphTypesWithMembers: 0
+            //
+            // RemapTypes: 0
+
+            """);
+    }
+
+    [Fact]
+    public async Task InputObjectGraphType_ExtractsInputTypeMapping()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class CreateProductInput
+            {
+                public string Name { get; set; }
+            }
+
+            public class CreateProductInputGraphType : InputObjectGraphType<CreateProductInput>
+            {
+                public CreateProductInputGraphType()
+                {
+                    Field(x => x.Name);
+                }
+            }
+
+            [AotGraphType<CreateProductInputGraphType>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        output.ShouldBe(
+            """
+            // SUCCESS:
+
+            // ========= SchemaTransformationReport.g.cs ============
+
+            // Schema: MySchema
+            //
+            // QueryRootGraphType: (none)
+            //
+            // MutationRootGraphType: (none)
+            //
+            // SubscriptionRootGraphType: (none)
+            //
+            // DiscoveredGraphTypes: 1
+            //   [0] CreateProductInputGraphType
+            //
+            // OutputClrTypeMappings: 0
+            //
+            // InputClrTypeMappings: 1
+            //   [0] CreateProductInput -> CreateProductInputGraphType
             //
             // InputListTypes: 0
             //
