@@ -1,0 +1,55 @@
+// FAILURE:
+
+(15,14): error CS0534: 'CustomScalarGraphType' does not implement inherited abstract member 'ScalarGraphType.ParseValue(object?)'
+(24,14): error CS0534: 'ComplexScalarGraphType' does not implement inherited abstract member 'ScalarGraphType.ParseValue(object?)'
+
+// ========= GeneratedTypeDataReport.g.cs ============
+
+// Schema: MySchema
+// Total Entries: 2
+//
+// ========== Entry 1 ==========
+// Namespace: MyApp.GraphQL
+// PartialClassHierarchy: public MySchema
+// Type: SchemaClass
+// HasConstructor: True
+// QueryRootTypeName: global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Query>
+// MutationRootTypeName: null
+// SubscriptionRootTypeName: null
+// RegisteredGraphTypes (4):
+//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Query>
+//     AotGenerated: QueryGraphType
+//     Override: null
+//   - global::MyApp.GraphQL.CustomScalarGraphType
+//     AotGenerated: null
+//     Override: null
+//   - global::MyApp.GraphQL.ComplexScalarGraphType
+//     AotGenerated: null
+//     Override: null
+//   - global::GraphQL.Types.StringGraphType
+//     AotGenerated: null
+//     Override: null
+//     ConstructorData:
+//       Parameters (0):
+//       RequiredProperties (0):
+// TypeMappings (2):
+//   global::MyApp.GraphQL.Query -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Query>
+//   string -> global::GraphQL.Types.StringGraphType
+// ArrayListTypes (0): 
+// GenericListTypes (0): 
+// HashSetTypes (0): 
+//
+// ========== Entry 2 ==========
+// Namespace: MyApp.GraphQL
+// PartialClassHierarchy: public MySchema
+// Type: OutputGraphType
+// IsInterface: False
+// FullyQualifiedClrTypeName: global::MyApp.GraphQL.Query
+// GraphTypeClassName: QueryGraphType
+// InstanceSource: ContextSource
+// SelectedMembers (1):
+//   - Method GetData
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: False
+//

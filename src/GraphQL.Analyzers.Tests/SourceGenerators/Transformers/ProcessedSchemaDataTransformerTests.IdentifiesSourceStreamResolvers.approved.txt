@@ -1,0 +1,92 @@
+// SUCCESS:
+
+// ========= GeneratedTypeDataReport.g.cs ============
+
+// Schema: MySchema
+// Total Entries: 3
+//
+// ========== Entry 1 ==========
+// Namespace: MyApp.GraphQL
+// PartialClassHierarchy: public MySchema
+// Type: SchemaClass
+// HasConstructor: True
+// QueryRootTypeName: null
+// MutationRootTypeName: null
+// SubscriptionRootTypeName: global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Subscription>
+// RegisteredGraphTypes (3):
+//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Subscription>
+//     AotGenerated: SubscriptionGraphType
+//     Override: null
+//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Message>
+//     AotGenerated: MessageGraphType
+//     Override: null
+//   - global::GraphQL.Types.StringGraphType
+//     AotGenerated: null
+//     Override: null
+//     ConstructorData:
+//       Parameters (0):
+//       RequiredProperties (0):
+// TypeMappings (3):
+//   global::MyApp.GraphQL.Subscription -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Subscription>
+//   global::MyApp.GraphQL.Message -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Message>
+//   string -> global::GraphQL.Types.StringGraphType
+// ArrayListTypes (0): 
+// GenericListTypes (0): 
+// HashSetTypes (0): 
+//
+// ========== Entry 2 ==========
+// Namespace: MyApp.GraphQL
+// PartialClassHierarchy: public MySchema
+// Type: OutputGraphType
+// IsInterface: False
+// FullyQualifiedClrTypeName: global::MyApp.GraphQL.Subscription
+// GraphTypeClassName: SubscriptionGraphType
+// InstanceSource: ContextSource
+// SelectedMembers (8):
+//   - Method OnMessage1
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: True
+//   - Method OnMessage2
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: True
+//   - Method OnMessage3
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: True
+//   - Method OnMessage4
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: True
+//   - Method OnMessage5
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: True
+//   - Method OnMessage6
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: True
+//   - Method GetMessage
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: False
+//   - Method GetMessageAsync
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: False
+//
+// ========== Entry 3 ==========
+// Namespace: MyApp.GraphQL
+// PartialClassHierarchy: public MySchema
+// Type: OutputGraphType
+// IsInterface: False
+// FullyQualifiedClrTypeName: global::MyApp.GraphQL.Message
+// GraphTypeClassName: MessageGraphType
+// InstanceSource: ContextSource
+// SelectedMembers (1):
+//   - Property Text
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: False
+//
