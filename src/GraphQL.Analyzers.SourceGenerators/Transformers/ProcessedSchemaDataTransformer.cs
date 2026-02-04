@@ -19,7 +19,7 @@ public static class ProcessedSchemaDataTransformer
         ProcessedSchemaData processedData,
         KnownSymbols knownSymbols)
     {
-        //
+        // Flag to indicate whether to create constructors for graph types (self-registering graph types)
         var createGraphTypeConstructors = false;
 
         // Create a name cache to ensure each graph type symbol gets a consistent unique name
