@@ -463,7 +463,7 @@ public static class ProcessedSchemaDataTransformer
             return null;
 
         // Transform constructor parameters
-        var parameters = new List<ConstructorParameterData>();
+        var parameters = new List<ConstructorParameterData>(constructor.Parameters.Length);
         foreach (var parameter in constructor.Parameters)
         {
             // Check if this is IResolveFieldContext
