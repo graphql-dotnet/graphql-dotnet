@@ -92,7 +92,7 @@ public static class ProcessedSchemaDataTransformer
         }
 
         // Transform registered graph types
-        var registeredGraphTypes = new List<RegisteredGraphTypeData>();
+        var registeredGraphTypes = new List<RegisteredGraphTypeData>(processedData.DiscoveredGraphTypes.Count);
         foreach (var discoveredGraphType in processedData.DiscoveredGraphTypes)
         {
             var graphTypeSymbol = (ITypeSymbol)discoveredGraphType;
