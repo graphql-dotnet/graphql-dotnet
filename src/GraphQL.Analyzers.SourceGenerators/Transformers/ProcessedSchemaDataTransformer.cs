@@ -85,7 +85,7 @@ public static class ProcessedSchemaDataTransformer
         bool hasConstructor = HasConstructor(schemaClass, knownSymbols);
 
         // Build a lookup dictionary for RemapTypes
-        var remapTypeLookup = new Dictionary<ITypeSymbol, ITypeSymbol>(SymbolEqualityComparer.Default);
+        var remapTypeLookup = new Dictionary<ITypeSymbol, ITypeSymbol>(processedData.RemapTypes.Count, SymbolEqualityComparer.Default);
         foreach (var (fromType, toType) in processedData.RemapTypes)
         {
             remapTypeLookup[(ITypeSymbol)fromType] = (ITypeSymbol)toType;
