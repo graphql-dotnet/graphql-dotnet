@@ -129,7 +129,7 @@ public static class ProcessedSchemaDataTransformer
         }
 
         // Transform type mappings
-        var typeMappings = new List<TypeMappingData>();
+        var typeMappings = new List<TypeMappingData>(processedData.OutputClrTypeMappings.Count);
         foreach (var (clrType, graphType) in processedData.OutputClrTypeMappings)
         {
             typeMappings.Add(new TypeMappingData(
