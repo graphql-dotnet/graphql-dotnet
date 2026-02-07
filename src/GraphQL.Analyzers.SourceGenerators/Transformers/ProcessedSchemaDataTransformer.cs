@@ -357,7 +357,7 @@ public static class ProcessedSchemaDataTransformer
         ImmutableEquatableArray<ISymbol> members,
         ITypeSymbol clrType)
     {
-        var result = new List<InputMemberData>();
+        var result = new List<InputMemberData>(members.Count);
 
         foreach (var member in members)
         {
