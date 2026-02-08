@@ -79,17 +79,11 @@ internal static class FieldInvocationTransformer
             return null;
 
         // Validate that the lambda body is a simple member access (property or field)
-        var (isValid, memberName, diagnostic) = ValidateAndExtractMemberAccess(lambdaExpression, invocation.GetLocation());
+        var memberName = ValidateAndExtractMemberAccess(lambdaExpression);
 
-        if (!isValid && diagnostic != null)
+        if (memberName == null)
         {
-            return new FieldInterceptorInfo
-            {
-                Location = interceptableLocation,
-                SourceTypeFullName = sourceType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                PropertyTypeFullName = propertyType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                Diagnostic = diagnostic
-            };
+            return null;
         }
 
         // Detect which parameters are present in the method signature
@@ -125,28 +119,17 @@ internal static class FieldInvocationTransformer
         };
     }
 
-    private static (bool IsValid, string? MemberName, DiagnosticInfo? Diagnostic) ValidateAndExtractMemberAccess(
-        LambdaExpressionSyntax lambda,
-        Location location)
+    private static string? ValidateAndExtractMemberAccess(
+        LambdaExpressionSyntax lambda)
     {
         // The body should be a simple member access: x.PropertyName
         if (lambda.Body is not MemberAccessExpressionSyntax memberAccess)
         {
-            return (false, null, new DiagnosticInfo
-            {
-                Id = "GQL_INT002",
-                Title = "Complex Field Expression",
-                MessageFormat = "Field expression must be a simple property or field access (e.g., x => x.PropertyName). Complex expressions are not supported for AOT compilation.",
-                Category = "GraphQL.Interceptors",
-                Severity = DiagnosticSeverity.Warning,
-                LocationString = location.ToString()
-            });
+            return null;
         }
 
         // Extract the member name
-        var memberName = memberAccess.Name.Identifier.Text;
-
-        return (true, memberName, null);
+        return memberAccess.Name.Identifier.Text;
     }
 
     private static bool IsComplexGraphType(INamedTypeSymbol type)

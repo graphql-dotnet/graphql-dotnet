@@ -1,6 +1,5 @@
 using System.Text;
 using GraphQL.Analyzers.Interceptors.Models;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 
 namespace GraphQL.Analyzers.Interceptors;
@@ -15,11 +14,8 @@ internal static class FieldInterceptorSourceGenerator
     /// </summary>
     public static (string FileName, SourceText SourceText)? Generate(FieldInterceptorInfo info)
     {
-        if (!info.IsValid || info.Location == null || info.SourceTypeFullName == null || info.PropertyTypeFullName == null || info.MemberName == null)
-            return null;
-
         // Create a unique method name based on location
-        var displayLocation = info.Location.GetDisplayLocation().Replace(":", "_").Replace("(", "_").Replace(")", "_").Replace(",", "_");
+        var displayLocation = info.Location.GetDisplayLocation();
         var methodName = $"Field_{displayLocation}";
         var fileName = $"FieldInterceptors_{displayLocation}.g.cs";
 

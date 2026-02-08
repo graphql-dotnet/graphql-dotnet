@@ -63,20 +63,11 @@ public class FieldExpressionInterceptorGenerator : IIncrementalGenerator
             .Select(static (tuple, _) => FieldInvocationTransformer.Transform(tuple.Left.Invocation, tuple.Left.SemanticModel));
 
         // Step 3: Generator - Generate source code from valid interceptor infos
-        // Step 4: Diagnostics - Report any diagnostics
         context.RegisterSourceOutput(interceptorInfos, static (spc, info) =>
         {
             if (info == null)
                 return;
 
-            // Report diagnostics if any
-            if (info.Diagnostic != null)
-            {
-                FieldInterceptorDiagnostics.Report(spc, info);
-                return;
-            }
-
-            // Generate source code
             var result = FieldInterceptorSourceGenerator.Generate(info);
             if (result.HasValue)
             {

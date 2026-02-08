@@ -654,9 +654,7 @@ public class FieldExpressionInterceptorGeneratorTests
             }
             """;
 
-        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
-
-        // Should generate a diagnostic warning about complex expression
-        output.ShouldMatchApproved(o => o.NoDiff());
+        // Should not generate any interceptors
+        await VerifyTestSG.VerifyIncrementalGeneratorAsync(source);
     }
 }

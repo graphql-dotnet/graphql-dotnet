@@ -1,3 +1,0 @@
-// FAILURE:
-
-warning GQL_INT002: Field expression must be a simple property or field access (e.g., x => x.PropertyName). Complex expressions are not supported for AOT compilation.
