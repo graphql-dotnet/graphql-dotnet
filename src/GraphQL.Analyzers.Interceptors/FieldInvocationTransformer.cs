@@ -92,12 +92,36 @@ internal static class FieldInvocationTransformer
             };
         }
 
+        // Detect which parameters are present in the method signature
+        bool hasNameParameter = false;
+        bool hasNullableParameter = false;
+        bool hasTypeParameter = false;
+
+        foreach (var param in methodSymbol.Parameters)
+        {
+            if (param.Type.SpecialType == SpecialType.System_String && param.Name == "name")
+            {
+                hasNameParameter = true;
+            }
+            else if (param.Type.SpecialType == SpecialType.System_Boolean && param.Name == "nullable")
+            {
+                hasNullableParameter = true;
+            }
+            else if (param.Name == "type" && param.Type.ToDisplayString() == "System.Type")
+            {
+                hasTypeParameter = true;
+            }
+        }
+
         return new FieldInterceptorInfo
         {
             Location = interceptableLocation,
             SourceTypeFullName = sourceType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
             PropertyTypeFullName = propertyType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-            MemberName = memberName
+            MemberName = memberName,
+            HasNameParameter = hasNameParameter,
+            HasNullableParameter = hasNullableParameter,
+            HasTypeParameter = hasTypeParameter
         };
     }
 

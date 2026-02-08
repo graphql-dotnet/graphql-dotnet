@@ -41,18 +41,73 @@ internal static class FieldInterceptorSourceGenerator
         sb.AppendLine("    internal static partial class FieldInterceptors");
         sb.AppendLine("    {");
         sb.AppendLine($"        {info.Location.GetInterceptsLocationAttributeSyntax()}");
-        sb.AppendLine($"        internal static global::GraphQL.Builders.FieldBuilder<{info.SourceTypeFullName}, {info.PropertyTypeFullName}> {methodName}<TGraphType>(");
+
+        // Build method signature based on which parameters are present
+        sb.Append($"        internal static global::GraphQL.Builders.FieldBuilder<{info.SourceTypeFullName}, {info.PropertyTypeFullName}> {methodName}<TProperty>(");
+        sb.AppendLine();
         sb.AppendLine($"            this global::GraphQL.Types.ComplexGraphType<{info.SourceTypeFullName}> graphType,");
-        sb.AppendLine($"            string name,");
-        sb.AppendLine($"            global::System.Linq.Expressions.Expression<global::System.Func<{info.SourceTypeFullName}, {info.PropertyTypeFullName}>> expression)");
-        sb.AppendLine($"            where TGraphType : global::GraphQL.Types.ComplexGraphType<{info.SourceTypeFullName}>");
+
+        // Conditionally add name parameter
+        if (info.HasNameParameter)
+        {
+            sb.AppendLine($"            string name,");
+        }
+
+        sb.Append($"            global::System.Linq.Expressions.Expression<global::System.Func<{info.SourceTypeFullName}, {info.PropertyTypeFullName}>> expression");
+
+        // Conditionally add nullable parameter
+        if (info.HasNullableParameter)
+        {
+            sb.AppendLine(",");
+            sb.Append($"            bool nullable");
+        }
+
+        // Conditionally add type parameter
+        if (info.HasTypeParameter)
+        {
+            sb.AppendLine(",");
+            sb.Append($"            global::System.Type type");
+        }
+
+        sb.AppendLine(")");
         sb.AppendLine("        {");
+
+        // Build the call to CreateFieldFromExpression
         sb.AppendLine($"            return global::GraphQL.Utilities.FieldBuilderHelpers.CreateFieldFromExpression<{info.SourceTypeFullName}, {info.PropertyTypeFullName}>(");
         sb.AppendLine("                graphType,");
-        sb.AppendLine("                name,");
+
+        // Pass name parameter or null
+        if (info.HasNameParameter)
+        {
+            sb.AppendLine("                name,");
+        }
+        else
+        {
+            sb.AppendLine("                null,");
+        }
+
         sb.AppendLine("                expression,");
-        sb.AppendLine("                nullable: null,");
-        sb.AppendLine("                type: null,");
+
+        // Pass nullable parameter or null
+        if (info.HasNullableParameter)
+        {
+            sb.AppendLine("                nullable: nullable,");
+        }
+        else
+        {
+            sb.AppendLine("                nullable: null,");
+        }
+
+        // Pass type parameter or null
+        if (info.HasTypeParameter)
+        {
+            sb.AppendLine("                type: type,");
+        }
+        else
+        {
+            sb.AppendLine("                type: null,");
+        }
+
         sb.AppendLine($"                resolve: context => context.Source!.{info.MemberName});");
         sb.AppendLine("        }");
         sb.AppendLine("    }");

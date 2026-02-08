@@ -30,6 +30,21 @@ internal sealed record FieldInterceptorInfo
     public string? MemberName { get; init; }
 
     /// <summary>
+    /// Indicates whether the Field call has a 'name' parameter (string).
+    /// </summary>
+    public bool HasNameParameter { get; init; }
+
+    /// <summary>
+    /// Indicates whether the Field call has a 'nullable' parameter (bool).
+    /// </summary>
+    public bool HasNullableParameter { get; init; }
+
+    /// <summary>
+    /// Indicates whether the Field call has a 'type' parameter (Type).
+    /// </summary>
+    public bool HasTypeParameter { get; init; }
+
+    /// <summary>
     /// Optional diagnostic information if transformation failed or encountered issues.
     /// </summary>
     public DiagnosticInfo? Diagnostic { get; init; }

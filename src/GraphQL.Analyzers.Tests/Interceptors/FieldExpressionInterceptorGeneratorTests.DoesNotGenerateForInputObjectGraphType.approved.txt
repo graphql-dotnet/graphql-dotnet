@@ -16,15 +16,13 @@ namespace GraphQL.Analyzers.Interceptors
     internal static partial class FieldInterceptors
     {
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "y9N3+ZF/cErS0uq2ZTXeu+UAAAA=")]
-        internal static global::GraphQL.Builders.FieldBuilder<global::Sample.PersonInput, string> Field__14_9_<TGraphType>(
+        internal static global::GraphQL.Builders.FieldBuilder<global::Sample.PersonInput, string> Field__14_9_<TProperty>(
             this global::GraphQL.Types.ComplexGraphType<global::Sample.PersonInput> graphType,
-            string name,
             global::System.Linq.Expressions.Expression<global::System.Func<global::Sample.PersonInput, string>> expression)
-            where TGraphType : global::GraphQL.Types.ComplexGraphType<global::Sample.PersonInput>
         {
             return global::GraphQL.Utilities.FieldBuilderHelpers.CreateFieldFromExpression<global::Sample.PersonInput, string>(
                 graphType,
-                name,
+                null,
                 expression,
                 nullable: null,
                 type: null,

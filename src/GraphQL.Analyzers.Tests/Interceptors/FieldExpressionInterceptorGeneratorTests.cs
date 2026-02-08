@@ -545,4 +545,88 @@ public class FieldExpressionInterceptorGeneratorTests
         // Should generate an interceptor
         output.ShouldMatchApproved(o => o.NoDiff());
     }
+
+    [Fact]
+    public async Task DoesNotGenerateForFieldWithTypeOnly()
+    {
+        // Field call with only Type parameter (no expression) should not be intercepted
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Person
+            {
+                public string Name { get; set; } = "";
+            }
+
+            public class PersonType : ObjectGraphType<Person>
+            {
+                public PersonType()
+                {
+                    Field("name", typeof(StringGraphType));
+                }
+            }
+            """;
+
+        // Should not generate any interceptors
+        await VerifyTestSG.VerifyIncrementalGeneratorAsync(source);
+    }
+
+    [Fact]
+    public async Task DoesNotGenerateForFieldWithIGraphTypeOnly()
+    {
+        // Field call with IGraphType parameter (no expression) should not be intercepted
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Person
+            {
+                public string Name { get; set; } = "";
+            }
+
+            public class PersonType : ObjectGraphType<Person>
+            {
+                public PersonType()
+                {
+                    Field("name", new StringGraphType());
+                }
+            }
+            """;
+
+        // Should not generate any interceptors
+        await VerifyTestSG.VerifyIncrementalGeneratorAsync(source);
+    }
+
+    [Fact]
+    public async Task DoesNotGenerateForFieldWithReturnTypeOnly()
+    {
+        // Field call with only TReturnType generic (no expression) should not be intercepted
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Person
+            {
+                public string Name { get; set; } = "";
+            }
+
+            public class PersonType : ObjectGraphType<Person>
+            {
+                public PersonType()
+                {
+                    Field<string>("name");
+                }
+            }
+            """;
+
+        // Should not generate any interceptors
+        await VerifyTestSG.VerifyIncrementalGeneratorAsync(source);
+    }
 }

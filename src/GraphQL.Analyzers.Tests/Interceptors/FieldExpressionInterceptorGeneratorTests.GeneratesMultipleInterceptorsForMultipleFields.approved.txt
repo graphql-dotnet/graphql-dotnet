@@ -16,11 +16,10 @@ namespace GraphQL.Analyzers.Interceptors
     internal static partial class FieldInterceptors
     {
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "D/YcfDAyrvkdtIQ4uQyp7RsBAAA=")]
-        internal static global::GraphQL.Builders.FieldBuilder<global::Sample.Person, string> Field__16_9_<TGraphType>(
+        internal static global::GraphQL.Builders.FieldBuilder<global::Sample.Person, string> Field__16_9_<TProperty>(
             this global::GraphQL.Types.ComplexGraphType<global::Sample.Person> graphType,
             string name,
             global::System.Linq.Expressions.Expression<global::System.Func<global::Sample.Person, string>> expression)
-            where TGraphType : global::GraphQL.Types.ComplexGraphType<global::Sample.Person>
         {
             return global::GraphQL.Utilities.FieldBuilderHelpers.CreateFieldFromExpression<global::Sample.Person, string>(
                 graphType,
@@ -50,11 +49,10 @@ namespace GraphQL.Analyzers.Interceptors
     internal static partial class FieldInterceptors
     {
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "D/YcfDAyrvkdtIQ4uQyp7UABAAA=")]
-        internal static global::GraphQL.Builders.FieldBuilder<global::Sample.Person, int> Field__17_9_<TGraphType>(
+        internal static global::GraphQL.Builders.FieldBuilder<global::Sample.Person, int> Field__17_9_<TProperty>(
             this global::GraphQL.Types.ComplexGraphType<global::Sample.Person> graphType,
             string name,
             global::System.Linq.Expressions.Expression<global::System.Func<global::Sample.Person, int>> expression)
-            where TGraphType : global::GraphQL.Types.ComplexGraphType<global::Sample.Person>
         {
             return global::GraphQL.Utilities.FieldBuilderHelpers.CreateFieldFromExpression<global::Sample.Person, int>(
                 graphType,
@@ -84,11 +82,10 @@ namespace GraphQL.Analyzers.Interceptors
     internal static partial class FieldInterceptors
     {
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "D/YcfDAyrvkdtIQ4uQyp7WMBAAA=")]
-        internal static global::GraphQL.Builders.FieldBuilder<global::Sample.Person, string> Field__18_9_<TGraphType>(
+        internal static global::GraphQL.Builders.FieldBuilder<global::Sample.Person, string> Field__18_9_<TProperty>(
             this global::GraphQL.Types.ComplexGraphType<global::Sample.Person> graphType,
             string name,
             global::System.Linq.Expressions.Expression<global::System.Func<global::Sample.Person, string>> expression)
-            where TGraphType : global::GraphQL.Types.ComplexGraphType<global::Sample.Person>
         {
             return global::GraphQL.Utilities.FieldBuilderHelpers.CreateFieldFromExpression<global::Sample.Person, string>(
                 graphType,
