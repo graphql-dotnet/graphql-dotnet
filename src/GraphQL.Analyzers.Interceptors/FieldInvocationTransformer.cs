@@ -109,7 +109,7 @@ internal static class FieldInvocationTransformer
 
         return new FieldInterceptorInfo
         {
-            Location = interceptableLocation,
+            Location = new(interceptableLocation),
             SourceTypeFullName = sourceType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
             PropertyTypeFullName = propertyType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
             MemberName = memberName,
