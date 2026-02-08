@@ -629,4 +629,34 @@ public class FieldExpressionInterceptorGeneratorTests
         // Should not generate any interceptors
         await VerifyTestSG.VerifyIncrementalGeneratorAsync(source);
     }
+
+    [Fact]
+    public async Task GeneratesDiagnosticForComplexExpression()
+    {
+        // Field call with complex expression (method call) should generate a diagnostic
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Person
+            {
+                public string Name { get; set; } = "";
+            }
+
+            public class PersonType : ObjectGraphType<Person>
+            {
+                public PersonType()
+                {
+                    Field("name", p => p.Name.ToString());
+                }
+            }
+            """;
+
+        var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
+
+        // Should generate a diagnostic warning about complex expression
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
 }
