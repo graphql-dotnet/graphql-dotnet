@@ -1,0 +1,177 @@
+// SUCCESS:
+
+// ========= GeneratedTypeDataReport.g.cs ============
+
+// Schema: MySchema
+// Total Entries: 7
+//
+// ========== Entry 1 ==========
+// Namespace: null
+// PartialClassHierarchy: public MySchema
+// Type: SchemaClass
+// HasConstructor: True
+// QueryRootTypeName: global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Query>
+// MutationRootTypeName: null
+// SubscriptionRootTypeName: null
+// RegisteredGraphTypes (9):
+//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Person>
+//     AotGenerated: PersonGraphType
+//     Override: null
+//   - global::GraphQL.Types.AutoRegisteringInterfaceGraphType<global::IEntity>
+//     AotGenerated: IEntityGraphType
+//     Override: null
+//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Mutation>
+//     AotGenerated: MutationGraphType
+//     Override: null
+//   - global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::PersonInput>
+//     AotGenerated: PersonInputGraphType
+//     Override: null
+//   - global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::SearchInput>
+//     AotGenerated: SearchInputGraphType
+//     Override: null
+//   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Query>
+//     AotGenerated: QueryGraphType
+//     Override: null
+//   - global::GraphQL.Types.StringGraphType
+//     AotGenerated: null
+//     Override: null
+//     ConstructorData:
+//       Parameters (0):
+//       RequiredProperties (0):
+//   - global::GraphQL.Types.IntGraphType
+//     AotGenerated: null
+//     Override: null
+//     ConstructorData:
+//       Parameters (0):
+//       RequiredProperties (0):
+//   - global::GraphQL.Types.DecimalGraphType
+//     AotGenerated: null
+//     Override: null
+//     ConstructorData:
+//       Parameters (0):
+//       RequiredProperties (0):
+// TypeMappings (9):
+//   global::Person -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Person>
+//   global::IEntity -> global::GraphQL.Types.AutoRegisteringInterfaceGraphType<global::IEntity>
+//   global::Mutation -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Mutation>
+//   global::Query -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Query>
+//   string -> global::GraphQL.Types.StringGraphType
+//   int -> global::GraphQL.Types.IntGraphType
+//   decimal -> global::GraphQL.Types.DecimalGraphType
+//   global::PersonInput -> global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::PersonInput>
+//   global::SearchInput -> global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::SearchInput>
+// ArrayListTypes (1): ListElementTypeData { ElementTypeName = int, IsNullable = False }
+// GenericListTypes (0): 
+// HashSetTypes (1): ListElementTypeData { ElementTypeName = string, IsNullable = True }
+//
+// ========== Entry 2 ==========
+// Namespace: null
+// PartialClassHierarchy: public MySchema
+// Type: OutputGraphType
+// IsInterface: False
+// FullyQualifiedClrTypeName: global::Person
+// GraphTypeClassName: PersonGraphType
+// InstanceSource: ContextSource
+// SelectedMembers (3):
+//   - Property Name
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: False
+//   - Property Tags
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: False
+//   - Method GetFullName
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: False
+//     Parameters (1):
+//       - string
+//
+// ========== Entry 3 ==========
+// Namespace: null
+// PartialClassHierarchy: public MySchema
+// Type: OutputGraphType
+// IsInterface: True
+// FullyQualifiedClrTypeName: global::IEntity
+// GraphTypeClassName: IEntityGraphType
+// InstanceSource: ContextSource
+// SelectedMembers (2):
+//   - Property Name
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: False
+//   - Property Id
+//     DeclaringType: global::IEntityBase
+//     IsStatic: False
+//     IsSourceStreamResolver: False
+//
+// ========== Entry 4 ==========
+// Namespace: null
+// PartialClassHierarchy: public MySchema
+// Type: OutputGraphType
+// IsInterface: False
+// FullyQualifiedClrTypeName: global::Mutation
+// GraphTypeClassName: MutationGraphType
+// InstanceSource: NewInstance
+// SelectedMembers (1):
+//   - Method UpdatePerson
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: False
+//     Parameters (1):
+//       - global::PersonInput
+// ConstructorData:
+//   Parameters (1):
+//     - global::MyDbContext
+//   RequiredProperties (1):
+//     - Context: global::GraphQL.IResolveFieldContext
+//
+// ========== Entry 5 ==========
+// Namespace: null
+// PartialClassHierarchy: public MySchema
+// Type: InputGraphType
+// FullyQualifiedClrTypeName: global::PersonInput
+// GraphTypeClassName: PersonInputGraphType
+// Members (2):
+//   - Name: string
+//     DeclaringType: same as CLR type
+//   - Age: int
+//     DeclaringType: same as CLR type
+// ConstructorParameters (2):
+//   - name
+//   - age
+//
+// ========== Entry 6 ==========
+// Namespace: null
+// PartialClassHierarchy: public MySchema
+// Type: InputGraphType
+// FullyQualifiedClrTypeName: global::SearchInput
+// GraphTypeClassName: SearchInputGraphType
+// Members (3):
+//   - Query: string
+//     DeclaringType: same as CLR type
+//   - Tags: int[]
+//     DeclaringType: same as CLR type
+//   - Categories: global::System.Collections.Generic.HashSet<string>
+//     DeclaringType: same as CLR type
+// ConstructorParameters (0):
+//
+// ========== Entry 7 ==========
+// Namespace: null
+// PartialClassHierarchy: public MySchema
+// Type: OutputGraphType
+// IsInterface: False
+// FullyQualifiedClrTypeName: global::Query
+// GraphTypeClassName: QueryGraphType
+// InstanceSource: ContextSource
+// SelectedMembers (2):
+//   - Method GetPerson
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: False
+//   - Method GetEntity
+//     DeclaringType: same as CLR type
+//     IsStatic: False
+//     IsSourceStreamResolver: False
+//
