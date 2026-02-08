@@ -84,6 +84,8 @@ public static class FieldBuilderHelpers
             builder.FieldType.Metadata[ComplexGraphType<TSourceType>.ORIGINAL_EXPRESSION_PROPERTY_NAME] = expr.Member.Name;
         }
 
+        complexGraphType.AddField(builder.FieldType);
+
         return builder;
     }
 

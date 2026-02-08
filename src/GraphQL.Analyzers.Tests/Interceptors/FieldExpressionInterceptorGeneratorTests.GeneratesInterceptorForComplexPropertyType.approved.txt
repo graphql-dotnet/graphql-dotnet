@@ -8,24 +8,13 @@
 namespace System.Runtime.CompilerServices
 {
     [global::System.AttributeUsage(global::System.AttributeTargets.Method, AllowMultiple = true)]
-    file sealed class InterceptsLocationAttribute : global::System.Attribute
-    {
-        public InterceptsLocationAttribute(int version, string data)
-        {
-            Version = version;
-            Data = data;
-        }
-
-        public int Version { get; }
-        public string Data { get; }
-    }
+    file sealed class InterceptsLocationAttribute(int version, string data) : global::System.Attribute;
 }
 
 namespace GraphQL.Analyzers.Interceptors
 {
     internal static partial class FieldInterceptors
     {
-        // (20,9)
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "ecXr+DStFnTt67NIRtmFzEoBAAA=")]
         internal static global::GraphQL.Builders.FieldBuilder<global::Sample.Person, global::System.Collections.Generic.List<global::Sample.Address>> Field__20_9_<TGraphType>(
             this global::GraphQL.Types.ComplexGraphType<global::Sample.Person> graphType,
@@ -33,18 +22,13 @@ namespace GraphQL.Analyzers.Interceptors
             global::System.Linq.Expressions.Expression<global::System.Func<global::Sample.Person, global::System.Collections.Generic.List<global::Sample.Address>>> expression)
             where TGraphType : global::GraphQL.Types.ComplexGraphType<global::Sample.Person>
         {
-            // Use FieldBuilderHelpers to create the field without setting ExpressionFieldResolver
-            // This allows AOT compilation while still setting up the field metadata
-            var builder = global::GraphQL.Utilities.FieldBuilderHelpers.CreateFieldBuilder<global::Sample.Person, global::System.Collections.Generic.List<global::Sample.Address>>(
+            return global::GraphQL.Utilities.FieldBuilderHelpers.CreateFieldFromExpression<global::Sample.Person, global::System.Collections.Generic.List<global::Sample.Address>>(
                 graphType,
                 name,
                 expression,
                 nullable: null,
                 type: null,
-                resolver: null);
-
-            graphType.AddField(builder.FieldType);
-            return builder;
+                resolve: context => context.Source!.Addresses);
         }
     }
 }

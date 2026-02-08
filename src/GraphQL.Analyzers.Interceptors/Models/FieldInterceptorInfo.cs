@@ -24,6 +24,12 @@ internal sealed record FieldInterceptorInfo
     public string? PropertyTypeFullName { get; init; }
 
     /// <summary>
+    /// The name of the property or field being accessed (e.g., "Name" from x => x.Name).
+    /// Only set if the expression is a simple member access.
+    /// </summary>
+    public string? MemberName { get; init; }
+
+    /// <summary>
     /// Optional diagnostic information if transformation failed or encountered issues.
     /// </summary>
     public DiagnosticInfo? Diagnostic { get; init; }
@@ -31,5 +37,5 @@ internal sealed record FieldInterceptorInfo
     /// <summary>
     /// Indicates whether this info represents a valid interceptor (no diagnostic).
     /// </summary>
-    public bool IsValid => Diagnostic == null && Location != null && SourceTypeFullName != null && PropertyTypeFullName != null;
+    public bool IsValid => Diagnostic == null && Location != null && SourceTypeFullName != null && PropertyTypeFullName != null && MemberName != null;
 }

@@ -64,12 +64,65 @@ internal static class FieldInvocationTransformer
         var sourceType = containingType.TypeArguments[0];
         var propertyType = methodSymbol.TypeArguments[0];
 
+        // Find the expression argument - look for a lambda expression
+        LambdaExpressionSyntax? lambdaExpression = null;
+        foreach (var arg in invocation.ArgumentList.Arguments)
+        {
+            if (arg.Expression is LambdaExpressionSyntax lambda)
+            {
+                lambdaExpression = lambda;
+                break;
+            }
+        }
+
+        if (lambdaExpression == null)
+            return null;
+
+        // Validate that the lambda body is a simple member access (property or field)
+        var (isValid, memberName, diagnostic) = ValidateAndExtractMemberAccess(lambdaExpression, invocation.GetLocation());
+
+        if (!isValid && diagnostic != null)
+        {
+            return new FieldInterceptorInfo
+            {
+                Location = interceptableLocation,
+                SourceTypeFullName = sourceType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                PropertyTypeFullName = propertyType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                Diagnostic = diagnostic
+            };
+        }
+
         return new FieldInterceptorInfo
         {
             Location = interceptableLocation,
             SourceTypeFullName = sourceType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-            PropertyTypeFullName = propertyType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+            PropertyTypeFullName = propertyType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+            MemberName = memberName
         };
+    }
+
+    private static (bool IsValid, string? MemberName, DiagnosticInfo? Diagnostic) ValidateAndExtractMemberAccess(
+        LambdaExpressionSyntax lambda,
+        Location location)
+    {
+        // The body should be a simple member access: x.PropertyName
+        if (lambda.Body is not MemberAccessExpressionSyntax memberAccess)
+        {
+            return (false, null, new DiagnosticInfo
+            {
+                Id = "GQL_INT002",
+                Title = "Complex Field Expression",
+                MessageFormat = "Field expression must be a simple property or field access (e.g., x => x.PropertyName). Complex expressions are not supported for AOT compilation.",
+                Category = "GraphQL.Interceptors",
+                Severity = DiagnosticSeverity.Warning,
+                LocationString = location.ToString()
+            });
+        }
+
+        // Extract the member name
+        var memberName = memberAccess.Name.Identifier.Text;
+
+        return (true, memberName, null);
     }
 
     private static bool IsComplexGraphType(INamedTypeSymbol type)

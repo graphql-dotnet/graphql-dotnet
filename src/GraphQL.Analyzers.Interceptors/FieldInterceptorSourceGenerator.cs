@@ -15,7 +15,7 @@ internal static class FieldInterceptorSourceGenerator
     /// </summary>
     public static (string FileName, SourceText SourceText)? Generate(FieldInterceptorInfo info)
     {
-        if (!info.IsValid || info.Location == null || info.SourceTypeFullName == null || info.PropertyTypeFullName == null)
+        if (!info.IsValid || info.Location == null || info.SourceTypeFullName == null || info.PropertyTypeFullName == null || info.MemberName == null)
             return null;
 
         // Create a unique method name based on location
@@ -32,17 +32,7 @@ internal static class FieldInterceptorSourceGenerator
         sb.AppendLine("namespace System.Runtime.CompilerServices");
         sb.AppendLine("{");
         sb.AppendLine("    [global::System.AttributeUsage(global::System.AttributeTargets.Method, AllowMultiple = true)]");
-        sb.AppendLine("    file sealed class InterceptsLocationAttribute : global::System.Attribute");
-        sb.AppendLine("    {");
-        sb.AppendLine("        public InterceptsLocationAttribute(int version, string data)");
-        sb.AppendLine("        {");
-        sb.AppendLine("            Version = version;");
-        sb.AppendLine("            Data = data;");
-        sb.AppendLine("        }");
-        sb.AppendLine();
-        sb.AppendLine("        public int Version { get; }");
-        sb.AppendLine("        public string Data { get; }");
-        sb.AppendLine("    }");
+        sb.AppendLine("    file sealed class InterceptsLocationAttribute(int version, string data) : global::System.Attribute;");
         sb.AppendLine("}");
         sb.AppendLine();
 
@@ -50,7 +40,6 @@ internal static class FieldInterceptorSourceGenerator
         sb.AppendLine("{");
         sb.AppendLine("    internal static partial class FieldInterceptors");
         sb.AppendLine("    {");
-        sb.AppendLine($"        // {info.Location.GetDisplayLocation()}");
         sb.AppendLine($"        {info.Location.GetInterceptsLocationAttributeSyntax()}");
         sb.AppendLine($"        internal static global::GraphQL.Builders.FieldBuilder<{info.SourceTypeFullName}, {info.PropertyTypeFullName}> {methodName}<TGraphType>(");
         sb.AppendLine($"            this global::GraphQL.Types.ComplexGraphType<{info.SourceTypeFullName}> graphType,");
@@ -58,18 +47,13 @@ internal static class FieldInterceptorSourceGenerator
         sb.AppendLine($"            global::System.Linq.Expressions.Expression<global::System.Func<{info.SourceTypeFullName}, {info.PropertyTypeFullName}>> expression)");
         sb.AppendLine($"            where TGraphType : global::GraphQL.Types.ComplexGraphType<{info.SourceTypeFullName}>");
         sb.AppendLine("        {");
-        sb.AppendLine("            // Use FieldBuilderHelpers to create the field without setting ExpressionFieldResolver");
-        sb.AppendLine("            // This allows AOT compilation while still setting up the field metadata");
-        sb.AppendLine($"            var builder = global::GraphQL.Utilities.FieldBuilderHelpers.CreateFieldBuilder<{info.SourceTypeFullName}, {info.PropertyTypeFullName}>(");
+        sb.AppendLine($"            return global::GraphQL.Utilities.FieldBuilderHelpers.CreateFieldFromExpression<{info.SourceTypeFullName}, {info.PropertyTypeFullName}>(");
         sb.AppendLine("                graphType,");
         sb.AppendLine("                name,");
         sb.AppendLine("                expression,");
         sb.AppendLine("                nullable: null,");
         sb.AppendLine("                type: null,");
-        sb.AppendLine("                resolver: null);");
-        sb.AppendLine();
-        sb.AppendLine("            graphType.AddField(builder.FieldType);");
-        sb.AppendLine("            return builder;");
+        sb.AppendLine($"                resolve: context => context.Source!.{info.MemberName});");
         sb.AppendLine("        }");
         sb.AppendLine("    }");
         sb.AppendLine("}");
