@@ -44,8 +44,12 @@ public static partial class CSharpIncrementalGeneratorVerifier<TIncrementalGener
     /// </summary>
     public static async Task<string> GetGeneratorOutputAsync(string source)
     {
-        // Parse the source code
-        var syntaxTree = CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.CSharp12));
+        // Create parse options with interceptors enabled
+        var parseOptions = new CSharpParseOptions(LanguageVersion.CSharp12)
+            .WithFeatures(new[] { new KeyValuePair<string, string>("InterceptorsNamespaces", "GraphQL.Analyzers.Interceptors") });
+
+        // Parse the source code with the same parse options
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, parseOptions);
 
         // Get references (similar to how Test class sets them up)
         var references = await ReferenceResolver.ReferenceAssemblies
@@ -65,7 +69,9 @@ public static partial class CSharpIncrementalGeneratorVerifier<TIncrementalGener
 
         // Create the generator and driver
         var generator = new TIncrementalGenerator();
-        var driver = CSharpGeneratorDriver.Create(generator);
+        var driver = CSharpGeneratorDriver.Create(
+            generators: new[] { generator.AsSourceGenerator() },
+            parseOptions: parseOptions);
 
         // Run the generator
         driver = (CSharpGeneratorDriver)driver.RunGeneratorsAndUpdateCompilation(

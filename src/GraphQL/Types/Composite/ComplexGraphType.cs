@@ -268,49 +268,13 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
         bool? nullable,
         Type? type)
     {
-        try
-        {
-            if (type == null && nullable == null && GlobalSwitches.InferFieldNullabilityFromNRTAnnotations)
-            {
-                if (expression.Body is MemberExpression memberExpression)
-                {
-                    var typeInfo = AutoRegisteringHelper.GetTypeInformation(memberExpression.Member, this is IInputObjectGraphType);
-                    type = typeInfo.ConstructGraphType();
-                }
-                else
-                {
-                    nullable = typeof(TProperty).IsValueType && Nullable.GetUnderlyingType(typeof(TProperty)) != null;
-                    type = typeof(TProperty).GetGraphTypeFromType(nullable.Value, this is IInputObjectGraphType);
-                }
-            }
-            else if (type == null)
-            {
-                nullable ??= false;
-                type = typeof(TProperty).GetGraphTypeFromType(nullable.Value, this is IInputObjectGraphType);
-            }
-        }
-        catch (ArgumentOutOfRangeException exp)
-        {
-            throw new ArgumentException($"The GraphQL type for field '{Name ?? GetType().Name}.{name}' could not be derived implicitly from expression '{expression}'. " + exp.Message, exp);
-        }
-
-        var builder = CreateBuilder<TProperty>(name, type)
-            .Description(expression.DescriptionOf())
-            .DeprecationReason(expression.DeprecationReasonOf())
-            .DefaultValue(expression.DefaultValueOf());
-
-        if (this is IInputObjectGraphType)
-        {
-            builder.ParseValue((value, vc) => value is TProperty ? value : vc.GetPropertyValue(value, typeof(TProperty), builder.FieldType.ResolvedType!)!);
-        }
-
-        if (this is IObjectGraphType)
-            builder.Resolve(new ExpressionFieldResolver<TSourceType, TProperty>(expression));
-
-        if (expression.Body is MemberExpression expr)
-        {
-            builder.FieldType.Metadata[ORIGINAL_EXPRESSION_PROPERTY_NAME] = expr.Member.Name;
-        }
+        var builder = FieldBuilderHelpers.CreateFieldBuilder(
+            this,
+            name,
+            expression,
+            nullable,
+            type,
+            this is IObjectGraphType ? new ExpressionFieldResolver<TSourceType, TProperty>(expression) : null);
 
         AddField(builder.FieldType);
         return builder;
