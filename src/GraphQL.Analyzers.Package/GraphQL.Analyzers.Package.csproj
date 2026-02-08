@@ -40,6 +40,8 @@
 
   <ItemGroup>
     <None Update="tools\*.ps1" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="" />
+    <None Include="build\GraphQL.Analyzers.props" Pack="true" PackagePath="build" />
+    <None Include="build\GraphQL.Analyzers.targets" Pack="true" PackagePath="build" />
   </ItemGroup>
 
   <Target Name="_AddAnalyzersToOutput" DependsOnTargets="ResolveProjectReferences">

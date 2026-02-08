@@ -67,11 +67,20 @@ public static partial class CSharpIncrementalGeneratorVerifier<TIncrementalGener
             }),
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-        // Create the generator and driver
+        // Create the generator and driver with MSBuild properties to enable interceptors
         var generator = new TIncrementalGenerator();
+
+        // Configure analyzer options to enable interceptors
+        var optionsProvider = new TestAnalyzerConfigOptionsProvider(
+            new Dictionary<string, string>
+            {
+                ["build_property.GraphQLEnableFieldInterceptors"] = "true"
+            });
+
         var driver = CSharpGeneratorDriver.Create(
             generators: new[] { generator.AsSourceGenerator() },
-            parseOptions: parseOptions);
+            parseOptions: parseOptions,
+            optionsProvider: optionsProvider);
 
         // Run the generator
         driver = (CSharpGeneratorDriver)driver.RunGeneratorsAndUpdateCompilation(

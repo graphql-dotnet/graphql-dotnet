@@ -6,6 +6,19 @@ namespace GraphQL.Analyzers.Interceptors;
 /// Source generator that creates interceptors for ComplexGraphType.Field calls with expressions
 /// to avoid using ExpressionFieldResolver and enable AOT compilation.
 /// <para>
+/// This generator is opt-in and will only run when the <c>GraphQLEnableFieldInterceptors</c> MSBuild property is set to <c>true</c>.
+/// The GraphQL.Analyzers NuGet package automatically sets this property when trimming is enabled
+/// (<c>PublishTrimmed</c> or <c>EnableTrimAnalyzer</c>).
+/// </para>
+/// <para>
+/// To enable interceptors explicitly, add to your .csproj:
+/// <code>
+/// &lt;PropertyGroup&gt;
+///   &lt;GraphQLEnableFieldInterceptors&gt;true&lt;/GraphQLEnableFieldInterceptors&gt;
+/// &lt;/PropertyGroup&gt;
+/// </code>
+/// </para>
+/// <para>
 /// The following public Field overloads from <c>ComplexGraphType&lt;TSourceType&gt;</c> are intercepted:
 /// </para>
 /// <list type="number">
@@ -38,12 +51,16 @@ public class FieldExpressionInterceptorGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        // Check if interceptors should be enabled based on MSBuild properties
+        var isEnabled = InterceptorEnabledProvider.Create(context);
+
         // Step 1: Provider - Find all invocation expressions that might be Field calls
-        // Step 2: Transformer - Transform invocations into FieldInterceptorInfo records
         var interceptorInfos = FieldInvocationProvider.Create(
             context,
-            static (invocation, semanticModel, _) => FieldInvocationTransformer.Transform(invocation, semanticModel))
-            .Where(static info => info is not null);
+            static (invocation, semanticModel, cancellationToken) => (Invocation: invocation, SemanticModel: semanticModel, CancellationToken: cancellationToken))
+            .Combine(isEnabled)
+            .Where(static tuple => tuple.Right) // Only continue if interceptors are enabled
+            .Select(static (tuple, _) => FieldInvocationTransformer.Transform(tuple.Left.Invocation, tuple.Left.SemanticModel));
 
         // Step 3: Generator - Generate source code from valid interceptor infos
         // Step 4: Diagnostics - Report any diagnostics
