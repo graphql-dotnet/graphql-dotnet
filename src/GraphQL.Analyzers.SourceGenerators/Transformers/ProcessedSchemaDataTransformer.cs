@@ -712,13 +712,33 @@ public static class ProcessedSchemaDataTransformer
     /// </summary>
     private static bool HasConstructor(INamedTypeSymbol schemaClass, KnownSymbols knownSymbols)
     {
-        // Count all public constructors (excluding implicit ones) that are NOT marked with GraphQLConstructorAttribute
-        var count = schemaClass.Constructors
-            .Where(c => c.DeclaredAccessibility == Accessibility.Public && !c.IsImplicitlyDeclared)
-            .Count(c => knownSymbols.GraphQLConstructorAttribute == null ||
-                        !c.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, knownSymbols.GraphQLConstructorAttribute)));
+        foreach (var constructor in schemaClass.Constructors)
+        {
+            // Skip non-public, implicit, or static constructors
+            if (constructor.DeclaredAccessibility != Accessibility.Public || constructor.IsImplicitlyDeclared || constructor.IsStatic)
+                continue;
 
-        return count > 0;
+            // If GraphQLConstructorAttribute is not available, any public constructor counts
+            if (knownSymbols.GraphQLConstructorAttribute == null)
+                return true;
+
+            // Check if this constructor has GraphQLConstructorAttribute
+            bool hasGraphQLConstructorAttribute = false;
+            foreach (var attribute in constructor.GetAttributes())
+            {
+                if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, knownSymbols.GraphQLConstructorAttribute))
+                {
+                    hasGraphQLConstructorAttribute = true;
+                    break;
+                }
+            }
+
+            // If constructor doesn't have GraphQLConstructorAttribute, it counts
+            if (!hasGraphQLConstructorAttribute)
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>
