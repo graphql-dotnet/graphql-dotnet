@@ -391,19 +391,18 @@ public static class ProcessedSchemaDataTransformer
     /// <summary>
     /// Gets constructor parameters for an input type.
     /// </summary>
-    private static List<InputConstructorParameterData> GetInputConstructorParameters(
+    private static IList<InputConstructorParameterData> GetInputConstructorParameters(
         ITypeSymbol clrType,
         ImmutableEquatableArray<ISymbol> members,
         KnownSymbols knownSymbols)
     {
-        var result = new List<InputConstructorParameterData>();
-
         if (clrType is not INamedTypeSymbol namedType)
-            return result;
+            return Array.Empty<InputConstructorParameterData>();
 
         var constructor = IdentifyConstructor(namedType, knownSymbols);
         if (constructor == null)
-            return result;
+            return Array.Empty<InputConstructorParameterData>();
+        var result = new List<InputConstructorParameterData>();
 
         // Create a set of member names for matching
         var memberNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
