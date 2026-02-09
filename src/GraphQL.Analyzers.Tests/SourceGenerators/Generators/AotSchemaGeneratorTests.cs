@@ -5,7 +5,7 @@ namespace GraphQL.Analyzers.Tests.SourceGenerators.Generators;
 
 /*
  * 
- * These tests do not rely on other components
+ * These tests are end-to-end and rely on all source generator components
  * 
  */
 
@@ -280,5 +280,26 @@ public class AotSchemaGeneratorTests
             """;
 
         await VerifySG.VerifyIncrementalGeneratorAsync(source);
+    }
+
+    [Fact]
+    public async Task Generates_StarWarsSchema()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.StarWars.TypeFirst;
+            using GraphQL.StarWars.TypeFirst.Types;
+            using GraphQL.Types;
+
+            [AotQueryType<StarWarsQuery>]
+            [AotMutationType<StarWarsMutation>]
+            internal partial class StarWarsSchema : AotSchema
+            {
+            }
+            """;
+
+        var output = await VerifySG.GetGeneratorOutputAsync(source);
+        output.ShouldMatchApproved(o => o.NoDiff());
     }
 }
