@@ -20,42 +20,67 @@ public class AotSchemaGenerator : IIncrementalGenerator
         // Get all candidate classes
         // This sets up handlers in Rosyln to track the specific attributes (such as [AotQueryType<>])
         //   that indicate a class is a candidate for code generation; then it combines these together
-        //   into a single collection of candidate classes to be processed.
+        //   into a stream of candidate classes to be processed.
         var candidateClasses = CandidateProvider.Create(context);
 
-        // Combine with the compilation
+        // Collect all candidate classes together and combine with the compilation
         var compilation = context.CompilationProvider;
-        var candidatesWithCompilation = candidateClasses.Combine(compilation);
+        var candidatesWithCompilation = candidateClasses.Collect().Combine(compilation);
 
-        // Process each candidate class and produces serialized data required for generation
-        var processedCandidates = candidatesWithCompilation.SelectMany((pair, _) =>
+        // Process the candidate classes and produce serialized data required for generation
+        var processedCandidates = candidatesWithCompilation.SelectMany((candidatesWithCompilation, cancellationToken) =>
         {
-            var (candidate, compilation) = pair;
+            var (candidates, compilation) = candidatesWithCompilation;
 
-            // Get known symbols
+            // If there are no candidates, return an empty array immediately to avoid unnecessary processing
+            if (candidates.Length == 0)
+                return Array.Empty<GeneratedTypeEntry>();
+
+            // Get known symbols for the compilation; this allows us to avoid repeatedly looking up the same symbols for each candidate class
             var symbols = KnownSymbolsProvider.Transform(compilation);
 
-            // Extract the attributes from the candidate class (e.g. [AotInputType<>], [AotOutputType<>], etc.)
-            var schemaData = CandidateClassTransformer.Transform(candidate, symbols);
-            if (!schemaData.HasValue)
-                return Array.Empty<GeneratedTypeEntry>();
+            // Process each candidate class
+            List<GeneratedTypeEntry>? classes = candidates.Length == 1 ? null : new List<GeneratedTypeEntry>();
+            foreach (var candidate in candidates)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
 
-            // Walks the referenced types to discover all types that need to be generated
-            var data = SchemaAttributeDataTransformer.Transform(schemaData.Value, symbols);
+                // Extract the attributes from the candidate class (e.g. [AotInputType<>], [AotOutputType<>], etc.)
+                var schemaData = CandidateClassTransformer.Transform(candidate, symbols);
+                if (!schemaData.HasValue)
+                    return Array.Empty<GeneratedTypeEntry>();
 
-            // Transform to primitive-only data suitable for code generation
-            // Each GeneratedTypeEntry represents a single file to be generated, consisting of:
-            //   a) the Configure method for the schema class and/or constructor
-            //   b) an "auto-registering" input graph type class
-            //   c) an "auto-registering" output (object/interface) graph type class
-            // Scalars, unions and enums will not produce a distinct file
-            var generatedTypeData = ProcessedSchemaDataTransformer.Transform(data, symbols);
-            if (generatedTypeData == null)
-                return Array.Empty<GeneratedTypeEntry>();
+                cancellationToken.ThrowIfCancellationRequested();
 
-            // Primitive data is stored in immutable records so Roslyn can track changes efficiently
-            return generatedTypeData;
+                // Walks the referenced types to discover all types that need to be generated
+                var data = SchemaAttributeDataTransformer.Transform(schemaData.Value, symbols);
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // Transform to primitive-only data suitable for code generation
+                // Each GeneratedTypeEntry represents a single file to be generated, consisting of either:
+                //   a) the Configure method for the schema class and/or constructor, or
+                //   b) an "auto-registering" input graph type class, or
+                //   c) an "auto-registering" output (object/interface) graph type class
+                // Scalars, unions and enums will not produce a distinct file
+                var generatedTypeData = ProcessedSchemaDataTransformer.Transform(data, symbols);
+                if (generatedTypeData != null)
+                {
+                    // Primitive data is stored in immutable records so Roslyn can track changes efficiently
+                    if (candidates.Length == 1)
+                        return generatedTypeData;
+                    else
+                        classes!.AddRange(generatedTypeData);
+                }
+            }
+
+            return classes ?? Enumerable.Empty<GeneratedTypeEntry>();
         });
+
+        // At this point we have a stream of GeneratedTypeEntry records, each containing all the information
+        //   needed to generate a single file for either a schema configuration, input graph type, or output
+        //   graph type. Roslyn will automatically handle incremental generation and only re-run the generator
+        //   for entries (files) that have changed.
 
         // Register source output for each schema or type to be generated
         context.RegisterSourceOutput(processedCandidates, GenerateSource);
