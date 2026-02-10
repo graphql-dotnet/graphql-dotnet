@@ -73,7 +73,7 @@ internal sealed class SourceBuilder
     /// Appends a line with formatted text (interpolated string) to the source code, with automatic indentation.
     /// </summary>
     /// <param name="handler">The interpolated string handler that writes content directly to the StringBuilder.</param>
-    public SourceBuilder AppendLine([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] AppendLineInterpolatedStringHandler handler)
+    public SourceBuilder AppendLine([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] AppendInterpolatedStringHandler handler)
     {
         // Handler already wrote the indented content to StringBuilder
         _ = handler;
@@ -137,26 +137,6 @@ internal sealed class SourceBuilder
         {
             _builder.Indentation--;
         }
-    }
-
-    /// <summary>
-    /// Interpolated string handler for AppendLine that writes directly to the StringBuilder.
-    /// </summary>
-    [System.Runtime.CompilerServices.InterpolatedStringHandler]
-    public struct AppendLineInterpolatedStringHandler
-    {
-        private readonly StringBuilder _sb;
-
-        public AppendLineInterpolatedStringHandler(int literalLength, int formattedCount, SourceBuilder builder)
-        {
-            builder.WriteIndentIfPending();
-            _sb = builder._sb;
-        }
-
-        public void AppendLiteral(string value) => _sb.Append(value);
-        public void AppendFormatted<T>(T value) => throw new NotImplementedException();
-        public void AppendFormatted(int value) => _sb.Append(value);
-        public void AppendFormatted(string? value) => _sb.Append(value);
     }
 
     /// <summary>
