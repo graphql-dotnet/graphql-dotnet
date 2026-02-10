@@ -46,47 +46,47 @@ public static class CandidateClassTransformer
                 : attributeClass;
 
             // Categorize by attribute type using symbolic comparison
-            if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotQueryType))
+            if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotQueryTypeAttribute))
             {
                 if (queryType == null && TryExtractRootTypeInfo(attributeClass, attributeSymbols.IGraphType, out var info))
                     queryType = info;
             }
-            else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotMutationType))
+            else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotMutationTypeAttribute))
             {
                 if (mutationType == null && TryExtractRootTypeInfo(attributeClass, attributeSymbols.IGraphType, out var info))
                     mutationType = info;
             }
-            else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotSubscriptionType))
+            else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotSubscriptionTypeAttribute))
             {
                 if (subscriptionType == null && TryExtractRootTypeInfo(attributeClass, attributeSymbols.IGraphType, out var info))
                     subscriptionType = info;
             }
-            else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotOutputType))
+            else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotOutputTypeAttribute))
             {
                 if (TryExtractOutputTypeInfo(attribute, attributeClass, out var info))
                     outputTypes.Add(info);
             }
-            else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotInputType))
+            else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotInputTypeAttribute))
             {
                 if (TryExtractSingleTypeArgument(attributeClass, out var typeArg))
                     inputTypes.Add(typeArg);
             }
-            else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotGraphType))
+            else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotGraphTypeAttribute))
             {
                 if (TryExtractGraphTypeInfo(attribute, attributeClass, out var info))
                     graphTypes.Add(info);
             }
-            else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotTypeMapping))
+            else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotTypeMappingAttribute))
             {
                 if (TryExtractTypeMappingInfo(attributeClass, out var mapping))
                     typeMappings.Add(mapping);
             }
-            else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotListType))
+            else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotListTypeAttribute))
             {
                 if (TryExtractSingleTypeArgument(attributeClass, out var typeArg))
                     listTypes.Add(typeArg);
             }
-            else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotRemapType))
+            else if (SymbolEqualityComparer.Default.Equals(unboundAttributeType, attributeSymbols.AotRemapTypeAttribute))
             {
                 if (TryExtractTypeMappingInfo(attributeClass, out var mapping))
                     remapTypes.Add(mapping);

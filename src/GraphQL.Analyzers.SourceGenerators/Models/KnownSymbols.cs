@@ -8,15 +8,15 @@ namespace GraphQL.Analyzers.SourceGenerators.Models;
 /// </summary>
 public record class KnownSymbols
 {
-    public INamedTypeSymbol? AotQueryType { get; init; }
-    public INamedTypeSymbol? AotMutationType { get; init; }
-    public INamedTypeSymbol? AotSubscriptionType { get; init; }
-    public INamedTypeSymbol? AotOutputType { get; init; }
-    public INamedTypeSymbol? AotInputType { get; init; }
-    public INamedTypeSymbol? AotGraphType { get; init; }
-    public INamedTypeSymbol? AotTypeMapping { get; init; }
-    public INamedTypeSymbol? AotListType { get; init; }
-    public INamedTypeSymbol? AotRemapType { get; init; }
+    public INamedTypeSymbol? AotQueryTypeAttribute { get; init; }
+    public INamedTypeSymbol? AotMutationTypeAttribute { get; init; }
+    public INamedTypeSymbol? AotSubscriptionTypeAttribute { get; init; }
+    public INamedTypeSymbol? AotOutputTypeAttribute { get; init; }
+    public INamedTypeSymbol? AotInputTypeAttribute { get; init; }
+    public INamedTypeSymbol? AotGraphTypeAttribute { get; init; }
+    public INamedTypeSymbol? AotTypeMappingAttribute { get; init; }
+    public INamedTypeSymbol? AotListTypeAttribute { get; init; }
+    public INamedTypeSymbol? AotRemapTypeAttribute { get; init; }
     public INamedTypeSymbol? IGraphType { get; init; }
     public INamedTypeSymbol? NonNullGraphType { get; init; }
     public INamedTypeSymbol? ListGraphType { get; init; }
