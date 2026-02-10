@@ -38,7 +38,7 @@ public partial class CandidateProviderTests
                     var className = classSymbol.Name;
 
                     // Get namespace including containing types
-                    var parts = new System.Collections.Generic.List<string>();
+                    var parts = new List<string>();
 
                     // Add namespace
                     if (classSymbol.ContainingNamespace != null && !classSymbol.ContainingNamespace.IsGlobalNamespace)
@@ -48,7 +48,7 @@ public partial class CandidateProviderTests
 
                     // Add containing types
                     var containingType = classSymbol.ContainingType;
-                    var containingTypes = new System.Collections.Generic.Stack<string>();
+                    var containingTypes = new Stack<string>();
                     while (containingType != null)
                     {
                         containingTypes.Push(containingType.Name);
@@ -58,9 +58,6 @@ public partial class CandidateProviderTests
 
                     var namespaceName = string.Join(".", parts);
 
-                    // Check if partial - a class is partial if it has multiple declarations
-                    var isPartial = classSymbol.DeclaringSyntaxReferences.Length > 1;
-
                     // Count total attributes from the symbol (which includes all partial declarations)
                     // This properly handles partial classes with attributes spread across multiple declarations
                     var totalAttributes = classSymbol.GetAttributes().Length;
@@ -68,7 +65,6 @@ public partial class CandidateProviderTests
                     sb.AppendLine();
                     sb.AppendLine($"// {className}");
                     sb.AppendLine($"//   Namespace: {namespaceName}");
-                    sb.AppendLine($"//   IsPartial: {isPartial}");
                     sb.AppendLine($"//   AttributeCount: {totalAttributes}");
                 }
 

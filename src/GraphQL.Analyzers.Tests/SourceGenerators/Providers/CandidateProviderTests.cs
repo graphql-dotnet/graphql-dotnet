@@ -91,7 +91,6 @@ public partial class CandidateProviderTests
 
             // MySchema
             //   Namespace: Sample
-            //   IsPartial: True
             //   AttributeCount: 1
 
             """);
@@ -133,7 +132,6 @@ public partial class CandidateProviderTests
 
             // MySchema
             //   Namespace: Sample
-            //   IsPartial: True
             //   AttributeCount: 3
 
             """);
@@ -178,12 +176,10 @@ public partial class CandidateProviderTests
 
             // Schema1
             //   Namespace: Sample
-            //   IsPartial: True
             //   AttributeCount: 1
 
             // Schema2
             //   Namespace: Sample
-            //   IsPartial: True
             //   AttributeCount: 1
 
             """);
@@ -224,7 +220,6 @@ public partial class CandidateProviderTests
 
             // MySchema
             //   Namespace: Sample
-            //   IsPartial: True
             //   AttributeCount: 3
 
             """);
@@ -276,7 +271,6 @@ public partial class CandidateProviderTests
 
             // MySchema
             //   Namespace: Sample
-            //   IsPartial: True
             //   AttributeCount: 1
 
             """);
@@ -337,7 +331,6 @@ public partial class CandidateProviderTests
 
             // MySchema
             //   Namespace: Sample
-            //   IsPartial: True
             //   AttributeCount: 1
 
             """);
@@ -380,7 +373,6 @@ public partial class CandidateProviderTests
 
             // MyDerivedSchema
             //   Namespace: Sample
-            //   IsPartial: True
             //   AttributeCount: 1
 
             """);
@@ -421,7 +413,6 @@ public partial class CandidateProviderTests
 
             // MySchema
             //   Namespace: Sample.OuterClass
-            //   IsPartial: True
             //   AttributeCount: 1
 
             """);
@@ -468,7 +459,6 @@ public partial class CandidateProviderTests
 
             // MySchema
             //   Namespace: Sample.Level1.Level2.Level3
-            //   IsPartial: True
             //   AttributeCount: 1
 
             """);
@@ -515,7 +505,6 @@ public partial class CandidateProviderTests
 
             // MySchema
             //   Namespace: Sample
-            //   IsPartial: True
             //   AttributeCount: 3
 
             """);
@@ -555,7 +544,6 @@ public partial class CandidateProviderTests
 
             // MySchema
             //   Namespace: Sample
-            //   IsPartial: False
             //   AttributeCount: 1
 
             """);
