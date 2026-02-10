@@ -31,45 +31,39 @@ public partial class CandidateProviderTests
                 var sb = new StringBuilder();
                 sb.AppendLine("// Matched Candidates:");
 
-                foreach (var candidate in candidates.OrderBy(c => c.ClassDeclarationSyntax.Identifier.Text))
+                foreach (var candidate in candidates.OrderBy(c => c.ClassSymbol.Name))
                 {
-                    var classDecl = candidate.ClassDeclarationSyntax;
-                    var semanticModel = candidate.SemanticModel;
+                    var classSymbol = candidate.ClassSymbol;
 
-                    var className = classDecl.Identifier.Text;
+                    var className = classSymbol.Name;
 
                     // Get namespace including containing types
-                    var classSymbol = semanticModel.GetDeclaredSymbol(classDecl);
-                    var namespaceName = string.Empty;
-                    if (classSymbol != null)
+                    var parts = new System.Collections.Generic.List<string>();
+
+                    // Add namespace
+                    if (classSymbol.ContainingNamespace != null && !classSymbol.ContainingNamespace.IsGlobalNamespace)
                     {
-                        var parts = new System.Collections.Generic.List<string>();
-
-                        // Add namespace
-                        if (classSymbol.ContainingNamespace != null && !classSymbol.ContainingNamespace.IsGlobalNamespace)
-                        {
-                            parts.Add(classSymbol.ContainingNamespace.ToDisplayString());
-                        }
-
-                        // Add containing types
-                        var containingType = classSymbol.ContainingType;
-                        var containingTypes = new System.Collections.Generic.Stack<string>();
-                        while (containingType != null)
-                        {
-                            containingTypes.Push(containingType.Name);
-                            containingType = containingType.ContainingType;
-                        }
-                        parts.AddRange(containingTypes);
-
-                        namespaceName = string.Join(".", parts);
+                        parts.Add(classSymbol.ContainingNamespace.ToDisplayString());
                     }
 
-                    // Check if partial
-                    var isPartial = classDecl.Modifiers.Any(Microsoft.CodeAnalysis.CSharp.SyntaxKind.PartialKeyword);
+                    // Add containing types
+                    var containingType = classSymbol.ContainingType;
+                    var containingTypes = new System.Collections.Generic.Stack<string>();
+                    while (containingType != null)
+                    {
+                        containingTypes.Push(containingType.Name);
+                        containingType = containingType.ContainingType;
+                    }
+                    parts.AddRange(containingTypes);
+
+                    var namespaceName = string.Join(".", parts);
+
+                    // Check if partial - a class is partial if it has multiple declarations
+                    var isPartial = classSymbol.DeclaringSyntaxReferences.Length > 1;
 
                     // Count total attributes from the symbol (which includes all partial declarations)
                     // This properly handles partial classes with attributes spread across multiple declarations
-                    var totalAttributes = classSymbol?.GetAttributes().Length ?? 0;
+                    var totalAttributes = classSymbol.GetAttributes().Length;
 
                     sb.AppendLine();
                     sb.AppendLine($"// {className}");
