@@ -13,6 +13,13 @@ namespace GraphQL.Analyzers.SourceGenerators.Providers;
 public static class CandidateProvider
 {
     /// <summary>
+    /// Intermediate struct to carry semantic model with class declaration syntax.
+    /// </summary>
+    private readonly record struct CandidateWithSemantics(
+        ClassDeclarationSyntax ClassDeclarationSyntax,
+        SemanticModel SemanticModel);
+
+    /// <summary>
     /// Creates an incremental provider that identifies all class declarations
     /// decorated with AOT-related attributes.
     /// </summary>
@@ -23,7 +30,7 @@ public static class CandidateProvider
     /// - Provides both syntax and semantic information in one pass
     /// - Automatically handles incremental compilation caching
     ///
-    /// Returns CandidateClass containing both syntax and semantic model for code generation.
+    /// Returns CandidateClass containing the class symbol for code generation.
     /// </remarks>
     public static IncrementalValuesProvider<CandidateClass> Create(
         IncrementalGeneratorInitializationContext context)
@@ -34,7 +41,7 @@ public static class CandidateProvider
 
         // Create a collected provider for each AOT attribute type
         var collectedProviders =
-            new IncrementalValueProvider<ImmutableArray<CandidateClass>>[Constants.AttributeNames.AllAot.Length];
+            new IncrementalValueProvider<ImmutableArray<CandidateWithSemantics>>[Constants.AttributeNames.AllAot.Length];
 
         for (int i = 0; i < Constants.AttributeNames.AllAot.Length; i++)
             collectedProviders[i] = CreateProviderForAttribute(context, Constants.AttributeNames.AllAot[i]).Collect();
@@ -57,17 +64,16 @@ public static class CandidateProvider
     /// <summary>
     /// Creates a provider for a specific AOT attribute using ForAttributeWithMetadataName.
     /// </summary>
-    private static IncrementalValuesProvider<CandidateClass> CreateProviderForAttribute(
+    private static IncrementalValuesProvider<CandidateWithSemantics> CreateProviderForAttribute(
         IncrementalGeneratorInitializationContext context,
         string fullyQualifiedMetadataName)
     {
         return context.SyntaxProvider.ForAttributeWithMetadataName(
             fullyQualifiedMetadataName,
             predicate: static (node, _) => IsClassDeclaration(node),
-            transform: static (ctx, _) => new CandidateClass(
+            transform: static (ctx, _) => new CandidateWithSemantics(
                 (ClassDeclarationSyntax)ctx.TargetNode,
-                ctx.SemanticModel,
-                null!));
+                ctx.SemanticModel));
     }
 
     /// <summary>
@@ -89,14 +95,14 @@ public static class CandidateProvider
     /// For classes with attributes on multiple partial declarations, uses the first declaration.
     /// </summary>
     private static ImmutableArray<CandidateClass> DeduplicateAndFilter(
-        ImmutableArray<CandidateClass> candidates,
+        ImmutableArray<CandidateWithSemantics> candidates,
         INamedTypeSymbol? aotSchemaSymbol)
     {
         if (candidates.Length == 0)
-            return candidates;
+            return ImmutableArray<CandidateClass>.Empty;
 
         // Group by class symbol to handle partial classes correctly
-        var seenSymbols = new Dictionary<INamedTypeSymbol, CandidateClass>(SymbolEqualityComparer.Default);
+        var seenSymbols = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
 
         for (int i = 0; i < candidates.Length; i++)
         {
@@ -108,22 +114,17 @@ public static class CandidateProvider
 
             // If we have seen it, we have multiple partial declarations with attributes
             // Keep the first one we found (it doesn't matter which we use as they represent the same class)
-            if (seenSymbols.ContainsKey(classSymbol))
+            if (seenSymbols.Contains(classSymbol))
                 continue;
 
             // If we haven't seen this symbol before, add it
             if (InheritsFromAotSchema(classSymbol, aotSchemaSymbol))
             {
-                // Create a new candidate with the ClassSymbol populated
-                var candidateWithSymbol = new CandidateClass(
-                    candidate.ClassDeclarationSyntax,
-                    candidate.SemanticModel,
-                    classSymbol);
-                seenSymbols.Add(classSymbol, candidateWithSymbol);
+                seenSymbols.Add(classSymbol);
             }
         }
 
-        return seenSymbols.Values.ToImmutableArray();
+        return seenSymbols.Select(x => new CandidateClass(x)).ToImmutableArray();
     }
 
     /// <summary>
