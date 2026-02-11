@@ -47,13 +47,11 @@ public class AotSchemaGenerator : IIncrementalGenerator
 
                 // Extract the attributes from the candidate class (e.g. [AotInputType<>], [AotOutputType<>], etc.)
                 var schemaData = CandidateClassTransformer.Transform(candidate, symbols);
-                if (!schemaData.HasValue)
-                    continue;
 
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Walks the referenced types to discover all types that need to be generated
-                var data = SchemaAttributeDataTransformer.Transform(schemaData.Value, symbols);
+                var data = SchemaAttributeDataTransformer.Transform(schemaData, symbols);
 
                 cancellationToken.ThrowIfCancellationRequested();
 

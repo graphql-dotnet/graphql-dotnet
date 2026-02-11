@@ -41,12 +41,7 @@ public partial class ProcessedSchemaDataTransformerTests
                         sb.AppendLine();
 
                     // First, extract attribute data from the candidate
-                    var schemaData = CandidateClassTransformer.Transform(candidate, symbols);
-
-                    if (schemaData == null)
-                        continue;
-
-                    var attributeData = schemaData.Value;
+                    var attributeData = CandidateClassTransformer.Transform(candidate, symbols);
 
                     // Now, transform the attribute data using SchemaAttributeDataTransformer
                     var processedData = SchemaAttributeDataTransformer.Transform(attributeData, symbols);

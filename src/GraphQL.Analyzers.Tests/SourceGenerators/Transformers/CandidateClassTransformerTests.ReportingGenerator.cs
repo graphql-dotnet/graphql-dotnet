@@ -37,12 +37,7 @@ public partial class CandidateClassTransformerTests
 
                 foreach (var (candidate, symbols) in items.OrderBy(x => x.Left.ClassSymbol.Name))
                 {
-                    var schemaData = CandidateClassTransformer.Transform(candidate, symbols);
-
-                    if (schemaData == null)
-                        continue;
-
-                    var data = schemaData.Value;
+                    var data = CandidateClassTransformer.Transform(candidate, symbols);
 
                     sb.AppendLine($"// Schema: {data.SchemaClass.Name}");
                     sb.AppendLine("//");
