@@ -8,33 +8,33 @@ internal static class Constants
     {
         // Generic attributes require the arity marker (`1 for one type parameter)
         // This is required for GetTypeByMetadataName to resolve generic types correctly
-        internal const string AOT_QUERY_TYPE = "GraphQL.AotQueryTypeAttribute`1";
-        internal const string AOT_MUTATION_TYPE = "GraphQL.AotMutationTypeAttribute`1";
-        internal const string AOT_SUBSCRIPTION_TYPE = "GraphQL.AotSubscriptionTypeAttribute`1";
-        internal const string AOT_OUTPUT_TYPE = "GraphQL.AotOutputTypeAttribute`1";
-        internal const string AOT_INPUT_TYPE = "GraphQL.AotInputTypeAttribute`1";
-        internal const string AOT_GRAPH_TYPE = "GraphQL.AotGraphTypeAttribute`1";
-        internal const string AOT_TYPE_MAPPING = "GraphQL.AotTypeMappingAttribute`2";  // 2 type parameters
-        internal const string AOT_LIST_TYPE = "GraphQL.AotListTypeAttribute`1";
-        internal const string AOT_REMAP_TYPE = "GraphQL.AotRemapTypeAttribute`2";  // 2 type parameters
-        internal const string IGNORE = "GraphQL.IgnoreAttribute";
-        internal const string DO_NOT_MAP_CLR_TYPE = "GraphQL.DoNotMapClrTypeAttribute";
-        internal const string CLR_TYPE_MAPPING = "GraphQL.ClrTypeMappingAttribute";
-        internal const string MEMBER_SCAN = "GraphQL.MemberScanAttribute";
+        internal const string AOT_QUERY_TYPE_ATTRIBUTE = "GraphQL.AotQueryTypeAttribute`1";
+        internal const string AOT_MUTATION_TYPE_ATTRIBUTE = "GraphQL.AotMutationTypeAttribute`1";
+        internal const string AOT_SUBSCRIPTION_TYPE_ATTRIBUTE = "GraphQL.AotSubscriptionTypeAttribute`1";
+        internal const string AOT_OUTPUT_TYPE_ATTRIBUTE = "GraphQL.AotOutputTypeAttribute`1";
+        internal const string AOT_INPUT_TYPE_ATTRIBUTE = "GraphQL.AotInputTypeAttribute`1";
+        internal const string AOT_GRAPH_TYPE_ATTRIBUTE = "GraphQL.AotGraphTypeAttribute`1";
+        internal const string AOT_TYPE_MAPPING_ATTRIBUTE = "GraphQL.AotTypeMappingAttribute`2";  // 2 type parameters
+        internal const string AOT_LIST_TYPE_ATTRIBUTE = "GraphQL.AotListTypeAttribute`1";
+        internal const string AOT_REMAP_TYPE_ATTRIBUTE = "GraphQL.AotRemapTypeAttribute`2";  // 2 type parameters
+        internal const string IGNORE_ATTRIBUTE = "GraphQL.IgnoreAttribute";
+        internal const string DO_NOT_MAP_CLR_TYPE_ATTRIBUTE = "GraphQL.DoNotMapClrTypeAttribute";
+        internal const string CLR_TYPE_MAPPING_ATTRIBUTE = "GraphQL.ClrTypeMappingAttribute";
+        internal const string MEMBER_SCAN_ATTRIBUTE = "GraphQL.MemberScanAttribute";
         internal const string PARAMETER_ATTRIBUTE = "GraphQL.ParameterAttribute";
         internal const string PARAMETER_ATTRIBUTE_T = "GraphQL.ParameterAttribute`1";
-        internal const string INPUT_TYPE = "GraphQL.InputTypeAttribute`1";
-        internal const string INPUT_TYPE_NON_GENERIC = "GraphQL.InputTypeAttribute";
-        internal const string INPUT_BASE_TYPE = "GraphQL.InputBaseTypeAttribute`1";
-        internal const string INPUT_BASE_TYPE_NON_GENERIC = "GraphQL.InputBaseTypeAttribute";
-        internal const string OUTPUT_TYPE = "GraphQL.OutputTypeAttribute`1";
-        internal const string OUTPUT_TYPE_NON_GENERIC = "GraphQL.OutputTypeAttribute";
-        internal const string OUTPUT_BASE_TYPE = "GraphQL.OutputBaseTypeAttribute`1";
-        internal const string OUTPUT_BASE_TYPE_NON_GENERIC = "GraphQL.OutputBaseTypeAttribute";
-        internal const string BASE_GRAPH_TYPE = "GraphQL.BaseGraphTypeAttribute`1";
-        internal const string BASE_GRAPH_TYPE_NON_GENERIC = "GraphQL.BaseGraphTypeAttribute";
-        internal const string GRAPHQL_CONSTRUCTOR = "GraphQL.GraphQLConstructorAttribute";
-        internal const string INSTANCE_SOURCE = "GraphQL.InstanceSourceAttribute";
+        internal const string INPUT_TYPE_T_ATTRIBUTE = "GraphQL.InputTypeAttribute`1";
+        internal const string INPUT_TYPE_ATTRIBUTE = "GraphQL.InputTypeAttribute";
+        internal const string INPUT_BASE_TYPE_T_ATTRIBUTE = "GraphQL.InputBaseTypeAttribute`1";
+        internal const string INPUT_BASE_TYPE_ATTRIBUTE = "GraphQL.InputBaseTypeAttribute";
+        internal const string OUTPUT_TYPE_T_ATTRIBUTE = "GraphQL.OutputTypeAttribute`1";
+        internal const string OUTPUT_TYPE_ATTRIBUTE = "GraphQL.OutputTypeAttribute";
+        internal const string OUTPUT_BASE_TYPE_T_ATTRIBUTE = "GraphQL.OutputBaseTypeAttribute`1";
+        internal const string OUTPUT_BASE_TYPE_ATTRIBUTE = "GraphQL.OutputBaseTypeAttribute";
+        internal const string BASE_GRAPH_TYPE_T_ATTRIBUTE = "GraphQL.BaseGraphTypeAttribute`1";
+        internal const string BASE_GRAPH_TYPE_ATTRIBUTE = "GraphQL.BaseGraphTypeAttribute";
+        internal const string GRAPHQL_CONSTRUCTOR_ATTRIBUTE = "GraphQL.GraphQLConstructorAttribute";
+        internal const string INSTANCE_SOURCE_ATTRIBUTE = "GraphQL.InstanceSourceAttribute";
 
         /// <summary>
         /// Includes AotQueryType, AotMutationType, AotSubscriptionType, AotOutputType, AotInputType,
@@ -42,15 +42,15 @@ internal static class Constants
         /// </summary>
         internal static readonly ImmutableArray<string> AllAot = ImmutableArray.Create(
         [
-            AOT_QUERY_TYPE,
-            AOT_MUTATION_TYPE,
-            AOT_SUBSCRIPTION_TYPE,
-            AOT_OUTPUT_TYPE,
-            AOT_INPUT_TYPE,
-            AOT_GRAPH_TYPE,
-            AOT_TYPE_MAPPING,
-            AOT_LIST_TYPE,
-            AOT_REMAP_TYPE
+            AOT_QUERY_TYPE_ATTRIBUTE,
+            AOT_MUTATION_TYPE_ATTRIBUTE,
+            AOT_SUBSCRIPTION_TYPE_ATTRIBUTE,
+            AOT_OUTPUT_TYPE_ATTRIBUTE,
+            AOT_INPUT_TYPE_ATTRIBUTE,
+            AOT_GRAPH_TYPE_ATTRIBUTE,
+            AOT_TYPE_MAPPING_ATTRIBUTE,
+            AOT_LIST_TYPE_ATTRIBUTE,
+            AOT_REMAP_TYPE_ATTRIBUTE
         ]);
     }
 
