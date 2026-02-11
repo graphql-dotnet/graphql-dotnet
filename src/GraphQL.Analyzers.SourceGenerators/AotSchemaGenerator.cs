@@ -64,14 +64,12 @@ public class AotSchemaGenerator : IIncrementalGenerator
                 //   c) an "auto-registering" output (object/interface) graph type class
                 // Scalars, unions and enums will not produce a distinct file
                 var generatedTypeData = ProcessedSchemaDataTransformer.Transform(data, symbols);
-                if (generatedTypeData != null)
-                {
-                    // Primitive data is stored in immutable records so Roslyn can track changes efficiently
-                    if (candidates.Length == 1)
-                        return generatedTypeData;
-                    else
-                        classes!.AddRange(generatedTypeData);
-                }
+
+                // Primitive data is stored in immutable records so Roslyn can track changes efficiently
+                if (candidates.Length == 1)
+                    return generatedTypeData;
+                else
+                    classes!.AddRange(generatedTypeData);
             }
 
             return classes ?? Enumerable.Empty<GeneratedTypeEntry>();
