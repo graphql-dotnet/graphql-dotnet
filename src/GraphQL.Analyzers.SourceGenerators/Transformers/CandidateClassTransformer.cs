@@ -16,7 +16,7 @@ public static class CandidateClassTransformer
     /// </summary>
     /// <param name="candidate">The candidate class to transform.</param>
     /// <param name="attributeSymbols">The resolved attribute symbols for symbolic comparison.</param>
-    public static SchemaAttributeData? Transform(CandidateClass candidate, KnownSymbols attributeSymbols)
+    public static SchemaAttributeData Transform(CandidateClass candidate, KnownSymbols attributeSymbols)
     {
         var schemaSymbol = candidate.ClassSymbol;
 

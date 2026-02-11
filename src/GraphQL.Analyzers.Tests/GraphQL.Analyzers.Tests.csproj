@@ -25,6 +25,7 @@
     <ProjectReference Include="..\GraphQL.Analyzers\GraphQL.Analyzers.csproj" />
     <ProjectReference Include="..\GraphQL.Analyzers.SourceGenerators\GraphQL.Analyzers.SourceGenerators.csproj" />
     <ProjectReference Include="..\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj" />
+    <ProjectReference Include="..\GraphQL.StarWars.TypeFirst\GraphQL.StarWars.TypeFirst.csproj" />
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
   </ItemGroup>
 

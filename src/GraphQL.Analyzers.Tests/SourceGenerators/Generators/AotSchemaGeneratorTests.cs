@@ -1,0 +1,305 @@
+using VerifySG = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpIncrementalGeneratorVerifier<
+    GraphQL.Analyzers.SourceGenerators.AotSchemaGenerator>;
+
+namespace GraphQL.Analyzers.Tests.SourceGenerators.Generators;
+
+/*
+ * 
+ * These tests are end-to-end and rely on all source generator components
+ * 
+ */
+
+public class AotSchemaGeneratorTests
+{
+    [Fact]
+    public async Task GeneratesPartialClass_ForQueryType()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query
+            {
+                public string Hello => "World";
+            }
+
+            [AotQueryType<Query>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+            """;
+
+        var output = await VerifySG.GetGeneratorOutputAsync(source);
+
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public async Task GeneratesPartialClass_ForMutationType()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Mutation
+            {
+                public string DoSomething(string input) => input;
+            }
+
+            [AotMutationType<Mutation>]
+            public partial class MySchema : AotSchema
+            {
+            }
+            """;
+
+        var output = await VerifySG.GetGeneratorOutputAsync(source);
+
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public async Task GeneratesPartialClass_ForSubscriptionType()
+    {
+        const string source =
+            """
+            using System;
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Subscription
+            {
+                public IObservable<string> OnMessage() => throw new NotImplementedException();
+            }
+
+            [AotSubscriptionType<Subscription>]
+            public partial class MySchema : AotSchema
+            {
+            }
+            """;
+
+        var output = await VerifySG.GetGeneratorOutputAsync(source);
+
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public async Task GeneratesPartialClass_ForInputType()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class MyInput
+            {
+                public string Name { get; set; }
+            }
+
+            [AotInputType<MyInput>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+            """;
+
+        var output = await VerifySG.GetGeneratorOutputAsync(source);
+
+        output.ShouldMatchApproved(o => o.NoDiff());
+
+    }
+
+    [Fact]
+    public async Task GeneratesPartialClass_ForOutputType()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class MyOutput
+            {
+                public string Name { get; set; }
+            }
+
+            [AotOutputType<MyOutput>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+            """;
+
+        var output = await VerifySG.GetGeneratorOutputAsync(source);
+
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public async Task GeneratesPartialClass_ForMultipleAttributes()
+    {
+        const string source =
+            """
+            using System;
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query
+            {
+                public string Hello => "World";
+            }
+
+            public class MyInput
+            {
+                public string Name { get; set; }
+            }
+
+            [AotQueryType<Query>]
+            [AotInputType<MyInput>]
+            [AotTypeMapping<DateTime, DateTimeGraphType>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+            """;
+
+        var output = await VerifySG.GetGeneratorOutputAsync(source);
+
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public async Task GeneratesPartialClass_WithoutNamespace()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            public class Query
+            {
+                public string Hello => "World";
+            }
+
+            [AotQueryType<Query>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+            """;
+
+        var output = await VerifySG.GetGeneratorOutputAsync(source);
+
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public async Task NoGeneration_WhenNoAotAttributes()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class MySchema : Schema
+            {
+            }
+            """;
+
+        await VerifySG.VerifyIncrementalGeneratorAsync(source);
+    }
+
+    [Fact]
+    public async Task NoGeneration_WhenNotOnAotSchema()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            [AotGraphType<StringGraphType>]
+            public class MySchema : Schema
+            {
+            }
+            """;
+
+        await VerifySG.VerifyIncrementalGeneratorAsync(source);
+    }
+
+    [Fact]
+    public async Task NoGeneration_WhenNotPartial()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            [AotGraphType<StringGraphType>]
+            public class MySchema : AotSchema
+            {
+            }
+            """;
+
+        var output = await VerifySG.GetGeneratorOutputAsync(source);
+
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public async Task NoGeneration_WhenNotAClass()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public interface IMySchema
+            {
+            }
+            """;
+
+        await VerifySG.VerifyIncrementalGeneratorAsync(source);
+    }
+
+    [Fact]
+    public async Task Generates_StarWarsSchema()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.StarWars.TypeFirst;
+            using GraphQL.StarWars.TypeFirst.Types;
+            using GraphQL.Types;
+
+            [AotQueryType<StarWarsQuery>]
+            [AotMutationType<StarWarsMutation>]
+            internal partial class StarWarsSchema : AotSchema
+            {
+            }
+            """;
+
+        var output = await VerifySG.GetGeneratorOutputAsync(source);
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
+}
