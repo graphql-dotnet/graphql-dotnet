@@ -1,4 +1,4 @@
-# GQLFED002: Key must not be null or empty
+# GQLFED002: Directive fields must not be empty
 
 |                        | Value      |
 | ---------------------- | ---------- |
@@ -11,21 +11,22 @@
 
 ## Cause
 
-A `@key` directive has been specified with a null or empty `fields` argument.
+A Federation directive (e.g., `@key`, `@provides`, `@requires`) has been specified
+with a null or empty `fields` argument.
 
 ## Rule description
 
-The `@key` directive designates an object type as an entity and specifies its
-key fields. The `fields` argument is required and must contain at least one
-field name. An empty or whitespace-only key is not valid and will not properly
-identify the entity.
+Federation directives like `@key`, `@provides`, and `@requires` require field
+selections to function properly. The `fields` argument must contain at least one
+field name. An empty or whitespace-only field list is not valid and will cause
+errors at runtime.
 
-This analyzer validates that all `.Key()` method calls have a non-empty `fields`
-argument.
+This analyzer validates that all Federation directive method calls (`.Key()`,
+`.Provides()`, `.Requires()`, etc.) have a non-empty `fields` argument.
 
 ## How to fix violations
 
-Provide a valid field name or set of field names in the `.Key()` method call.
+Provide a valid field name or set of field names in the directive method call.
 
 ## Example of a violation
 
@@ -34,6 +35,7 @@ public class UserGraphType : ObjectGraphType<User>
 {
     public UserGraphType()
     {
+        // Empty key
         this.Key("");
 
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
@@ -49,6 +51,7 @@ public class UserGraphType : ObjectGraphType<User>
 {
     public UserGraphType()
     {
+        // Valid key with field name
         this.Key("id");
 
         Field<NonNullGraphType<IdGraphType>>(x => x.Id);
