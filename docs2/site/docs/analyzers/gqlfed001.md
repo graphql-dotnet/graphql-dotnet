@@ -1,4 +1,4 @@
-# GQLFED001: Key field does not exist
+# GQLFED001: Field does not exist
 
 |                        | Value      |
 | ---------------------- | ---------- |
@@ -11,22 +11,19 @@
 
 ## Cause
 
-A field specified in a `@key` directive does not exist on the GraphQL type.
+A field specified in a Federation directive (such as `@key`) does not exist on the GraphQL type.
 
 ## Rule description
 
-The `@key` directive designates an object type as an entity and specifies its
-key fields. Key fields are a set of fields that a subgraph can use to uniquely
-identify any instance of the entity. All field names specified in the `fields`
-argument must exist on the type.
+Federation directives like `@key` reference fields on a GraphQL type. All field names
+specified in these directives must exist on the type being decorated.
 
-This analyzer validates that all fields referenced in `.Key()` method calls
-exist on the GraphQL type.
+This analyzer validates that all fields referenced in Federation directive method calls
+(such as `.Key()`) exist on the GraphQL type.
 
 ## How to fix violations
 
-Either add the missing field to the type or correct the field name in the
-`.Key()` method call.
+Either add the missing field to the type or correct the field name in the directive method call.
 
 ## Example of a violation
 

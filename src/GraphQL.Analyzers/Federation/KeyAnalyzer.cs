@@ -11,24 +11,6 @@ namespace GraphQL.Analyzers.Federation;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class KeyAnalyzer : DiagnosticAnalyzer
 {
-    public static readonly DiagnosticDescriptor KeyFieldDoesNotExist = new(
-        id: DiagnosticIds.KEY_FIELD_DOES_NOT_EXIST,
-        title: "Key field does not exist",
-        messageFormat: "Key field '{0}' does not exist on type '{1}'",
-        category: DiagnosticCategories.FEDERATION,
-        defaultSeverity: DiagnosticSeverity.Error,
-        isEnabledByDefault: true,
-        helpLinkUri: HelpLinks.KEY_FIELD_DOES_NOT_EXIST);
-
-    public static readonly DiagnosticDescriptor KeyMustNotBeNullOrEmpty = new(
-        id: DiagnosticIds.KEY_MUST_NOT_BE_NULL_OR_EMPTY,
-        title: "Key must not be null or empty",
-        messageFormat: "Key must not be null or empty on type '{0}'",
-        category: DiagnosticCategories.FEDERATION,
-        defaultSeverity: DiagnosticSeverity.Error,
-        isEnabledByDefault: true,
-        helpLinkUri: HelpLinks.KEY_MUST_NOT_BE_NULL_OR_EMPTY);
-
     public static readonly DiagnosticDescriptor DuplicateKey = new(
         id: DiagnosticIds.DUPLICATE_KEY,
         title: "Duplicate key",
@@ -67,8 +49,6 @@ public class KeyAnalyzer : DiagnosticAnalyzer
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(
-            KeyFieldDoesNotExist,
-            KeyMustNotBeNullOrEmpty,
             DuplicateKey,
             RedundantKey,
             KeyFieldMustNotHaveArguments,
@@ -99,16 +79,9 @@ public class KeyAnalyzer : DiagnosticAnalyzer
         GraphQLGraphType graphType,
         FederationKey key)
     {
-        // Check if the key is empty or whitespace
+        // Check if the key is empty or whitespace - handled by FieldExistenceAnalyzer
         if (string.IsNullOrWhiteSpace(key.FieldsString))
-        {
-            var diagnostic = Diagnostic.Create(
-                KeyMustNotBeNullOrEmpty,
-                key.Location,
-                graphType.Name);
-            context.ReportDiagnostic(diagnostic);
             return;
-        }
 
         var selectionSet = key.Fields;
         if (selectionSet == null)
@@ -129,17 +102,7 @@ public class KeyAnalyzer : DiagnosticAnalyzer
             var fieldName = field.Name.StringValue;
             var graphTypeField = graphType.GetField(fieldName);
 
-            if (graphTypeField == null)
-            {
-                var fieldLocation = key.GetFieldLocation(fieldName, field.Location.Start);
-                var diagnostic = Diagnostic.Create(
-                    KeyFieldDoesNotExist,
-                    fieldLocation,
-                    fieldName,
-                    typeName);
-                context.ReportDiagnostic(diagnostic);
-            }
-            else
+            if (graphTypeField != null)
             {
                 // Check if the field has arguments in the GraphType definition
                 if (graphTypeField.Arguments.Count > 0)

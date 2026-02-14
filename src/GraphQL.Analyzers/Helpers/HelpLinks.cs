@@ -25,8 +25,8 @@ public static class HelpLinks
     public const string NULLABLE_REFERENCE_TYPE_ARGUMENT_SHOULD_SPECIFY_NULLABLE = $"{DOCS_URL}/gql021";
     public const string AOT_SCHEMA_ATTRIBUTE_MUST_BE_ON_AOT_SCHEMA = $"{DOCS_URL}/gql022";
 
-    public const string KEY_FIELD_DOES_NOT_EXIST = $"{DOCS_URL}/gqlfed001";
-    public const string KEY_MUST_NOT_BE_NULL_OR_EMPTY = $"{DOCS_URL}/gqlfed002";
+    public const string FIELD_DOES_NOT_EXIST = $"{DOCS_URL}/gqlfed001";
+    public const string FIELDS_MUST_NOT_BE_EMPTY = $"{DOCS_URL}/gqlfed002";
     public const string DUPLICATE_KEY = $"{DOCS_URL}/gqlfed003";
     public const string REDUNDANT_KEY = $"{DOCS_URL}/gqlfed004";
     public const string KEY_FIELD_MUST_NOT_HAVE_ARGUMENTS = $"{DOCS_URL}/gqlfed005";
