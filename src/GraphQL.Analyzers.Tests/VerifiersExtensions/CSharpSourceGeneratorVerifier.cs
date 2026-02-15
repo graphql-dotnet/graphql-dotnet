@@ -64,6 +64,7 @@ public static partial class CSharpIncrementalGeneratorVerifier<TIncrementalGener
             {
                 MetadataReference.CreateFromFile(typeof(GraphQL.Types.Schema).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(GraphQLParser.ROM).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(StarWars.TypeFirst.Types.StarWarsQuery).Assembly.Location),
             }),
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 

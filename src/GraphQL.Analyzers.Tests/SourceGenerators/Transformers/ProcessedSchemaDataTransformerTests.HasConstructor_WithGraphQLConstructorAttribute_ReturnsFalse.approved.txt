@@ -1,0 +1,24 @@
+// SUCCESS:
+
+// ========= GeneratedTypeDataReport.g.cs ============
+
+// Schema: MySchema
+// Total Entries: 1
+//
+// ========== Entry 1 ==========
+// Namespace: MyApp.GraphQL
+// PartialClassHierarchy: public MySchema
+// Type: SchemaClass
+// HasConstructor: False
+// QueryRootTypeName: null
+// MutationRootTypeName: null
+// SubscriptionRootTypeName: null
+// RegisteredGraphTypes (1):
+//   - global::MyApp.GraphQL.MyType
+//     AotGenerated: null
+//     Override: null
+// TypeMappings (0):
+// ArrayListTypes (0): 
+// GenericListTypes (0): 
+// HashSetTypes (0): 
+//
