@@ -58,7 +58,7 @@ public class AotSchemaConstructorAnalyzer : DiagnosticAnalyzer
         // Check if the constructor body calls Configure()
         if (constructorDeclaration.Body != null)
         {
-            if (CallsConfigure(constructorDeclaration.Body, context.SemanticModel))
+            if (CallsConfigure(constructorDeclaration.Body, context.SemanticModel, classSymbol))
             {
                 return;
             }
@@ -79,40 +79,51 @@ public class AotSchemaConstructorAnalyzer : DiagnosticAnalyzer
         if (aotSchemaSymbol == null)
             return false;
 
-        var current = classSymbol.BaseType;
-        while (current != null)
-        {
-            if (SymbolEqualityComparer.Default.Equals(current, aotSchemaSymbol))
-                return true;
+        return IsSameOrBaseType(aotSchemaSymbol, classSymbol.BaseType);
+    }
 
-            current = current.BaseType;
+    private static bool CallsConfigure(BlockSyntax body, SemanticModel semanticModel, INamedTypeSymbol containingType)
+    {
+        foreach (var invocation in body.DescendantNodes().OfType<InvocationExpressionSyntax>())
+        {
+            // Reject explicit base.Configure()
+            if (invocation.Expression is MemberAccessExpressionSyntax ma &&
+                ma.Expression is BaseExpressionSyntax &&
+                ma.Name.Identifier.Text == Constants.MethodNames.Configure)
+            {
+                continue;
+            }
+
+            // Bind the invoked method symbol (handles IdentifierName, MemberAccess, etc.)
+            var info = semanticModel.GetSymbolInfo(invocation);
+
+            // Prefer the chosen symbol; fall back to candidates if needed
+            var method =
+                info.Symbol as IMethodSymbol ??
+                info.CandidateSymbols.OfType<IMethodSymbol>().FirstOrDefault();
+
+            if (method is null)
+                continue;
+
+            if (method.Name != Constants.MethodNames.Configure || method.Parameters.Length != 0)
+                continue;
+
+            if (!IsSameOrBaseType(method.ContainingType, containingType))
+                continue;
+
+            return true;
         }
 
         return false;
     }
 
-    private static bool CallsConfigure(BlockSyntax body, SemanticModel semanticModel)
+    private static bool IsSameOrBaseType(INamedTypeSymbol candidate, INamedTypeSymbol? target)
     {
-        // Look for any invocation of Configure() in the constructor body
-        var invocations = body.DescendantNodes().OfType<InvocationExpressionSyntax>();
-
-        foreach (var invocation in invocations)
+        for (var t = target; t is not null; t = t.BaseType)
         {
-            // Check if this is a call to Configure()
-            if (invocation.Expression is IdentifierNameSyntax identifier &&
-                identifier.Identifier.Text == "Configure")
-            {
-                // Verify it's calling the Configure method from the class (not some other Configure)
-                var symbolInfo = semanticModel.GetSymbolInfo(invocation);
-                if (symbolInfo.Symbol is IMethodSymbol methodSymbol &&
-                    methodSymbol.Name == "Configure" &&
-                    methodSymbol.Parameters.Length == 0)
-                {
-                    return true;
-                }
-            }
+            if (SymbolEqualityComparer.Default.Equals(candidate, t))
+                return true;
         }
-
         return false;
     }
 }
