@@ -128,7 +128,7 @@ public class AotSchemaConstructorAnalyzerTests
     }
 
     [Fact]
-    public async Task DerivedFromDerivedAotSchema_MissingConfigure_Diagnostic()
+    public async Task DerivedFromDerivedAotSchema_MissingConfigure_NoDiagnostic()
     {
         const string source =
             """
@@ -152,9 +152,9 @@ public class AotSchemaConstructorAnalyzerTests
 
             public class MySchema : BaseSchema
             {
-                public {|#0:MySchema|}() : base()
+                public MySchema() : base()
                 {
-                    // Missing Configure() call
+                    // No diagnostic - only classes directly deriving from AotSchema are checked
                 }
 
                 protected override void Configure()
@@ -165,10 +165,7 @@ public class AotSchemaConstructorAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(AotSchemaConstructorAnalyzer.AotSchemaConstructorMustCallConfigure)
-            .WithLocation(0).WithArguments("MySchema");
-
-        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Fact]

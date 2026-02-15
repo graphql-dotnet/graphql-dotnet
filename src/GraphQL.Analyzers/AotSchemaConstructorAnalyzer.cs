@@ -80,7 +80,8 @@ public class AotSchemaConstructorAnalyzer : DiagnosticAnalyzer
         if (aotSchemaSymbol == null)
             return false;
 
-        return IsSameOrBaseType(aotSchemaSymbol, classSymbol.BaseType);
+        // Only check classes that directly derive from AotSchema
+        return SymbolEqualityComparer.Default.Equals(classSymbol.BaseType, aotSchemaSymbol);
     }
 
     private static bool CallsConfigure(BlockSyntax body, SemanticModel semanticModel, INamedTypeSymbol containingType)
