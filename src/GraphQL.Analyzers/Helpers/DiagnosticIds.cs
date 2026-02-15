@@ -24,6 +24,7 @@ public static class DiagnosticIds
     public const string VALIDATE_ARGUMENTS_METHOD_MUST_BE_VALID = "GQL020";
     public const string NULLABLE_REFERENCE_TYPE_ARGUMENT_SHOULD_SPECIFY_NULLABLE = "GQL021";
     public const string AOT_SCHEMA_ATTRIBUTE_MUST_BE_ON_AOT_SCHEMA = "GQL022";
+    public const string AOT_SCHEMA_CONSTRUCTOR_MUST_CALL_CONFIGURE = "GQL023";
 
     public const string KEY_FIELD_DOES_NOT_EXIST = "GQLFED001";
     public const string KEY_MUST_NOT_BE_NULL_OR_EMPTY = "GQLFED002";
