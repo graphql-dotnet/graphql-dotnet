@@ -56,12 +56,9 @@ public class AotSchemaConstructorAnalyzer : DiagnosticAnalyzer
         }
 
         // Check if the constructor body calls Configure()
-        if (constructorDeclaration.Body != null)
+        if (constructorDeclaration.Body != null && CallsConfigure(constructorDeclaration.Body, context.SemanticModel, classSymbol))
         {
-            if (CallsConfigure(constructorDeclaration.Body, context.SemanticModel, classSymbol))
-            {
-                return;
-            }
+            return;
         }
 
         // Report diagnostic - constructor does not call Configure() and does not chain to another constructor
