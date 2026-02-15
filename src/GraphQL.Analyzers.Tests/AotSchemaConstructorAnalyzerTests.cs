@@ -262,4 +262,31 @@ public class AotSchemaConstructorAnalyzerTests
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
+    [Fact]
+    public async Task AbstractClass_DoesNotCallConfigure_NoDiagnostic()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+            using System;
+
+            namespace Sample.Server;
+
+            public abstract class BaseSchema : AotSchema
+            {
+                protected BaseSchema() : base(null!, null!)
+                {
+                    // Abstract class - should not trigger diagnostic even without Configure() call
+                }
+
+                protected override void Configure()
+                {
+                    // Schema configuration
+                }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
 }

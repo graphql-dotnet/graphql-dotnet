@@ -43,6 +43,10 @@ public class AotSchemaConstructorAnalyzer : DiagnosticAnalyzer
         if (classSymbol == null)
             return;
 
+        // Skip abstract classes
+        if (classSymbol.IsAbstract)
+            return;
+
         // Check if the class derives from AotSchema
         if (!DerivesFromAotSchema(classSymbol, context.Compilation))
             return;
