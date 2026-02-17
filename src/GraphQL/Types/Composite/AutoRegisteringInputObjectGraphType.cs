@@ -25,10 +25,11 @@ public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(Dyn
     /// Initializes a new instance of the <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/> class without adding any fields.
     /// </summary>
     /// <param name="configureGraph">When true, sets the name and processes all attributes defined for the source type.</param>
-    internal AutoRegisteringInputObjectGraphType(bool configureGraph)
-        : base(configureGraph)
+    /// <param name="cloneFrom">When specified, clones the fields and configuration from the provided instance.</param>
+    internal AutoRegisteringInputObjectGraphType(bool configureGraph, AutoRegisteringInputObjectGraphType<TSourceType>? cloneFrom)
+        : base(configureGraph, cloneFrom)
     {
-        if (configureGraph)
+        if (configureGraph && cloneFrom == null)
         {
             Name = typeof(TSourceType).GraphQLName();
             ConfigureGraph();

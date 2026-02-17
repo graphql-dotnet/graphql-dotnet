@@ -57,9 +57,14 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
     private Func<IDictionary<string, object?>, IValueConverter, object>? _parseDictionary;
     private Action<ISchema>? _initialize;
 
-    internal InputObjectGraphType(bool configureGraph)
+    internal InputObjectGraphType(bool configureGraph, InputObjectGraphType<TSourceType>? cloneFrom)
+        : base(cloneFrom)
     {
         _ = configureGraph;
+        if (cloneFrom != null)
+        {
+            IsOneOf = cloneFrom.IsOneOf;
+        }
         // do not set or reference initialization logic to allow for AOT trimming of code requiring reflection
     }
 

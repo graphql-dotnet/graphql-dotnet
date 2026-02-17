@@ -89,10 +89,12 @@ public static class InputGraphTypeGenerator
         using (sb.Indent())
         {
             // Generate fields
-            GenerateFields(sb);
+            GenerateFields(sb, inputGraphType);
 
-            // Generate constructor
-            GenerateConstructor(sb, inputGraphType);
+            // Generate constructors
+            GenerateStaticConstructor(sb, inputGraphType);
+            GeneratePublicConstructor(sb, inputGraphType);
+            GeneratePrivateConstructor(sb, inputGraphType);
 
             // Generate GetRegisteredMembers method
             GenerateGetRegisteredMembersMethod(sb);
@@ -110,20 +112,20 @@ public static class InputGraphTypeGenerator
         sb.AppendLine("}");
     }
 
-    private static void GenerateFields(SourceBuilder sb)
+    private static void GenerateFields(SourceBuilder sb, InputGraphTypeData inputGraphType)
     {
-        sb.AppendLine("private readonly global::System.Reflection.MemberInfo[] _members;");
+        sb.AppendLine($"private static {inputGraphType.GraphTypeClassName}? _cache;");
+        sb.AppendLine("private static readonly global::System.Reflection.MemberInfo[] _members;");
         sb.AppendLine("private readonly global::GraphQL.Types.FieldType[] _fields;");
         sb.AppendLine();
     }
 
-    private static void GenerateConstructor(
+    private static void GenerateStaticConstructor(
         SourceBuilder sb,
         InputGraphTypeData inputGraphType)
     {
-        sb.AppendLine($"public {inputGraphType.GraphTypeClassName}()");
+        sb.AppendLine($"static {inputGraphType.GraphTypeClassName}()");
         sb.AppendLine("{");
-
         using (sb.Indent())
         {
             // Initialize _members array
@@ -139,6 +141,40 @@ public static class InputGraphTypeGenerator
                 }
             }
             sb.AppendLine("];");
+        }
+        sb.AppendLine("}");
+        sb.AppendLine();
+    }
+
+    private static void GeneratePublicConstructor(
+        SourceBuilder sb,
+        InputGraphTypeData inputGraphType)
+    {
+        sb.AppendLine($"public {inputGraphType.GraphTypeClassName}() : this(_cache)");
+        sb.AppendLine("{");
+        sb.AppendLine("}");
+        sb.AppendLine();
+    }
+
+    private static void GeneratePrivateConstructor(
+        SourceBuilder sb,
+        InputGraphTypeData inputGraphType)
+    {
+        sb.AppendLine($"private {inputGraphType.GraphTypeClassName}({inputGraphType.GraphTypeClassName}? cloneFrom) : base(cloneFrom)");
+        sb.AppendLine("{");
+
+        using (sb.Indent())
+        {
+            // Check cache first
+            sb.AppendLine("if (cloneFrom != null)");
+            sb.AppendLine("{");
+            using (sb.Indent())
+            {
+                sb.AppendLine("_fields = global::System.Linq.Enumerable.ToArray(cloneFrom.Fields);");
+                sb.AppendLine("return;");
+            }
+            sb.AppendLine("}");
+            sb.AppendLine();
 
             // Initialize _fields array
             sb.AppendLine("_fields = global::System.Linq.Enumerable.ToArray(ProvideFields());");
@@ -149,6 +185,16 @@ public static class InputGraphTypeGenerator
             using (sb.Indent())
             {
                 sb.AppendLine("AddField(fieldType);");
+            }
+            sb.AppendLine("}");
+            sb.AppendLine();
+
+            // Set cache if enabled
+            sb.AppendLine("if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)");
+            sb.AppendLine("{");
+            using (sb.Indent())
+            {
+                sb.AppendLine($"_cache = new {inputGraphType.GraphTypeClassName}(this);");
             }
             sb.AppendLine("}");
         }

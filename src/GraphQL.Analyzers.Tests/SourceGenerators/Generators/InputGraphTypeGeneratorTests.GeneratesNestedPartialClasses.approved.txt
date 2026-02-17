@@ -11,19 +11,39 @@ public partial class OuterClass
         {
             private class AutoInputGraphType_AddressInput : global::GraphQL.Types.Aot.AotAutoRegisteringInputObjectGraphType<global::Sample.AddressInput>
             {
-                private readonly global::System.Reflection.MemberInfo[] _members;
+                private static AutoInputGraphType_AddressInput? _cache;
+                private static readonly global::System.Reflection.MemberInfo[] _members;
                 private readonly global::GraphQL.Types.FieldType[] _fields;
 
-                public AutoInputGraphType_AddressInput()
+                static AutoInputGraphType_AddressInput()
                 {
                     _members = [
                         typeof(global::Sample.AddressInput).GetProperty(nameof(global::Sample.AddressInput.Street))!,
                         typeof(global::Sample.AddressInput).GetProperty(nameof(global::Sample.AddressInput.City))!
                     ];
+                }
+
+                public AutoInputGraphType_AddressInput() : this(_cache)
+                {
+                }
+
+                private AutoInputGraphType_AddressInput(AutoInputGraphType_AddressInput? cloneFrom) : base(cloneFrom)
+                {
+                    if (cloneFrom != null)
+                    {
+                        _fields = global::System.Linq.Enumerable.ToArray(cloneFrom.Fields);
+                        return;
+                    }
+
                     _fields = global::System.Linq.Enumerable.ToArray(ProvideFields());
                     foreach (var fieldType in _fields)
                     {
                         AddField(fieldType);
+                    }
+
+                    if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+                    {
+                        _cache = new AutoInputGraphType_AddressInput(this);
                     }
                 }
 

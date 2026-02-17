@@ -3256,7 +3256,7 @@ namespace GraphQL.Types.Aot
 {
     public abstract class AotAutoRegisteringInputObjectGraphType<T> : GraphQL.Types.AutoRegisteringInputObjectGraphType<T>
     {
-        public AotAutoRegisteringInputObjectGraphType() { }
+        public AotAutoRegisteringInputObjectGraphType(GraphQL.Types.Aot.AotAutoRegisteringInputObjectGraphType<T>? cloneFrom) { }
         protected override System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
         public override bool IsValidDefault(object value) { }
         public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }

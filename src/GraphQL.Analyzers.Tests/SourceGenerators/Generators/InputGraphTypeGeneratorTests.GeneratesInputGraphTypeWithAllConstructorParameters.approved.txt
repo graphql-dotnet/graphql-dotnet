@@ -7,19 +7,39 @@ public partial class SampleAotSchema
 {
     private class AutoInputGraphType_ImmutableInput : global::GraphQL.Types.Aot.AotAutoRegisteringInputObjectGraphType<global::Sample.ImmutableInput>
     {
-        private readonly global::System.Reflection.MemberInfo[] _members;
+        private static AutoInputGraphType_ImmutableInput? _cache;
+        private static readonly global::System.Reflection.MemberInfo[] _members;
         private readonly global::GraphQL.Types.FieldType[] _fields;
 
-        public AutoInputGraphType_ImmutableInput()
+        static AutoInputGraphType_ImmutableInput()
         {
             _members = [
                 typeof(global::Sample.ImmutableInput).GetProperty(nameof(global::Sample.ImmutableInput.Id))!,
                 typeof(global::Sample.ImmutableInput).GetProperty(nameof(global::Sample.ImmutableInput.Value))!
             ];
+        }
+
+        public AutoInputGraphType_ImmutableInput() : this(_cache)
+        {
+        }
+
+        private AutoInputGraphType_ImmutableInput(AutoInputGraphType_ImmutableInput? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                _fields = global::System.Linq.Enumerable.ToArray(cloneFrom.Fields);
+                return;
+            }
+
             _fields = global::System.Linq.Enumerable.ToArray(ProvideFields());
             foreach (var fieldType in _fields)
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new AutoInputGraphType_ImmutableInput(this);
             }
         }
 
