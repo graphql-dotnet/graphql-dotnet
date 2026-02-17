@@ -3263,38 +3263,38 @@ namespace GraphQL.Types.Aot
     }
     public abstract class AotAutoRegisteringInterfaceGraphType<TSource> : GraphQL.Types.AutoRegisteringInterfaceGraphType<TSource>
     {
-        public AotAutoRegisteringInterfaceGraphType() { }
+        public AotAutoRegisteringInterfaceGraphType(GraphQL.Types.Aot.AotAutoRegisteringInterfaceGraphType<TSource>? cloneFrom) { }
         protected virtual System.Func<GraphQL.IResolveFieldContext, TParameterType> BuildArgument<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
-        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<T>> fn, bool requiresAccessor) { }
-        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<T>> fn, bool requiresAccessor) { }
-        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, T> fn, bool requiresAccessor) { }
         protected override void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
-        protected GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Collections.Generic.IAsyncEnumerable<T>> fn) { }
-        protected GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.IObservable<T>> fn) { }
-        protected GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<System.Collections.Generic.IAsyncEnumerable<T>>> fn) { }
-        protected GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<System.IObservable<T>>> fn) { }
-        protected GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<System.Collections.Generic.IAsyncEnumerable<T>>> fn) { }
-        protected GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<System.IObservable<T>>> fn) { }
         protected override System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
+        protected static GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<T>> fn, bool requiresAccessor) { }
+        protected static GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<T>> fn, bool requiresAccessor) { }
+        protected static GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, T> fn, bool requiresAccessor) { }
+        protected static GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Collections.Generic.IAsyncEnumerable<T>> fn) { }
+        protected static GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.IObservable<T>> fn) { }
+        protected static GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<System.Collections.Generic.IAsyncEnumerable<T>>> fn) { }
+        protected static GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<System.IObservable<T>>> fn) { }
+        protected static GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<System.Collections.Generic.IAsyncEnumerable<T>>> fn) { }
+        protected static GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<System.IObservable<T>>> fn) { }
     }
     public abstract class AotAutoRegisteringObjectGraphType<TSource> : GraphQL.Types.AutoRegisteringObjectGraphType<TSource>
     {
-        public AotAutoRegisteringObjectGraphType() { }
+        public AotAutoRegisteringObjectGraphType(GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<TSource>? cloneFrom) { }
         protected virtual System.Func<GraphQL.IResolveFieldContext, TParameterType> BuildArgument<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
         protected virtual System.Func<GraphQL.IResolveFieldContext, TParameterType> BuildConstructorParameter<TParameterType>() { }
-        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<T>> fn, bool requiresAccessor) { }
-        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<T>> fn, bool requiresAccessor) { }
-        protected GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, T> fn, bool requiresAccessor) { }
         protected override void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
         protected override sealed System.Linq.Expressions.LambdaExpression BuildMemberInstanceExpression(System.Reflection.MemberInfo memberInfo) { }
-        protected GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Collections.Generic.IAsyncEnumerable<T>> fn) { }
-        protected GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.IObservable<T>> fn) { }
-        protected GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<System.Collections.Generic.IAsyncEnumerable<T>>> fn) { }
-        protected GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<System.IObservable<T>>> fn) { }
-        protected GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<System.Collections.Generic.IAsyncEnumerable<T>>> fn) { }
-        protected GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<System.IObservable<T>>> fn) { }
         protected virtual TSource GetMemberInstance(GraphQL.IResolveFieldContext context) { }
         protected override System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
+        protected static GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<T>> fn, bool requiresAccessor) { }
+        protected static GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<T>> fn, bool requiresAccessor) { }
+        protected static GraphQL.Resolvers.IFieldResolver BuildFieldResolver<T>(System.Func<GraphQL.IResolveFieldContext, T> fn, bool requiresAccessor) { }
+        protected static GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Collections.Generic.IAsyncEnumerable<T>> fn) { }
+        protected static GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.IObservable<T>> fn) { }
+        protected static GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<System.Collections.Generic.IAsyncEnumerable<T>>> fn) { }
+        protected static GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<System.IObservable<T>>> fn) { }
+        protected static GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<System.Collections.Generic.IAsyncEnumerable<T>>> fn) { }
+        protected static GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver<T>(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<System.IObservable<T>>> fn) { }
     }
 }
 namespace GraphQL.Types.Relay
