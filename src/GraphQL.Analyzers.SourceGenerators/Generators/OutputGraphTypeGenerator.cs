@@ -125,8 +125,8 @@ public static class OutputGraphTypeGenerator
         sb.AppendLine($"private static {outputGraphType.GraphTypeClassName}? _cache;");
         sb.AppendLine($"private static readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, {actionType}> _members;");
 
-        // Add _getMemberInstance field for object types only
-        if (!outputGraphType.IsInterface)
+        // Add _getMemberInstance field for object types only, but not for ContextSource
+        if (!outputGraphType.IsInterface && outputGraphType.InstanceSource != InstanceSource.ContextSource)
         {
             sb.AppendLine($"private static readonly global::System.Func<global::GraphQL.IResolveFieldContext, {outputGraphType.FullyQualifiedClrTypeName}> _getMemberInstance;");
         }
@@ -143,8 +143,8 @@ public static class OutputGraphTypeGenerator
 
         using (sb.Indent())
         {
-            // Initialize _getMemberInstance for object types only
-            if (!outputGraphType.IsInterface)
+            // Initialize _getMemberInstance for object types only, but not for ContextSource
+            if (!outputGraphType.IsInterface && outputGraphType.InstanceSource != InstanceSource.ContextSource)
             {
                 GenerateGetMemberInstanceInitialization(sb, outputGraphType);
                 sb.AppendLine();
@@ -228,10 +228,6 @@ public static class OutputGraphTypeGenerator
     {
         switch (outputGraphType.InstanceSource)
         {
-            case InstanceSource.ContextSource:
-                sb.AppendLine($"_getMemberInstance = GetMemberInstanceFromSource;");
-                break;
-
             case InstanceSource.GetRequiredService:
                 sb.AppendLine($"_getMemberInstance = BuildConstructorParameter<{outputGraphType.FullyQualifiedClrTypeName}>();");
                 break;
@@ -475,7 +471,16 @@ public static class OutputGraphTypeGenerator
         // Only generate for object types
         if (!outputGraphType.IsInterface)
         {
-            sb.AppendLine($"protected static {outputGraphType.FullyQualifiedClrTypeName} GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);");
+            if (outputGraphType.InstanceSource == InstanceSource.ContextSource)
+            {
+                // For ContextSource, directly call GetMemberInstanceFromSource
+                sb.AppendLine($"protected static {outputGraphType.FullyQualifiedClrTypeName} GetMemberInstance(global::GraphQL.IResolveFieldContext context) => GetMemberInstanceFromSource(context);");
+            }
+            else
+            {
+                // For other sources, use the _getMemberInstance delegate
+                sb.AppendLine($"protected static {outputGraphType.FullyQualifiedClrTypeName} GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);");
+            }
             sb.AppendLine();
         }
     }

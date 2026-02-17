@@ -9,12 +9,9 @@ public partial class SampleAotSchema
     {
         private static AutoOutputGraphType_Subscription? _cache;
         private static readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        private static readonly global::System.Func<global::GraphQL.IResolveFieldContext, global::Sample.Subscription> _getMemberInstance;
 
         static AutoOutputGraphType_Subscription()
         {
-            _getMemberInstance = GetMemberInstanceFromSource;
-
             _members = new()
             {
                 { typeof(global::Sample.Subscription).GetMethod(nameof(global::Sample.Subscription.OnMessage), [])!, ConstructField0_OnMessage },
@@ -52,7 +49,7 @@ public partial class SampleAotSchema
             _members[memberInfo](fieldType, memberInfo);
         }
 
-        protected static global::Sample.Subscription GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);
+        protected static global::Sample.Subscription GetMemberInstance(global::GraphQL.IResolveFieldContext context) => GetMemberInstanceFromSource(context);
 
         public static void ConstructField0_OnMessage(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {

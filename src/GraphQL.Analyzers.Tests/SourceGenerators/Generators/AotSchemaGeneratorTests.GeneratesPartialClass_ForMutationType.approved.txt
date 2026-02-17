@@ -13,12 +13,9 @@ public partial class MySchema
     {
         private static MutationGraphType? _cache;
         private static readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        private static readonly global::System.Func<global::GraphQL.IResolveFieldContext, global::Sample.Mutation> _getMemberInstance;
 
         static MutationGraphType()
         {
-            _getMemberInstance = GetMemberInstanceFromSource;
-
             _members = new()
             {
                 { typeof(global::Sample.Mutation).GetMethod(nameof(global::Sample.Mutation.DoSomething), [typeof(string)])!, ConstructField0_DoSomething },
@@ -53,7 +50,7 @@ public partial class MySchema
             _members[memberInfo](fieldType, memberInfo);
         }
 
-        protected static global::Sample.Mutation GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);
+        protected static global::Sample.Mutation GetMemberInstance(global::GraphQL.IResolveFieldContext context) => GetMemberInstanceFromSource(context);
 
         public static void ConstructField0_DoSomething(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
