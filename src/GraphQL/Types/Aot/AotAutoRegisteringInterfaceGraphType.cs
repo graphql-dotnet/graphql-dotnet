@@ -9,7 +9,7 @@ namespace GraphQL.Types.Aot;
 public abstract class AotAutoRegisteringInterfaceGraphType<TSource> : AutoRegisteringInterfaceGraphType<TSource>
 {
     /// <inheritdoc/>
-    public AotAutoRegisteringInterfaceGraphType() : base(true)
+    public AotAutoRegisteringInterfaceGraphType(AotAutoRegisteringInterfaceGraphType<TSource>? cloneFrom) : base(true, cloneFrom)
     {
     }
 
@@ -21,12 +21,12 @@ public abstract class AotAutoRegisteringInterfaceGraphType<TSource> : AutoRegist
     /// <summary>
     /// Builds a field argument and returns a resolver.
     /// </summary>
-    protected virtual Func<IResolveFieldContext, TParameterType> BuildArgument<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)
+    protected static Func<IResolveFieldContext, TParameterType> BuildArgument<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)
     {
-        var argumentInfo = GetArgumentInformation(fieldType, parameterInfo);
+        var argumentInfo = AutoRegisteringOutputHelper.GetArgumentInformation(typeof(TSource), AutoRegisteringHelper.GetTypeInformation(parameterInfo), fieldType, parameterInfo);
         var queryArgument = argumentInfo.ConstructQueryArgument();
-        ApplyArgumentAttributes(parameterInfo, queryArgument);
-        var resolver = GetParameterResolver<TParameterType>(argumentInfo);
+        AutoRegisteringOutputHelper.ApplyArgumentAttributes(parameterInfo, queryArgument);
+        var resolver = AutoRegisteringHelper.GetParameterResolver<TParameterType>(argumentInfo);
         if (resolver == null)
         {
             (fieldType.Arguments ??= new()).Add(queryArgument);
@@ -38,19 +38,19 @@ public abstract class AotAutoRegisteringInterfaceGraphType<TSource> : AutoRegist
     /// <summary>
     /// Builds a field resolver using the provided function.
     /// </summary>
-    protected IFieldResolver BuildFieldResolver<T>(Func<IResolveFieldContext, T> fn, bool requiresAccessor)
+    protected static IFieldResolver BuildFieldResolver<T>(Func<IResolveFieldContext, T> fn, bool requiresAccessor)
         => requiresAccessor
         ? new FuncFieldResolver<T>(context => fn(context))
         : new FuncFieldResolverNoAccessor<T>(context => fn(context));
 
     /// <inheritdoc cref="BuildFieldResolver{T}(Func{IResolveFieldContext, T}, bool)"/>
-    protected IFieldResolver BuildFieldResolver<T>(Func<IResolveFieldContext, Task<T>> fn, bool requiresAccessor)
+    protected static IFieldResolver BuildFieldResolver<T>(Func<IResolveFieldContext, Task<T>> fn, bool requiresAccessor)
         => requiresAccessor
         ? new FuncFieldResolver<T>(context => new ValueTask<T>(fn(context))!)
         : new FuncFieldResolverNoAccessor<T>(context => new ValueTask<T>(fn(context))!);
 
     /// <inheritdoc cref="BuildFieldResolver{T}(Func{IResolveFieldContext, T}, bool)"/>
-    protected IFieldResolver BuildFieldResolver<T>(Func<IResolveFieldContext, ValueTask<T>> fn, bool requiresAccessor)
+    protected static IFieldResolver BuildFieldResolver<T>(Func<IResolveFieldContext, ValueTask<T>> fn, bool requiresAccessor)
         => requiresAccessor
         ? new FuncFieldResolver<T>(fn!)
         : new FuncFieldResolverNoAccessor<T>(fn!);
@@ -58,26 +58,26 @@ public abstract class AotAutoRegisteringInterfaceGraphType<TSource> : AutoRegist
     /// <summary>
     /// Builds a source stream resolver using the provided function.
     /// </summary>
-    protected ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, IObservable<T>> fn)
+    protected static ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, IObservable<T>> fn)
         => new SourceStreamResolver<T>(fn);
 
     /// <inheritdoc cref="BuildSourceStreamResolver{T}(Func{IResolveFieldContext, IObservable{T}})"/>
-    protected ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, Task<IObservable<T>>> fn)
+    protected static ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, Task<IObservable<T>>> fn)
         => new SourceStreamResolver<T>(context => new ValueTask<IObservable<T>>(fn(context))!);
 
     /// <inheritdoc cref="BuildSourceStreamResolver{T}(Func{IResolveFieldContext, IObservable{T}})"/>
-    protected ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, ValueTask<IObservable<T>>> fn)
+    protected static ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, ValueTask<IObservable<T>>> fn)
         => new SourceStreamResolver<T>(fn!);
 
     /// <inheritdoc cref="BuildSourceStreamResolver{T}(Func{IResolveFieldContext, IObservable{T}})"/>
-    protected ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, IAsyncEnumerable<T>> fn)
+    protected static ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, IAsyncEnumerable<T>> fn)
         => new SourceStreamResolver<object?>(ObservableFromAsyncEnumerable<T>.Create(fn));
 
     /// <inheritdoc cref="BuildSourceStreamResolver{T}(Func{IResolveFieldContext, IObservable{T}})"/>
-    protected ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, Task<IAsyncEnumerable<T>>> fn)
+    protected static ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, Task<IAsyncEnumerable<T>>> fn)
         => new SourceStreamResolver<object?>(ObservableFromAsyncEnumerable<T>.Create(fn));
 
     /// <inheritdoc cref="BuildSourceStreamResolver{T}(Func{IResolveFieldContext, IObservable{T}})"/>
-    protected ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, ValueTask<IAsyncEnumerable<T>>> fn)
+    protected static ISourceStreamResolver BuildSourceStreamResolver<T>(Func<IResolveFieldContext, ValueTask<IAsyncEnumerable<T>>> fn)
         => new SourceStreamResolver<object?>(ObservableFromAsyncEnumerable<T>.Create(fn));
 }

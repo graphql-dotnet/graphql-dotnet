@@ -7,8 +7,10 @@ public partial class SampleAotSchema
 {
     private class AutoOutputGraphType_IStarWarsCharacter : global::GraphQL.Types.Aot.AotAutoRegisteringInterfaceGraphType<global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>?> _members;
-        public AutoOutputGraphType_IStarWarsCharacter()
+        private static AutoOutputGraphType_IStarWarsCharacter? _cache;
+        private static readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>?> _members;
+
+        static AutoOutputGraphType_IStarWarsCharacter()
         {
             _members = new()
             {
@@ -20,9 +22,27 @@ public partial class SampleAotSchema
                 { typeof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter.Version))!, ConstructField5_Version },
                 { typeof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter.GetAllCharacterTypes), [])!, ConstructField6_GetAllCharacterTypes },
             };
+        }
+
+        public AutoOutputGraphType_IStarWarsCharacter() : this(_cache)
+        {
+        }
+
+        private AutoOutputGraphType_IStarWarsCharacter(AutoOutputGraphType_IStarWarsCharacter? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new AutoOutputGraphType_IStarWarsCharacter(this);
             }
         }
 
@@ -37,12 +57,12 @@ public partial class SampleAotSchema
             }
         }
 
-        public void ConstructField5_Version(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField5_Version(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => global::GraphQL.StarWars.TypeFirst.IStarWarsCharacter.Version, false);
         }
 
-        public void ConstructField6_GetAllCharacterTypes(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField6_GetAllCharacterTypes(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context =>
             {

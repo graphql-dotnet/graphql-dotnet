@@ -7,9 +7,14 @@ public partial class SampleAotSchema
 {
     private class AutoOutputGraphType_Droid : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::GraphQL.StarWars.TypeFirst.Types.Droid>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public AutoOutputGraphType_Droid()
+        private static AutoOutputGraphType_Droid? _cache;
+        private static readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
+        private static readonly global::System.Func<global::GraphQL.IResolveFieldContext, global::GraphQL.StarWars.TypeFirst.Types.Droid> _getMemberInstance;
+
+        static AutoOutputGraphType_Droid()
         {
+            _getMemberInstance = GetMemberInstanceFromSource;
+
             _members = new()
             {
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.Droid).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.Types.Droid.Id))!, ConstructField0_Id },
@@ -23,9 +28,27 @@ public partial class SampleAotSchema
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.Droid).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.Types.Droid.CreateDroid), [typeof(string), typeof(string)])!, ConstructField8_CreateDroid },
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.Droid).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.Types.Droid.GetSerialNumber), [])!, ConstructField9_GetSerialNumber },
             };
+        }
+
+        public AutoOutputGraphType_Droid() : this(_cache)
+        {
+        }
+
+        private AutoOutputGraphType_Droid(AutoOutputGraphType_Droid? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new AutoOutputGraphType_Droid(this);
             }
         }
 
@@ -35,17 +58,19 @@ public partial class SampleAotSchema
             _members[memberInfo](fieldType, memberInfo);
         }
 
-        public void ConstructField0_Id(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        protected static global::GraphQL.StarWars.TypeFirst.Types.Droid GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);
+
+        public static void ConstructField0_Id(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).Id, false);
         }
 
-        public void ConstructField1_Name(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField1_Name(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).Name, false);
         }
 
-        public void ConstructField2_GetFriends(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField2_GetFriends(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             var parameters = ((global::System.Reflection.MethodInfo)memberInfo).GetParameters();
             var param0 = BuildArgument<global::GraphQL.StarWars.TypeFirst.StarWarsData>(fieldType, parameters[0]);
@@ -57,7 +82,7 @@ public partial class SampleAotSchema
             }, true);
         }
 
-        public void ConstructField3_GetFriendsConnection(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField3_GetFriendsConnection(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             var parameters = ((global::System.Reflection.MethodInfo)memberInfo).GetParameters();
             var param0 = BuildArgument<global::GraphQL.StarWars.TypeFirst.StarWarsData>(fieldType, parameters[0]);
@@ -73,27 +98,27 @@ public partial class SampleAotSchema
             }, true);
         }
 
-        public void ConstructField4_AppearsIn(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField4_AppearsIn(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).AppearsIn, false);
         }
 
-        public void ConstructField5_PrimaryFunction(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField5_PrimaryFunction(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).PrimaryFunction, false);
         }
 
-        public void ConstructField6__manufacturer(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField6__manufacturer(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context)._manufacturer, false);
         }
 
-        public void ConstructField7_DefaultModel(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField7_DefaultModel(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => global::GraphQL.StarWars.TypeFirst.Types.Droid.DefaultModel, false);
         }
 
-        public void ConstructField8_CreateDroid(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField8_CreateDroid(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             var parameters = ((global::System.Reflection.MethodInfo)memberInfo).GetParameters();
             var param0 = BuildArgument<string>(fieldType, parameters[0]);
@@ -106,7 +131,7 @@ public partial class SampleAotSchema
             }, true);
         }
 
-        public void ConstructField9_GetSerialNumber(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField9_GetSerialNumber(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context =>
             {

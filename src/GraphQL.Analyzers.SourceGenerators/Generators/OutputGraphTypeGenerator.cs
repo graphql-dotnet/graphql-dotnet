@@ -90,11 +90,13 @@ public static class OutputGraphTypeGenerator
 
         using (sb.Indent())
         {
-            // Generate members dictionary field
-            GenerateMembersDictionaryField(sb, outputGraphType);
+            // Generate fields
+            GenerateFields(sb, outputGraphType);
 
-            // Generate constructor
-            GenerateConstructor(sb, outputGraphType);
+            // Generate constructors
+            GenerateStaticConstructor(sb, outputGraphType);
+            GeneratePublicConstructor(sb, outputGraphType);
+            GeneratePrivateConstructor(sb, outputGraphType);
 
             // Generate GetRegisteredMembers method
             GenerateGetRegisteredMembersMethod(sb);
@@ -102,8 +104,8 @@ public static class OutputGraphTypeGenerator
             // Generate BuildFieldType method
             GenerateBuildFieldTypeMethod(sb, outputGraphType);
 
-            // Generate GetMemberInstance override if needed
-            GenerateGetMemberInstanceOverride(sb, outputGraphType);
+            // Generate GetMemberInstance method
+            GenerateGetMemberInstanceMethod(sb, outputGraphType);
 
             // Generate ConstructField methods for object types
             GenerateConstructFieldMethods(sb, outputGraphType);
@@ -112,7 +114,7 @@ public static class OutputGraphTypeGenerator
         sb.AppendLine("}");
     }
 
-    private static void GenerateMembersDictionaryField(
+    private static void GenerateFields(
         SourceBuilder sb,
         OutputGraphTypeData outputGraphType)
     {
@@ -120,26 +122,29 @@ public static class OutputGraphTypeGenerator
             ? "global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>?"
             : "global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>";
 
-        sb.AppendLine($"private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, {actionType}> _members;");
+        sb.AppendLine($"private static {outputGraphType.GraphTypeClassName}? _cache;");
+        sb.AppendLine($"private static readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, {actionType}> _members;");
 
-        // Add _getMemberInstance field if needed
-        if (outputGraphType.InstanceSource != InstanceSource.ContextSource)
+        // Add _getMemberInstance field for object types only
+        if (!outputGraphType.IsInterface)
         {
-            sb.AppendLine($"private readonly global::System.Func<global::GraphQL.IResolveFieldContext, {outputGraphType.FullyQualifiedClrTypeName}> _getMemberInstance;");
+            sb.AppendLine($"private static readonly global::System.Func<global::GraphQL.IResolveFieldContext, {outputGraphType.FullyQualifiedClrTypeName}> _getMemberInstance;");
         }
+
+        sb.AppendLine();
     }
 
-    private static void GenerateConstructor(
+    private static void GenerateStaticConstructor(
         SourceBuilder sb,
         OutputGraphTypeData outputGraphType)
     {
-        sb.AppendLine($"public {outputGraphType.GraphTypeClassName}()");
+        sb.AppendLine($"static {outputGraphType.GraphTypeClassName}()");
         sb.AppendLine("{");
 
         using (sb.Indent())
         {
-            // Initialize _getMemberInstance if needed
-            if (outputGraphType.InstanceSource != InstanceSource.ContextSource)
+            // Initialize _getMemberInstance for object types only
+            if (!outputGraphType.IsInterface)
             {
                 GenerateGetMemberInstanceInitialization(sb, outputGraphType);
                 sb.AppendLine();
@@ -158,6 +163,40 @@ public static class OutputGraphTypeGenerator
             }
 
             sb.AppendLine("};");
+        }
+
+        sb.AppendLine("}");
+        sb.AppendLine();
+    }
+
+    private static void GeneratePublicConstructor(
+        SourceBuilder sb,
+        OutputGraphTypeData outputGraphType)
+    {
+        sb.AppendLine($"public {outputGraphType.GraphTypeClassName}() : this(_cache)");
+        sb.AppendLine("{");
+        sb.AppendLine("}");
+        sb.AppendLine();
+    }
+
+    private static void GeneratePrivateConstructor(
+        SourceBuilder sb,
+        OutputGraphTypeData outputGraphType)
+    {
+        sb.AppendLine($"private {outputGraphType.GraphTypeClassName}({outputGraphType.GraphTypeClassName}? cloneFrom) : base(cloneFrom)");
+        sb.AppendLine("{");
+
+        using (sb.Indent())
+        {
+            // Check cache first
+            sb.AppendLine("if (cloneFrom != null)");
+            sb.AppendLine("{");
+            using (sb.Indent())
+            {
+                sb.AppendLine("return;");
+            }
+            sb.AppendLine("}");
+            sb.AppendLine();
 
             // Add fields
             sb.AppendLine("foreach (var fieldType in ProvideFields())");
@@ -165,6 +204,16 @@ public static class OutputGraphTypeGenerator
             using (sb.Indent())
             {
                 sb.AppendLine("AddField(fieldType);");
+            }
+            sb.AppendLine("}");
+            sb.AppendLine();
+
+            // Set cache if enabled
+            sb.AppendLine("if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)");
+            sb.AppendLine("{");
+            using (sb.Indent())
+            {
+                sb.AppendLine($"_cache = new {outputGraphType.GraphTypeClassName}(this);");
             }
             sb.AppendLine("}");
         }
@@ -179,6 +228,10 @@ public static class OutputGraphTypeGenerator
     {
         switch (outputGraphType.InstanceSource)
         {
+            case InstanceSource.ContextSource:
+                sb.AppendLine($"_getMemberInstance = GetMemberInstanceFromSource;");
+                break;
+
             case InstanceSource.GetRequiredService:
                 sb.AppendLine($"_getMemberInstance = BuildConstructorParameter<{outputGraphType.FullyQualifiedClrTypeName}>();");
                 break;
@@ -415,17 +468,16 @@ public static class OutputGraphTypeGenerator
         sb.AppendLine();
     }
 
-    private static void GenerateGetMemberInstanceOverride(
+    private static void GenerateGetMemberInstanceMethod(
         SourceBuilder sb,
         OutputGraphTypeData outputGraphType)
     {
-        if (outputGraphType.InstanceSource == InstanceSource.ContextSource)
+        // Only generate for object types
+        if (!outputGraphType.IsInterface)
         {
-            return; // No override needed for ContextSource
+            sb.AppendLine($"protected static {outputGraphType.FullyQualifiedClrTypeName} GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);");
+            sb.AppendLine();
         }
-
-        sb.AppendLine($"protected override {outputGraphType.FullyQualifiedClrTypeName} GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);");
-        sb.AppendLine();
     }
 
     private static void GenerateConstructFieldMethods(
@@ -442,7 +494,7 @@ public static class OutputGraphTypeGenerator
                 continue;
             }
 
-            sb.AppendLine($"public void ConstructField{i}_{member.MemberName}(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)");
+            sb.AppendLine($"public static void ConstructField{i}_{member.MemberName}(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)");
             sb.AppendLine("{");
 
             using (sb.Indent())

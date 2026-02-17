@@ -7,9 +7,11 @@ public partial class SampleAotSchema
 {
     private class AutoOutputGraphType_Person : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::Sample.Person>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        private readonly global::System.Func<global::GraphQL.IResolveFieldContext, global::Sample.Person> _getMemberInstance;
-        public AutoOutputGraphType_Person()
+        private static AutoOutputGraphType_Person? _cache;
+        private static readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
+        private static readonly global::System.Func<global::GraphQL.IResolveFieldContext, global::Sample.Person> _getMemberInstance;
+
+        static AutoOutputGraphType_Person()
         {
             var ctorParam0 = BuildConstructorParameter<global::System.String>();
             var ctorParam1 = BuildConstructorParameter<global::System.Int32>();
@@ -28,9 +30,27 @@ public partial class SampleAotSchema
             {
                 { typeof(global::Sample.Person).GetProperty(nameof(global::Sample.Person.Name))!, ConstructField0_Name },
             };
+        }
+
+        public AutoOutputGraphType_Person() : this(_cache)
+        {
+        }
+
+        private AutoOutputGraphType_Person(AutoOutputGraphType_Person? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new AutoOutputGraphType_Person(this);
             }
         }
 
@@ -40,9 +60,9 @@ public partial class SampleAotSchema
             _members[memberInfo](fieldType, memberInfo);
         }
 
-        protected override global::Sample.Person GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);
+        protected static global::Sample.Person GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);
 
-        public void ConstructField0_Name(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField0_Name(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).Name, false);
         }

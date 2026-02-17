@@ -9,9 +9,14 @@ internal partial class StarWarsSchema
 {
     private class ConnectionGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::GraphQL.Types.Relay.DataObjects.Connection<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public ConnectionGraphType()
+        private static ConnectionGraphType? _cache;
+        private static readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
+        private static readonly global::System.Func<global::GraphQL.IResolveFieldContext, global::GraphQL.Types.Relay.DataObjects.Connection<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>> _getMemberInstance;
+
+        static ConnectionGraphType()
         {
+            _getMemberInstance = GetMemberInstanceFromSource;
+
             _members = new()
             {
                 { typeof(global::GraphQL.Types.Relay.DataObjects.Connection<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter, global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>>).GetProperty(nameof(global::GraphQL.Types.Relay.DataObjects.Connection<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter, global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>>.TotalCount))!, ConstructField0_TotalCount },
@@ -19,9 +24,27 @@ internal partial class StarWarsSchema
                 { typeof(global::GraphQL.Types.Relay.DataObjects.Connection<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter, global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>>).GetProperty(nameof(global::GraphQL.Types.Relay.DataObjects.Connection<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter, global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>>.Edges))!, ConstructField2_Edges },
                 { typeof(global::GraphQL.Types.Relay.DataObjects.Connection<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter, global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>>).GetProperty(nameof(global::GraphQL.Types.Relay.DataObjects.Connection<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter, global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>>.Items))!, ConstructField3_Items },
             };
+        }
+
+        public ConnectionGraphType() : this(_cache)
+        {
+        }
+
+        private ConnectionGraphType(ConnectionGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new ConnectionGraphType(this);
             }
         }
 
@@ -31,22 +54,24 @@ internal partial class StarWarsSchema
             _members[memberInfo](fieldType, memberInfo);
         }
 
-        public void ConstructField0_TotalCount(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        protected static global::GraphQL.Types.Relay.DataObjects.Connection<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter> GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);
+
+        public static void ConstructField0_TotalCount(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).TotalCount, false);
         }
 
-        public void ConstructField1_PageInfo(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField1_PageInfo(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).PageInfo, false);
         }
 
-        public void ConstructField2_Edges(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField2_Edges(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).Edges, false);
         }
 
-        public void ConstructField3_Items(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField3_Items(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).Items, false);
         }
@@ -64,9 +89,14 @@ internal partial class StarWarsSchema
 {
     private class DroidGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::GraphQL.StarWars.TypeFirst.Types.Droid>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public DroidGraphType()
+        private static DroidGraphType? _cache;
+        private static readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
+        private static readonly global::System.Func<global::GraphQL.IResolveFieldContext, global::GraphQL.StarWars.TypeFirst.Types.Droid> _getMemberInstance;
+
+        static DroidGraphType()
         {
+            _getMemberInstance = GetMemberInstanceFromSource;
+
             _members = new()
             {
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.Droid).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.Types.Droid.PrimaryFunction))!, ConstructField0_PrimaryFunction },
@@ -76,9 +106,27 @@ internal partial class StarWarsSchema
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsCharacter).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsCharacter.GetFriends), [typeof(global::GraphQL.StarWars.TypeFirst.StarWarsData)])!, ConstructField4_GetFriends },
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsCharacter).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsCharacter.GetFriendsConnection), [typeof(global::GraphQL.StarWars.TypeFirst.StarWarsData)])!, ConstructField5_GetFriendsConnection },
             };
+        }
+
+        public DroidGraphType() : this(_cache)
+        {
+        }
+
+        private DroidGraphType(DroidGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new DroidGraphType(this);
             }
         }
 
@@ -88,27 +136,29 @@ internal partial class StarWarsSchema
             _members[memberInfo](fieldType, memberInfo);
         }
 
-        public void ConstructField0_PrimaryFunction(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        protected static global::GraphQL.StarWars.TypeFirst.Types.Droid GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);
+
+        public static void ConstructField0_PrimaryFunction(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).PrimaryFunction, false);
         }
 
-        public void ConstructField1_Id(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField1_Id(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).Id, false);
         }
 
-        public void ConstructField2_Name(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField2_Name(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).Name, false);
         }
 
-        public void ConstructField3_AppearsIn(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField3_AppearsIn(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).AppearsIn, false);
         }
 
-        public void ConstructField4_GetFriends(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField4_GetFriends(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             var parameters = ((global::System.Reflection.MethodInfo)memberInfo).GetParameters();
             var param0 = BuildArgument<global::GraphQL.StarWars.TypeFirst.StarWarsData>(fieldType, parameters[0]);
@@ -120,7 +170,7 @@ internal partial class StarWarsSchema
             }, true);
         }
 
-        public void ConstructField5_GetFriendsConnection(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField5_GetFriendsConnection(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             var parameters = ((global::System.Reflection.MethodInfo)memberInfo).GetParameters();
             var param0 = BuildArgument<global::GraphQL.StarWars.TypeFirst.StarWarsData>(fieldType, parameters[0]);
@@ -145,17 +195,40 @@ internal partial class StarWarsSchema
 {
     private class EdgeGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public EdgeGraphType()
+        private static EdgeGraphType? _cache;
+        private static readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
+        private static readonly global::System.Func<global::GraphQL.IResolveFieldContext, global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>> _getMemberInstance;
+
+        static EdgeGraphType()
         {
+            _getMemberInstance = GetMemberInstanceFromSource;
+
             _members = new()
             {
                 { typeof(global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>).GetProperty(nameof(global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>.Cursor))!, ConstructField0_Cursor },
                 { typeof(global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>).GetProperty(nameof(global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>.Node))!, ConstructField1_Node },
             };
+        }
+
+        public EdgeGraphType() : this(_cache)
+        {
+        }
+
+        private EdgeGraphType(EdgeGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new EdgeGraphType(this);
             }
         }
 
@@ -165,12 +238,14 @@ internal partial class StarWarsSchema
             _members[memberInfo](fieldType, memberInfo);
         }
 
-        public void ConstructField0_Cursor(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        protected static global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter> GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);
+
+        public static void ConstructField0_Cursor(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).Cursor, false);
         }
 
-        public void ConstructField1_Node(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField1_Node(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).Node, false);
         }
@@ -188,9 +263,14 @@ internal partial class StarWarsSchema
 {
     private class HumanGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::GraphQL.StarWars.TypeFirst.Types.Human>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public HumanGraphType()
+        private static HumanGraphType? _cache;
+        private static readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
+        private static readonly global::System.Func<global::GraphQL.IResolveFieldContext, global::GraphQL.StarWars.TypeFirst.Types.Human> _getMemberInstance;
+
+        static HumanGraphType()
         {
+            _getMemberInstance = GetMemberInstanceFromSource;
+
             _members = new()
             {
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.Human).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.Types.Human.HomePlanet))!, ConstructField0_HomePlanet },
@@ -200,9 +280,27 @@ internal partial class StarWarsSchema
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsCharacter).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsCharacter.GetFriends), [typeof(global::GraphQL.StarWars.TypeFirst.StarWarsData)])!, ConstructField4_GetFriends },
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsCharacter).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsCharacter.GetFriendsConnection), [typeof(global::GraphQL.StarWars.TypeFirst.StarWarsData)])!, ConstructField5_GetFriendsConnection },
             };
+        }
+
+        public HumanGraphType() : this(_cache)
+        {
+        }
+
+        private HumanGraphType(HumanGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new HumanGraphType(this);
             }
         }
 
@@ -212,27 +310,29 @@ internal partial class StarWarsSchema
             _members[memberInfo](fieldType, memberInfo);
         }
 
-        public void ConstructField0_HomePlanet(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        protected static global::GraphQL.StarWars.TypeFirst.Types.Human GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);
+
+        public static void ConstructField0_HomePlanet(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).HomePlanet, false);
         }
 
-        public void ConstructField1_Id(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField1_Id(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).Id, false);
         }
 
-        public void ConstructField2_Name(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField2_Name(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).Name, false);
         }
 
-        public void ConstructField3_AppearsIn(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField3_AppearsIn(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).AppearsIn, false);
         }
 
-        public void ConstructField4_GetFriends(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField4_GetFriends(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             var parameters = ((global::System.Reflection.MethodInfo)memberInfo).GetParameters();
             var param0 = BuildArgument<global::GraphQL.StarWars.TypeFirst.StarWarsData>(fieldType, parameters[0]);
@@ -244,7 +344,7 @@ internal partial class StarWarsSchema
             }, true);
         }
 
-        public void ConstructField5_GetFriendsConnection(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField5_GetFriendsConnection(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             var parameters = ((global::System.Reflection.MethodInfo)memberInfo).GetParameters();
             var param0 = BuildArgument<global::GraphQL.StarWars.TypeFirst.StarWarsData>(fieldType, parameters[0]);
@@ -357,8 +457,10 @@ internal partial class StarWarsSchema
 {
     private class IStarWarsCharacterGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringInterfaceGraphType<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>?> _members;
-        public IStarWarsCharacterGraphType()
+        private static IStarWarsCharacterGraphType? _cache;
+        private static readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>?> _members;
+
+        static IStarWarsCharacterGraphType()
         {
             _members = new()
             {
@@ -368,9 +470,27 @@ internal partial class StarWarsSchema
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter.GetFriends), [typeof(global::GraphQL.StarWars.TypeFirst.StarWarsData)])!, null },
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter.GetFriendsConnection), [typeof(global::GraphQL.StarWars.TypeFirst.StarWarsData)])!, null },
             };
+        }
+
+        public IStarWarsCharacterGraphType() : this(_cache)
+        {
+        }
+
+        private IStarWarsCharacterGraphType(IStarWarsCharacterGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new IStarWarsCharacterGraphType(this);
             }
         }
 
@@ -398,9 +518,14 @@ internal partial class StarWarsSchema
 {
     private class PageInfoGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::GraphQL.Types.Relay.DataObjects.PageInfo>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public PageInfoGraphType()
+        private static PageInfoGraphType? _cache;
+        private static readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
+        private static readonly global::System.Func<global::GraphQL.IResolveFieldContext, global::GraphQL.Types.Relay.DataObjects.PageInfo> _getMemberInstance;
+
+        static PageInfoGraphType()
         {
+            _getMemberInstance = GetMemberInstanceFromSource;
+
             _members = new()
             {
                 { typeof(global::GraphQL.Types.Relay.DataObjects.PageInfo).GetProperty(nameof(global::GraphQL.Types.Relay.DataObjects.PageInfo.HasNextPage))!, ConstructField0_HasNextPage },
@@ -408,9 +533,27 @@ internal partial class StarWarsSchema
                 { typeof(global::GraphQL.Types.Relay.DataObjects.PageInfo).GetProperty(nameof(global::GraphQL.Types.Relay.DataObjects.PageInfo.StartCursor))!, ConstructField2_StartCursor },
                 { typeof(global::GraphQL.Types.Relay.DataObjects.PageInfo).GetProperty(nameof(global::GraphQL.Types.Relay.DataObjects.PageInfo.EndCursor))!, ConstructField3_EndCursor },
             };
+        }
+
+        public PageInfoGraphType() : this(_cache)
+        {
+        }
+
+        private PageInfoGraphType(PageInfoGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new PageInfoGraphType(this);
             }
         }
 
@@ -420,22 +563,24 @@ internal partial class StarWarsSchema
             _members[memberInfo](fieldType, memberInfo);
         }
 
-        public void ConstructField0_HasNextPage(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        protected static global::GraphQL.Types.Relay.DataObjects.PageInfo GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);
+
+        public static void ConstructField0_HasNextPage(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).HasNextPage, false);
         }
 
-        public void ConstructField1_HasPreviousPage(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField1_HasPreviousPage(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).HasPreviousPage, false);
         }
 
-        public void ConstructField2_StartCursor(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField2_StartCursor(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).StartCursor, false);
         }
 
-        public void ConstructField3_EndCursor(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField3_EndCursor(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             fieldType.Resolver = BuildFieldResolver(context => GetMemberInstance(context).EndCursor, false);
         }
@@ -453,16 +598,39 @@ internal partial class StarWarsSchema
 {
     private class StarWarsMutationGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::GraphQL.StarWars.TypeFirst.Types.StarWarsMutation>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public StarWarsMutationGraphType()
+        private static StarWarsMutationGraphType? _cache;
+        private static readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
+        private static readonly global::System.Func<global::GraphQL.IResolveFieldContext, global::GraphQL.StarWars.TypeFirst.Types.StarWarsMutation> _getMemberInstance;
+
+        static StarWarsMutationGraphType()
         {
+            _getMemberInstance = GetMemberInstanceFromSource;
+
             _members = new()
             {
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsMutation).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsMutation.CreateHuman), [typeof(global::GraphQL.StarWars.TypeFirst.StarWarsData), typeof(global::GraphQL.StarWars.TypeFirst.Types.HumanInput)])!, ConstructField0_CreateHuman },
             };
+        }
+
+        public StarWarsMutationGraphType() : this(_cache)
+        {
+        }
+
+        private StarWarsMutationGraphType(StarWarsMutationGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new StarWarsMutationGraphType(this);
             }
         }
 
@@ -472,7 +640,9 @@ internal partial class StarWarsSchema
             _members[memberInfo](fieldType, memberInfo);
         }
 
-        public void ConstructField0_CreateHuman(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        protected static global::GraphQL.StarWars.TypeFirst.Types.StarWarsMutation GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);
+
+        public static void ConstructField0_CreateHuman(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             var parameters = ((global::System.Reflection.MethodInfo)memberInfo).GetParameters();
             var param0 = BuildArgument<global::GraphQL.StarWars.TypeFirst.StarWarsData>(fieldType, parameters[0]);
@@ -498,18 +668,41 @@ internal partial class StarWarsSchema
 {
     private class StarWarsQueryGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::GraphQL.StarWars.TypeFirst.Types.StarWarsQuery>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public StarWarsQueryGraphType()
+        private static StarWarsQueryGraphType? _cache;
+        private static readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
+        private static readonly global::System.Func<global::GraphQL.IResolveFieldContext, global::GraphQL.StarWars.TypeFirst.Types.StarWarsQuery> _getMemberInstance;
+
+        static StarWarsQueryGraphType()
         {
+            _getMemberInstance = GetMemberInstanceFromSource;
+
             _members = new()
             {
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsQuery).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsQuery.HeroAsync), [typeof(global::GraphQL.StarWars.TypeFirst.StarWarsData)])!, ConstructField0_HeroAsync },
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsQuery).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsQuery.HumanAsync), [typeof(global::GraphQL.StarWars.TypeFirst.StarWarsData), typeof(string)])!, ConstructField1_HumanAsync },
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsQuery).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsQuery.DroidAsync), [typeof(global::GraphQL.StarWars.TypeFirst.StarWarsData), typeof(string)])!, ConstructField2_DroidAsync },
             };
+        }
+
+        public StarWarsQueryGraphType() : this(_cache)
+        {
+        }
+
+        private StarWarsQueryGraphType(StarWarsQueryGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new StarWarsQueryGraphType(this);
             }
         }
 
@@ -519,7 +712,9 @@ internal partial class StarWarsSchema
             _members[memberInfo](fieldType, memberInfo);
         }
 
-        public void ConstructField0_HeroAsync(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        protected static global::GraphQL.StarWars.TypeFirst.Types.StarWarsQuery GetMemberInstance(global::GraphQL.IResolveFieldContext context) => _getMemberInstance(context);
+
+        public static void ConstructField0_HeroAsync(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             var parameters = ((global::System.Reflection.MethodInfo)memberInfo).GetParameters();
             var param0 = BuildArgument<global::GraphQL.StarWars.TypeFirst.StarWarsData>(fieldType, parameters[0]);
@@ -530,7 +725,7 @@ internal partial class StarWarsSchema
             }, true);
         }
 
-        public void ConstructField1_HumanAsync(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField1_HumanAsync(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             var parameters = ((global::System.Reflection.MethodInfo)memberInfo).GetParameters();
             var param0 = BuildArgument<global::GraphQL.StarWars.TypeFirst.StarWarsData>(fieldType, parameters[0]);
@@ -543,7 +738,7 @@ internal partial class StarWarsSchema
             }, true);
         }
 
-        public void ConstructField2_DroidAsync(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
+        public static void ConstructField2_DroidAsync(global::GraphQL.Types.FieldType fieldType, global::System.Reflection.MemberInfo memberInfo)
         {
             var parameters = ((global::System.Reflection.MethodInfo)memberInfo).GetParameters();
             var param0 = BuildArgument<global::GraphQL.StarWars.TypeFirst.StarWarsData>(fieldType, parameters[0]);
