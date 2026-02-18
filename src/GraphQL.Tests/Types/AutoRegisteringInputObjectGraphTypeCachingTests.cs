@@ -96,4 +96,51 @@ public class AutoRegisteringInputObjectGraphTypeCachingTests
         [Obsolete("Dep2")]
         public int Value { get; set; }
     }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void IsOneOf_Is_Copied_During_Caching(bool withCaching)
+    {
+        TestGraphTypeWithIsOneOf.Configured = false;
+        GlobalSwitches.EnableReflectionCaching = withCaching;
+        try
+        {
+            var graph1 = new TestGraphTypeWithIsOneOf();
+            graph1.IsOneOf.ShouldBeTrue();
+
+            if (!withCaching)
+            {
+                Should.Throw<AlreadyConfiguredException>(() => new TestGraphTypeWithIsOneOf());
+                TestGraphTypeWithIsOneOf.Configured = false;
+            }
+            var graph2 = new TestGraphTypeWithIsOneOf();
+            graph2.IsOneOf.ShouldBeTrue();
+        }
+        finally
+        {
+            GlobalSwitches.EnableReflectionCaching = false;
+            TestGraphTypeWithIsOneOf.Configured = false;
+        }
+    }
+
+    private class TestGraphTypeWithIsOneOf : AutoRegisteringInputObjectGraphType<Class2>
+    {
+        public static bool Configured { get; set; }
+
+        protected override void ConfigureGraph()
+        {
+            base.ConfigureGraph();
+            if (Configured)
+                throw new AlreadyConfiguredException();
+            Configured = true;
+            IsOneOf = true;
+        }
+    }
+
+    private class Class2
+    {
+        public string? Option1 { get; set; }
+        public string? Option2 { get; set; }
+    }
 }
