@@ -3547,7 +3547,7 @@ namespace GraphQL.Types.Aot
     [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", @"IL2091: 'target generic parameter' generic argument does not satisfy 'DynamicallyAccessedMembersAttribute' in 'target method or type'. The generic parameter 'source target parameter' of 'source method or type' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to", Justification="Code using reflection to access unreferenced members has been disabled.")]
     public abstract class AotAutoRegisteringInputObjectGraphType<T> : GraphQL.Types.AutoRegisteringInputObjectGraphType<T>
     {
-        public AotAutoRegisteringInputObjectGraphType() { }
+        public AotAutoRegisteringInputObjectGraphType(GraphQL.Types.Aot.AotAutoRegisteringInputObjectGraphType<T>? cloneFrom) { }
         protected override System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
         public override bool IsValidDefault(object value) { }
         public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }

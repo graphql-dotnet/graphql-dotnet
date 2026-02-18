@@ -269,19 +269,39 @@ internal partial class StarWarsSchema
 {
     private class HumanInputGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringInputObjectGraphType<global::GraphQL.StarWars.TypeFirst.Types.HumanInput>
     {
-        private readonly global::System.Reflection.MemberInfo[] _members;
+        private static HumanInputGraphType? _cache;
+        private static readonly global::System.Reflection.MemberInfo[] _members;
         private readonly global::GraphQL.Types.FieldType[] _fields;
 
-        public HumanInputGraphType()
+        static HumanInputGraphType()
         {
             _members = [
                 typeof(global::GraphQL.StarWars.TypeFirst.Types.HumanInput).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.Types.HumanInput.Name))!,
                 typeof(global::GraphQL.StarWars.TypeFirst.Types.HumanInput).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.Types.HumanInput.HomePlanet))!
             ];
+        }
+
+        public HumanInputGraphType() : this(_cache)
+        {
+        }
+
+        private HumanInputGraphType(HumanInputGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                _fields = global::System.Linq.Enumerable.ToArray(cloneFrom.Fields);
+                return;
+            }
+
             _fields = global::System.Linq.Enumerable.ToArray(ProvideFields());
             foreach (var fieldType in _fields)
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new HumanInputGraphType(this);
             }
         }
 

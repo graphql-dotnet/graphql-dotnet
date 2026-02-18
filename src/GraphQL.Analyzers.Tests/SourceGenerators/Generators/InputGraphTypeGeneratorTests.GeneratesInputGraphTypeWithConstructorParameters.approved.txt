@@ -7,20 +7,40 @@ public partial class SampleAotSchema
 {
     private class AutoInputGraphType_PersonInput : global::GraphQL.Types.Aot.AotAutoRegisteringInputObjectGraphType<global::Sample.PersonInput>
     {
-        private readonly global::System.Reflection.MemberInfo[] _members;
+        private static AutoInputGraphType_PersonInput? _cache;
+        private static readonly global::System.Reflection.MemberInfo[] _members;
         private readonly global::GraphQL.Types.FieldType[] _fields;
 
-        public AutoInputGraphType_PersonInput()
+        static AutoInputGraphType_PersonInput()
         {
             _members = [
                 typeof(global::Sample.PersonInput).GetProperty(nameof(global::Sample.PersonInput.FirstName))!,
                 typeof(global::Sample.PersonInput).GetProperty(nameof(global::Sample.PersonInput.LastName))!,
                 typeof(global::Sample.PersonInput).GetProperty(nameof(global::Sample.PersonInput.Email))!
             ];
+        }
+
+        public AutoInputGraphType_PersonInput() : this(_cache)
+        {
+        }
+
+        private AutoInputGraphType_PersonInput(AutoInputGraphType_PersonInput? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                _fields = global::System.Linq.Enumerable.ToArray(cloneFrom.Fields);
+                return;
+            }
+
             _fields = global::System.Linq.Enumerable.ToArray(ProvideFields());
             foreach (var fieldType in _fields)
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new AutoInputGraphType_PersonInput(this);
             }
         }
 
