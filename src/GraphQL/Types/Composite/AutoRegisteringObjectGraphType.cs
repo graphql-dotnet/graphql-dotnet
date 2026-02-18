@@ -24,7 +24,7 @@ public class AutoRegisteringObjectGraphType<[NotAGraphType] TSourceType> : Objec
     /// Initializes a new instance of the <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> class without adding any fields.
     /// </summary>
     /// <param name="configureGraph">When true, sets the name and processes all attributes defined for the source type.</param>
-    /// <param name="cloneFrom">When not null, clones fields the specified instance. This is used internally for caching instances when <see cref="GlobalSwitches.EnableReflectionCaching"/> is enabled.</param>
+    /// <param name="cloneFrom">When not null, clones fields from the specified instance. This is used internally for caching instances when <see cref="GlobalSwitches.EnableReflectionCaching"/> is enabled.</param>
     internal AutoRegisteringObjectGraphType(bool configureGraph, AutoRegisteringObjectGraphType<TSourceType>? cloneFrom)
     {
         if (configureGraph && cloneFrom == null)
