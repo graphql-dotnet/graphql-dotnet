@@ -11,9 +11,20 @@ public partial class OuterClass
         {
             private class AutoOutputGraphType_Person : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::Sample.Person>
             {
-                private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-                public AutoOutputGraphType_Person()
+                private static AutoOutputGraphType_Person? _cache;
+                private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members = null!;
+
+                public AutoOutputGraphType_Person() : this(_cache)
                 {
+                }
+
+                private AutoOutputGraphType_Person(AutoOutputGraphType_Person? cloneFrom) : base(cloneFrom)
+                {
+                    if (cloneFrom != null)
+                    {
+                        return;
+                    }
+
                     _members = new()
                     {
                         { typeof(global::Sample.Person).GetProperty(nameof(global::Sample.Person.Name))!, ConstructField0_Name },
@@ -21,6 +32,11 @@ public partial class OuterClass
                     foreach (var fieldType in ProvideFields())
                     {
                         AddField(fieldType);
+                    }
+
+                    if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+                    {
+                        _cache = new AutoOutputGraphType_Person(this);
                     }
                 }
 

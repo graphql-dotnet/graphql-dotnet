@@ -7,9 +7,20 @@ public partial class SampleAotSchema
 {
     private class AutoOutputGraphType_Droid : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::GraphQL.StarWars.TypeFirst.Types.Droid>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public AutoOutputGraphType_Droid()
+        private static AutoOutputGraphType_Droid? _cache;
+        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members = null!;
+
+        public AutoOutputGraphType_Droid() : this(_cache)
         {
+        }
+
+        private AutoOutputGraphType_Droid(AutoOutputGraphType_Droid? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             _members = new()
             {
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.Droid).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.Types.Droid.Id))!, ConstructField0_Id },
@@ -26,6 +37,11 @@ public partial class SampleAotSchema
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new AutoOutputGraphType_Droid(this);
             }
         }
 

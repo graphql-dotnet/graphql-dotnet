@@ -9,9 +9,20 @@ internal partial class StarWarsSchema
 {
     private class ConnectionGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::GraphQL.Types.Relay.DataObjects.Connection<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public ConnectionGraphType()
+        private static ConnectionGraphType? _cache;
+        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members = null!;
+
+        public ConnectionGraphType() : this(_cache)
         {
+        }
+
+        private ConnectionGraphType(ConnectionGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             _members = new()
             {
                 { typeof(global::GraphQL.Types.Relay.DataObjects.Connection<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter, global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>>).GetProperty(nameof(global::GraphQL.Types.Relay.DataObjects.Connection<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter, global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>>.TotalCount))!, ConstructField0_TotalCount },
@@ -22,6 +33,11 @@ internal partial class StarWarsSchema
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new ConnectionGraphType(this);
             }
         }
 
@@ -64,9 +80,20 @@ internal partial class StarWarsSchema
 {
     private class DroidGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::GraphQL.StarWars.TypeFirst.Types.Droid>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public DroidGraphType()
+        private static DroidGraphType? _cache;
+        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members = null!;
+
+        public DroidGraphType() : this(_cache)
         {
+        }
+
+        private DroidGraphType(DroidGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             _members = new()
             {
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.Droid).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.Types.Droid.PrimaryFunction))!, ConstructField0_PrimaryFunction },
@@ -79,6 +106,11 @@ internal partial class StarWarsSchema
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new DroidGraphType(this);
             }
         }
 
@@ -145,9 +177,20 @@ internal partial class StarWarsSchema
 {
     private class EdgeGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public EdgeGraphType()
+        private static EdgeGraphType? _cache;
+        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members = null!;
+
+        public EdgeGraphType() : this(_cache)
         {
+        }
+
+        private EdgeGraphType(EdgeGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             _members = new()
             {
                 { typeof(global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>).GetProperty(nameof(global::GraphQL.Types.Relay.DataObjects.Edge<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>.Cursor))!, ConstructField0_Cursor },
@@ -156,6 +199,11 @@ internal partial class StarWarsSchema
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new EdgeGraphType(this);
             }
         }
 
@@ -188,9 +236,20 @@ internal partial class StarWarsSchema
 {
     private class HumanGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::GraphQL.StarWars.TypeFirst.Types.Human>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public HumanGraphType()
+        private static HumanGraphType? _cache;
+        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members = null!;
+
+        public HumanGraphType() : this(_cache)
         {
+        }
+
+        private HumanGraphType(HumanGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             _members = new()
             {
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.Human).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.Types.Human.HomePlanet))!, ConstructField0_HomePlanet },
@@ -203,6 +262,11 @@ internal partial class StarWarsSchema
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new HumanGraphType(this);
             }
         }
 
@@ -377,9 +441,20 @@ internal partial class StarWarsSchema
 {
     private class IStarWarsCharacterGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringInterfaceGraphType<global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>?> _members;
-        public IStarWarsCharacterGraphType()
+        private static IStarWarsCharacterGraphType? _cache;
+        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>?> _members = null!;
+
+        public IStarWarsCharacterGraphType() : this(_cache)
         {
+        }
+
+        private IStarWarsCharacterGraphType(IStarWarsCharacterGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             _members = new()
             {
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.Types.IStarWarsCharacter.Id))!, null },
@@ -391,6 +466,11 @@ internal partial class StarWarsSchema
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new IStarWarsCharacterGraphType(this);
             }
         }
 
@@ -418,9 +498,20 @@ internal partial class StarWarsSchema
 {
     private class PageInfoGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::GraphQL.Types.Relay.DataObjects.PageInfo>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public PageInfoGraphType()
+        private static PageInfoGraphType? _cache;
+        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members = null!;
+
+        public PageInfoGraphType() : this(_cache)
         {
+        }
+
+        private PageInfoGraphType(PageInfoGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             _members = new()
             {
                 { typeof(global::GraphQL.Types.Relay.DataObjects.PageInfo).GetProperty(nameof(global::GraphQL.Types.Relay.DataObjects.PageInfo.HasNextPage))!, ConstructField0_HasNextPage },
@@ -431,6 +522,11 @@ internal partial class StarWarsSchema
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new PageInfoGraphType(this);
             }
         }
 
@@ -473,9 +569,20 @@ internal partial class StarWarsSchema
 {
     private class StarWarsMutationGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::GraphQL.StarWars.TypeFirst.Types.StarWarsMutation>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public StarWarsMutationGraphType()
+        private static StarWarsMutationGraphType? _cache;
+        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members = null!;
+
+        public StarWarsMutationGraphType() : this(_cache)
         {
+        }
+
+        private StarWarsMutationGraphType(StarWarsMutationGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             _members = new()
             {
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsMutation).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsMutation.CreateHuman), [typeof(global::GraphQL.StarWars.TypeFirst.StarWarsData), typeof(global::GraphQL.StarWars.TypeFirst.Types.HumanInput)])!, ConstructField0_CreateHuman },
@@ -483,6 +590,11 @@ internal partial class StarWarsSchema
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new StarWarsMutationGraphType(this);
             }
         }
 
@@ -518,9 +630,20 @@ internal partial class StarWarsSchema
 {
     private class StarWarsQueryGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::GraphQL.StarWars.TypeFirst.Types.StarWarsQuery>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public StarWarsQueryGraphType()
+        private static StarWarsQueryGraphType? _cache;
+        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members = null!;
+
+        public StarWarsQueryGraphType() : this(_cache)
         {
+        }
+
+        private StarWarsQueryGraphType(StarWarsQueryGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             _members = new()
             {
                 { typeof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsQuery).GetMethod(nameof(global::GraphQL.StarWars.TypeFirst.Types.StarWarsQuery.HeroAsync), [typeof(global::GraphQL.StarWars.TypeFirst.StarWarsData)])!, ConstructField0_HeroAsync },
@@ -530,6 +653,11 @@ internal partial class StarWarsSchema
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new StarWarsQueryGraphType(this);
             }
         }
 
