@@ -27,19 +27,28 @@
   </ItemDefinitionGroup>
 
   <ItemGroup>
+    <!-- Add explicit reference to resolve version conflict between Roslyn 4.8 and 4.13 -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.13.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.csproj" />
+    <ProjectReference Include="..\GraphQL.Analyzers.Interceptors\GraphQL.Analyzers.Interceptors.csproj" />
     <ProjectReference Include="..\GraphQL.Analyzers.SourceGenerators\GraphQL.Analyzers.SourceGenerators.csproj" />
     <ProjectReference Include="..\GraphQL.Analyzers\GraphQL.Analyzers.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="tools\*.ps1" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="" />
+    <None Include="build\GraphQL.Analyzers.props" Pack="true" PackagePath="build" />
+    <None Include="build\GraphQL.Analyzers.targets" Pack="true" PackagePath="build" />
   </ItemGroup>
 
   <Target Name="_AddAnalyzersToOutput" DependsOnTargets="ResolveProjectReferences">
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(OutputPath)\GraphQL.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
       <TfmSpecificPackageFile Include="$(OutputPath)\GraphQL.Analyzers.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\GraphQL.Analyzers.Interceptors.dll" PackagePath="analyzers/dotnet/cs" />
       <TfmSpecificPackageFile Include="$(OutputPath)\GraphQL.Analyzers.SourceGenerators.dll" PackagePath="analyzers/dotnet/cs" />
       <TfmSpecificPackageFile Include="..\GraphQL.Analyzers\bin\$(Configuration)\netstandard2.0\GraphQLParser.dll" PackagePath="analyzers/dotnet/cs" />
     </ItemGroup>
