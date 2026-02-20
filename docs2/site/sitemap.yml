@@ -75,6 +75,8 @@
       - title: Guides
         dir: guides
         items:
+          - title: ASP.NET Core Integration
+            file: aspnetcore.md
           - title: Serialization
             file: serialization.md
           - title: Dataloader
