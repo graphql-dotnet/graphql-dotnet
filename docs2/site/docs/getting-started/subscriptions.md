@@ -43,3 +43,45 @@ public class ChatSubscriptions : ObjectGraphType
 ```
 
 > See this full schema [here](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL.Tests/Subscription/SubscriptionSchema.cs).
+
+## Cleanup when a subscription stops
+
+A subscription resolver returns an `IObservable<T>`, and the transport layer subscribes to it.
+When the client unsubscribes (or disconnects), the transport layer disposes the `IDisposable`
+returned by `Subscribe(...)`.
+
+If your subscription stream allocates resources (timers, event handlers, sockets, etc.), put
+cleanup logic in that disposable.
+
+```csharp
+public sealed class MessageStream : IObservable<string>
+{
+    public IDisposable Subscribe(IObserver<string> observer)
+    {
+        var timer = new Timer(_ => observer.OnNext(DateTime.UtcNow.ToString("O")),
+            state: null,
+            dueTime: TimeSpan.Zero,
+            period: TimeSpan.FromSeconds(1));
+
+        return new TimerSubscription(timer);
+    }
+
+    private sealed class TimerSubscription : IDisposable
+    {
+        private readonly Timer _timer;
+
+        public TimerSubscription(Timer timer)
+        {
+            _timer = timer;
+        }
+
+        public void Dispose()
+        {
+            _timer.Dispose();
+        }
+    }
+}
+```
+
+In a GraphQL subscription, this means your resource cleanup runs automatically when the
+subscription is completed by the client.
