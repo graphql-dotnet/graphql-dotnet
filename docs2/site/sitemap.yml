@@ -72,6 +72,11 @@
             file: relay.md
           - title: Global Switches
             file: global-switches.md
+      - title: Server
+        dir: server
+        items:
+          - title: Overview
+            file: overview.md
       - title: Guides
         dir: guides
         items:
