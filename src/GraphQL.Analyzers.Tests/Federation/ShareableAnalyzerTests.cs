@@ -80,6 +80,29 @@ public class ShareableAnalyzerTests
     }
 
     [Theory]
+    [InlineData("UnionGraphType")]
+    [InlineData("EnumerationGraphType")]
+    public async Task OtherGraphType_NoDiagnostics(string parentType)
+    {
+        string source =
+            $$"""
+            using GraphQL.Types;
+            using GraphQL.Federation;
+
+            namespace Sample.Server;
+
+            public class Product{{parentType}} : {{parentType}}
+            {
+                public Product{{parentType}}()
+                {
+                }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Theory]
     [InlineData("InterfaceGraphType", "interface")]
     [InlineData("InputObjectGraphType", "input")]
     public async Task NonObject_WithMultipleShareableFields_ReportAllShareableField(string parentType, string type)

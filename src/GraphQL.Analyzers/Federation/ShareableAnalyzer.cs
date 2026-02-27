@@ -36,7 +36,7 @@ public class ShareableAnalyzer : DiagnosticAnalyzer
     private void AnalyzeGraphQLGraphType(GraphQLGraphType graphType, SyntaxNodeAnalysisContext context)
     {
         // Only check interface types and input types
-        if (graphType.IsObjectType)
+        if (!graphType.IsInterfaceType && !graphType.IsInputType)
             return;
 
         string typeKind = graphType.IsInterfaceType ? "interface" : "input";
