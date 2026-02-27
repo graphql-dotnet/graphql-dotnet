@@ -7,15 +7,31 @@ public partial class SampleAotSchema
 {
     private class AutoOutputGraphType_EmptyType : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::Sample.EmptyType>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public AutoOutputGraphType_EmptyType()
+        private static AutoOutputGraphType_EmptyType? _cache;
+        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members = null!;
+
+        public AutoOutputGraphType_EmptyType() : this(_cache)
         {
+        }
+
+        private AutoOutputGraphType_EmptyType(AutoOutputGraphType_EmptyType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             _members = new()
             {
             };
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new AutoOutputGraphType_EmptyType(this);
             }
         }
 

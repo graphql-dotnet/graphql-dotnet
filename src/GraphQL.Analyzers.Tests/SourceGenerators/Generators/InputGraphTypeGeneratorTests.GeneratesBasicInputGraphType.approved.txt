@@ -7,19 +7,39 @@ public partial class SampleAotSchema
 {
     private class AutoInputGraphType_HumanInput : global::GraphQL.Types.Aot.AotAutoRegisteringInputObjectGraphType<global::GraphQL.StarWars.TypeFirst.Types.HumanInput>
     {
-        private readonly global::System.Reflection.MemberInfo[] _members;
+        private static AutoInputGraphType_HumanInput? _cache;
+        private static readonly global::System.Reflection.MemberInfo[] _members;
         private readonly global::GraphQL.Types.FieldType[] _fields;
 
-        public AutoInputGraphType_HumanInput()
+        static AutoInputGraphType_HumanInput()
         {
             _members = [
                 typeof(global::GraphQL.StarWars.TypeFirst.Types.HumanInput).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.Types.HumanInput.Name))!,
                 typeof(global::GraphQL.StarWars.TypeFirst.Types.HumanInput).GetProperty(nameof(global::GraphQL.StarWars.TypeFirst.Types.HumanInput.HomePlanet))!
             ];
+        }
+
+        public AutoInputGraphType_HumanInput() : this(_cache)
+        {
+        }
+
+        private AutoInputGraphType_HumanInput(AutoInputGraphType_HumanInput? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                _fields = global::System.Linq.Enumerable.ToArray(cloneFrom.Fields);
+                return;
+            }
+
             _fields = global::System.Linq.Enumerable.ToArray(ProvideFields());
             foreach (var fieldType in _fields)
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new AutoInputGraphType_HumanInput(this);
             }
         }
 

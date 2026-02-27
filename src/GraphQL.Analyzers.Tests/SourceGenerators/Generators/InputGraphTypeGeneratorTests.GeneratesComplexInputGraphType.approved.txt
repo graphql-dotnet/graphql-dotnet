@@ -7,10 +7,11 @@ public partial class SampleAotSchema
 {
     private class AutoInputGraphType_ComplexInput : global::GraphQL.Types.Aot.AotAutoRegisteringInputObjectGraphType<global::Sample.ComplexInput>
     {
-        private readonly global::System.Reflection.MemberInfo[] _members;
+        private static AutoInputGraphType_ComplexInput? _cache;
+        private static readonly global::System.Reflection.MemberInfo[] _members;
         private readonly global::GraphQL.Types.FieldType[] _fields;
 
-        public AutoInputGraphType_ComplexInput()
+        static AutoInputGraphType_ComplexInput()
         {
             _members = [
                 typeof(global::Sample.ComplexInput).GetProperty(nameof(global::Sample.ComplexInput.Id))!,
@@ -19,10 +20,29 @@ public partial class SampleAotSchema
                 typeof(global::Sample.ComplexInput).GetProperty(nameof(global::Sample.ComplexInput.Tags))!,
                 typeof(global::Sample.ComplexInput).GetProperty(nameof(global::Sample.ComplexInput.Metadata))!
             ];
+        }
+
+        public AutoInputGraphType_ComplexInput() : this(_cache)
+        {
+        }
+
+        private AutoInputGraphType_ComplexInput(AutoInputGraphType_ComplexInput? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                _fields = global::System.Linq.Enumerable.ToArray(cloneFrom.Fields);
+                return;
+            }
+
             _fields = global::System.Linq.Enumerable.ToArray(ProvideFields());
             foreach (var fieldType in _fields)
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new AutoInputGraphType_ComplexInput(this);
             }
         }
 

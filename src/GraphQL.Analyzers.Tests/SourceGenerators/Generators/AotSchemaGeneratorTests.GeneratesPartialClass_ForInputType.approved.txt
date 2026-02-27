@@ -11,18 +11,38 @@ public partial class MySchema
 {
     private class MyInputGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringInputObjectGraphType<global::Sample.MyInput>
     {
-        private readonly global::System.Reflection.MemberInfo[] _members;
+        private static MyInputGraphType? _cache;
+        private static readonly global::System.Reflection.MemberInfo[] _members;
         private readonly global::GraphQL.Types.FieldType[] _fields;
 
-        public MyInputGraphType()
+        static MyInputGraphType()
         {
             _members = [
                 typeof(global::Sample.MyInput).GetProperty(nameof(global::Sample.MyInput.Name))!
             ];
+        }
+
+        public MyInputGraphType() : this(_cache)
+        {
+        }
+
+        private MyInputGraphType(MyInputGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                _fields = global::System.Linq.Enumerable.ToArray(cloneFrom.Fields);
+                return;
+            }
+
             _fields = global::System.Linq.Enumerable.ToArray(ProvideFields());
             foreach (var fieldType in _fields)
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new MyInputGraphType(this);
             }
         }
 
