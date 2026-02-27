@@ -967,7 +967,7 @@ public class GraphQLGraphTypeTests
     [Theory]
     [InlineData("this.Shareable();", true)]
     [InlineData(null, false)]
-    public async Task IsSharableObject_CorrectlyResolve(string? directive, bool isSharable)
+    public async Task IsShareableObject_CorrectlyResolve(string? directive, bool isShareable)
     {
         var context = await TestContext.CreateAsync(
             $$"""
@@ -993,7 +993,7 @@ public class GraphQLGraphTypeTests
         var graphType = GraphQLGraphType.TryCreate(classDeclaration, context.SemanticModel);
 
         graphType.ShouldNotBeNull();
-        if (isSharable)
+        if (isShareable)
         {
             graphType.IsShareable.ShouldNotBeNull();
             graphType.IsShareable!.Value.ShouldBeTrue();

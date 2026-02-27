@@ -1,11 +1,11 @@
 using GraphQL.Analyzers.Federation;
 using Microsoft.CodeAnalysis.Testing;
 using VerifyCS = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpAnalyzerVerifier<
-    GraphQL.Analyzers.Federation.SharableAnalyzer>;
+    GraphQL.Analyzers.Federation.ShareableAnalyzer>;
 
 namespace GraphQL.Analyzers.Tests.Federation;
 
-public class SharableAnalyzerTests
+public class ShareableAnalyzerTests
 {
     [Fact]
     public async Task Sanity_NoDiagnostics()
@@ -44,7 +44,7 @@ public class SharableAnalyzerTests
     [InlineData("InputObjectGraphType", "input", ".{|#0:Shareable()|}", true)]
     [InlineData("InterfaceGraphType", "interface", null, false)]
     [InlineData("InputObjectGraphType", "input", null, false)]
-    public async Task NonObject_ReportWhenSharableField(string parentType, string type, string? directive, bool report)
+    public async Task NonObject_ReportWhenShareableField(string parentType, string type, string? directive, bool report)
     {
         string source =
             $$"""
@@ -70,7 +70,7 @@ public class SharableAnalyzerTests
         var expected = report
             ?
             [
-                VerifyCS.Diagnostic(SharableAnalyzer.ShareableNotAllowedOnInterface)
+                VerifyCS.Diagnostic(ShareableAnalyzer.ShareableNotAllowedOnInterface)
                     .WithLocation(0)
                     .WithArguments("name", type, $"Product{parentType}")
             ]
@@ -82,7 +82,7 @@ public class SharableAnalyzerTests
     [Theory]
     [InlineData("InterfaceGraphType", "interface")]
     [InlineData("InputObjectGraphType", "input")]
-    public async Task NonObject_WithMultipleShareableFields_ReportAllSharableField(string parentType, string type)
+    public async Task NonObject_WithMultipleShareableFields_ReportAllShareableField(string parentType, string type)
     {
         string source =
             $$"""
@@ -104,10 +104,10 @@ public class SharableAnalyzerTests
 
         var expected = new[]
         {
-            VerifyCS.Diagnostic(SharableAnalyzer.ShareableNotAllowedOnInterface)
+            VerifyCS.Diagnostic(ShareableAnalyzer.ShareableNotAllowedOnInterface)
                 .WithLocation(0)
                 .WithArguments("name", type, $"Product{parentType}"),
-            VerifyCS.Diagnostic(SharableAnalyzer.ShareableNotAllowedOnInterface)
+            VerifyCS.Diagnostic(ShareableAnalyzer.ShareableNotAllowedOnInterface)
                 .WithLocation(1)
                 .WithArguments("description", type, $"Product{parentType}")
         };

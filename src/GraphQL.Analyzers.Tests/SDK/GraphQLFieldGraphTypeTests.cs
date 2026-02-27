@@ -232,7 +232,7 @@ public class GraphQLFieldGraphTypeTests
     [Theory]
     [InlineData(".Shareable()", true)]
     [InlineData("", false)]
-    public async Task IsShareable_WithShareableMethod_ReturnsTrue(string extensionMethod, bool isSharable)
+    public async Task IsShareable_WithShareableMethod_ReturnsTrue(string extensionMethod, bool isShareable)
     {
         var context = await TestContext.CreateAsync(
             $$"""
@@ -254,7 +254,7 @@ public class GraphQLFieldGraphTypeTests
         var field = GraphQLFieldInvocation.TryCreate(invocation, context.SemanticModel);
 
         field.ShouldNotBeNull();
-        if (isSharable)
+        if (isShareable)
         {
             field.IsShareable.ShouldNotBeNull();
             field.IsShareable!.Value.ShouldBeTrue();

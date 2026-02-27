@@ -12,7 +12,7 @@ namespace GraphQL.Analyzers.Federation;
 /// not on interface types or input types.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class SharableAnalyzer : DiagnosticAnalyzer
+public class ShareableAnalyzer : DiagnosticAnalyzer
 {
     public static readonly DiagnosticDescriptor ShareableNotAllowedOnInterface = new(
         id: DiagnosticIds.SHAREABLE_NOT_ALLOWED_ON_INTERFACE_OR_INPUT,

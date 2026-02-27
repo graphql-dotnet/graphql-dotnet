@@ -14,4 +14,4 @@ GQLFED003 | Federation | Warning | KeyAnalyzer, [Documentation](https://graphql-
 GQLFED004 | Federation | Warning | KeyAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gqlfed004)
 GQLFED005 | Federation | Error | KeyAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gqlfed005)
 GQLFED006 | Federation | Error | KeyAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gqlfed006)
-GQLFED007 | Federation | Error | SharableAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gqlfed007)
+GQLFED007 | Federation | Error | ShareableAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gqlfed007)
