@@ -45,6 +45,7 @@ public class ObjectGraphType<[NotAGraphType] TSourceType> : ComplexGraphType<TSo
             return;
         }
         IsTypeOf = cloneFrom.IsTypeOf;
+        SkipTypeCheck = cloneFrom.SkipTypeCheck;
         Interfaces = cloneFrom.Interfaces;
         if (cloneFrom.ResolvedInterfaces.Count > 0)
             throw new InvalidOperationException("Cannot clone ObjectGraphType when ResolvedInterfaces contains items.");

@@ -58,7 +58,10 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
     internal InputObjectGraphType(InputObjectGraphType<TSourceType>? cloneFrom)
         : base(cloneFrom)
     {
-        // if (cloneFrom == null) { /* initialization logic */ }
+        if (cloneFrom != null)
+        {
+            IsOneOf = cloneFrom.IsOneOf;
+        }
 
         if (typeof(TSourceType) == typeof(object))
         {
