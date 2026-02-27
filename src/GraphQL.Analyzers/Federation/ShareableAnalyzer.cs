@@ -14,7 +14,7 @@ namespace GraphQL.Analyzers.Federation;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class ShareableAnalyzer : DiagnosticAnalyzer
 {
-    public static readonly DiagnosticDescriptor ShareableNotAllowedOnInterface = new(
+    public static readonly DiagnosticDescriptor ShareableNotAllowedOnInterfaceOrInput = new(
         id: DiagnosticIds.SHAREABLE_NOT_ALLOWED_ON_INTERFACE_OR_INPUT,
         title: "@shareable directive is not allowed on interface or input types",
         messageFormat: "Field '{0}' on {1} type '{2}' cannot use @shareable directive which is only allowed on object types",
@@ -24,7 +24,7 @@ public class ShareableAnalyzer : DiagnosticAnalyzer
         helpLinkUri: HelpLinks.SHAREABLE_NOT_ALLOWED_ON_INTERFACE_OR_INPUT);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(ShareableNotAllowedOnInterface);
+        ImmutableArray.Create(ShareableNotAllowedOnInterfaceOrInput);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -46,7 +46,7 @@ public class ShareableAnalyzer : DiagnosticAnalyzer
             {
                 var fieldName = field.GetName()?.Value ?? "<unknown>";
                 var diagnostic = Diagnostic.Create(
-                    ShareableNotAllowedOnInterface,
+                    ShareableNotAllowedOnInterfaceOrInput,
                     field.IsShareable.Location,
                     fieldName,
                     typeKind,

@@ -70,7 +70,7 @@ public class ShareableAnalyzerTests
         var expected = report
             ?
             [
-                VerifyCS.Diagnostic(ShareableAnalyzer.ShareableNotAllowedOnInterface)
+                VerifyCS.Diagnostic(ShareableAnalyzer.ShareableNotAllowedOnInterfaceOrInput)
                     .WithLocation(0)
                     .WithArguments("name", type, $"Product{parentType}")
             ]
@@ -104,10 +104,10 @@ public class ShareableAnalyzerTests
 
         var expected = new[]
         {
-            VerifyCS.Diagnostic(ShareableAnalyzer.ShareableNotAllowedOnInterface)
+            VerifyCS.Diagnostic(ShareableAnalyzer.ShareableNotAllowedOnInterfaceOrInput)
                 .WithLocation(0)
                 .WithArguments("name", type, $"Product{parentType}"),
-            VerifyCS.Diagnostic(ShareableAnalyzer.ShareableNotAllowedOnInterface)
+            VerifyCS.Diagnostic(ShareableAnalyzer.ShareableNotAllowedOnInterfaceOrInput)
                 .WithLocation(1)
                 .WithArguments("description", type, $"Product{parentType}")
         };
