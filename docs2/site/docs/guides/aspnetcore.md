@@ -6,7 +6,7 @@ For complete documentation, samples, and advanced configuration options, please 
 
 ## Quick Start
 
-Below is a complete sample of a .NET 8 console app that hosts a GraphQL endpoint at `http://localhost:5000/graphql`:
+Below is a complete sample of a .NET 10 console app that hosts a GraphQL endpoint at `http://localhost:5000/graphql`:
 
 ### Project file
 
@@ -14,7 +14,7 @@ Below is a complete sample of a .NET 8 console app that hosts a GraphQL endpoint
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
