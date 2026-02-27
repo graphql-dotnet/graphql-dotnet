@@ -1,0 +1,57 @@
+# This file defines the structure of the documentation sidebar/navigation.
+# Each entry corresponds to a page in docs2/site/docs/.
+
+- title: Introduction
+  href: /
+- title: Getting Started
+  href: /getting-started
+- title: Schema
+  items:
+    - title: Schema Types
+      href: /schema-types
+    - title: Scalars
+      href: /scalars
+    - title: Schema SDL
+      href: /schema-sdl
+- title: Queries
+  items:
+    - title: Queries and Mutations
+      href: /queries
+    - title: Variables
+      href: /variables
+    - title: Directives
+      href: /directives
+    - title: Fragments
+      href: /fragments
+- title: Resolvers
+  items:
+    - title: Field Middleware
+      href: /field-middleware
+    - title: DataLoader
+      href: /dataloader
+- title: Execution
+  items:
+    - title: Execution Options
+      href: /execution-options
+    - title: Document Listeners
+      href: /document-listeners
+    - title: Errors
+      href: /errors
+    - title: Complexity Analyzer
+      href: /complexity-analyzer
+    - title: Security
+      href: /security
+- title: Subscriptions
+  href: /subscriptions
+- title: Server
+  items:
+    - title: GraphQL.NET Server
+      href: /server
+- title: Analyzers
+  items:
+    - title: GQL001
+      href: /analyzers/gql001
+    - title: GQL002
+      href: /analyzers/gql002
+    - title: GQL003
+      href: /analyzers/gql003
