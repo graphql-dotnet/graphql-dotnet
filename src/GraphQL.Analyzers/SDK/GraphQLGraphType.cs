@@ -251,7 +251,7 @@ public sealed class GraphQLGraphType
             if (!invocation.IsGraphQLMethodInvocation(SemanticModel, "Shareable"))
                 continue;
 
-            // Only accept type-level calls: this.Shareable() or Shareable()
+            // Only accept type-level calls: this.Shareable()
             if (invocation.Parent is MemberAccessExpressionSyntax)
                 continue;
 
@@ -261,14 +261,6 @@ public sealed class GraphQLGraphType
                     continue;
 
                 var nameStart = memberAccess.Name.SpanStart;
-                var invocationEnd = invocation.Span.End;
-                var span = Microsoft.CodeAnalysis.Text.TextSpan.FromBounds(nameStart, invocationEnd);
-                return new GraphQLObjectProperty<bool>(true, Location.Create(invocation.SyntaxTree, span));
-            }
-
-            if (invocation.Expression is IdentifierNameSyntax)
-            {
-                var nameStart = invocation.SpanStart;
                 var invocationEnd = invocation.Span.End;
                 var span = Microsoft.CodeAnalysis.Text.TextSpan.FromBounds(nameStart, invocationEnd);
                 return new GraphQLObjectProperty<bool>(true, Location.Create(invocation.SyntaxTree, span));
