@@ -32,4 +32,5 @@ public static class DiagnosticIds
     public const string REDUNDANT_KEY = "GQLFED004";
     public const string KEY_FIELD_MUST_NOT_HAVE_ARGUMENTS = "GQLFED005";
     public const string KEY_FIELD_MUST_NOT_BE_INTERFACE_OR_UNION = "GQLFED006";
+    public const string SHAREABLE_NOT_ALLOWED_ON_INTERFACE_OR_INPUT = "GQLFED007";
 }

@@ -840,4 +840,168 @@ public class GraphQLGraphTypeTests
         graphType.IsUnionType.ShouldBeFalse();
         graphType.IsOutputType.ShouldBeTrue();
     }
+
+    [Fact]
+    public async Task IsObjectType_ObjectGraphType_ReturnsTrue()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class MyType : ObjectGraphType
+            {
+                public MyType()
+                {
+                    Field<StringGraphType>("name");
+                }
+            }
+            """);
+
+        var classDeclaration = context.Root.DescendantNodes()
+            .OfType<ClassDeclarationSyntax>()
+            .First();
+
+        var graphType = GraphQLGraphType.TryCreate(classDeclaration, context.SemanticModel);
+
+        graphType.ShouldNotBeNull();
+        graphType.IsObjectType.ShouldBeTrue();
+        graphType.IsOutputType.ShouldBeTrue();
+        graphType.IsInterfaceType.ShouldBeFalse();
+        graphType.IsInputType.ShouldBeFalse();
+        graphType.IsUnionType.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task IsObjectType_InterfaceGraphType_ReturnsFalse()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class MyInterfaceType : InterfaceGraphType
+            {
+                public MyInterfaceType()
+                {
+                    Field<StringGraphType>("name");
+                }
+            }
+            """);
+
+        var classDeclaration = context.Root.DescendantNodes()
+            .OfType<ClassDeclarationSyntax>()
+            .First();
+
+        var graphType = GraphQLGraphType.TryCreate(classDeclaration, context.SemanticModel);
+
+        graphType.ShouldNotBeNull();
+        graphType.IsObjectType.ShouldBeFalse();
+        graphType.IsInterfaceType.ShouldBeTrue();
+        graphType.IsOutputType.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task IsObjectType_InputObjectGraphType_ReturnsFalse()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class MyInputType : InputObjectGraphType
+            {
+                public MyInputType()
+                {
+                    Field<StringGraphType>("name");
+                }
+            }
+            """);
+
+        var classDeclaration = context.Root.DescendantNodes()
+            .OfType<ClassDeclarationSyntax>()
+            .First();
+
+        var graphType = GraphQLGraphType.TryCreate(classDeclaration, context.SemanticModel);
+
+        graphType.ShouldNotBeNull();
+        graphType.IsObjectType.ShouldBeFalse();
+        graphType.IsInputType.ShouldBeTrue();
+        graphType.IsInterfaceType.ShouldBeFalse();
+        graphType.IsOutputType.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task IsObjectType_UnionGraphType_ReturnsFalse()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class MyUnionType : UnionGraphType
+            {
+                public MyUnionType()
+                {
+                }
+            }
+            """);
+
+        var classDeclaration = context.Root.DescendantNodes()
+            .OfType<ClassDeclarationSyntax>()
+            .First();
+
+        var graphType = GraphQLGraphType.TryCreate(classDeclaration, context.SemanticModel);
+
+        graphType.ShouldNotBeNull();
+        graphType.IsObjectType.ShouldBeFalse();
+        graphType.IsUnionType.ShouldBeTrue();
+        graphType.IsInterfaceType.ShouldBeFalse();
+        graphType.IsOutputType.ShouldBeFalse();
+    }
+
+    [Theory]
+    [InlineData("this.Shareable();", true)]
+    [InlineData(null, false)]
+    public async Task IsSharableObject_CorrectlyResolve(string? directive, bool isSharable)
+    {
+        var context = await TestContext.CreateAsync(
+            $$"""
+            using GraphQL.Types;
+            using GraphQL.Federation;
+
+            namespace Sample;
+
+            public class ProductGraphType : ObjectGraphType
+            {
+                public ProductGraphType()
+                {
+                    {{directive}}
+                    Field<StringGraphType>("name");
+                }
+            }
+            """);
+
+        var classDeclaration = context.Root.DescendantNodes()
+            .OfType<ClassDeclarationSyntax>()
+            .First();
+
+        var graphType = GraphQLGraphType.TryCreate(classDeclaration, context.SemanticModel);
+
+        graphType.ShouldNotBeNull();
+        if (isSharable)
+        {
+            graphType.IsShareable.ShouldNotBeNull();
+            graphType.IsShareable!.Value.ShouldBeTrue();
+            graphType.IsShareable.Location.ShouldNotBeNull();
+        }
+        else
+        {
+            graphType.IsShareable.ShouldBeNull();
+        }
+    }
 }
