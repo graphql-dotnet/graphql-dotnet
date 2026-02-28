@@ -1,6 +1,6 @@
 # ASP.NET Core Integration
 
-The [GraphQL.Server](https://github.com/graphql-dotnet/server) project provides middleware and supporting infrastructure for hosting GraphQL endpoints in ASP.NET Core applications. It includes support for GraphQL queries, mutations, subscriptions, and popular GraphQL IDEs like GraphiQL and Playground.
+The [GraphQL.Server](https://github.com/graphql-dotnet/server) project provides middleware and supporting infrastructure for hosting GraphQL endpoints in ASP.NET Core applications. It includes support for GraphQL queries, mutations, subscriptions, and popular GraphQL IDEs like GraphiQL.
 
 For complete documentation, samples, and advanced configuration options, please refer to the [server repository README](https://github.com/graphql-dotnet/server).
 
