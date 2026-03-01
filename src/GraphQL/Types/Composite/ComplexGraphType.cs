@@ -276,7 +276,6 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
             type,
             this is IObjectGraphType ? new ExpressionFieldResolver<TSourceType, TProperty>(expression) : null);
 
-        AddField(builder.FieldType);
         return builder;
     }
 
