@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using VerifyTestSG = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpIncrementalGeneratorVerifier<
     GraphQL.Analyzers.Interceptors.FieldExpressionInterceptorGenerator>;
 
@@ -10,6 +11,19 @@ namespace GraphQL.Analyzers.Tests.Interceptors;
 /// </summary>
 public class FieldExpressionInterceptorGeneratorTests
 {
+    private static string ReplaceHash(string input)
+    {
+        string result = Regex.Replace(
+            input,
+            @"(?<=FieldInterceptors_)[A-Za-z0-9_+/=]+(?=\.g\.cs)" +                           // FieldInterceptors_<hash>.g.cs (hash includes D_)
+            @"|(?<=InterceptsLocationAttribute\(\d+,\s*"")[A-Za-z0-9_+/=]+(?=""\))" +         // InterceptsLocationAttribute(..., "<hash>") (hash includes D/)
+            @"|(?<=\bField_)[A-Za-z0-9_]+(?=<)",                                              // Field_<hash><TProperty>(  (hash includes underscores)
+            "hash"
+        );
+
+        return result;
+    }
+
     [Fact]
     public async Task DoesNotGenerateForFieldWithoutExpression()
     {
@@ -65,7 +79,7 @@ public class FieldExpressionInterceptorGeneratorTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
 
         // Should generate an interceptor
-        output.ShouldMatchApproved(o => o.NoDiff());
+        ReplaceHash(output).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
@@ -95,7 +109,7 @@ public class FieldExpressionInterceptorGeneratorTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
 
         // Should generate an interceptor
-        output.ShouldMatchApproved(o => o.NoDiff());
+        ReplaceHash(output).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
@@ -125,7 +139,7 @@ public class FieldExpressionInterceptorGeneratorTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
 
         // Should generate an interceptor
-        output.ShouldMatchApproved(o => o.NoDiff());
+        ReplaceHash(output).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
@@ -159,7 +173,7 @@ public class FieldExpressionInterceptorGeneratorTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
 
         // Should generate interceptors
-        output.ShouldMatchApproved(o => o.NoDiff());
+        ReplaceHash(output).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
@@ -189,7 +203,7 @@ public class FieldExpressionInterceptorGeneratorTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
 
         // Should generate an interceptor
-        output.ShouldMatchApproved(o => o.NoDiff());
+        ReplaceHash(output).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
@@ -225,7 +239,7 @@ public class FieldExpressionInterceptorGeneratorTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
 
         // Should generate an interceptor
-        output.ShouldMatchApproved(o => o.NoDiff());
+        ReplaceHash(output).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
@@ -258,7 +272,7 @@ public class FieldExpressionInterceptorGeneratorTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
 
         // Should generate an interceptor
-        output.ShouldMatchApproved(o => o.NoDiff());
+        ReplaceHash(output).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
@@ -289,7 +303,7 @@ public class FieldExpressionInterceptorGeneratorTests
 
         // InputObjectGraphType uses Field with expressions but for parsing, not resolving
         // The interceptor should still be generated but won't set a resolver
-        output.ShouldMatchApproved(o => o.NoDiff());
+        ReplaceHash(output).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
@@ -319,7 +333,7 @@ public class FieldExpressionInterceptorGeneratorTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
 
         // Should contain InterceptsLocation attribute with file path and position
-        output.ShouldMatchApproved(o => o.NoDiff());
+        ReplaceHash(output).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
@@ -350,7 +364,7 @@ public class FieldExpressionInterceptorGeneratorTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
 
         // Should generate an interceptor
-        output.ShouldMatchApproved(o => o.NoDiff());
+        ReplaceHash(output).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
@@ -380,7 +394,7 @@ public class FieldExpressionInterceptorGeneratorTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
 
         // Should generate an interceptor
-        output.ShouldMatchApproved(o => o.NoDiff());
+        ReplaceHash(output).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
@@ -410,7 +424,7 @@ public class FieldExpressionInterceptorGeneratorTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
 
         // Should contain metadata preservation code
-        output.ShouldMatchApproved(o => o.NoDiff());
+        ReplaceHash(output).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
@@ -440,7 +454,7 @@ public class FieldExpressionInterceptorGeneratorTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
 
         // Should not set ExpressionFieldResolver
-        output.ShouldMatchApproved(o => o.NoDiff());
+        ReplaceHash(output).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
@@ -483,7 +497,7 @@ public class FieldExpressionInterceptorGeneratorTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
 
         // Should generate interceptors for both types
-        output.ShouldMatchApproved(o => o.NoDiff());
+        ReplaceHash(output).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
@@ -513,7 +527,7 @@ public class FieldExpressionInterceptorGeneratorTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
 
         // Should generate an interceptor
-        output.ShouldMatchApproved(o => o.NoDiff());
+        ReplaceHash(output).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
@@ -543,7 +557,7 @@ public class FieldExpressionInterceptorGeneratorTests
         var output = await VerifyTestSG.GetGeneratorOutputAsync(source);
 
         // Should generate an interceptor
-        output.ShouldMatchApproved(o => o.NoDiff());
+        ReplaceHash(output).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
