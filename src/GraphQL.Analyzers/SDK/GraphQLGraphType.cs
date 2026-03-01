@@ -1,3 +1,4 @@
+using GraphQL.Analyzers.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -13,9 +14,10 @@ public sealed class GraphQLGraphType
     private readonly Lazy<GraphQLSourceType?> _sourceType;
     private readonly Lazy<IReadOnlyList<GraphQLFieldInvocation>> _fields;
     private readonly Lazy<bool> _isInputType;
-    private readonly Lazy<bool> _isOutputType;
+    private readonly Lazy<bool> _isObjectType;
     private readonly Lazy<bool> _isInterfaceType;
     private readonly Lazy<bool> _isUnionType;
+    private readonly Lazy<GraphQLObjectProperty<bool>?> _isShareable;
     private readonly Lazy<Location> _location;
     private readonly Lazy<IReadOnlyList<FederationKey>?> _federationKeys;
 
@@ -29,9 +31,10 @@ public sealed class GraphQLGraphType
         _sourceType = new Lazy<GraphQLSourceType?>(GetSourceType);
         _fields = new Lazy<IReadOnlyList<GraphQLFieldInvocation>>(GetFields);
         _isInputType = new Lazy<bool>(CheckIsInputType);
-        _isOutputType = new Lazy<bool>(CheckIsOutputType);
+        _isObjectType = new Lazy<bool>(CheckIsObjectType);
         _isInterfaceType = new Lazy<bool>(CheckIsInterfaceType);
         _isUnionType = new Lazy<bool>(CheckIsUnionType);
+        _isShareable = new Lazy<GraphQLObjectProperty<bool>?>(CheckIsShareable);
         _location = new Lazy<Location>(classDeclaration.Identifier.GetLocation);
         _federationKeys = new Lazy<IReadOnlyList<FederationKey>?>(GetFederationKeys);
     }
@@ -87,7 +90,12 @@ public sealed class GraphQLGraphType
     /// <summary>
     /// Gets whether this is an output graph type (IObjectGraphType, IInterfaceGraphType).
     /// </summary>
-    public bool IsOutputType => _isOutputType.Value;
+    public bool IsOutputType => IsObjectType || IsInterfaceType;
+
+    /// <summary>
+    /// Gets whether this is an object graph type (IObjectGraphType).
+    /// </summary>
+    public bool IsObjectType => _isObjectType.Value;
 
     /// <summary>
     /// Gets whether this is an interface graph type (IInterfaceGraphType).
@@ -98,6 +106,11 @@ public sealed class GraphQLGraphType
     /// Gets whether this is a union graph type (UnionGraphType).
     /// </summary>
     public bool IsUnionType => _isUnionType.Value;
+
+    /// <summary>
+    /// Gets whether the graph type has the @shareable directive applied (via the Shareable() extension method).
+    /// </summary>
+    public GraphQLObjectProperty<bool>? IsShareable => _isShareable.Value;
 
     /// <summary>
     /// Gets the location of the graph type declaration in source code.
@@ -197,10 +210,10 @@ public sealed class GraphQLGraphType
         return typeSymbol?.AllInterfaces.Any(i => i.Name == "IInputObjectGraphType") == true;
     }
 
-    private bool CheckIsOutputType()
+    private bool CheckIsObjectType()
     {
         var typeSymbol = _typeSymbol.Value;
-        return typeSymbol?.AllInterfaces.Any(i => i.Name is "IObjectGraphType" or "IInterfaceGraphType") == true;
+        return typeSymbol?.AllInterfaces.Any(i => i.Name == "IObjectGraphType") == true;
     }
 
     private bool CheckIsInterfaceType()
@@ -229,6 +242,32 @@ public sealed class GraphQLGraphType
         }
 
         return false;
+    }
+
+    private GraphQLObjectProperty<bool>? CheckIsShareable()
+    {
+        foreach (var invocation in Syntax.DescendantNodes().OfType<InvocationExpressionSyntax>())
+        {
+            if (!invocation.IsGraphQLMethodInvocation(SemanticModel, "Shareable"))
+                continue;
+
+            // Only accept type-level calls: this.Shareable()
+            if (invocation.Parent is MemberAccessExpressionSyntax)
+                continue;
+
+            if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
+            {
+                if (memberAccess.Expression is not ThisExpressionSyntax)
+                    continue;
+
+                var nameStart = memberAccess.Name.SpanStart;
+                var invocationEnd = invocation.Span.End;
+                var span = Microsoft.CodeAnalysis.Text.TextSpan.FromBounds(nameStart, invocationEnd);
+                return new GraphQLObjectProperty<bool>(true, Location.Create(invocation.SyntaxTree, span));
+            }
+        }
+
+        return null;
     }
 
     /// <summary>

@@ -18,6 +18,7 @@ public sealed class GraphQLFieldInvocation
     private readonly Lazy<GraphQLFieldExpression?> _fieldExpression;
     private readonly Lazy<IReadOnlyList<GraphQLFieldArgument>> _arguments;
     private readonly Lazy<GraphQLGraphType?> _declaringGraphType;
+    private readonly Lazy<GraphQLObjectProperty<bool>?> _isShareable;
     private readonly Lazy<Location> _location;
 
     private GraphQLFieldInvocation(InvocationExpressionSyntax invocation, SemanticModel semanticModel)
@@ -33,6 +34,7 @@ public sealed class GraphQLFieldInvocation
         _fieldExpression = new Lazy<GraphQLFieldExpression?>(GetFieldExpression);
         _arguments = new Lazy<IReadOnlyList<GraphQLFieldArgument>>(GetArguments);
         _declaringGraphType = new Lazy<GraphQLGraphType?>(FindDeclaringGraphType);
+        _isShareable = new Lazy<GraphQLObjectProperty<bool>?>(GetIsShareable);
         _location = new Lazy<Location>(invocation.GetLocation);
     }
 
@@ -99,6 +101,11 @@ public sealed class GraphQLFieldInvocation
     /// Gets the graph type that declares this field, if it can be determined.
     /// </summary>
     public GraphQLGraphType? DeclaringGraphType => _declaringGraphType.Value;
+
+    /// <summary>
+    /// Gets whether the field has the @shareable directive applied (via the Shareable() extension method).
+    /// </summary>
+    public GraphQLObjectProperty<bool>? IsShareable => _isShareable.Value;
 
     /// <summary>
     /// Gets the location of the entire field invocation in source code.
@@ -191,6 +198,20 @@ public sealed class GraphQLFieldInvocation
                 arg.Expression.GetLocation());
         }
 
+        return null;
+    }
+
+    private GraphQLObjectProperty<bool>? GetIsShareable()
+    {
+        var shareableInvocation = FindChainedMethod("Shareable");
+        if (shareableInvocation?.Expression is MemberAccessExpressionSyntax memberAccess)
+        {
+            var nameStart = memberAccess.Name.SpanStart;
+            var invocationEnd = shareableInvocation.Span.End;
+            var span = Microsoft.CodeAnalysis.Text.TextSpan.FromBounds(nameStart, invocationEnd);
+            var location = Location.Create(shareableInvocation.SyntaxTree, span);
+            return new GraphQLObjectProperty<bool>(true, location);
+        }
         return null;
     }
 
