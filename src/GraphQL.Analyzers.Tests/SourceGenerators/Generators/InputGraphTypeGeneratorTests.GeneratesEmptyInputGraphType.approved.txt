@@ -7,17 +7,37 @@ public partial class SampleAotSchema
 {
     private class AutoInputGraphType_EmptyInput : global::GraphQL.Types.Aot.AotAutoRegisteringInputObjectGraphType<global::Sample.EmptyInput>
     {
-        private readonly global::System.Reflection.MemberInfo[] _members;
+        private static AutoInputGraphType_EmptyInput? _cache;
+        private static readonly global::System.Reflection.MemberInfo[] _members;
         private readonly global::GraphQL.Types.FieldType[] _fields;
 
-        public AutoInputGraphType_EmptyInput()
+        static AutoInputGraphType_EmptyInput()
         {
             _members = [
             ];
+        }
+
+        public AutoInputGraphType_EmptyInput() : this(_cache)
+        {
+        }
+
+        private AutoInputGraphType_EmptyInput(AutoInputGraphType_EmptyInput? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                _fields = global::System.Linq.Enumerable.ToArray(cloneFrom.Fields);
+                return;
+            }
+
             _fields = global::System.Linq.Enumerable.ToArray(ProvideFields());
             foreach (var fieldType in _fields)
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new AutoInputGraphType_EmptyInput(this);
             }
         }
 

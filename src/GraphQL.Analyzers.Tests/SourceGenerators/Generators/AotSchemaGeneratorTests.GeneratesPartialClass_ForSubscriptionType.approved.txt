@@ -11,9 +11,20 @@ public partial class MySchema
 {
     private class SubscriptionGraphType : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::Sample.Subscription>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public SubscriptionGraphType()
+        private static SubscriptionGraphType? _cache;
+        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members = null!;
+
+        public SubscriptionGraphType() : this(_cache)
         {
+        }
+
+        private SubscriptionGraphType(SubscriptionGraphType? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             _members = new()
             {
                 { typeof(global::Sample.Subscription).GetMethod(nameof(global::Sample.Subscription.OnMessage), [])!, ConstructField0_OnMessage },
@@ -21,6 +32,11 @@ public partial class MySchema
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new SubscriptionGraphType(this);
             }
         }
 

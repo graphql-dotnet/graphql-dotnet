@@ -7,9 +7,20 @@ public partial class SampleAotSchema
 {
     private class AutoOutputGraphType_Subscription : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::Sample.Subscription>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        public AutoOutputGraphType_Subscription()
+        private static AutoOutputGraphType_Subscription? _cache;
+        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members = null!;
+
+        public AutoOutputGraphType_Subscription() : this(_cache)
         {
+        }
+
+        private AutoOutputGraphType_Subscription(AutoOutputGraphType_Subscription? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             _members = new()
             {
                 { typeof(global::Sample.Subscription).GetMethod(nameof(global::Sample.Subscription.OnMessage), [])!, ConstructField0_OnMessage },
@@ -20,6 +31,11 @@ public partial class SampleAotSchema
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new AutoOutputGraphType_Subscription(this);
             }
         }
 

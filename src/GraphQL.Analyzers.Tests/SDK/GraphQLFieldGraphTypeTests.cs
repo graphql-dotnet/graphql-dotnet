@@ -228,4 +228,41 @@ public class GraphQLFieldGraphTypeTests
         var unwrappedType = field.GraphType.GetUnwrappedType();
         unwrappedType.ShouldBeNull();
     }
+
+    [Theory]
+    [InlineData(".Shareable()", true)]
+    [InlineData("", false)]
+    public async Task IsShareable_WithShareableMethod_ReturnsTrue(string extensionMethod, bool isShareable)
+    {
+        var context = await TestContext.CreateAsync(
+            $$"""
+            using GraphQL.Types;
+            using GraphQL.Federation;
+
+            namespace Sample;
+
+            public class MyType : ObjectGraphType
+            {
+                public MyType()
+                {
+                    Field<StringGraphType>("name"){{extensionMethod}};
+                }
+            }
+            """);
+
+        var invocation = context.Root.FindFieldInvocation();
+        var field = GraphQLFieldInvocation.TryCreate(invocation, context.SemanticModel);
+
+        field.ShouldNotBeNull();
+        if (isShareable)
+        {
+            field.IsShareable.ShouldNotBeNull();
+            field.IsShareable!.Value.ShouldBeTrue();
+            field.IsShareable.Location.ShouldNotBeNull();
+        }
+        else
+        {
+            field.IsShareable.ShouldBeNull();
+        }
+    }
 }

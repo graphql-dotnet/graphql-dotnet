@@ -24,9 +24,10 @@ public class AutoRegisteringInterfaceGraphType<[NotAGraphType] TSourceType> : In
     /// Initializes a new instance of the <see cref="AutoRegisteringInterfaceGraphType{TSourceType}"/> class without adding any fields.
     /// </summary>
     /// <param name="configureGraph">When true, sets the name and processes all attributes defined for the source type.</param>
-    internal AutoRegisteringInterfaceGraphType(bool configureGraph)
+    /// <param name="cloneFrom">When not null, clones fields from the specified instance. This is used internally for caching instances when <see cref="GlobalSwitches.EnableReflectionCaching"/> is enabled.</param>
+    internal AutoRegisteringInterfaceGraphType(bool configureGraph, AutoRegisteringInterfaceGraphType<TSourceType>? cloneFrom) : base(cloneFrom)
     {
-        if (configureGraph)
+        if (configureGraph && cloneFrom == null)
         {
             Name = typeof(TSourceType).GraphQLName();
             ConfigureGraph();

@@ -11,7 +11,7 @@ namespace GraphQL.Types.Aot;
 public abstract class AotAutoRegisteringInputObjectGraphType<T> : AutoRegisteringInputObjectGraphType<T>
 {
     /// <inheritdoc/>
-    public AotAutoRegisteringInputObjectGraphType() : base(true)
+    public AotAutoRegisteringInputObjectGraphType(AotAutoRegisteringInputObjectGraphType<T>? cloneFrom) : base(true, cloneFrom)
     {
     }
 

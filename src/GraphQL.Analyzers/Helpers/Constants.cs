@@ -37,6 +37,7 @@ public static class Constants
     {
         public const string Argument = "Argument";
         public const string Arguments = "Arguments";
+        public const string Configure = "Configure";
         public const string Connection = "Connection";
         public const string Create = "Create";
         public const string DefaultValue = "DefaultValue";

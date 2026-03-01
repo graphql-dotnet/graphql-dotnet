@@ -7,10 +7,21 @@ public partial class SampleAotSchema
 {
     private class AutoOutputGraphType_Person : global::GraphQL.Types.Aot.AotAutoRegisteringObjectGraphType<global::Sample.Person>
     {
-        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members;
-        private readonly global::System.Func<global::GraphQL.IResolveFieldContext, global::Sample.Person> _getMemberInstance;
-        public AutoOutputGraphType_Person()
+        private static AutoOutputGraphType_Person? _cache;
+        private readonly global::System.Collections.Generic.Dictionary<global::System.Reflection.MemberInfo, global::System.Action<global::GraphQL.Types.FieldType, global::System.Reflection.MemberInfo>> _members = null!;
+        private readonly global::System.Func<global::GraphQL.IResolveFieldContext, global::Sample.Person> _getMemberInstance = null!;
+
+        public AutoOutputGraphType_Person() : this(_cache)
         {
+        }
+
+        private AutoOutputGraphType_Person(AutoOutputGraphType_Person? cloneFrom) : base(cloneFrom)
+        {
+            if (cloneFrom != null)
+            {
+                return;
+            }
+
             var ctorParam0 = BuildConstructorParameter<global::System.String>();
             var ctorParam1 = BuildConstructorParameter<global::System.Int32>();
             var reqProp0 = BuildConstructorParameter<global::System.String>();
@@ -37,6 +48,11 @@ public partial class SampleAotSchema
             foreach (var fieldType in ProvideFields())
             {
                 AddField(fieldType);
+            }
+
+            if (global::GraphQL.GlobalSwitches.EnableReflectionCaching)
+            {
+                _cache = new AutoOutputGraphType_Person(this);
             }
         }
 
