@@ -27,6 +27,8 @@ await schema.ExecuteAsync(_ =>
 });
 ```
 
+For a runnable end-to-end example, see `samples/GraphQL.ValidationRules.Sample`.
+
 ## Setting validation rules on input arguments or input object fields
 
 When defining a schema, you can set validation rules on input arguments or input object fields.
