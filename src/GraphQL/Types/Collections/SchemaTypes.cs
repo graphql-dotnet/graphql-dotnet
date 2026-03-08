@@ -224,6 +224,7 @@ public sealed partial class SchemaTypes : SchemaTypesBase
         private readonly Action<IGraphType>? _onBeforeInitialize;
         private readonly Dictionary<Type, Type> _inputClrTypeMappingCache;
         private readonly Dictionary<Type, Type> _outputClrTypeMappingCache;
+        private readonly Dictionary<Type, Type>? _typeRemappings;
 
         // Set of base GraphQL types that may be used to build a schema manually, and as such must not use type mapping
         private static readonly HashSet<Type> _baseTypes = new()
@@ -271,6 +272,10 @@ public sealed partial class SchemaTypes : SchemaTypesBase
                 if (mappedGraphType.IsOutputType())
                     _outputClrTypeMappingCache[mappedClrType] = mappedGraphType;
             }
+
+            // Initialize type remapping dictionary from schema.TypeRemappings
+            foreach (var (originalType, newType) in _schema.TypeRemappings)
+                (_typeRemappings ??= new Dictionary<Type, Type>())[originalType] = newType;
         }
 
         /// <summary>
@@ -753,6 +758,10 @@ public sealed partial class SchemaTypes : SchemaTypesBase
 
             // Resolve any CLR type references within the type
             type = ResolveClrTypeReferences(type);
+
+            // Apply type remappings from schema
+            if (_typeRemappings != null && _typeRemappings.TryGetValue(type, out var remappedType))
+                type = remappedType;
 
             var instance = ResolveGraphType(type);
 

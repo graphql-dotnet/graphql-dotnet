@@ -993,6 +993,9 @@ namespace GraphQL
             where TSchema : GraphQL.Types.ISchema { }
         public static void RegisterVisitor<TVisitor>(this GraphQL.Types.ISchema schema)
             where TVisitor : GraphQL.Utilities.ISchemaNodeVisitor { }
+        public static void RemapType<TOriginal, TNew>(this GraphQL.Types.ISchema schema)
+            where TOriginal : GraphQL.Types.IGraphType
+            where TNew : GraphQL.Types.IGraphType, new () { }
         public static TSchema ReplaceScalar<TSchema>(this TSchema schema, GraphQL.Types.ScalarGraphType scalar)
             where TSchema : GraphQL.Types.ISchema { }
         public static void Run(this GraphQL.Utilities.ISchemaNodeVisitor visitor, GraphQL.Types.ISchema schema) { }
@@ -2835,6 +2838,10 @@ namespace GraphQL.Types
         System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeMappings { get; }
         GraphQL.Types.FieldType TypeMetaFieldType { get; }
         GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
+        [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "originalType",
+                "newType"})]
+        System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeRemappings { get; }
         GraphQL.ValueConverterBase ValueConverter { get; }
         void Initialize();
         void RegisterType(GraphQL.Types.IGraphType type);
@@ -2842,6 +2849,7 @@ namespace GraphQL.Types
         void RegisterTypeMapping(System.Type clrType, System.Type graphType);
         void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor);
         void RegisterVisitor(System.Type type);
+        void RemapType(System.Type originalType, System.Type newType);
     }
     public class IdGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -3090,6 +3098,10 @@ namespace GraphQL.Types
         public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeMappings { get; }
         public GraphQL.Types.FieldType TypeMetaFieldType { get; }
         public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
+        [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "originalType",
+                "newType"})]
+        public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeRemappings { get; }
         public GraphQL.ValueConverterBase ValueConverter { get; set; }
         protected virtual void CoerceInputTypeDefaultValues() { }
         protected virtual GraphQL.Types.SchemaTypesBase CreateSchemaTypes() { }
@@ -3103,6 +3115,7 @@ namespace GraphQL.Types
         public void RegisterTypes(params System.Type[] types) { }
         public void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor) { }
         public void RegisterVisitor(System.Type type) { }
+        public void RemapType(System.Type originalType, System.Type newType) { }
         protected virtual void Validate() { }
         public static GraphQL.Types.Schema For(string typeDefinitions, System.Action<GraphQL.Utilities.SchemaBuilder>? configure = null) { }
         public static GraphQL.Types.Schema For<TSchemaBuilder>(string typeDefinitions, System.Action<TSchemaBuilder>? configure = null)

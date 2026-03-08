@@ -414,6 +414,30 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     /// <inheritdoc/>
     public IEnumerable<(Type clrType, Type graphType)> TypeMappings => _clrToGraphTypeMappings ?? Enumerable.Empty<(Type, Type)>();
 
+    private List<(Type originalType, Type newType)>? _typeRemappings;
+
+    /// <inheritdoc/>
+    public void RemapType(Type originalType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type newType)
+    {
+        CheckDisposed();
+        CheckInitialized();
+
+        if (originalType == null)
+            throw new ArgumentNullException(nameof(originalType));
+        if (newType == null)
+            throw new ArgumentNullException(nameof(newType));
+
+        if (!typeof(IGraphType).IsAssignableFrom(originalType))
+            throw new ArgumentOutOfRangeException(nameof(originalType), $"Type '{originalType.FullName}' must implement IGraphType.");
+        if (!typeof(IGraphType).IsAssignableFrom(newType))
+            throw new ArgumentOutOfRangeException(nameof(newType), $"Type '{newType.FullName}' must implement IGraphType.");
+
+        (_typeRemappings ??= []).Add((originalType, newType));
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<(Type originalType, Type newType)> TypeRemappings => _typeRemappings ?? Enumerable.Empty<(Type, Type)>();
+
     /// <inheritdoc/>
     public virtual IEnumerable<(Type clrType, Type graphType)> BuiltInTypeMappings
     {
