@@ -16,7 +16,7 @@ namespace GraphQL.Analyzers.Interceptors
     internal static partial class FieldInterceptors
     {
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "hash")]
-        internal static global::GraphQL.Builders.FieldBuilder<global::Sample.Person, string> Field_hash<TProperty>(
+        internal static global::GraphQL.Builders.FieldBuilder<global::Sample.Person, string> Field_qRII_2TJymouNEmjnTw5fqB0BAAA(
             this global::GraphQL.Types.ComplexGraphType<global::Sample.Person> graphType,
             string name,
             global::System.Linq.Expressions.Expression<global::System.Func<global::Sample.Person, string>> expression)
@@ -49,7 +49,7 @@ namespace GraphQL.Analyzers.Interceptors
     internal static partial class FieldInterceptors
     {
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "hash")]
-        internal static global::GraphQL.Builders.FieldBuilder<global::Sample.Company, string> Field_hash<TProperty>(
+        internal static global::GraphQL.Builders.FieldBuilder<global::Sample.Company, string> Field_qRII_2TJymouNEmjnTw5fqKcBAAA(
             this global::GraphQL.Types.ComplexGraphType<global::Sample.Company> graphType,
             string name,
             global::System.Linq.Expressions.Expression<global::System.Func<global::Sample.Company, string>> expression)

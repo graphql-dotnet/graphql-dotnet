@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,6 +8,9 @@
     <PublishAot>true</PublishAot>
     <IsPackable>false</IsPackable>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <GraphQLEnableFieldInterceptors>true</GraphQLEnableFieldInterceptors>
+    <InterceptorsNamespaces>$(InterceptorsNamespaces);GraphQL.Analyzers.Interceptors</InterceptorsNamespaces>
+    <InterceptorsPreviewNamespaces>$(InterceptorsPreviewNamespaces);GraphQL.Analyzers.Interceptors</InterceptorsPreviewNamespaces>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,8 +25,16 @@
     <ProjectReference Include="..\..\src\GraphQL.Analyzers.SourceGenerators\GraphQL.Analyzers.SourceGenerators.csproj"
                       OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\src\GraphQL.Analyzers.Interceptors\GraphQL.Analyzers.Interceptors.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Make the property visible to source generators -->
+    <CompilerVisibleProperty Include="GraphQLEnableFieldInterceptors" />
+  </ItemGroup>
+  
   <ItemGroup>
     <None Remove="IntrospectionQuery.graphql" />
     <EmbeddedResource Include="IntrospectionQuery.graphql" />

@@ -39,7 +39,7 @@ internal static class FieldInterceptorSourceGenerator
         sb.AppendLine($"        {info.Location.GetInterceptsLocationAttributeSyntax()}");
 
         // Build method signature based on which parameters are present
-        sb.Append($"        internal static global::GraphQL.Builders.FieldBuilder<{info.SourceTypeFullName}, {info.PropertyTypeFullName}> {methodName}<TProperty>(");
+        sb.Append($"        internal static global::GraphQL.Builders.FieldBuilder<{info.SourceTypeFullName}, {info.PropertyTypeFullName}> {methodName}(");
         sb.AppendLine();
         sb.AppendLine($"            this global::GraphQL.Types.ComplexGraphType<{info.SourceTypeFullName}> graphType,");
 

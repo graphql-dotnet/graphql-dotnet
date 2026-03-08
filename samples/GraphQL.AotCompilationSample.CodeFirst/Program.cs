@@ -32,6 +32,7 @@ serviceCollection.AddTransient<ConnectionType<CharacterInterface, EdgeType<Chara
 serviceCollection.AddTransient<EdgeType<CharacterInterface>>();
 serviceCollection.AddTransient<PageInfoType>();
 serviceCollection.AddTransient<EpisodeEnum>();
+serviceCollection.AddTransient<MyGraphType>();
 
 // other notes:
 // - auto clr type mappings are generally not supported
@@ -94,6 +95,7 @@ static string LoadResource(string resourceName)
     return reader.ReadToEnd();
 }
 
+//[AotRemapType<HumanInputType, AotAutoRegisteringInputObjectGraphType<Human>>]
 internal partial class StarWarsAotSchema : AotSchema
 {
     public StarWarsAotSchema(IServiceProvider serviceProvider, IEnumerable<GraphQL.DI.IConfigureSchema> configurations)
@@ -104,6 +106,17 @@ internal partial class StarWarsAotSchema : AotSchema
 
         Description = "Example StarWars universe schema";
 
+        this.RegisterType<MyGraphType>();
         Configure();
+    }
+}
+
+// tests interceptors
+// (separately compiled GraphQL.StarWars does not reference the interceptors package and so does not trigger the source generator)
+public class MyGraphType : ObjectGraphType<Human>
+{
+    public MyGraphType()
+    {
+        Field(x => x.Name);
     }
 }
