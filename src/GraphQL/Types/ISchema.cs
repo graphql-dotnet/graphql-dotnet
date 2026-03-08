@@ -146,7 +146,7 @@ public interface ISchema : IMetadataReader, IMetadataWriter, IProvideDescription
     /// </summary>
     /// <param name="originalType">The GraphType to be replaced.</param>
     /// <param name="newType">The GraphType to use as the replacement.</param>
-    public void RemapType(Type originalType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type newType);
+    public void RemapType(Type originalType, Type newType);
 
     /// <summary>
     /// Returns all registered type remappings set by <see cref="RemapType"/>.

@@ -58,6 +58,10 @@ public class SchemaConfigurationGeneratorTests
             HasConstructor: false,
             RegisteredGraphTypes: registeredTypes,
             TypeMappings: typeMappings,
+            RemapTypes: new ImmutableEquatableArray<TypeMappingData>(new[]
+            {
+                new TypeMappingData("global::GraphQL.Types.IdGraphType", "global::GraphQL.Types.GuidGraphType")
+            }),
             QueryRootTypeName: "global::GraphQL.Types.AutoRegisteringObjectGraphType<StarWarsQuery>",
             MutationRootTypeName: null,
             SubscriptionRootTypeName: null,
@@ -86,6 +90,7 @@ public class SchemaConfigurationGeneratorTests
             HasConstructor: true,
             RegisteredGraphTypes: ImmutableEquatableArray<RegisteredGraphTypeData>.Empty,
             TypeMappings: ImmutableEquatableArray<TypeMappingData>.Empty,
+            RemapTypes: ImmutableEquatableArray<TypeMappingData>.Empty,
             QueryRootTypeName: null,
             MutationRootTypeName: null,
             SubscriptionRootTypeName: null,
@@ -180,7 +185,57 @@ public class SchemaConfigurationGeneratorTests
             HasConstructor: false,
             RegisteredGraphTypes: registeredTypes,
             TypeMappings: typeMappings,
+            RemapTypes: ImmutableEquatableArray<TypeMappingData>.Empty,
             QueryRootTypeName: "global::GraphQL.Types.AutoRegisteringObjectGraphType<Query>",
+            MutationRootTypeName: null,
+            SubscriptionRootTypeName: null,
+            ArrayListTypes: ImmutableEquatableArray<ListElementTypeData>.Empty,
+            GenericListTypes: ImmutableEquatableArray<ListElementTypeData>.Empty,
+            HashSetTypes: ImmutableEquatableArray<ListElementTypeData>.Empty);
+
+        // Act
+        var result = SchemaConfigurationGenerator.Generate(@namespace, partialClassHierarchy, schemaClass);
+
+        // Assert
+        result.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public void GeneratesRemapTypeCalls()
+    {
+        // Arrange
+        var @namespace = "AotSample";
+        var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
+        {
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
+        });
+
+        var registeredTypes = new ImmutableEquatableArray<RegisteredGraphTypeData>(new[]
+        {
+            new RegisteredGraphTypeData(
+                "global::GraphQL.Types.StringGraphType",
+                null,
+                null,
+                new ConstructorData(ImmutableEquatableArray<ConstructorParameterData>.Empty, ImmutableEquatableArray<RequiredPropertyData>.Empty)),
+            // Remap type: IdGraphType -> GuidGraphType
+            new RegisteredGraphTypeData(
+                "global::GraphQL.Types.IdGraphType",
+                null,
+                "global::GraphQL.Types.GuidGraphType",
+                new ConstructorData(ImmutableEquatableArray<ConstructorParameterData>.Empty, ImmutableEquatableArray<RequiredPropertyData>.Empty)),
+        });
+
+        var remapTypes = new ImmutableEquatableArray<TypeMappingData>(new[]
+        {
+            new TypeMappingData("global::GraphQL.Types.IdGraphType", "global::GraphQL.Types.GuidGraphType")
+        });
+
+        var schemaClass = new SchemaClassData(
+            HasConstructor: true,
+            RegisteredGraphTypes: registeredTypes,
+            TypeMappings: ImmutableEquatableArray<TypeMappingData>.Empty,
+            RemapTypes: remapTypes,
+            QueryRootTypeName: null,
             MutationRootTypeName: null,
             SubscriptionRootTypeName: null,
             ArrayListTypes: ImmutableEquatableArray<ListElementTypeData>.Empty,

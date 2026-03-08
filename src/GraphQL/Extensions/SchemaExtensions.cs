@@ -103,7 +103,7 @@ public static class SchemaExtensions
     /// </summary>
     /// <typeparam name="TOriginal">The GraphType to be replaced.</typeparam>
     /// <typeparam name="TNew">The GraphType to use as the replacement.</typeparam>
-    public static void RemapType<TOriginal, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNew>(this ISchema schema)
+    public static void RemapType<TOriginal, TNew>(this ISchema schema)
         where TOriginal : IGraphType
         where TNew : IGraphType, new()
     {

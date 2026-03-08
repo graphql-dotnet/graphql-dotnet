@@ -16,7 +16,7 @@ public partial class SampleAotSchema : global::GraphQL.Conversion.IListConverter
         AddAotType<global::GraphQL.Types.AutoRegisteringObjectGraphType<StarWarsQuery>, StarWarsQuery>();
         AddAotType<global::GraphQL.Types.IntGraphType>();
         AddAotType<global::GraphQL.Types.StringGraphType>();
-        AddAotType<global::GraphQL.Types.IdGraphType, global::GraphQL.Types.GuidGraphType>();
+        AddAotType<global::GraphQL.Types.GuidGraphType>();
 
         RegisterType(typeof(global::GraphQL.Types.AutoRegisteringObjectGraphType<StarWarsQuery>));
         RegisterType(typeof(global::GraphQL.Types.IntGraphType));
@@ -25,6 +25,8 @@ public partial class SampleAotSchema : global::GraphQL.Conversion.IListConverter
 
         RegisterTypeMapping(typeof(int), typeof(global::GraphQL.Types.IntGraphType));
         RegisterTypeMapping(typeof(string), typeof(global::GraphQL.Types.StringGraphType));
+
+        RemapType(typeof(global::GraphQL.Types.IdGraphType), typeof(global::GraphQL.Types.GuidGraphType));
 
         Query = GetRequiredService<global::GraphQL.Types.AutoRegisteringObjectGraphType<StarWarsQuery>>();
 

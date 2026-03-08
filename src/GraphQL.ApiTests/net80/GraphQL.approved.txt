@@ -1042,7 +1042,7 @@ namespace GraphQL
             where TSchema : GraphQL.Types.ISchema { }
         public static void RegisterVisitor<TVisitor>(this GraphQL.Types.ISchema schema)
             where TVisitor : GraphQL.Utilities.ISchemaNodeVisitor { }
-        public static void RemapType<TOriginal, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNew>(this GraphQL.Types.ISchema schema)
+        public static void RemapType<TOriginal, TNew>(this GraphQL.Types.ISchema schema)
             where TOriginal : GraphQL.Types.IGraphType
             where TNew : GraphQL.Types.IGraphType, new () { }
         public static TSchema ReplaceScalar<TSchema>(this TSchema schema, GraphQL.Types.ScalarGraphType scalar)
@@ -3099,7 +3099,7 @@ namespace GraphQL.Types
         void RegisterTypeMapping(System.Type clrType, System.Type graphType);
         void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor);
         void RegisterVisitor(System.Type type);
-        void RemapType(System.Type originalType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type newType);
+        void RemapType(System.Type originalType, System.Type newType);
     }
     public class IdGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -3395,7 +3395,7 @@ namespace GraphQL.Types
         public void RegisterTypes(params System.Type[] types) { }
         public void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor) { }
         public void RegisterVisitor(System.Type type) { }
-        public void RemapType(System.Type originalType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type newType) { }
+        public void RemapType(System.Type originalType, System.Type newType) { }
         protected virtual void Validate() { }
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Builds resolvers at runtime, requiring dynamic code generation.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses DefaultServiceProvider which does not statically reference graph type constr" +

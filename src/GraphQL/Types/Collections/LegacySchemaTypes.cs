@@ -151,18 +151,12 @@ public class LegacySchemaTypes : SchemaTypesBase
         // set the name converter properly
         _nameConverter = schema.NameConverter ?? CamelCaseNameConverter.Instance;
 
-        // Build type remapping lookup from schema.TypeRemappings
-        Dictionary<Type, Type>? typeRemappings = null;
-        foreach (var (originalType, newType) in schema.TypeRemappings)
-            (typeRemappings ??= new Dictionary<Type, Type>())[originalType] = newType;
+        if (schema.TypeRemappings.Any())
+            throw new NotSupportedException("Type remappings are not supported by LegacySchemaTypes. Please use SchemaTypes instead.");
 
         var ctx = new TypeCollectionContext(
             serviceType =>
             {
-                // Apply type remapping if available
-                if (typeRemappings != null && typeRemappings.TryGetValue(serviceType, out var remappedType))
-                    serviceType = remappedType;
-
                 // attempt to pull the required service from the service provider
                 // if the service provider does not provide an instance, and if
                 // the type is a GraphQL.NET built-in type, create an instance of it

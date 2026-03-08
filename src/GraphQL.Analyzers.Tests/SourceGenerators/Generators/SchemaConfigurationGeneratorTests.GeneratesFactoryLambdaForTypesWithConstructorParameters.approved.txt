@@ -22,7 +22,7 @@ public partial class SampleAotSchema
             Name = GetRequiredService<global::System.String>(),
             Count = GetRequiredService<global::System.Int32>(),
         });
-        AddAotType<global::GraphQL.Types.IdGraphType, global::GraphQL.Types.GuidGraphType>();
+        AddAotType<global::GraphQL.Types.GuidGraphType>();
 
         RegisterType(typeof(global::GraphQL.Types.AutoRegisteringObjectGraphType<Query>));
         RegisterType(typeof(global::GraphQL.Types.StringGraphType));

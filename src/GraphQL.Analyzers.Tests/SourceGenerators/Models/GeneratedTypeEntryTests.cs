@@ -42,6 +42,7 @@ public class GeneratedTypeEntryTests
                     new TypeMappingData("global::Sample.Person", "global::Sample.PersonGraphType"),
                     new TypeMappingData("global::Sample.Product", "global::Sample.ProductGraphType")
                 }),
+                RemapTypes: ImmutableEquatableArray<TypeMappingData>.Empty,
                 QueryRootTypeName: "Query",
                 MutationRootTypeName: "Mutation",
                 SubscriptionRootTypeName: "Subscription",
@@ -101,6 +102,7 @@ public class GeneratedTypeEntryTests
                     new TypeMappingData("global::Sample.Person", "global::Sample.PersonGraphType"),
                     new TypeMappingData("global::Sample.Product", "global::Sample.ProductGraphType")
                 }),
+                RemapTypes: ImmutableEquatableArray<TypeMappingData>.Empty,
                 QueryRootTypeName: "Query",
                 MutationRootTypeName: "Mutation",
                 SubscriptionRootTypeName: "Subscription",

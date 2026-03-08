@@ -302,4 +302,32 @@ public class AotSchemaGeneratorTests
         var output = await VerifySG.GetGeneratorOutputAsync(source);
         output.ShouldMatchApproved(o => o.NoDiff());
     }
+
+    [Fact]
+    public async Task GeneratesPartialClass_WithRemapType()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Query
+            {
+                public int Value => 42;
+            }
+
+            [AotQueryType<Query>]
+            [AotRemapType<IdGraphType, StringGraphType>]
+            public partial class MySchema : AotSchema
+            {
+                public MySchema() : base(null!, null!) { }
+            }
+            """;
+
+        var output = await VerifySG.GetGeneratorOutputAsync(source);
+
+        output.ShouldMatchApproved(o => o.NoDiff());
+    }
 }

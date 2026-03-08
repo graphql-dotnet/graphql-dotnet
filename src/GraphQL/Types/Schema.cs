@@ -417,7 +417,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     private List<(Type originalType, Type newType)>? _typeRemappings;
 
     /// <inheritdoc/>
-    public void RemapType(Type originalType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type newType)
+    public void RemapType(Type originalType, Type newType)
     {
         CheckDisposed();
         CheckInitialized();

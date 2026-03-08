@@ -195,10 +195,18 @@ public static class ProcessedSchemaDataTransformer
             }
         }
 
+        // Transform remap types
+        var remapTypes = processedData.RemapTypes
+            .Select(r => new TypeMappingData(
+                FullyQualifiedClrTypeName: GetFullyQualifiedTypeName((ITypeSymbol)r.Item1),
+                FullyQualifiedGraphTypeName: GetFullyQualifiedTypeName((ITypeSymbol)r.Item2)))
+            .ToImmutableEquatableArray();
+
         return new SchemaClassData(
             HasConstructor: hasConstructor,
             RegisteredGraphTypes: registeredGraphTypes.ToImmutableEquatableArray(),
             TypeMappings: typeMappings.ToImmutableEquatableArray(),
+            RemapTypes: remapTypes,
             QueryRootTypeName: queryRootTypeName,
             MutationRootTypeName: mutationRootTypeName,
             SubscriptionRootTypeName: subscriptionRootTypeName,

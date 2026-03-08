@@ -137,6 +137,7 @@ public record class SchemaClassData(
     bool HasConstructor,
     ImmutableEquatableArray<RegisteredGraphTypeData> RegisteredGraphTypes,
     ImmutableEquatableArray<TypeMappingData> TypeMappings,
+    ImmutableEquatableArray<TypeMappingData> RemapTypes,
     string? QueryRootTypeName,
     string? MutationRootTypeName,
     string? SubscriptionRootTypeName,
