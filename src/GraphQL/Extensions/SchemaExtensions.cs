@@ -105,7 +105,7 @@ public static class SchemaExtensions
     /// <typeparam name="TNew">The GraphType to use as the replacement.</typeparam>
     public static void RemapType<TOriginal, TNew>(this ISchema schema)
         where TOriginal : IGraphType
-        where TNew : IGraphType, new()
+        where TNew : IGraphType
     {
         schema.RemapType(typeof(TOriginal), typeof(TNew));
     }

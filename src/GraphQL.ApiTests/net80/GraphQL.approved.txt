@@ -1044,7 +1044,7 @@ namespace GraphQL
             where TVisitor : GraphQL.Utilities.ISchemaNodeVisitor { }
         public static void RemapType<TOriginal, TNew>(this GraphQL.Types.ISchema schema)
             where TOriginal : GraphQL.Types.IGraphType
-            where TNew : GraphQL.Types.IGraphType, new () { }
+            where TNew : GraphQL.Types.IGraphType { }
         public static TSchema ReplaceScalar<TSchema>(this TSchema schema, GraphQL.Types.ScalarGraphType scalar)
             where TSchema : GraphQL.Types.ISchema { }
         public static void Run(this GraphQL.Utilities.ISchemaNodeVisitor visitor, GraphQL.Types.ISchema schema) { }
