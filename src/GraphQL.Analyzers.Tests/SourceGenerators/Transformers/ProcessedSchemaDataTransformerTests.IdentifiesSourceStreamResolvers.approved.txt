@@ -16,13 +16,10 @@
 // RegisteredGraphTypes (3):
 //   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Subscription>
 //     AotGenerated: SubscriptionGraphType
-//     Override: null
 //   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Message>
 //     AotGenerated: MessageGraphType
-//     Override: null
 //   - global::GraphQL.Types.StringGraphType
 //     AotGenerated: null
-//     Override: null
 //     ConstructorData:
 //       Parameters (0):
 //       RequiredProperties (0):

@@ -16,22 +16,18 @@
 // RegisteredGraphTypes (4):
 //   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Query>
 //     AotGenerated: QueryGraphType
-//     Override: null
 //   - global::GraphQL.Types.GuidGraphType
 //     AotGenerated: null
-//     Override: null
 //     ConstructorData:
 //       Parameters (0):
 //       RequiredProperties (0):
 //   - global::GraphQL.Types.DateOnlyGraphType
 //     AotGenerated: null
-//     Override: null
 //     ConstructorData:
 //       Parameters (0):
 //       RequiredProperties (0):
 //   - global::GraphQL.Types.StringGraphType
 //     AotGenerated: null
-//     Override: null
 //     ConstructorData:
 //       Parameters (0):
 //       RequiredProperties (0):

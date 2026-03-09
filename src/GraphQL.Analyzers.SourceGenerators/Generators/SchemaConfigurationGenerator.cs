@@ -142,18 +142,7 @@ public static class SchemaConfigurationGenerator
                     && registeredType.ConstructorData.Parameters.Count == 0
                     && registeredType.ConstructorData.RequiredProperties.Count == 0)
                 {
-                    // For remap types (OverrideTypeName set), register only the implementation type
-                    // so DiscoverTypes can resolve it after applying the RemapType mapping.
-                    // The original type is tracked separately via RegisterType() below,
-                    // and RemapType() ensures schema initialization uses the implementation type.
-                    if (!string.IsNullOrEmpty(registeredType.OverrideTypeName))
-                    {
-                        sb.AppendLine($"AddAotType<{registeredType.OverrideTypeName}>();");
-                    }
-                    else
-                    {
-                        sb.AppendLine($"AddAotType<{registeredType.FullyQualifiedGraphTypeName}>();");
-                    }
+                    sb.AppendLine($"AddAotType<{registeredType.FullyQualifiedGraphTypeName}>();");
                 }
                 // Skip if constructor data is null
                 else if (registeredType.ConstructorData == null)
@@ -163,12 +152,7 @@ public static class SchemaConfigurationGenerator
                 // Generate factory lambda for types with constructor parameters or required properties
                 else
                 {
-                    // For remap types (OverrideTypeName set), register the implementation type directly
-                    // so DiscoverTypes can resolve it after applying the RemapType mapping.
-                    // targetTypeName is used for instantiation; aotTypeKey is the key in AotTypes.
-                    var targetTypeName = registeredType.OverrideTypeName ?? registeredType.FullyQualifiedGraphTypeName;
-                    var aotTypeKey = registeredType.OverrideTypeName ?? registeredType.FullyQualifiedGraphTypeName;
-                    sb.Append($"AotTypes.Add(typeof({aotTypeKey}), () => new {targetTypeName}(");
+                    sb.Append($"AotTypes.Add(typeof({registeredType.FullyQualifiedGraphTypeName}), () => new {registeredType.FullyQualifiedGraphTypeName}(");
 
                     // Generate constructor parameters
                     bool firstParam = true;

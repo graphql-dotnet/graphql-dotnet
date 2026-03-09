@@ -151,7 +151,6 @@ public record class SchemaClassData(
 public record class RegisteredGraphTypeData(
     string FullyQualifiedGraphTypeName,
     string? AotGeneratedTypeName,
-    string? OverrideTypeName,
     ConstructorData? ConstructorData);
 
 /// <summary>

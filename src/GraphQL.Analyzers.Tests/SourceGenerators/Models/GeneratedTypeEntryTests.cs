@@ -19,7 +19,6 @@ public class GeneratedTypeEntryTests
                     new RegisteredGraphTypeData(
                         FullyQualifiedGraphTypeName: "global::Sample.PersonGraphType",
                         AotGeneratedTypeName: "AutoOutputGraphType_Person",
-                        OverrideTypeName: null,
                         ConstructorData: new ConstructorData(
                             Parameters: new ImmutableEquatableArray<ConstructorParameterData>(new[]
                             {
@@ -34,7 +33,6 @@ public class GeneratedTypeEntryTests
                     new RegisteredGraphTypeData(
                         FullyQualifiedGraphTypeName: "global::Sample.ProductGraphType",
                         AotGeneratedTypeName: "AutoOutputGraphType_Product",
-                        OverrideTypeName: "CustomProduct",
                         ConstructorData: null)
                 }),
                 TypeMappings: new ImmutableEquatableArray<TypeMappingData>(new[]
@@ -79,7 +77,6 @@ public class GeneratedTypeEntryTests
                     new RegisteredGraphTypeData(
                         FullyQualifiedGraphTypeName: "global::Sample.PersonGraphType",
                         AotGeneratedTypeName: "AutoOutputGraphType_Person",
-                        OverrideTypeName: null,
                         ConstructorData: new ConstructorData(
                             Parameters: new ImmutableEquatableArray<ConstructorParameterData>(new[]
                             {
@@ -94,7 +91,6 @@ public class GeneratedTypeEntryTests
                     new RegisteredGraphTypeData(
                         FullyQualifiedGraphTypeName: "global::Sample.ProductGraphType",
                         AotGeneratedTypeName: "AutoOutputGraphType_Product",
-                        OverrideTypeName: "CustomProduct",
                         ConstructorData: null)
                 }),
                 TypeMappings: new ImmutableEquatableArray<TypeMappingData>(new[]

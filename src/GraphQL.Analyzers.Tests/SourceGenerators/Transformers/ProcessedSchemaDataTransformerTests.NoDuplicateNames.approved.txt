@@ -16,19 +16,14 @@
 // RegisteredGraphTypes (5):
 //   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Product>
 //     AotGenerated: ProductGraphType
-//     Override: null
 //   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.MyStatic.Product>
 //     AotGenerated: ProductGraphType2
-//     Override: null
 //   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Item<int>>
 //     AotGenerated: ItemGraphType
-//     Override: null
 //   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Item<long>>
 //     AotGenerated: ItemGraphType2
-//     Override: null
 //   - global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::MyApp.GraphQL.Product>
 //     AotGenerated: ProductGraphType3
-//     Override: null
 // TypeMappings (5):
 //   global::MyApp.GraphQL.Product -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Product>
 //   global::MyApp.GraphQL.MyStatic.Product -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.MyStatic.Product>

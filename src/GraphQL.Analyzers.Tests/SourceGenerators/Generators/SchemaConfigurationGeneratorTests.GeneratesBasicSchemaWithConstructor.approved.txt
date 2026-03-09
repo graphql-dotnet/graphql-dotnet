@@ -21,7 +21,7 @@ public partial class SampleAotSchema : global::GraphQL.Conversion.IListConverter
         RegisterType(typeof(global::GraphQL.Types.AutoRegisteringObjectGraphType<StarWarsQuery>));
         RegisterType(typeof(global::GraphQL.Types.IntGraphType));
         RegisterType(typeof(global::GraphQL.Types.StringGraphType));
-        RegisterType(typeof(global::GraphQL.Types.IdGraphType));
+        RegisterType(typeof(global::GraphQL.Types.GuidGraphType));
 
         RegisterTypeMapping(typeof(int), typeof(global::GraphQL.Types.IntGraphType));
         RegisterTypeMapping(typeof(string), typeof(global::GraphQL.Types.StringGraphType));
