@@ -315,11 +315,12 @@ public class AotSchemaGeneratorTests
 
             public class Query
             {
-                public int Value => 42;
+                [Id]
+                public byte Value => 42;
             }
 
             [AotQueryType<Query>]
-            [AotRemapType<IdGraphType, StringGraphType>]
+            [AotRemapType<IdGraphType, ByteGraphType>]
             public partial class MySchema : AotSchema
             {
                 public MySchema() : base(null!, null!) { }
