@@ -458,25 +458,6 @@ public sealed partial class SchemaTypes : SchemaTypesBase
                 _typeDictionary[typeKey] = type;
             }
 
-            // For scalar types that derive from built-in scalars, also register the base type
-            // if the Name matches (indicating it's an override, not a new type)
-            if (type is ScalarGraphType)
-            {
-                var baseType = type.GetType().BaseType;
-                while (baseType != null && baseType != typeof(ScalarGraphType) && baseType != typeof(object))
-                {
-                    if (BuiltInScalars.TryGetValue(baseType, out var builtInInstance))
-                    {
-                        // Check if the name matches the built-in scalar's name
-                        if (builtInInstance.Name == type.Name)
-                        {
-                            _typeDictionary[baseType] = type;
-                        }
-                    }
-                    baseType = baseType.BaseType;
-                }
-            }
-
             // Process the type immediately after adding it (unless skipProcessing is true)
             if (!skipProcessing)
                 ProcessType(type);

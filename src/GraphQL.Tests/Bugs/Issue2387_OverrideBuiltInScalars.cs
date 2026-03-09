@@ -127,8 +127,8 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
             }
             """;
         var schema = GraphQL.Types.Schema.For(typeDefs, config => config.Types.Include<SchemaFirstRoot>());
-        schema.RegisterType(new MyIntGraphType());
-        schema.RegisterType<MyStringGraphType>();
+        schema.RemapType<IntGraphType, MyIntGraphType>();
+        schema.RemapType<StringGraphType, MyStringGraphType>();
         return schema;
     }
 
@@ -161,8 +161,8 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
         public MySchema()
         {
             Query = new MyQuery();
-            RegisterType(new MyIntGraphType());
-            RegisterType(typeof(MyStringGraphType));
+            this.RemapType<IntGraphType, MyIntGraphType>();
+            this.RemapType<StringGraphType, MyStringGraphType>();
         }
     }
 
