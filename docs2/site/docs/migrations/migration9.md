@@ -334,8 +334,7 @@ public class MySchema : Schema
 ```
 
 The remapping is applied during schema initialization: when the schema encounters `BooleanGraphType`
-while building its type list, it substitutes `MyBooleanGraphType` instead. The replacement type
-must derive from the original type and have the same `Name` value.
+while building its type list, it substitutes `MyBooleanGraphType` instead.
 
 See the [custom scalars documentation](../getting-started/custom-scalars.md#replacing-built-in-scalar-types) for full details.
 
