@@ -329,8 +329,6 @@ public sealed partial class SchemaTypes : SchemaTypesBase
             // 4. Register type references from AdditionalTypes without processing
             foreach (var type in _schema.AdditionalTypes)
             {
-                // Apply type remapping: if this type is remapped, use the target type for both
-                // service resolution and registration to ensure consistent lookup
                 var effectiveType = _typeRemappings != null && _typeRemappings.TryGetValue(type, out var remapped) ? remapped : type;
                 var graphType = ResolveGraphType(effectiveType);
                 AddType(graphType, effectiveType, skipProcessing: true);
