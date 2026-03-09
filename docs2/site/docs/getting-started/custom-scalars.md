@@ -687,12 +687,8 @@ public class MySchema : Schema
 }
 ```
 
-`RemapType` is an extension method on `ISchema` defined in `SchemaExtensions`. It replaces all
-references to the original type (`BooleanGraphType`) with the new type (`MyBooleanGraphType`)
-during schema initialization. The new type must derive from the original type and have the same
-name (as set in step 1). Since `MyBooleanGraphType` derives from `BooleanGraphType` and has the
-same name, `RemapType` will ensure every place that references `BooleanGraphType` in your schema
-will use `MyBooleanGraphType` instead.
+`RemapType` replaces all references to the original type (`BooleanGraphType` in the example above)
+with the new type (`MyBooleanGraphType`) during schema initialization.
 
 Alternatively, you may register the type within your DI engine.
 
