@@ -197,9 +197,9 @@ public static class ProcessedSchemaDataTransformer
 
         // Transform remap types
         var remapTypes = processedData.RemapTypes
-            .Select(r => new TypeMappingData(
-                FullyQualifiedClrTypeName: GetFullyQualifiedTypeName((ITypeSymbol)r.Item1),
-                FullyQualifiedGraphTypeName: GetFullyQualifiedTypeName((ITypeSymbol)r.Item2)))
+            .Select(r => new TypeRemappingData(
+                FullyQualifiedOriginalTypeName: GetFullyQualifiedTypeName((ITypeSymbol)r.FromType),
+                FullyQualifiedNewTypeName: GetFullyQualifiedTypeName((ITypeSymbol)r.ToType)))
             .ToImmutableEquatableArray();
 
         return new SchemaClassData(

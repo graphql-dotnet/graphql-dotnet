@@ -71,7 +71,7 @@ public partial class MySchema
         AddAotType<global::GraphQL.Types.IntGraphType>();
 
         RegisterType(typeof(global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Sample.Query>));
-        RegisterType(typeof(global::GraphQL.Types.IdGraphType));
+        RegisterType(typeof(global::GraphQL.Types.StringGraphType));
         RegisterType(typeof(global::GraphQL.Types.IntGraphType));
 
         RegisterTypeMapping(typeof(global::Sample.Query), typeof(global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Sample.Query>));

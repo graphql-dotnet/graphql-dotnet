@@ -58,9 +58,9 @@ public class SchemaConfigurationGeneratorTests
             HasConstructor: false,
             RegisteredGraphTypes: registeredTypes,
             TypeMappings: typeMappings,
-            RemapTypes: new ImmutableEquatableArray<TypeMappingData>(new[]
+            RemapTypes: new ImmutableEquatableArray<TypeRemappingData>(new[]
             {
-                new TypeMappingData("global::GraphQL.Types.IdGraphType", "global::GraphQL.Types.GuidGraphType")
+                new TypeRemappingData("global::GraphQL.Types.IdGraphType", "global::GraphQL.Types.GuidGraphType")
             }),
             QueryRootTypeName: "global::GraphQL.Types.AutoRegisteringObjectGraphType<StarWarsQuery>",
             MutationRootTypeName: null,
@@ -90,7 +90,7 @@ public class SchemaConfigurationGeneratorTests
             HasConstructor: true,
             RegisteredGraphTypes: ImmutableEquatableArray<RegisteredGraphTypeData>.Empty,
             TypeMappings: ImmutableEquatableArray<TypeMappingData>.Empty,
-            RemapTypes: ImmutableEquatableArray<TypeMappingData>.Empty,
+            RemapTypes: ImmutableEquatableArray<TypeRemappingData>.Empty,
             QueryRootTypeName: null,
             MutationRootTypeName: null,
             SubscriptionRootTypeName: null,
@@ -185,7 +185,7 @@ public class SchemaConfigurationGeneratorTests
             HasConstructor: false,
             RegisteredGraphTypes: registeredTypes,
             TypeMappings: typeMappings,
-            RemapTypes: ImmutableEquatableArray<TypeMappingData>.Empty,
+            RemapTypes: ImmutableEquatableArray<TypeRemappingData>.Empty,
             QueryRootTypeName: "global::GraphQL.Types.AutoRegisteringObjectGraphType<Query>",
             MutationRootTypeName: null,
             SubscriptionRootTypeName: null,
@@ -225,9 +225,9 @@ public class SchemaConfigurationGeneratorTests
                 new ConstructorData(ImmutableEquatableArray<ConstructorParameterData>.Empty, ImmutableEquatableArray<RequiredPropertyData>.Empty)),
         });
 
-        var remapTypes = new ImmutableEquatableArray<TypeMappingData>(new[]
+        var remapTypes = new ImmutableEquatableArray<TypeRemappingData>(new[]
         {
-            new TypeMappingData("global::GraphQL.Types.IdGraphType", "global::GraphQL.Types.GuidGraphType")
+            new TypeRemappingData("global::GraphQL.Types.IdGraphType", "global::GraphQL.Types.GuidGraphType")
         });
 
         var schemaClass = new SchemaClassData(

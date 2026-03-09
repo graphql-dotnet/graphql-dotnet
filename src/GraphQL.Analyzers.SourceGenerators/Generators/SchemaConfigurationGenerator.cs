@@ -229,7 +229,7 @@ public static class SchemaConfigurationGenerator
             // Generate RemapType calls
             foreach (var remapType in schemaClass.RemapTypes)
             {
-                sb.AppendLine($"RemapType(typeof({remapType.FullyQualifiedClrTypeName}), typeof({remapType.FullyQualifiedGraphTypeName}));");
+                sb.AppendLine($"RemapType(typeof({remapType.FullyQualifiedOriginalTypeName}), typeof({remapType.FullyQualifiedNewTypeName}));");
             }
 
             if (schemaClass.RemapTypes.Count > 0)

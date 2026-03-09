@@ -137,7 +137,7 @@ public record class SchemaClassData(
     bool HasConstructor,
     ImmutableEquatableArray<RegisteredGraphTypeData> RegisteredGraphTypes,
     ImmutableEquatableArray<TypeMappingData> TypeMappings,
-    ImmutableEquatableArray<TypeMappingData> RemapTypes,
+    ImmutableEquatableArray<TypeRemappingData> RemapTypes,
     string? QueryRootTypeName,
     string? MutationRootTypeName,
     string? SubscriptionRootTypeName,
@@ -160,3 +160,10 @@ public record class RegisteredGraphTypeData(
 public record struct TypeMappingData(
     string FullyQualifiedClrTypeName,
     string FullyQualifiedGraphTypeName);
+
+/// <summary>
+/// Data for a type remapping, where one graph type is remapped to another.
+/// </summary>
+public record struct TypeRemappingData(
+    string FullyQualifiedOriginalTypeName,
+    string FullyQualifiedNewTypeName);

@@ -2264,8 +2264,8 @@ public partial class SchemaAttributeDataTransformerTests
             //
             // DiscoveredGraphTypes: 3
             //   [0] AutoRegisteringObjectGraphType<Query>
-            //   [1] IdGraphType
-            //   [2] DateGraphType
+            //   [1] GuidGraphType
+            //   [2] DateOnlyGraphType
             //
             // OutputClrTypeMappings: 1
             //   [0] Query -> AutoRegisteringObjectGraphType<Query>
