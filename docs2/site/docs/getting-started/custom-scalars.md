@@ -669,23 +669,30 @@ public class MyBooleanGraphType : BooleanGraphType
 }
 ```
 
-### 3. Register the custom scalar within your schema.
+### 3. Remap the built-in scalar to your custom scalar within your schema.
 
-The final step is to register an instance of the custom scalar within the schema. This can be
-done for code-first or schema-first schemas. For code-first schemas, register it within
-your constructor via `RegisterType`, as follows:
+The final step is to remap the built-in scalar to the custom scalar within the schema. This can be
+done for code-first or schema-first schemas. For code-first schemas, call `RemapType` within
+your constructor, as follows:
 
 ```csharp
 public class MySchema : Schema
 {
-    public void MySchema()
+    public MySchema()
     {
         Query = ....;
 
-        RegisterType(new MyBooleanGraphType());
+        this.RemapType<BooleanGraphType, MyBooleanGraphType>();
     }
 }
 ```
+
+`RemapType` is an extension method on `ISchema` defined in `SchemaExtensions`. It replaces all
+references to the original type (`BooleanGraphType`) with the new type (`MyBooleanGraphType`)
+during schema initialization. The new type must derive from the original type and have the same
+name (as set in step 1). Since `MyBooleanGraphType` derives from `BooleanGraphType` and has the
+same name, `RemapType` will ensure every place that references `BooleanGraphType` in your schema
+will use `MyBooleanGraphType` instead.
 
 Alternatively, you may register the type within your DI engine.
 
@@ -693,16 +700,16 @@ Alternatively, you may register the type within your DI engine.
 services.AddSingleton<BooleanGraphType, MyBooleanGraphType>();
 ```
 
-For schema-first schemas, register it immediately after calling `Schema.For` to create the schema.
-Immediately after calling `Schema.For` the schema is not yet initialized, therefore allowing registration of types.
+For schema-first schemas, call `RemapType` immediately after calling `Schema.For` to create the schema.
+Immediately after calling `Schema.For` the schema is not yet initialized, therefore allowing type remapping.
 
 ```csharp
 var schema = Schema.For(...);
-schema.RegisterType(new MyBooleanGraphType());
+schema.RemapType<BooleanGraphType, MyBooleanGraphType>();
 ```
 
-Now all `BooleanGraphType` references in your schema will utilize the new `MyBooleanGraphType`
-registered within the schema. This technique can be used to replace any of the built-in graph types.
+Now all `BooleanGraphType` references in your schema will utilize the new `MyBooleanGraphType`.
+This technique can be used to replace any of the built-in graph types.
 
 Note that if you set the `ResolvedType` property of a field or argument to an instance of a built-in
 type, or provide an instance of a built-in type to an applicable constructor, it will not be replaced
