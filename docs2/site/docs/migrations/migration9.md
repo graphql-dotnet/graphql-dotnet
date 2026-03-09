@@ -715,8 +715,6 @@ Previously, replacing a built-in scalar (e.g. `BooleanGraphType`) required passi
 the replacement type to `RegisterType`. In v9, using `RegisterType` with an instance whose type name
 matches a built-in scalar will throw an exception. Use the new `RemapType` extension method instead.
 
-**Before (v8):**
-
 ```csharp
 public class MySchema : Schema
 {
@@ -724,20 +722,9 @@ public class MySchema : Schema
     {
         Query = ...;
 
+        // v8:
         RegisterType(new MyBooleanGraphType());
-    }
-}
-```
-
-**After (v9):**
-
-```csharp
-public class MySchema : Schema
-{
-    public MySchema()
-    {
-        Query = ...;
-
+        // v9:
         this.RemapType<BooleanGraphType, MyBooleanGraphType>();
     }
 }
