@@ -29,22 +29,18 @@ public class SchemaConfigurationGeneratorTests
             new RegisteredGraphTypeData(
                 "global::GraphQL.Types.AutoRegisteringObjectGraphType<StarWarsQuery>",
                 "StarWarsQuery",
-                null,
                 null),
             new RegisteredGraphTypeData(
                 "global::GraphQL.Types.IntGraphType",
-                null,
                 null,
                 new ConstructorData(ImmutableEquatableArray<ConstructorParameterData>.Empty, ImmutableEquatableArray<RequiredPropertyData>.Empty)),
             new RegisteredGraphTypeData(
                 "global::GraphQL.Types.StringGraphType",
                 null,
-                null,
                 new ConstructorData(ImmutableEquatableArray<ConstructorParameterData>.Empty, ImmutableEquatableArray<RequiredPropertyData>.Empty)),
             new RegisteredGraphTypeData(
-                "global::GraphQL.Types.IdGraphType",
-                null,
                 "global::GraphQL.Types.GuidGraphType",
+                null,
                 new ConstructorData(ImmutableEquatableArray<ConstructorParameterData>.Empty, ImmutableEquatableArray<RequiredPropertyData>.Empty)),
         });
 
@@ -58,6 +54,10 @@ public class SchemaConfigurationGeneratorTests
             HasConstructor: false,
             RegisteredGraphTypes: registeredTypes,
             TypeMappings: typeMappings,
+            RemapTypes: new ImmutableEquatableArray<TypeRemappingData>(new[]
+            {
+                new TypeRemappingData("global::GraphQL.Types.IdGraphType", "global::GraphQL.Types.GuidGraphType")
+            }),
             QueryRootTypeName: "global::GraphQL.Types.AutoRegisteringObjectGraphType<StarWarsQuery>",
             MutationRootTypeName: null,
             SubscriptionRootTypeName: null,
@@ -86,6 +86,7 @@ public class SchemaConfigurationGeneratorTests
             HasConstructor: true,
             RegisteredGraphTypes: ImmutableEquatableArray<RegisteredGraphTypeData>.Empty,
             TypeMappings: ImmutableEquatableArray<TypeMappingData>.Empty,
+            RemapTypes: ImmutableEquatableArray<TypeRemappingData>.Empty,
             QueryRootTypeName: null,
             MutationRootTypeName: null,
             SubscriptionRootTypeName: null,
@@ -116,18 +117,15 @@ public class SchemaConfigurationGeneratorTests
             new RegisteredGraphTypeData(
                 "global::GraphQL.Types.AutoRegisteringObjectGraphType<Query>",
                 "QueryGraphType",
-                null,
                 null),
             // Type with zero params - should use standard AddAotType
             new RegisteredGraphTypeData(
                 "global::GraphQL.Types.StringGraphType",
                 null,
-                null,
                 new ConstructorData(ImmutableEquatableArray<ConstructorParameterData>.Empty, ImmutableEquatableArray<RequiredPropertyData>.Empty)),
             // Type with constructor parameter - should generate factory lambda
             new RegisteredGraphTypeData(
                 "global::CustomScalarGraphType",
-                null,
                 null,
                 new ConstructorData(
                     new[] { new ConstructorParameterData("global::System.String") }.ToImmutableEquatableArray(),
@@ -135,7 +133,6 @@ public class SchemaConfigurationGeneratorTests
             // Type with multiple constructor parameters - should generate factory lambda
             new RegisteredGraphTypeData(
                 "global::ComplexScalarGraphType",
-                null,
                 null,
                 new ConstructorData(
                     new[]
@@ -149,7 +146,6 @@ public class SchemaConfigurationGeneratorTests
             new RegisteredGraphTypeData(
                 "global::TypeWithRequiredProps",
                 null,
-                null,
                 new ConstructorData(
                     new[] { new ConstructorParameterData("global::System.String") }.ToImmutableEquatableArray(),
                     new[]
@@ -159,14 +155,12 @@ public class SchemaConfigurationGeneratorTests
                     }.ToImmutableEquatableArray())),
             // Type with override - should use override type in factory
             new RegisteredGraphTypeData(
-                "global::GraphQL.Types.IdGraphType",
-                null,
                 "global::GraphQL.Types.GuidGraphType",
+                null,
                 new ConstructorData(ImmutableEquatableArray<ConstructorParameterData>.Empty, ImmutableEquatableArray<RequiredPropertyData>.Empty)),
             // Type with null constructor data - should not generate AddAotType
             new RegisteredGraphTypeData(
                 "global::UnknownGraphType",
-                null,
                 null,
                 null),
         });
@@ -180,7 +174,55 @@ public class SchemaConfigurationGeneratorTests
             HasConstructor: false,
             RegisteredGraphTypes: registeredTypes,
             TypeMappings: typeMappings,
+            RemapTypes: ImmutableEquatableArray<TypeRemappingData>.Empty,
             QueryRootTypeName: "global::GraphQL.Types.AutoRegisteringObjectGraphType<Query>",
+            MutationRootTypeName: null,
+            SubscriptionRootTypeName: null,
+            ArrayListTypes: ImmutableEquatableArray<ListElementTypeData>.Empty,
+            GenericListTypes: ImmutableEquatableArray<ListElementTypeData>.Empty,
+            HashSetTypes: ImmutableEquatableArray<ListElementTypeData>.Empty);
+
+        // Act
+        var result = SchemaConfigurationGenerator.Generate(@namespace, partialClassHierarchy, schemaClass);
+
+        // Assert
+        result.ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public void GeneratesRemapTypeCalls()
+    {
+        // Arrange
+        var @namespace = "AotSample";
+        var partialClassHierarchy = new ImmutableEquatableArray<PartialClassInfo>(new[]
+        {
+            new PartialClassInfo("SampleAotSchema", Accessibility: ClassAccessibility.Public)
+        });
+
+        var registeredTypes = new ImmutableEquatableArray<RegisteredGraphTypeData>(new[]
+        {
+            new RegisteredGraphTypeData(
+                "global::GraphQL.Types.StringGraphType",
+                null,
+                new ConstructorData(ImmutableEquatableArray<ConstructorParameterData>.Empty, ImmutableEquatableArray<RequiredPropertyData>.Empty)),
+            // Remap type: IdGraphType -> GuidGraphType
+            new RegisteredGraphTypeData(
+                "global::GraphQL.Types.GuidGraphType",
+                null,
+                new ConstructorData(ImmutableEquatableArray<ConstructorParameterData>.Empty, ImmutableEquatableArray<RequiredPropertyData>.Empty)),
+        });
+
+        var remapTypes = new ImmutableEquatableArray<TypeRemappingData>(new[]
+        {
+            new TypeRemappingData("global::GraphQL.Types.IdGraphType", "global::GraphQL.Types.GuidGraphType")
+        });
+
+        var schemaClass = new SchemaClassData(
+            HasConstructor: true,
+            RegisteredGraphTypes: registeredTypes,
+            TypeMappings: ImmutableEquatableArray<TypeMappingData>.Empty,
+            RemapTypes: remapTypes,
+            QueryRootTypeName: null,
             MutationRootTypeName: null,
             SubscriptionRootTypeName: null,
             ArrayListTypes: ImmutableEquatableArray<ListElementTypeData>.Empty,

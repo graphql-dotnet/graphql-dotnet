@@ -105,26 +105,16 @@ public static class ProcessedSchemaDataTransformer
                 aotGeneratedTypeName = GetUniqueGraphTypeName(graphTypeSymbol, nameCache, usedNames);
             }
 
-            // Check if this graph type has a remap override
-            string? overrideTypeName = null;
-            if (remapTypeLookup.TryGetValue(graphTypeSymbol, out var remappedToType))
-            {
-                overrideTypeName = GetFullyQualifiedTypeName(remappedToType);
-            }
-
             // Get constructor data for non-AOT-generated types
             ConstructorData? constructorData = null;
-            if (aotGeneratedTypeName == null && (createGraphTypeConstructors || IsBuiltInGraphType(remappedToType ?? graphTypeSymbol, knownSymbols)))
+            if (aotGeneratedTypeName == null && (createGraphTypeConstructors || IsBuiltInGraphType(graphTypeSymbol, knownSymbols)))
             {
-                // Use the remapped type symbol if available, otherwise use the original graph type symbol
-                var symbolForConstructor = remappedToType ?? graphTypeSymbol;
-                constructorData = GetConstructorData(symbolForConstructor, knownSymbols);
+                constructorData = GetConstructorData(graphTypeSymbol, knownSymbols);
             }
 
             registeredGraphTypes.Add(new RegisteredGraphTypeData(
                 FullyQualifiedGraphTypeName: fullyQualifiedName,
                 AotGeneratedTypeName: aotGeneratedTypeName,
-                OverrideTypeName: overrideTypeName,
                 ConstructorData: constructorData));
         }
 
@@ -195,10 +185,18 @@ public static class ProcessedSchemaDataTransformer
             }
         }
 
+        // Transform remap types
+        var remapTypes = processedData.RemapTypes
+            .Select(r => new TypeRemappingData(
+                FullyQualifiedOriginalTypeName: GetFullyQualifiedTypeName((ITypeSymbol)r.FromType),
+                FullyQualifiedNewTypeName: GetFullyQualifiedTypeName((ITypeSymbol)r.ToType)))
+            .ToImmutableEquatableArray();
+
         return new SchemaClassData(
             HasConstructor: hasConstructor,
             RegisteredGraphTypes: registeredGraphTypes.ToImmutableEquatableArray(),
             TypeMappings: typeMappings.ToImmutableEquatableArray(),
+            RemapTypes: remapTypes,
             QueryRootTypeName: queryRootTypeName,
             MutationRootTypeName: mutationRootTypeName,
             SubscriptionRootTypeName: subscriptionRootTypeName,

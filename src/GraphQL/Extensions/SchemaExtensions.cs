@@ -96,6 +96,21 @@ public static class SchemaExtensions
     }
 
     /// <summary>
+    /// Remaps one GraphType to another during schema initialization.
+    /// When the schema encounters <typeparamref name="TOriginal"/> while building its type list,
+    /// it will use <typeparamref name="TNew"/> instead.
+    /// This allows you to substitute a specialized graph type implementation in place of a base type.
+    /// </summary>
+    /// <typeparam name="TOriginal">The GraphType to be replaced.</typeparam>
+    /// <typeparam name="TNew">The GraphType to use as the replacement.</typeparam>
+    public static void RemapType<TOriginal, TNew>(this ISchema schema)
+        where TOriginal : IGraphType
+        where TNew : IGraphType
+    {
+        schema.RemapType(typeof(TOriginal), typeof(TNew));
+    }
+
+    /// <summary>
     /// Prevents <typeparamref name="T"/> from being trimmed by the linker.
     /// </summary>
     private static void Preserve<T>() => GC.KeepAlive(typeof(T));

@@ -313,6 +313,31 @@ public class User
 }
 ```
 
+### 10. `RemapType` for Replacing Built-in Scalar Types
+
+A new `RemapType` extension method has been added to `ISchema` to provide a clean, type-safe way to
+replace built-in scalar graph types (or any graph type) with a custom implementation during schema
+initialization. This is the recommended approach when you want every reference to a built-in scalar
+to use your custom replacement.
+
+```csharp
+public class MySchema : Schema
+{
+    public MySchema()
+    {
+        Query = ...;
+
+        // Replace all BooleanGraphType references with MyBooleanGraphType
+        this.RemapType<BooleanGraphType, MyBooleanGraphType>();
+    }
+}
+```
+
+The remapping is applied during schema initialization: when the schema encounters `BooleanGraphType`
+while building its type list, it substitutes `MyBooleanGraphType` instead.
+
+See the [custom scalars documentation](../getting-started/custom-scalars.md#replacing-built-in-scalar-types) for full details.
+
 ## Breaking Changes
 
 ### 1. Removal of Obsolete Members
@@ -683,3 +708,27 @@ public string GetUserName([MyUserContext] MyUserContext userContext)
 ### 19. Type-first and auto-registering graph types will not function with NativeAOT
 
 For GraphQL.NET v9, NativeAOT compatibility is provided through a source generator; see the New Features section.
+
+### 20. Replacing built-in scalar types now requires `RemapType` instead of `RegisterType`
+
+Previously, replacing a built-in scalar (e.g. `BooleanGraphType`) required passing an instance of
+the replacement type to `RegisterType`. In v9, using `RegisterType` with an instance whose type name
+matches a built-in scalar will throw an exception. Use the new `RemapType` extension method instead.
+
+```csharp
+public class MySchema : Schema
+{
+    public MySchema()
+    {
+        Query = ...;
+
+        // v8:
+        RegisterType(new MyBooleanGraphType());
+        // v9:
+        this.RemapType<BooleanGraphType, MyBooleanGraphType>();
+    }
+}
+```
+
+The DI-based override (`services.AddSingleton<BooleanGraphType, MyBooleanGraphType>()`) continues
+to work without changes.

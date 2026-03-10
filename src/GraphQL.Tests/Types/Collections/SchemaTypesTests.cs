@@ -225,7 +225,7 @@ public class SchemaTypesTests
     public void can_override_scalars_manually()
     {
         var schema = new Schema();
-        schema.RegisterType(new MyBooleanGraphType());
+        schema.RemapType<BooleanGraphType, MyBooleanGraphType>();
         var query = new ObjectGraphType();
         query.Field<IntGraphType>("sample")
           .Argument<BooleanGraphType>("argNewBehavior");
@@ -237,7 +237,7 @@ public class SchemaTypesTests
     public void cant_have_mixed_scalars_then_replace_them()
     {
         var schema = new Schema();
-        schema.RegisterType(new MyBooleanGraphType());
+        schema.RemapType<BooleanGraphType, MyBooleanGraphType>();
         var query = new ObjectGraphType();
         query.Field<IntGraphType>("sample")
           .Argument<BooleanGraphType>("argNewBehavior")

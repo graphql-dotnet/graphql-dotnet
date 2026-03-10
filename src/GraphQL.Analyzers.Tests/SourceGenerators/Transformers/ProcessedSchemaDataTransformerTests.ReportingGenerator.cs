@@ -94,7 +94,6 @@ public partial class ProcessedSchemaDataTransformerTests
             {
                 sb.AppendLine($"//   - {gt.FullyQualifiedGraphTypeName}");
                 sb.AppendLine($"//     AotGenerated: {gt.AotGeneratedTypeName ?? "null"}");
-                sb.AppendLine($"//     Override: {gt.OverrideTypeName ?? "null"}");
                 if (gt.ConstructorData is not null)
                 {
                     var ctor = gt.ConstructorData;

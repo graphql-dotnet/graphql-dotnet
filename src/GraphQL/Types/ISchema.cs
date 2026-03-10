@@ -139,6 +139,22 @@ public interface ISchema : IMetadataReader, IMetadataWriter, IProvideDescription
     public IEnumerable<(Type clrType, Type graphType)> TypeMappings { get; }
 
     /// <summary>
+    /// Remaps one GraphType to another during schema initialization.
+    /// When the schema encounters <paramref name="originalType"/> while building its type list,
+    /// it will use <paramref name="newType"/> instead.
+    /// This allows you to substitute a specialized graph type implementation in place of a base type.
+    /// This method also explicitly registers <paramref name="newType"/> within the schema.
+    /// </summary>
+    /// <param name="originalType">The GraphType to be replaced.</param>
+    /// <param name="newType">The GraphType to use as the replacement.</param>
+    public void RemapType(Type originalType, Type newType);
+
+    /// <summary>
+    /// Returns all registered type remappings set by <see cref="RemapType"/>.
+    /// </summary>
+    public IEnumerable<(Type originalType, Type newType)> TypeRemappings { get; }
+
+    /// <summary>
     /// Returns all built-in type mappings for scalars.
     /// </summary>
     public IEnumerable<(Type clrType, Type graphType)> BuiltInTypeMappings { get; }
