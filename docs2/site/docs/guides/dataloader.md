@@ -41,6 +41,12 @@ services.AddGraphQL(b => b
 );
 ```
 
+> **Note for ASP.NET Core projects**: If you are using the `GraphQL.MicrosoftDI` package (included by default with `AddGraphQL()`), you can also register DataLoader services directly in `ConfigureServices` without manually configuring the document listener:
+> ```csharp
+> services.AddDataLoader();
+> ```
+> This registers both `IDataLoaderContextAccessor` and `DataLoaderDocumentListener` automatically, and configures the listener to be added to each document execution.
+
 2. Hook up your GraphQL schema to your IoC container.
 
 ``` csharp
