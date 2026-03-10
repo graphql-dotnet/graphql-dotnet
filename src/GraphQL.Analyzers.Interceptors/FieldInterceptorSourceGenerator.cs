@@ -79,7 +79,7 @@ internal static class FieldInterceptorSourceGenerator
         }
         else
         {
-            sb.AppendLine("                null,");
+            sb.AppendLine($"                \"{info.MemberName}\",");
         }
 
         sb.AppendLine("                expression,");

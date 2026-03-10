@@ -27,7 +27,7 @@ serviceCollection.AddTransient<StarWarsMutation>();
 serviceCollection.AddTransient<CharacterInterface>();
 serviceCollection.AddTransient<DroidType>();
 serviceCollection.AddTransient<HumanType>();
-serviceCollection.AddTransient<HumanInputType>();
+//serviceCollection.AddTransient<HumanInputType>();
 serviceCollection.AddTransient<ConnectionType<CharacterInterface, EdgeType<CharacterInterface>>>();
 serviceCollection.AddTransient<EdgeType<CharacterInterface>>();
 serviceCollection.AddTransient<PageInfoType>();
@@ -95,7 +95,10 @@ static string LoadResource(string resourceName)
     return reader.ReadToEnd();
 }
 
-//[AotRemapType<HumanInputType, AotAutoRegisteringInputObjectGraphType<Human>>]
+public record HumanInput(string Name, string? HomePlanet);
+
+[AotRemapType<HumanInputType, AutoRegisteringInputObjectGraphType<HumanInput>>]
+[AotTypeMapping<Human, HumanType>]
 internal partial class StarWarsAotSchema : AotSchema
 {
     public StarWarsAotSchema(IServiceProvider serviceProvider, IEnumerable<GraphQL.DI.IConfigureSchema> configurations)
