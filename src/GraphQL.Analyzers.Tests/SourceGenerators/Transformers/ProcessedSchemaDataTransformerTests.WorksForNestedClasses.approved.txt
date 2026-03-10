@@ -16,7 +16,6 @@
 // RegisteredGraphTypes (1):
 //   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Outer.Inner.Query>
 //     AotGenerated: QueryGraphType
-//     Override: null
 // TypeMappings (1):
 //   global::MyApp.GraphQL.Outer.Inner.Query -> global::GraphQL.Types.AutoRegisteringObjectGraphType<global::MyApp.GraphQL.Outer.Inner.Query>
 // ArrayListTypes (0): 

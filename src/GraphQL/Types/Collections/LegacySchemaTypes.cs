@@ -151,6 +151,9 @@ public class LegacySchemaTypes : SchemaTypesBase
         // set the name converter properly
         _nameConverter = schema.NameConverter ?? CamelCaseNameConverter.Instance;
 
+        if (schema.TypeRemappings.Any())
+            throw new NotSupportedException("Type remappings are not supported by LegacySchemaTypes. Please use SchemaTypes instead.");
+
         var ctx = new TypeCollectionContext(
             serviceType =>
             {

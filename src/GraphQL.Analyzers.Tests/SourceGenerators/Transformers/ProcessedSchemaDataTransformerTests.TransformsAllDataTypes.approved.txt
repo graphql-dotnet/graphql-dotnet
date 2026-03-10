@@ -16,37 +16,28 @@
 // RegisteredGraphTypes (9):
 //   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Person>
 //     AotGenerated: PersonGraphType
-//     Override: null
 //   - global::GraphQL.Types.AutoRegisteringInterfaceGraphType<global::IEntity>
 //     AotGenerated: IEntityGraphType
-//     Override: null
 //   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Mutation>
 //     AotGenerated: MutationGraphType
-//     Override: null
 //   - global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::PersonInput>
 //     AotGenerated: PersonInputGraphType
-//     Override: null
 //   - global::GraphQL.Types.AutoRegisteringInputObjectGraphType<global::SearchInput>
 //     AotGenerated: SearchInputGraphType
-//     Override: null
 //   - global::GraphQL.Types.AutoRegisteringObjectGraphType<global::Query>
 //     AotGenerated: QueryGraphType
-//     Override: null
 //   - global::GraphQL.Types.StringGraphType
 //     AotGenerated: null
-//     Override: null
 //     ConstructorData:
 //       Parameters (0):
 //       RequiredProperties (0):
 //   - global::GraphQL.Types.IntGraphType
 //     AotGenerated: null
-//     Override: null
 //     ConstructorData:
 //       Parameters (0):
 //       RequiredProperties (0):
 //   - global::GraphQL.Types.DecimalGraphType
 //     AotGenerated: null
-//     Override: null
 //     ConstructorData:
 //       Parameters (0):
 //       RequiredProperties (0):

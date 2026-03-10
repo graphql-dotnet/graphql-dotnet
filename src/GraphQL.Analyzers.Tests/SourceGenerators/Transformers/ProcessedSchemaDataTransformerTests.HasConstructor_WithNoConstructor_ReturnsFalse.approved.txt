@@ -18,7 +18,6 @@
 // RegisteredGraphTypes (1):
 //   - global::MyApp.GraphQL.MyType
 //     AotGenerated: null
-//     Override: null
 // TypeMappings (0):
 // ArrayListTypes (0): 
 // GenericListTypes (0): 

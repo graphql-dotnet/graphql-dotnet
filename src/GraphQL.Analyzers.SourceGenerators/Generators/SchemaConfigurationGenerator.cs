@@ -142,12 +142,7 @@ public static class SchemaConfigurationGenerator
                     && registeredType.ConstructorData.Parameters.Count == 0
                     && registeredType.ConstructorData.RequiredProperties.Count == 0)
                 {
-                    sb.Append($"AddAotType<{registeredType.FullyQualifiedGraphTypeName}");
-                    if (!string.IsNullOrEmpty(registeredType.OverrideTypeName))
-                    {
-                        sb.Append($", {registeredType.OverrideTypeName}");
-                    }
-                    sb.AppendLine(">();");
+                    sb.AppendLine($"AddAotType<{registeredType.FullyQualifiedGraphTypeName}>();");
                 }
                 // Skip if constructor data is null
                 else if (registeredType.ConstructorData == null)
@@ -157,8 +152,7 @@ public static class SchemaConfigurationGenerator
                 // Generate factory lambda for types with constructor parameters or required properties
                 else
                 {
-                    var targetTypeName = registeredType.OverrideTypeName ?? registeredType.FullyQualifiedGraphTypeName;
-                    sb.Append($"AotTypes.Add(typeof({registeredType.FullyQualifiedGraphTypeName}), () => new {targetTypeName}(");
+                    sb.Append($"AotTypes.Add(typeof({registeredType.FullyQualifiedGraphTypeName}), () => new {registeredType.FullyQualifiedGraphTypeName}(");
 
                     // Generate constructor parameters
                     bool firstParam = true;
@@ -214,6 +208,15 @@ public static class SchemaConfigurationGenerator
             }
 
             if (schemaClass.TypeMappings.Count > 0)
+                sb.AppendLine();
+
+            // Generate RemapType calls
+            foreach (var remapType in schemaClass.RemapTypes)
+            {
+                sb.AppendLine($"RemapType(typeof({remapType.FullyQualifiedOriginalTypeName}), typeof({remapType.FullyQualifiedNewTypeName}));");
+            }
+
+            if (schemaClass.RemapTypes.Count > 0)
                 sb.AppendLine();
 
             // Configure root types

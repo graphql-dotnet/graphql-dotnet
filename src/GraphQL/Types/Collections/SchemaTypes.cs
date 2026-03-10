@@ -224,6 +224,7 @@ public sealed partial class SchemaTypes : SchemaTypesBase
         private readonly Action<IGraphType>? _onBeforeInitialize;
         private readonly Dictionary<Type, Type> _inputClrTypeMappingCache;
         private readonly Dictionary<Type, Type> _outputClrTypeMappingCache;
+        private readonly Dictionary<Type, Type>? _typeRemappings;
 
         // Set of base GraphQL types that may be used to build a schema manually, and as such must not use type mapping
         private static readonly HashSet<Type> _baseTypes = new()
@@ -271,6 +272,10 @@ public sealed partial class SchemaTypes : SchemaTypesBase
                 if (mappedGraphType.IsOutputType())
                     _outputClrTypeMappingCache[mappedClrType] = mappedGraphType;
             }
+
+            // Initialize type remapping dictionary from schema.TypeRemappings
+            foreach (var (originalType, newType) in _schema.TypeRemappings)
+                (_typeRemappings ??= new Dictionary<Type, Type>())[originalType] = newType;
         }
 
         /// <summary>
@@ -324,8 +329,9 @@ public sealed partial class SchemaTypes : SchemaTypesBase
             // 4. Register type references from AdditionalTypes without processing
             foreach (var type in _schema.AdditionalTypes)
             {
-                var graphType = ResolveGraphType(type);
-                AddType(graphType, type, skipProcessing: true);
+                var effectiveType = _typeRemappings != null && _typeRemappings.TryGetValue(type, out var remapped) ? remapped : type;
+                var graphType = ResolveGraphType(effectiveType);
+                AddType(graphType, effectiveType, skipProcessing: true);
             }
         }
 
@@ -448,25 +454,6 @@ public sealed partial class SchemaTypes : SchemaTypesBase
             {
                 var typeKey = clrType ?? type.GetType();
                 _typeDictionary[typeKey] = type;
-            }
-
-            // For scalar types that derive from built-in scalars, also register the base type
-            // if the Name matches (indicating it's an override, not a new type)
-            if (type is ScalarGraphType)
-            {
-                var baseType = type.GetType().BaseType;
-                while (baseType != null && baseType != typeof(ScalarGraphType) && baseType != typeof(object))
-                {
-                    if (BuiltInScalars.TryGetValue(baseType, out var builtInInstance))
-                    {
-                        // Check if the name matches the built-in scalar's name
-                        if (builtInInstance.Name == type.Name)
-                        {
-                            _typeDictionary[baseType] = type;
-                        }
-                    }
-                    baseType = baseType.BaseType;
-                }
             }
 
             // Process the type immediately after adding it (unless skipProcessing is true)
@@ -753,6 +740,10 @@ public sealed partial class SchemaTypes : SchemaTypesBase
 
             // Resolve any CLR type references within the type
             type = ResolveClrTypeReferences(type);
+
+            // Apply type remappings from schema
+            if (_typeRemappings != null && _typeRemappings.TryGetValue(type, out var remappedType))
+                type = remappedType;
 
             var instance = ResolveGraphType(type);
 

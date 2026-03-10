@@ -73,6 +73,8 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
         public IEnumerable<(Type clrType, Type graphType)> TypeMappings => _schema.TypeMappings;
 
+        public IEnumerable<(Type originalType, Type newType)> TypeRemappings => _schema.TypeRemappings;
+
         /// <inheritdoc/>
         public IEnumerable<(Type clrType, Type graphType)> BuiltInTypeMappings => _schema.BuiltInTypeMappings;
     }
@@ -413,6 +415,35 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
     /// <inheritdoc/>
     public IEnumerable<(Type clrType, Type graphType)> TypeMappings => _clrToGraphTypeMappings ?? Enumerable.Empty<(Type, Type)>();
+
+    private List<(Type originalType, Type newType)>? _typeRemappings;
+
+    /// <inheritdoc/>
+    public void RemapType(Type originalType, Type newType)
+    {
+        CheckDisposed();
+        CheckInitialized();
+
+        if (originalType == null)
+            throw new ArgumentNullException(nameof(originalType));
+        if (newType == null)
+            throw new ArgumentNullException(nameof(newType));
+
+        if (originalType == newType)
+            throw new ArgumentOutOfRangeException(nameof(newType), "Original and new types must be different.");
+        if (!typeof(IGraphType).IsAssignableFrom(originalType))
+            throw new ArgumentOutOfRangeException(nameof(originalType), $"Type '{originalType.GetFriendlyName()}' must implement IGraphType.");
+        if (!typeof(IGraphType).IsAssignableFrom(newType))
+            throw new ArgumentOutOfRangeException(nameof(newType), $"Type '{newType.GetFriendlyName()}' must implement IGraphType.");
+        if (_additionalTypes?.Contains(originalType) == true)
+            throw new ArgumentOutOfRangeException(nameof(originalType), $"Type '{originalType.GetFriendlyName()}' must not be manually added to the schema.");
+
+        (_typeRemappings ??= []).Add((originalType, newType));
+        RegisterType(newType);
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<(Type originalType, Type newType)> TypeRemappings => _typeRemappings ?? Enumerable.Empty<(Type, Type)>();
 
     /// <inheritdoc/>
     public virtual IEnumerable<(Type clrType, Type graphType)> BuiltInTypeMappings
