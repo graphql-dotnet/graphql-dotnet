@@ -81,11 +81,18 @@ public partial class DocumentValidator
             else
             {
                 // assuming the schema passed validation, we should be find the matching graph type for this inline fragment
-                if (context.Schema.AllTypes[typeCondition.Type.Name.Value]?.GetNamedType() is IComplexGraphType type)
+                var namedType = context.Schema.AllTypes[typeCondition.Type.Name.Value]?.GetNamedType();
+                if (namedType is IComplexGraphType type)
                 {
                     context.Types.Push(type);
                     await base.VisitInlineFragmentAsync(inlineFragment, context).ConfigureAwait(false);
                     context.Types.Pop();
+                }
+                else if (namedType is IAbstractGraphType)
+                {
+                    // union types may contain inline fragments or fragment spreads with concrete types;
+                    // visit the body without pushing a type so nested inline fragments can push their own concrete types
+                    await base.VisitInlineFragmentAsync(inlineFragment, context).ConfigureAwait(false);
                 }
             }
         }
@@ -111,11 +118,18 @@ public partial class DocumentValidator
         protected override async ValueTask VisitFragmentDefinitionAsync(GraphQLFragmentDefinition fragmentDefinition, Context context)
         {
             // the fragment type name should be listed in the document, or the document would have failed validation
-            if (context.Schema.AllTypes[fragmentDefinition.TypeCondition.Type.Name.Value]?.GetNamedType() is IComplexGraphType type)
+            var namedType = context.Schema.AllTypes[fragmentDefinition.TypeCondition.Type.Name.Value]?.GetNamedType();
+            if (namedType is IComplexGraphType type)
             {
                 context.Types.Push(type);
                 await base.VisitFragmentDefinitionAsync(fragmentDefinition, context).ConfigureAwait(false);
                 context.Types.Pop();
+            }
+            else if (namedType is IAbstractGraphType)
+            {
+                // union types may contain inline fragments or fragment spreads with concrete types;
+                // visit the body without pushing a type so nested inline fragments can push their own concrete types
+                await base.VisitFragmentDefinitionAsync(fragmentDefinition, context).ConfigureAwait(false);
             }
         }
 
