@@ -260,8 +260,8 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// If expression is not <see cref="MemberExpression"/> and <typeparamref name="TProperty"/> is of value type
     /// the graph type nullability will match the <typeparamref name="TProperty"/> nullability. Otherwise, the field will be not nullable.
     /// </remarks>
-    [RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
-    [RequiresUnreferencedCode("Compiles the provided expression into a field resolver.")]
+    [SuppressMessage("Trimming", "IL2026", Justification = "Method body is replaced by a source generator interceptor at compile time.")]
+    [SuppressMessage("AOT", "IL3050", Justification = "Method body is replaced by a source generator interceptor at compile time.")]
     private FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         string name,
         Expression<Func<TSourceType, TProperty>> expression,
@@ -296,8 +296,6 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// If expression is not <see cref="MemberExpression"/> and <typeparamref name="TProperty"/> is of value type
     /// the graph type nullability will match the <typeparamref name="TProperty"/> nullability. Otherwise, the field will be not nullable.
     /// </remarks>
-    [RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
-    [RequiresUnreferencedCode("Compiles the provided expression into a field resolver.")]
     public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         string name,
         Expression<Func<TSourceType, TProperty>> expression) =>
@@ -314,8 +312,6 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <param name="name">The name of this field.</param>
     /// <param name="expression">The property of the source object represented within an expression.</param>
     /// <param name="nullable">Indicates if this field should be nullable or not.</param>
-    [RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
-    [RequiresUnreferencedCode("Compiles the provided expression into a field resolver.")]
     public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         string name,
         Expression<Func<TSourceType, TProperty>> expression,
@@ -332,8 +328,6 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <param name="name">The name of this field.</param>
     /// <param name="expression">The property of the source object represented within an expression.</param>
     /// <param name="type">The graph type of the field.</param>
-    [RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
-    [RequiresUnreferencedCode("Compiles the provided expression into a field resolver.")]
     public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         string name,
         Expression<Func<TSourceType, TProperty>> expression,
@@ -359,8 +353,6 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// If expression is not <see cref="MemberExpression"/> and <typeparamref name="TProperty"/> is of value type
     /// the graph type nullability will match the <typeparamref name="TProperty"/> nullability. Otherwise, the field will be not nullable.
     /// </remarks>
-    [RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
-    [RequiresUnreferencedCode("Compiles the provided expression into a field resolver.")]
     private FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         Expression<Func<TSourceType, TProperty>> expression,
         bool? nullable,
@@ -397,8 +389,6 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// If expression is not <see cref="MemberExpression"/> and <typeparamref name="TProperty"/> is of value type
     /// the graph type nullability will match the <typeparamref name="TProperty"/> nullability. Otherwise, the field will be not nullable.
     /// </remarks>
-    [RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
-    [RequiresUnreferencedCode("Compiles the provided expression into a field resolver.")]
     public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         Expression<Func<TSourceType, TProperty>> expression) =>
         Field(expression, nullable: null, type: null);
@@ -414,8 +404,6 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <typeparam name="TProperty">The return type of the field.</typeparam>
     /// <param name="expression">The property of the source object represented within an expression.</param>
     /// <param name="nullable">Indicates if this field should be nullable or not.</param>
-    [RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
-    [RequiresUnreferencedCode("Compiles the provided expression into a field resolver.")]
     public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         Expression<Func<TSourceType, TProperty>> expression, bool nullable) =>
         Field(expression, (bool?)nullable, type: null);
@@ -430,8 +418,6 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <typeparam name="TProperty">The return type of the field.</typeparam>
     /// <param name="expression">The property of the source object represented within an expression.</param>
     /// <param name="type">The graph type of the field.</param>
-    [RequiresDynamicCode("Compiles the provided expression into a field resolver.")]
-    [RequiresUnreferencedCode("Compiles the provided expression into a field resolver.")]
     public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         Expression<Func<TSourceType, TProperty>> expression,
         Type type) =>

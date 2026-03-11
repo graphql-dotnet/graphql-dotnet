@@ -2681,20 +2681,14 @@ namespace GraphQL.Types
         protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(string name, System.Type type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field(string name, GraphQL.Types.IGraphType type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field(string name, System.Type type) { }
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Compiles the provided expression into a field resolver.")]
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<TGraphType>(string name)
             where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Compiles the provided expression into a field resolver.")]
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, System.Type type) { }
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Compiles the provided expression into a field resolver.")]
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable) { }
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Compiles the provided expression into a field resolver.")]
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TReturnType>(string name, bool nullable = false) { }
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Compiles the provided expression into a field resolver.")]
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, System.Type type) { }
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Compiles the provided expression into a field resolver.")]
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name)
             where TGraphType : GraphQL.Types.IGraphType { }
