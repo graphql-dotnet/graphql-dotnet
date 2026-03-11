@@ -5,46 +5,6 @@ namespace GraphQL.Analyzers.Interceptors;
 /// <summary>
 /// Source generator that creates interceptors for ComplexGraphType.Field calls with expressions
 /// to avoid using ExpressionFieldResolver and enable AOT compilation.
-/// <para>
-/// This generator is opt-in and will only run when the <c>GraphQLEnableFieldInterceptors</c> MSBuild property is set to <c>true</c>.
-/// The GraphQL.Analyzers NuGet package automatically sets this property when trimming is enabled
-/// (<c>PublishTrimmed</c> or <c>EnableTrimAnalyzer</c>).
-/// </para>
-/// <para>
-/// To enable interceptors explicitly, add to your .csproj:
-/// <code>
-/// &lt;PropertyGroup&gt;
-///   &lt;GraphQLEnableFieldInterceptors&gt;true&lt;/GraphQLEnableFieldInterceptors&gt;
-/// &lt;/PropertyGroup&gt;
-/// </code>
-/// </para>
-/// <para>
-/// The following public Field overloads from <c>ComplexGraphType&lt;TSourceType&gt;</c> are intercepted:
-/// </para>
-/// <list type="number">
-/// <item>
-/// <description><c>Field&lt;TProperty&gt;(string name, Expression&lt;Func&lt;TSourceType, TProperty&gt;&gt; expression)</c> - Basic field with name and expression</description>
-/// </item>
-/// <item>
-/// <description><c>Field&lt;TProperty&gt;(string name, Expression&lt;Func&lt;TSourceType, TProperty&gt;&gt; expression, bool nullable)</c> - Field with name, expression, and explicit nullable flag</description>
-/// </item>
-/// <item>
-/// <description><c>Field&lt;TProperty&gt;(string name, Expression&lt;Func&lt;TSourceType, TProperty&gt;&gt; expression, Type type)</c> - Field with name, expression, and explicit graph type</description>
-/// </item>
-/// <item>
-/// <description><c>Field&lt;TProperty&gt;(Expression&lt;Func&lt;TSourceType, TProperty&gt;&gt; expression)</c> - Field with only expression (name inferred from expression)</description>
-/// </item>
-/// <item>
-/// <description><c>Field&lt;TProperty&gt;(Expression&lt;Func&lt;TSourceType, TProperty&gt;&gt; expression, bool nullable)</c> - Field with expression and explicit nullable flag (name inferred)</description>
-/// </item>
-/// <item>
-/// <description><c>Field&lt;TProperty&gt;(Expression&lt;Func&lt;TSourceType, TProperty&gt;&gt; expression, Type type)</c> - Field with expression and explicit graph type (name inferred)</description>
-/// </item>
-/// </list>
-/// <para>
-/// All interceptors call <c>FieldBuilderHelpers.CreateFieldBuilder</c> with null resolver parameter,
-/// allowing the field metadata to be set up without using <c>ExpressionFieldResolver</c> which is not AOT-compatible.
-/// </para>
 /// </summary>
 [Generator(LanguageNames.CSharp)]
 public class FieldExpressionInterceptorGenerator : IIncrementalGenerator
