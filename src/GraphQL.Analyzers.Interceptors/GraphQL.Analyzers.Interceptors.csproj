@@ -17,4 +17,8 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\GraphQL.Analyzers.SourceGenerators\SourceBuilder.cs" Link="SourceBuilder.cs" />
+  </ItemGroup>
+
 </Project>
