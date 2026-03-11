@@ -1,5 +1,6 @@
 using System.Text.Json;
 using GraphQL;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
 
 Console.WriteLine("GraphQL.NET Schema-First sample");
