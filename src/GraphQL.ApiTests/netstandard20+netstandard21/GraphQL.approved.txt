@@ -3431,6 +3431,11 @@ namespace GraphQL.Utilities
         public virtual void VisitSchema(GraphQL.Types.ISchema schema) { }
         public virtual void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
     }
+    public static class FieldBuilderHelpers
+    {
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TProperty> CreateFieldBuilder<TSourceType, TProperty>(GraphQL.Types.IComplexGraphType complexGraphType, string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool? nullable, System.Type? type, GraphQL.Resolvers.IFieldResolver? resolver) { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TProperty> CreateFieldFromExpression<TSourceType, TProperty>(GraphQL.Types.IComplexGraphType complexGraphType, string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool? nullable, System.Type? type, System.Func<GraphQL.IResolveFieldContext<TSourceType>, TProperty?> resolve) { }
+    }
     public class FieldConfig : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldMetadataWriter, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
     {
         public FieldConfig(string name) { }
