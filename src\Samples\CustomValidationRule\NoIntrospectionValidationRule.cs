@@ -9,8 +9,8 @@ namespace CustomValidationRuleSample;
 /// prevent clients from discovering your schema structure.
 /// </summary>
 /// <remarks>
-/// Introspection fields are those whose names begin with double underscores (__),
-/// such as __schema, __type, and __typename.
+/// GraphQL introspection fields have names that begin with double underscores (<c>__</c>),
+/// such as <c>__schema</c>, <c>__type</c>, and <c>__typename</c>.
 /// </remarks>
 public class NoIntrospectionValidationRule : IValidationRule
 {
@@ -20,6 +20,7 @@ public class NoIntrospectionValidationRule : IValidationRule
 
     private sealed class Visitor : INodeVisitor
     {
+        /// <summary>Singleton instance – the visitor is stateless so it can be safely reused.</summary>
         public static readonly Visitor Instance = new();
 
         public ValueTask EnterAsync(ASTNode node, ValidationContext context)
