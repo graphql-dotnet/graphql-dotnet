@@ -4,16 +4,16 @@ using GraphQL.Types;
 namespace GraphQL.SchemaFirstDemo;
 
 /// <summary>
-/// Resolvers for fields on the <c>Book</c> type.
+/// Field resolvers for the <c>Book</c> type.
 /// <para>
-/// For simple property-to-field mappings (same name, no additional logic) you do
-/// not need an explicit resolver class – graphql-dotnet resolves them automatically
-/// via reflection. This class is included to show the pattern and to demonstrate
-/// how a resolver receives the parent/source object as its first parameter.
+/// For simple property-to-field mappings (same name, no extra logic) graphql-dotnet
+/// resolves them automatically via reflection, so an explicit resolver class is not
+/// strictly necessary. This class is included to illustrate the pattern and to show
+/// how resolver methods receive the parent/source object as their first parameter.
 /// </para>
 /// </summary>
 [GraphQLMetadata("Book")]
-public class BookResolvers
+public sealed class BookResolvers
 {
     [GraphQLMetadata("id")]
     public string GetId(Book book) => book.Id;
