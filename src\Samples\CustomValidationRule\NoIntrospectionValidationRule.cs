@@ -6,8 +6,12 @@ namespace CustomValidationRuleSample;
 /// <summary>
 /// A custom validation rule that prohibits introspection queries.
 /// This is useful in production environments where you want to
-/// prevent clients from discovering the schema structure.
+/// prevent clients from discovering your schema structure.
 /// </summary>
+/// <remarks>
+/// Introspection fields are those whose names begin with double underscores (__),
+/// such as __schema, __type, and __typename.
+/// </remarks>
 public class NoIntrospectionValidationRule : IValidationRule
 {
     /// <inheritdoc/>
