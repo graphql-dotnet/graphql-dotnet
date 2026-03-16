@@ -5,16 +5,13 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>GraphQL.SchemaFirstDemo</RootNamespace>
+    <AssemblyName>GraphQL.SchemaFirstDemo</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL.MicrosoftDI" Version="$(GraphQLVersion)" />
-    <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="$(GraphQLServerVersion)" />
-    <PackageReference Include="GraphQL.Server.Ui.Playground" Version="$(GraphQLServerVersion)" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
+    <PackageReference Include="GraphQL.MicrosoftDI" Version="8.*" />
+    <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="8.*" />
+    <PackageReference Include="GraphQL.Server.Ui.Playground" Version="8.*" />
   </ItemGroup>
 
 </Project>
