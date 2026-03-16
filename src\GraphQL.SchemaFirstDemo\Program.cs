@@ -1,30 +1,34 @@
 using GraphQL;
 using GraphQL.SchemaFirstDemo;
-using GraphQL.Types;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register application services.
+// ---------------------------------------------------------------------------
+// Application services
+// ---------------------------------------------------------------------------
 builder.Services.AddSingleton<IBookRepository, BookRepository>();
 
-// Register resolver classes so they can be resolved from DI by SchemaBuilder.
+// Resolver classes must be registered in DI so SchemaBuilder can resolve them
+// and inject their constructor dependencies.
 builder.Services.AddSingleton<QueryResolvers>();
 builder.Services.AddSingleton<MutationResolvers>();
 builder.Services.AddSingleton<BookResolvers>();
 
-// Register GraphQL.NET with Schema-First schema.
+// ---------------------------------------------------------------------------
+// GraphQL.NET
+// ---------------------------------------------------------------------------
 builder.Services.AddGraphQL(b => b
     .AddSchema<BookSchema>()
     .AddSystemTextJson()
-    .AddErrorInfoProvider(opt => opt.ExposeExceptionDetails = builder.Environment.IsDevelopment())
-);
+    .AddErrorInfoProvider(opt =>
+        opt.ExposeExceptionDetails = builder.Environment.IsDevelopment()));
 
 var app = builder.Build();
 
-// Mount the GraphQL endpoint.
+// ---------------------------------------------------------------------------
+// Middleware
+// ---------------------------------------------------------------------------
 app.UseGraphQL<BookSchema>("/graphql");
-
-// Mount the Playground UI for interactive exploration.
 app.UseGraphQLPlayground("/ui/playground");
 
 await app.RunAsync();
