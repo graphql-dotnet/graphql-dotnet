@@ -4,24 +4,38 @@ using GraphQL.Utilities;
 namespace GraphQL.SchemaFirstDemo;
 
 /// <summary>
-/// Demonstrates the Schema-First approach: the full API surface is declared in
-/// GraphQL SDL and .NET resolver classes are registered via <see cref="SchemaBuilder"/>.
+/// Demonstrates the Schema-First (SDL-First) approach in GraphQL.NET.
+/// <para>
+/// The API surface is defined entirely in the GraphQL Schema Definition Language
+/// (<see cref="TypeDefinitions"/>), and .NET resolver classes are registered via
+/// <see cref="SchemaBuilder"/> so that graphql-dotnet can dispatch field resolution
+/// to them at runtime.
+/// </para>
 /// </summary>
-public class BookSchema : Schema
+public sealed class BookSchema : Schema
 {
     /// <summary>
-    /// The GraphQL Schema Definition Language that describes this API.
-    /// In a real project you would typically keep this in an embedded <c>.graphql</c>
-    /// resource file so it can be shared with clients and tooling.
+    /// The GraphQL Schema Definition Language (SDL) that describes this API.
+    /// <para>
+    /// In a production application you would typically keep this in an embedded
+    /// <c>.graphql</c> resource file so that the contract can be shared with
+    /// clients and tooling independently of the C# implementation.
+    /// </para>
     /// </summary>
     public const string TypeDefinitions = @"
         type Query {
+            """"""Returns all books in the library.""""""
             books: [Book!]!
+
+            """"""Returns a single book by its ID, or null if not found.""""""
             book(id: ID!): Book
         }
 
         type Mutation {
+            """"""Adds a new book to the library.""""""
             addBook(input: AddBookInput!): Book!
+
+            """"""Removes a book by ID. Returns true if the book was found and deleted.""""""
             deleteBook(id: ID!): Boolean!
         }
 
@@ -51,12 +65,10 @@ public class BookSchema : Schema
 
     public BookSchema(IServiceProvider serviceProvider) : base(serviceProvider)
     {
-        // SchemaBuilder parses the SDL and returns a ready-to-use Schema whose
-        // types/fields have resolvers populated from the registered resolver classes.
+        // Build the schema from SDL and wire up resolver classes.
+        // SchemaBuilder.Types.Include<T> reads [GraphQLMetadata] attributes on T
+        // to map it to a named SDL type and its individual field resolver methods.
         var builder = new SchemaBuilder();
-
-        // Register resolver classes. SchemaBuilder resolves them from the DI container
-        // so they can declare constructor dependencies normally.
         builder.Types.Include<QueryResolvers>(serviceProvider);
         builder.Types.Include<MutationResolvers>(serviceProvider);
         builder.Types.Include<BookResolvers>(serviceProvider);
