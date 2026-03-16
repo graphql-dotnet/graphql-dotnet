@@ -1,5 +1,6 @@
 namespace GraphQL.SchemaFirstDemo.Models;
 
+/// <summary>Domain model returned by the Books API.</summary>
 public class Book
 {
     public string Id { get; set; } = default!;
