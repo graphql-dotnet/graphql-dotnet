@@ -1,17 +1,20 @@
+- title: "Introduction"
+  url: /
+
 - title: "Getting Started"
   url: /getting-started
+  children:
+    - title: "Samples"
+      url: /getting-started/samples
+
+- title: "Schema Types"
+  url: /schema-types
+
+- title: "Queries and Mutations"
+  url: /queries
+
+- title: "Validation"
+  url: /validation
 
 - title: "Migrations"
   url: /migrations
-  children:
-    - title: "Migrating from 3.x to 4.x"
-      url: /migrations/migration4
-    - title: "Migrating from 4.x to 5.x"
-      url: /migrations/migration5
-    - title: "Migrating from 5.x to 7.x"
-      url: /migrations/migration7
-    - title: "Migrating from 7.x to 8.x"
-      url: /migrations/migration8
-
-- title: "Samples"
-  url: /samples
