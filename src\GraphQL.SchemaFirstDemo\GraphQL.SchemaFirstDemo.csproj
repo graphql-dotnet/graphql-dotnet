@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>GraphQL.SchemaFirstDemo</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GraphQL.MicrosoftDI" Version="$(GraphQLVersion)" />
+    <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="$(GraphQLServerVersion)" />
+    <PackageReference Include="GraphQL.Server.Ui.Playground" Version="$(GraphQLServerVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
+  </ItemGroup>
+
+</Project>
