@@ -1,53 +1,69 @@
+using CustomValidationRuleSample;
 using GraphQL;
 using GraphQL.Types;
 using GraphQL.Validation;
-using GraphQLParser.AST;
 
-// This sample demonstrates how to create a custom validation rule
-// that prohibits introspection queries.
+// This sample demonstrates how to create a custom validation rule.
+// The NoIntrospectionValidationRule prohibits introspection queries,
+// which can be useful in production to hide schema structure.
 
 var schema = Schema.For(@"
     type Query {
         hello: String
+        add(a: Int!, b: Int!): Int
     }
-", builder => {
-    builder.Types.For("Query").ResolveField("hello", ctx => "Hello World!");
+", builder =>
+{
+    builder.Types.For("Query").ResolveField("hello", _ => "Hello World!");
+    builder.Types.For("Query").ResolveField("add", ctx =>
+    {
+        var a = ctx.GetArgument<int>("a");
+        var b = ctx.GetArgument<int>("b");
+        return a + b;
+    });
 });
 
-// Execute a normal query - should succeed
-Console.WriteLine("=== Normal Query ===");
-var result1 = await new DocumentExecuter().ExecuteAsync(options =>
-{
-    options.Schema = schema;
-    options.Query = "{ hello }";
-    options.ValidationRules = DocumentValidator.CoreRules.Append(new NoIntrospectionValidationRule());
-});
-Console.WriteLine(result1.Errors == null
-    ? $"Result: {System.Text.Json.JsonSerializer.Serialize(result1.Data)}"
-    : $"Errors: {string.Join(", ", result1.Errors.Select(e => e.Message))}");
+var executer = new DocumentExecuter();
+var serializer = new GraphQL.SystemTextJson.GraphQLSerializer(indent: true);
 
-// Execute an introspection query - should fail
-Console.WriteLine();
-Console.WriteLine("=== Introspection Query (should fail) ===");
-var result2 = await new DocumentExecuter().ExecuteAsync(options =>
-{
-    options.Schema = schema;
-    options.Query = "{ __schema { types { name } } }";
-    options.ValidationRules = DocumentValidator.CoreRules.Append(new NoIntrospectionValidationRule());
-});
-Console.WriteLine(result2.Errors == null
-    ? $"Result: {System.Text.Json.JsonSerializer.Serialize(result2.Data)}"
-    : $"Errors: {string.Join(", ", result2.Errors.Select(e => e.Message))}");
+var validationRules = DocumentValidator.CoreRules.Append(new NoIntrospectionValidationRule());
 
-// Execute a mixed query - should fail
-Console.WriteLine();
-Console.WriteLine("=== Mixed Query (should fail) ===");
-var result3 = await new DocumentExecuter().ExecuteAsync(options =>
+// --- Example 1: Normal query (should succeed) ---
+Console.WriteLine("=== Example 1: Normal query ===");
+var result = await executer.ExecuteAsync(opt =>
 {
-    options.Schema = schema;
-    options.Query = "{ hello __typename }";
-    options.ValidationRules = DocumentValidator.CoreRules.Append(new NoIntrospectionValidationRule());
+    opt.Schema = schema;
+    opt.Query = "{ hello }";
+    opt.ValidationRules = validationRules;
 });
-Console.WriteLine(result3.Errors == null
-    ? $"Result: {System.Text.Json.JsonSerializer.Serialize(result3.Data)}"
-    : $"Errors: {string.Join(", ", result3.Errors.Select(e => e.Message))}");
+Console.WriteLine(await serializer.SerializeToStringAsync(result));
+
+// --- Example 2: Query with arguments (should succeed) ---
+Console.WriteLine("=== Example 2: Query with arguments ===");
+result = await executer.ExecuteAsync(opt =>
+{
+    opt.Schema = schema;
+    opt.Query = "{ add(a: 3, b: 4) }";
+    opt.ValidationRules = validationRules;
+});
+Console.WriteLine(await serializer.SerializeToStringAsync(result));
+
+// --- Example 3: Introspection query (should fail) ---
+Console.WriteLine("=== Example 3: Introspection query (should fail) ===");
+result = await executer.ExecuteAsync(opt =>
+{
+    opt.Schema = schema;
+    opt.Query = "{ __schema { types { name } } }";
+    opt.ValidationRules = validationRules;
+});
+Console.WriteLine(await serializer.SerializeToStringAsync(result));
+
+// --- Example 4: Mixed query with __typename (should fail) ---
+Console.WriteLine("=== Example 4: Mixed query with introspection field (should fail) ===");
+result = await executer.ExecuteAsync(opt =>
+{
+    opt.Schema = schema;
+    opt.Query = "{ hello __typename }";
+    opt.ValidationRules = validationRules;
+});
+Console.WriteLine(await serializer.SerializeToStringAsync(result));
