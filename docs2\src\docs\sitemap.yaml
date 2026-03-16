@@ -1,0 +1,82 @@
+# Navigation structure for the GraphQL.NET documentation site.
+# Each entry becomes a sidebar link; order values control the sort order within a group.
+
+- label: Getting Started
+  items:
+    - label: Introduction
+      link: /getting-started/
+    - label: Installation
+      link: /getting-started/installation/
+    - label: Upgrade Guides
+      link: /getting-started/upgrade-guides/
+
+- label: Fundamentals
+  items:
+    - label: Queries and Mutations
+      link: /fundamentals/queries/
+    - label: Types
+      link: /fundamentals/types/
+    - label: Scalars
+      link: /fundamentals/scalars/
+    - label: Interfaces
+      link: /fundamentals/interfaces/
+    - label: Unions
+      link: /fundamentals/unions/
+    - label: Arguments
+      link: /fundamentals/arguments/
+    - label: Variables
+      link: /fundamentals/variables/
+    - label: Directives
+      link: /fundamentals/directives/
+    - label: Subscriptions
+      link: /fundamentals/subscriptions/
+    - label: Schema-First
+      link: /fundamentals/schema-first/
+
+- label: Execution
+  items:
+    - label: Executing Queries
+      link: /execution/executing-queries/
+    - label: Complexity Analysis
+      link: /execution/complexity/
+    - label: Middleware
+      link: /execution/middleware/
+    - label: DataLoader
+      link: /execution/dataloader/
+    - label: Validation
+      link: /execution/validation/
+    - label: Error Handling
+      link: /execution/errors/
+    - label: Tracing
+      link: /execution/tracing/
+
+- label: ASP.NET Core Integration
+  items:
+    - label: Getting Started
+      link: /aspnet/getting-started/
+    - label: Transports
+      link: /aspnet/transports/
+    - label: Authorization
+      link: /aspnet/authorization/
+    - label: Persisted Queries
+      link: /aspnet/persisted-queries/
+
+- label: Samples
+  items:
+    - label: Overview
+      link: /samples/
+    - label: Schema-First Demo
+      link: /samples/schema-first/
+    - label: StarWars (Code-First)
+      link: /samples/starwars/
+    - label: GraphQL.Harness
+      link: /samples/harness/
+    - label: AOT Samples
+      link: /samples/aot/
+
+- label: Migration
+  items:
+    - label: Migrate to v8
+      link: /migration/migration8/
+    - label: Migrate to v7
+      link: /migration/migration7/
