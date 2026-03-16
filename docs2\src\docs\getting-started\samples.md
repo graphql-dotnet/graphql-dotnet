@@ -2,13 +2,13 @@
 title: Samples
 ---
 
-The GraphQL.NET repository ships with several sample projects that demonstrate different features and integration scenarios. All samples can be found in the [`src/Samples`](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/Samples) directory (or as top-level projects under `src/`).
+The GraphQL.NET repository ships with several sample projects that demonstrate different features and integration scenarios. All samples can be found in the repository under the `src/` directory.
 
 ## StarWars (Code-First)
 
-**Location:** `src/StarWars`
+**Location:** [`src/StarWars`](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/StarWars)
 
-A classic implementation of the [Star Wars GraphQL API](https://github.com/graphql/swapi-graphql) using **code-first** schema definition.
+A classic implementation of the [Star Wars GraphQL API](https://graphql.org/swapi-graphql/) using **code-first** schema definition.
 
 Topics demonstrated:
 - Defining types with `ObjectGraphType<T>` and `InterfaceGraphType<T>`
@@ -18,45 +18,47 @@ Topics demonstrated:
 
 ## StarWars (Schema-First)
 
-**Location:** `src/StarWarsSchemaFirst` *(if present)*
+**Location:** [`src/StarWarsSchemaFirst`](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/StarWarsSchemaFirst)
 
 The same Star Wars API using **schema-first** (SDL) schema definition.
 
 Topics demonstrated:
 - Defining the schema with a GraphQL SDL string
 - Mapping SDL types to .NET classes
-- Field resolvers via `resolver.Field(...)`
+- Field resolvers with SDL builder
 
 ## GraphQL.Harness
 
-**Location:** `src/GraphQL.Harness`
+**Location:** [`src/GraphQL.Harness`](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.Harness)
 
-A more complete ASP.NET Core web application that hosts a GraphQL endpoint.
+A complete ASP.NET Core web application that hosts a GraphQL endpoint.
 
 Topics demonstrated:
 - ASP.NET Core middleware setup
-- Dependency injection
+- Dependency injection integration
 - Serving the GraphiQL browser UI
-- Subscription support over WebSockets
+- WebSocket subscriptions
 
 ## AOT Samples
 
-**Location:** `src/Samples/AOT`
+**Location:** [`src/Samples/AOT`](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/Samples/AOT)
 
-Two samples demonstrating how to use GraphQL.NET with **.NET Native AOT** (ahead-of-time compilation), where JIT reflection is unavailable.
+Two sample projects demonstrating how to use GraphQL.NET with **.NET Native AOT** compilation.
 
 Topics demonstrated:
 - AOT-compatible schema building
 - Trimming annotations
-- Avoiding reflection-based features
+- Avoiding reflection-based patterns that are incompatible with AOT
 
 ## Custom Validation Rule Sample
 
-**Location:** `src/Samples/CustomValidationRule`
+**Location:** [`src/Samples/CustomValidationRule`](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/Samples/CustomValidationRule)
 
 Demonstrates how to write a **custom validation rule** that inspects incoming GraphQL documents and rejects queries that violate application-specific constraints — all *before* execution begins.
 
-The sample implements `NoIntrospectionValidationRule`, which disables GraphQL introspection. Disabling introspection in production is a common security measure to prevent clients from discovering your schema structure.
+The sample implements `NoIntrospectionValidationRule`, which disables GraphQL introspection.
+Disabling introspection in production is a common security measure to prevent clients from
+discovering your schema structure.
 
 ### What Is a Validation Rule?
 
