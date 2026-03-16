@@ -1,7 +1,8 @@
 namespace GraphQL.SchemaFirstDemo.Models;
 
 /// <summary>
-/// Book genre enum.  The values must match the SDL enum values (case-insensitive).
+/// Book genre.  Enum member names are matched case-insensitively to the SDL
+/// <c>Genre</c> enum values (<c>FICTION</c>, <c>NON_FICTION</c>, …).
 /// </summary>
 public enum Genre
 {
@@ -9,5 +10,5 @@ public enum Genre
     NonFiction,
     Science,
     History,
-    Biography
+    Biography,
 }
