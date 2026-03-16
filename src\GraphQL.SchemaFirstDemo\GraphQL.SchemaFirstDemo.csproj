@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>GraphQL.SchemaFirstDemo</RootNamespace>
     <AssemblyName>GraphQL.SchemaFirstDemo</AssemblyName>
+    <Description>Sample project demonstrating the Schema-First approach with GraphQL.NET</Description>
   </PropertyGroup>
 
   <ItemGroup>
