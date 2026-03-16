@@ -4,8 +4,8 @@ This sample demonstrates the **Schema-First** (SDL-First) approach supported by 
 
 ## What is Schema-First?
 
-In the Schema-First approach you define the entire API surface using the
-[GraphQL Schema Definition Language](https://graphql.org/learn/schema/) (SDL) and then wire
-.NET resolver classes onto the parsed type graph. This is the opposite of the more common
-Code-First approach, where you define .NET classes that *generate* the SDL.
+In the Schema-First approach you write the entire API surface as a
+[GraphQL Schema Definition Language](https://graphql.org/learn/schema/) (SDL) string and then
+bind .NET resolver classes to the parsed type graph. This contrasts with the Code-First approach
+where .NET types *generate* the SDL.
 
