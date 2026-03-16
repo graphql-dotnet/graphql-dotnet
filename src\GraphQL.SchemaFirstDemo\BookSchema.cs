@@ -4,14 +4,17 @@ using GraphQL.Utilities;
 namespace GraphQL.SchemaFirstDemo;
 
 /// <summary>
-/// Schema-First schema definition for a simple Books API.
-/// The SDL (Schema Definition Language) string defines the schema structure,
-/// and <see cref="BookSchemaConfigurator"/> maps types/fields to .NET resolver logic.
+/// Demonstrates the Schema-First approach: the API surface is defined entirely
+/// in SDL and resolver classes are wired up via <see cref="SchemaBuilder"/>.
 /// </summary>
 public class BookSchema : Schema
 {
-    // The SDL defines the shape of your API.
-    private const string Sdl = @"
+    /// <summary>
+    /// The GraphQL Schema Definition Language (SDL) that describes this API.
+    /// In a real application you would typically load this from an embedded resource
+    /// or a <c>.graphql</c> file so that it can be shared with clients/tooling.
+    /// </summary>
+    public const string Sdl = """
         type Query {
             books: [Book!]!
             book(id: ID!): Book
@@ -44,19 +47,18 @@ public class BookSchema : Schema
             HISTORY
             BIOGRAPHY
         }
-    ";
+        """;
 
     public BookSchema(IServiceProvider serviceProvider) : base(serviceProvider)
     {
-        // Build the schema from SDL and wire up resolvers via the configurator.
-        var schema = For(Sdl, configurator =>
-        {
-            configurator.Types.Include<QueryType>("Query");
-            configurator.Types.Include<MutationType>("Mutation");
-            configurator.Types.Include<BookType>("Book");
-        });
+        var builder = new SchemaBuilder();
+        builder.Types.Include<QueryResolvers>(serviceProvider);
+        builder.Types.Include<MutationResolvers>(serviceProvider);
+        builder.Types.Include<BookResolvers>(serviceProvider);
 
-        Query = schema.Query;
-        Mutation = schema.Mutation;
+        var builtSchema = builder.Build(Sdl);
+
+        Query    = builtSchema.Query;
+        Mutation = builtSchema.Mutation;
     }
 }
