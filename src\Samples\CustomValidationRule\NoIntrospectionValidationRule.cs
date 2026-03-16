@@ -1,30 +1,34 @@
 using GraphQL.Validation;
 using GraphQLParser.AST;
 
+namespace CustomValidationRuleSample;
+
 /// <summary>
 /// A custom validation rule that prohibits introspection queries.
-/// This can be useful in production environments where you want to
-/// hide the schema structure from clients.
+/// This is useful in production environments where you want to
+/// prevent clients from discovering the schema structure.
 /// </summary>
 public class NoIntrospectionValidationRule : IValidationRule
 {
     /// <inheritdoc/>
     public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context)
-        => new(new NoIntrospectionVisitor());
+        => new(Visitor.Instance);
 
-    private class NoIntrospectionVisitor : INodeVisitor
+    private sealed class Visitor : INodeVisitor
     {
+        public static readonly Visitor Instance = new();
+
         public ValueTask EnterAsync(ASTNode node, ValidationContext context)
         {
             if (node is GraphQLField field)
             {
-                var name = field.Name.StringValue;
-                if (name.StartsWith("__"))
+                var fieldName = field.Name.StringValue;
+                if (fieldName.StartsWith("__", StringComparison.Ordinal))
                 {
                     context.ReportError(new ValidationError(
                         context.Document.Source,
                         "NoIntrospection",
-                        $"Introspection queries are not allowed. Field '{name}' is an introspection field.",
+                        $"Introspection is disabled. Field '{fieldName}' is not allowed.",
                         field));
                 }
             }
