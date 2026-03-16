@@ -1,82 +1,93 @@
-# Navigation structure for the GraphQL.NET documentation site.
-# Each entry becomes a sidebar link; order values control the sort order within a group.
-
-- label: Getting Started
+- name: Getting Started
   items:
-    - label: Introduction
-      link: /getting-started/
-    - label: Installation
-      link: /getting-started/installation/
-    - label: Upgrade Guides
-      link: /getting-started/upgrade-guides/
+  - name: Introduction
+    href: getting-started
+  - name: Installation
+    href: installation
+  - name: Query
+    href: queries
 
-- label: Fundamentals
+- name: Schemas and Types
   items:
-    - label: Queries and Mutations
-      link: /fundamentals/queries/
-    - label: Types
-      link: /fundamentals/types/
-    - label: Scalars
-      link: /fundamentals/scalars/
-    - label: Interfaces
-      link: /fundamentals/interfaces/
-    - label: Unions
-      link: /fundamentals/unions/
-    - label: Arguments
-      link: /fundamentals/arguments/
-    - label: Variables
-      link: /fundamentals/variables/
-    - label: Directives
-      link: /fundamentals/directives/
-    - label: Subscriptions
-      link: /fundamentals/subscriptions/
-    - label: Schema-First
-      link: /fundamentals/schema-first/
+  - name: Schema
+    href: schema
+  - name: Object Types
+    href: object-types
+  - name: Field Definitions
+    href: field-definitions
+  - name: Scalars
+    href: scalars
+  - name: Enumerations
+    href: enumerations
+  - name: Interfaces
+    href: interfaces
+  - name: Unions
+    href: unions
+  - name: Input Objects
+    href: inputs
+  - name: Lists
+    href: lists
+  - name: Non-Null
+    href: non-null
+  - name: Directives
+    href: directives
+  - name: Schema-First
+    href: schema-first
 
-- label: Execution
+- name: Execution
   items:
-    - label: Executing Queries
-      link: /execution/executing-queries/
-    - label: Complexity Analysis
-      link: /execution/complexity/
-    - label: Middleware
-      link: /execution/middleware/
-    - label: DataLoader
-      link: /execution/dataloader/
-    - label: Validation
-      link: /execution/validation/
-    - label: Error Handling
-      link: /execution/errors/
-    - label: Tracing
-      link: /execution/tracing/
+  - name: Executing Queries
+    href: executing-queries
+  - name: Complexity Analysis
+    href: complexity-analyzer
+  - name: Middleware
+    href: middleware
+  - name: DataLoader
+    href: dataloader
+  - name: Validation
+    href: document-validation
+  - name: Error Handling
+    href: errors
+  - name: Tracing
+    href: tracing
+  - name: Subscriptions
+    href: subscriptions
 
-- label: ASP.NET Core Integration
+- name: ASP.NET Core
   items:
-    - label: Getting Started
-      link: /aspnet/getting-started/
-    - label: Transports
-      link: /aspnet/transports/
-    - label: Authorization
-      link: /aspnet/authorization/
-    - label: Persisted Queries
-      link: /aspnet/persisted-queries/
+  - name: Getting Started
+    href: aspnet
+  - name: Authentication and Authorization
+    href: authorization
+  - name: File Uploads
+    href: file-uploads
+  - name: Persisted Queries
+    href: persisted-queries
 
-- label: Samples
+- name: Advanced
   items:
-    - label: Overview
-      link: /samples/
-    - label: Schema-First Demo
-      link: /samples/schema-first/
-    - label: StarWars (Code-First)
-      link: /samples/starwars/
-    - label: GraphQL.Harness
-      link: /samples/harness/
-    - label: AOT Samples
-      link: /samples/aot/
+  - name: Dependency Injection
+    href: dependency-injection
+  - name: Migrations
+    href: migrations
+  - name: Relay
+    href: relay
+  - name: Introspection
+    href: introspection
+  - name: Security
+    href: security
+  - name: Serialization
+    href: serialization
 
-- label: Migration
+- name: Samples
   items:
-    - label: Migrate to v8
-      link: /migration/migration8/
-    - label: Migrate to v7
-      link: /migration/migration7/
+  - name: Samples Overview
+    href: samples
+  - name: Schema-First Demo
+    href: samples/schema-first
+  - name: StarWars
+    href: samples/starwars
+  - name: GraphQL.Harness
+    href: samples/harness
+  - name: AOT Samples
+    href: samples/aot
