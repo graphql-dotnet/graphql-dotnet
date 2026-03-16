@@ -1746,6 +1746,61 @@ public interface IValidationRule
 It is recommended to inherit from `ValidationRuleBase` for custom validation rules
 and override only the methods you need to implement.
 
+#### Transition from EnterLeaveListener (removed in v4)
+
+If you were using the old `EnterLeaveListener` pattern (removed in v4), you should migrate
+to the new `IValidationRule` approach. The new pattern provides similar functionality but with
+a cleaner API and better integration with the validation pipeline.
+
+The old approach looked like this:
+
+```csharp
+// Old v3 pattern (removed)
+public class MyListener : INodeVisitor
+{
+    public void Enter(INode node, ValidationContext context)
+    {
+        // Called when entering a node
+    }
+
+    public void Leave(INode node, ValidationContext context)
+    {
+        // Called when leaving a node
+    }
+}
+```
+
+The new approach uses `ValidationRuleBase` and async methods:
+
+```csharp
+// New v8+ pattern
+public class MyValidationRule : ValidationRuleBase, INodeVisitor
+{
+    public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
+        => new(this);
+
+    public ValueTask INodeVisitor.EnterAsync(ASTNode node, ValidationContext context)
+    {
+        // Called when entering a node
+        return default;
+    }
+
+    public ValueTask INodeVisitor.LeaveAsync(ASTNode node, ValidationContext context)
+    {
+        // Called when leaving a node
+        return default;
+    }
+}
+```
+
+Key changes:
+1. Methods are now async (`EnterAsync`/`LeaveAsync` instead of `Enter`/`Leave`)
+2. Validation rules inherit from `ValidationRuleBase` and implement `INodeVisitor`
+3. Override `GetPreNodeVisitorAsync` to return the visitor instance
+4. Register the rule with `.AddValidationRule<MyValidationRule>()` in your DI configuration
+
+For a complete example of custom validation rules, see the [GraphQL.Validation.Sample](../../guides/samples) sample project.
+
 ### 13. New properties added to `IGraphType`, `IFieldType` and `IObjectGraphType`
 
 See the new features section for details on the new properties added to these interfaces.
