@@ -2,6 +2,7 @@ using GraphQL.SchemaFirstDemo.Models;
 
 namespace GraphQL.SchemaFirstDemo;
 
+/// <summary>Abstraction over the in-memory book store.</summary>
 public interface IBookRepository
 {
     IEnumerable<Book> GetAll();
