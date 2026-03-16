@@ -4,17 +4,17 @@ using GraphQL.Utilities;
 namespace GraphQL.SchemaFirstDemo;
 
 /// <summary>
-/// Demonstrates the Schema-First approach: the API surface is defined entirely
-/// in SDL and resolver classes are wired up via <see cref="SchemaBuilder"/>.
+/// Demonstrates the Schema-First approach: the full API surface is declared in
+/// GraphQL SDL and .NET resolver classes are registered via <see cref="SchemaBuilder"/>.
 /// </summary>
 public class BookSchema : Schema
 {
     /// <summary>
-    /// The GraphQL Schema Definition Language (SDL) that describes this API.
-    /// In a real application you would typically load this from an embedded resource
-    /// or a <c>.graphql</c> file so that it can be shared with clients/tooling.
+    /// The GraphQL Schema Definition Language that describes this API.
+    /// In a real project you would typically keep this in an embedded <c>.graphql</c>
+    /// resource file so it can be shared with clients and tooling.
     /// </summary>
-    public const string Sdl = """
+    public const string TypeDefinitions = @"
         type Query {
             books: [Book!]!
             book(id: ID!): Book
@@ -47,18 +47,23 @@ public class BookSchema : Schema
             HISTORY
             BIOGRAPHY
         }
-        """;
+    ";
 
     public BookSchema(IServiceProvider serviceProvider) : base(serviceProvider)
     {
+        // SchemaBuilder parses the SDL and returns a ready-to-use Schema whose
+        // types/fields have resolvers populated from the registered resolver classes.
         var builder = new SchemaBuilder();
+
+        // Register resolver classes. SchemaBuilder resolves them from the DI container
+        // so they can declare constructor dependencies normally.
         builder.Types.Include<QueryResolvers>(serviceProvider);
         builder.Types.Include<MutationResolvers>(serviceProvider);
         builder.Types.Include<BookResolvers>(serviceProvider);
 
-        var builtSchema = builder.Build(Sdl);
+        var schema = builder.Build(TypeDefinitions);
 
-        Query    = builtSchema.Query;
-        Mutation = builtSchema.Mutation;
+        Query    = schema.Query;
+        Mutation = schema.Mutation;
     }
 }
