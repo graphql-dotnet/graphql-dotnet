@@ -1,20 +1,7 @@
 - title: "Introduction"
-  url: /
+  items:
+    - title: "Getting Started"
+      url: /getting-started
 
-- title: "Getting Started"
-  url: /getting-started
-  children:
-    - title: "Samples"
-      url: /getting-started/samples
-
-- title: "Schema Types"
-  url: /schema-types
-
-- title: "Queries and Mutations"
-  url: /queries
-
-- title: "Validation"
-  url: /validation
-
-- title: "Migrations"
-  url: /migrations
+- title: "Samples"
+  url: /getting-started/samples
