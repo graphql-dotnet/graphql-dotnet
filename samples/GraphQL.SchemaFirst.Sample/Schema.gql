@@ -1,0 +1,11 @@
+type Query {
+  hero: Droid
+  droids: [Droid!]!
+  droid(id: ID!): Droid
+}
+
+type Droid {
+  id: ID!
+  name: String!
+  primaryFunction: String
+}
