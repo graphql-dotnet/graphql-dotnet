@@ -10,6 +10,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <LangVersion>latest</LangVersion>
     <InterceptorsPreviewNamespaces>$(InterceptorsPreviewNamespaces);GraphQL.Analyzers.Interceptors</InterceptorsPreviewNamespaces>
+    <DefineConstants>$(DefineConstants);IMMUTABLE_EQUATABLE_ARRAY_INTERNAL</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +20,7 @@
 
   <ItemGroup>
     <Compile Include="..\GraphQL.Analyzers.SourceGenerators\SourceBuilder.cs" Link="SourceBuilder.cs" />
+    <Compile Include="..\GraphQL.Analyzers.SourceGenerators\Models\ImmutableEquatableArray.cs" Link="ImmutableEquatableArray.cs" />
   </ItemGroup>
 
 </Project>

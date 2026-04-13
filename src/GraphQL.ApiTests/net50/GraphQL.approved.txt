@@ -3741,6 +3741,10 @@ namespace GraphQL.Utilities
         public override void VisitSchema(GraphQL.Types.ISchema schema) { }
         public override void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
     }
+    public static class ResolveDelegateHelpers
+    {
+        public static System.Func<GraphQL.IResolveFieldContext, TParameterType> BuildArgument<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
+    }
     public class SchemaBuilder
     {
         protected readonly System.Collections.Generic.Dictionary<string, GraphQL.Types.IGraphType> _types;
