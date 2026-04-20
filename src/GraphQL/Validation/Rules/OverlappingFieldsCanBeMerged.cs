@@ -61,11 +61,12 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
         {
             _context = context;
 
-            // Pre-process fragment definitions in post-order so that conflicts within
-            // fragments are detected at the innermost level first.  This ensures that
-            // when the operation-level visitor later reaches the same leaf conflict through
-            // recursive merge-and-check, the dedup set suppresses the doubly-wrapped
-            // duplicate and preserves the singly-wrapped error at the correct level.
+            // Pre-process fragment definitions by checking inner (child) selection sets
+            // before outer (parent) ones, so that conflicts within fragments are detected
+            // at the innermost level first.  This ensures that when the operation-level
+            // visitor later reaches the same leaf conflict through recursive merge-and-check,
+            // the dedup set suppresses the doubly-wrapped duplicate and preserves the
+            // singly-wrapped error at the correct level.
             foreach (var def in context.Document.Definitions)
             {
                 if (def is GraphQLFragmentDefinition fragment)
@@ -76,8 +77,8 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
             }
         }
 
-        // Use LeaveAsync (post-order) so inner SelectionSets within the operation
-        // are checked before outer ones.
+        // Use LeaveAsync so inner (child) SelectionSets within the operation
+        // are checked before outer (parent) ones.
         ValueTask INodeVisitor.EnterAsync(ASTNode node, ValidationContext context) => default;
 
         ValueTask INodeVisitor.LeaveAsync(ASTNode node, ValidationContext context)
@@ -91,8 +92,9 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
         }
 
         /// <summary>
-        /// Recursively walks a SelectionSet tree in post-order and runs the Simon Adameit check
-        /// at each level. Used to pre-process fragment definitions before the main visitor runs.
+        /// Recursively walks a SelectionSet tree, checking child selection sets before their
+        /// parents, and runs the Simon Adameit check at each level. Used to pre-process
+        /// fragment definitions before the main visitor runs.
         /// </summary>
         private void PreProcessSelectionSet(IGraphType? parentType, GraphQLSelectionSet selectionSet)
         {
