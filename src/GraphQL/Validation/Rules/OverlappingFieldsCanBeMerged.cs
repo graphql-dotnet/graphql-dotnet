@@ -36,21 +36,21 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
     // ── ThreadStatic caches reused across validation runs on the same thread ──
 
     [ThreadStatic]
-    private static Dictionary<ExpandCacheKey, CacheEntry>? t_expandCache;
+    private static Dictionary<ExpandCacheKey, CacheEntry>? _expandCache;
 
     [ThreadStatic]
-    private static HashSet<(nint, nint)>? t_reportedPairs;
+    private static HashSet<(nint, nint)>? _reportedPairs;
 
     [ThreadStatic]
-    private static HashSet<ROM>? t_visitedFragments;
+    private static HashSet<ROM>? _visitedFragments;
 
     /// <inheritdoc/>
     /// <exception cref="OverlappingFieldsCanBeMergedError"/>
     public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
     {
         // Reuse ThreadStatic dictionaries; clear at the start of each validation run.
-        var expandCache = t_expandCache ??= new();
-        var reportedPairs = t_reportedPairs ??= new();
+        var expandCache = _expandCache ??= new();
+        var reportedPairs = _reportedPairs ??= new();
 
         expandCache.Clear();
         reportedPairs.Clear();
@@ -145,30 +145,7 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
     /// <summary>
     /// Cache key for expanded field maps, keyed by (parentType, selectionSet) using reference equality.
     /// </summary>
-    private readonly struct ExpandCacheKey : IEquatable<ExpandCacheKey>
-    {
-        public readonly IGraphType? ParentType;
-        public readonly GraphQLSelectionSet SelectionSet;
-
-        public ExpandCacheKey(IGraphType? parentType, GraphQLSelectionSet selectionSet)
-        {
-            ParentType = parentType;
-            SelectionSet = selectionSet;
-        }
-
-        public bool Equals(ExpandCacheKey other)
-            => ReferenceEquals(ParentType, other.ParentType) && ReferenceEquals(SelectionSet, other.SelectionSet);
-
-        public override bool Equals(object? obj) => obj is ExpandCacheKey other && Equals(other);
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return RuntimeHelpers.GetHashCode(ParentType) * 397 ^ RuntimeHelpers.GetHashCode(SelectionSet);
-            }
-        }
-    }
+    private readonly record struct ExpandCacheKey(IGraphType? ParentType, GraphQLSelectionSet SelectionSet);
 
     private static CacheEntry GetOrCreateCacheEntry(
         ValidationContext context,
@@ -182,7 +159,7 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
 
         var fieldMap = new Dictionary<ROM, List<FieldDefPair>>();
 
-        var visitedFragments = t_visitedFragments ??= new();
+        var visitedFragments = _visitedFragments ??= new();
         visitedFragments.Clear();
 
         ExpandSelectionSetCore(context, parentType, selectionSet, fieldMap, visitedFragments);
