@@ -33,200 +33,189 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
     {
     }
 
-    // ── ThreadStatic caches reused across validation runs on the same thread ──
-
-    [ThreadStatic]
-    private static Dictionary<ExpandCacheKey, CacheEntry>? _expandCache;
-
-    [ThreadStatic]
-    private static HashSet<(nint, nint)>? _reportedPairs;
-
-    [ThreadStatic]
-    private static HashSet<ROM>? _visitedFragments;
-
     /// <inheritdoc/>
     /// <exception cref="OverlappingFieldsCanBeMergedError"/>
     public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
-    {
-        // Reuse ThreadStatic dictionaries; clear at the start of each validation run.
-        var expandCache = _expandCache ??= new();
-        var reportedPairs = _reportedPairs ??= new();
+        => new(new Visitor(context));
 
-        expandCache.Clear();
-        reportedPairs.Clear();
-
-        // Pre-process fragment definitions in post-order so that conflicts within
-        // fragments are detected at the innermost level first.  This ensures that
-        // when the operation-level visitor later reaches the same leaf conflict through
-        // recursive merge-and-check, the dedup set suppresses the doubly-wrapped
-        // duplicate and preserves the singly-wrapped error at the correct level.
-        foreach (var def in context.Document.Definitions)
-        {
-            if (def is GraphQLFragmentDefinition fragment)
-            {
-                var fragmentType = fragment.TypeCondition.Type.GraphTypeFromType(context.Schema);
-                PreProcessSelectionSet(context, expandCache, reportedPairs, fragmentType, fragment.SelectionSet);
-            }
-        }
-
-        // Use leave (post-order) callback so inner SelectionSets within the operation
-        // are checked before outer ones.
-        return new ValueTask<INodeVisitor?>(new MatchingNodeVisitor<GraphQLSelectionSet>(
-            leave: (selectionSet, context) =>
-        {
-            var parentType = context.TypeInfo.GetParentType();
-            CheckSelectionSet(context, expandCache, reportedPairs, parentType, selectionSet);
-        }));
-    }
-
-    /// <summary>
-    /// Recursively walks a SelectionSet tree in post-order and runs the Simon Adameit check
-    /// at each level. Used to pre-process fragment definitions before the main visitor runs.
-    /// </summary>
-    private static void PreProcessSelectionSet(
-        ValidationContext context,
-        Dictionary<ExpandCacheKey, CacheEntry> expandCache,
-        HashSet<(nint, nint)> reportedPairs,
-        IGraphType? parentType,
-        GraphQLSelectionSet selectionSet)
-    {
-        // Recurse into children first (post-order)
-        for (int i = 0; i < selectionSet.Selections.Count; i++)
-        {
-            var selection = selectionSet.Selections[i];
-            if (selection is GraphQLField field && field.SelectionSet != null)
-            {
-                FieldType? fieldDef = null;
-                if (parentType is IComplexGraphType complexType)
-                    fieldDef = complexType.GetField(field.Name);
-                var fieldReturnType = fieldDef?.ResolvedType;
-                PreProcessSelectionSet(context, expandCache, reportedPairs, fieldReturnType, field.SelectionSet);
-            }
-            else if (selection is GraphQLInlineFragment inlineFragment)
-            {
-                var typeCondition = inlineFragment.TypeCondition?.Type;
-                var inlineType = typeCondition != null
-                    ? typeCondition.GraphTypeFromType(context.Schema)
-                    : parentType;
-                PreProcessSelectionSet(context, expandCache, reportedPairs, inlineType, inlineFragment.SelectionSet);
-            }
-        }
-
-        // Then check this level
-        CheckSelectionSet(context, expandCache, reportedPairs, parentType, selectionSet);
-    }
-
-    private static void CheckSelectionSet(
-        ValidationContext context,
-        Dictionary<ExpandCacheKey, CacheEntry> expandCache,
-        HashSet<(nint, nint)> reportedPairs,
-        IGraphType? parentType,
-        GraphQLSelectionSet selectionSet)
-    {
-        var entry = GetOrCreateCacheEntry(context, expandCache, parentType, selectionSet);
-
-        // Optimization: if only 0 or 1 field per response name, no conflicts possible
-        if (!entry.HasOverlappingFields)
-            return;
-
-        List<Conflict>? conflicts = null;
-        entry.SameResponseShapeByName(context, expandCache, reportedPairs, ref conflicts);
-        entry.SameForCommonParentsByName(context, expandCache, reportedPairs, ref conflicts);
-
-        if (conflicts != null)
-        {
-            foreach (var conflict in conflicts)
-                context.ReportError(new OverlappingFieldsCanBeMergedError(context, conflict));
-        }
-    }
-
-    // ── Field expansion: flatten selection sets by inlining all fragments ──
+    // ── Cache key for expanded field maps ──
 
     /// <summary>
     /// Cache key for expanded field maps, keyed by (parentType, selectionSet) using reference equality.
     /// </summary>
     private readonly record struct ExpandCacheKey(IGraphType? ParentType, GraphQLSelectionSet SelectionSet);
 
-    private static CacheEntry GetOrCreateCacheEntry(
-        ValidationContext context,
-        Dictionary<ExpandCacheKey, CacheEntry> cache,
-        IGraphType? parentType,
-        GraphQLSelectionSet selectionSet)
+    // ── Inner visitor: owns all per-validation-run state ──
+
+    /// <summary>
+    /// Implements the Simon Adameit overlapping-fields check as an <see cref="INodeVisitor"/>.
+    /// </summary>
+    private sealed class Visitor : INodeVisitor
     {
-        var key = new ExpandCacheKey(parentType, selectionSet);
-        if (cache.TryGetValue(key, out var entry))
-            return entry;
+        private readonly ValidationContext _context;
+        private readonly Dictionary<ExpandCacheKey, CacheEntry> _expandCache = new();
+        private readonly HashSet<(nint, nint)> _reportedPairs = new();
+        private readonly HashSet<ROM> _visitedFragments = new();
 
-        var fieldMap = new Dictionary<ROM, List<FieldDefPair>>();
-
-        var visitedFragments = _visitedFragments ??= new();
-        visitedFragments.Clear();
-
-        ExpandSelectionSetCore(context, parentType, selectionSet, fieldMap, visitedFragments);
-
-        entry = new CacheEntry(fieldMap);
-        cache[key] = entry;
-        return entry;
-    }
-
-    private static void ExpandSelectionSetCore(
-        ValidationContext context,
-        IGraphType? parentType,
-        GraphQLSelectionSet selectionSet,
-        Dictionary<ROM, List<FieldDefPair>> result,
-        HashSet<ROM> visitedFragments)
-    {
-        for (int i = 0; i < selectionSet.Selections.Count; i++)
+        public Visitor(ValidationContext context)
         {
-            var selection = selectionSet.Selections[i];
+            _context = context;
 
-            if (selection is GraphQLField field)
+            // Pre-process fragment definitions in post-order so that conflicts within
+            // fragments are detected at the innermost level first.  This ensures that
+            // when the operation-level visitor later reaches the same leaf conflict through
+            // recursive merge-and-check, the dedup set suppresses the doubly-wrapped
+            // duplicate and preserves the singly-wrapped error at the correct level.
+            foreach (var def in context.Document.Definitions)
             {
-                var fieldName = field.Name;
-                FieldType? fieldDef = null;
-                if (parentType is IComplexGraphType complexType)
-                    fieldDef = complexType.GetField(fieldName);
-
-                var responseName = field.Alias is null ? fieldName : field.Alias.Name;
-
-                if (!result.TryGetValue(responseName, out var list))
-                {
-                    list = new List<FieldDefPair>();
-                    result[responseName] = list;
-                }
-
-                list.Add(new FieldDefPair
-                {
-                    ParentType = parentType,
-                    Field = field,
-                    FieldDef = fieldDef
-                });
-            }
-            else if (selection is GraphQLFragmentSpread fragmentSpread)
-            {
-                var fragmentName = fragmentSpread.FragmentName.Name;
-
-                // Prevent infinite recursion for recursive fragments
-                if (!visitedFragments.Add(fragmentName))
-                    continue;
-
-                var fragment = context.Document.FindFragmentDefinition(fragmentName);
-                if (fragment != null)
+                if (def is GraphQLFragmentDefinition fragment)
                 {
                     var fragmentType = fragment.TypeCondition.Type.GraphTypeFromType(context.Schema);
-                    ExpandSelectionSetCore(context, fragmentType, fragment.SelectionSet, result, visitedFragments);
+                    PreProcessSelectionSet(fragmentType, fragment.SelectionSet);
                 }
-
-                visitedFragments.Remove(fragmentName); // Allow re-entry from different paths
             }
-            else if (selection is GraphQLInlineFragment inlineFragment)
-            {
-                var typeCondition = inlineFragment.TypeCondition?.Type;
-                var inlineFragmentType = typeCondition != null
-                    ? typeCondition.GraphTypeFromType(context.Schema)
-                    : parentType;
+        }
 
-                ExpandSelectionSetCore(context, inlineFragmentType, inlineFragment.SelectionSet, result, visitedFragments);
+        // Use LeaveAsync (post-order) so inner SelectionSets within the operation
+        // are checked before outer ones.
+        ValueTask INodeVisitor.EnterAsync(ASTNode node, ValidationContext context) => default;
+
+        ValueTask INodeVisitor.LeaveAsync(ASTNode node, ValidationContext context)
+        {
+            if (node is GraphQLSelectionSet selectionSet)
+            {
+                var parentType = context.TypeInfo.GetParentType();
+                CheckSelectionSet(parentType, selectionSet);
+            }
+            return default;
+        }
+
+        /// <summary>
+        /// Recursively walks a SelectionSet tree in post-order and runs the Simon Adameit check
+        /// at each level. Used to pre-process fragment definitions before the main visitor runs.
+        /// </summary>
+        private void PreProcessSelectionSet(IGraphType? parentType, GraphQLSelectionSet selectionSet)
+        {
+            // Recurse into children first (post-order)
+            for (int i = 0; i < selectionSet.Selections.Count; i++)
+            {
+                var selection = selectionSet.Selections[i];
+                if (selection is GraphQLField field && field.SelectionSet != null)
+                {
+                    FieldType? fieldDef = null;
+                    if (parentType is IComplexGraphType complexType)
+                        fieldDef = complexType.GetField(field.Name);
+                    var fieldReturnType = fieldDef?.ResolvedType;
+                    PreProcessSelectionSet(fieldReturnType, field.SelectionSet);
+                }
+                else if (selection is GraphQLInlineFragment inlineFragment)
+                {
+                    var typeCondition = inlineFragment.TypeCondition?.Type;
+                    var inlineType = typeCondition != null
+                        ? typeCondition.GraphTypeFromType(_context.Schema)
+                        : parentType;
+                    PreProcessSelectionSet(inlineType, inlineFragment.SelectionSet);
+                }
+            }
+
+            // Then check this level
+            CheckSelectionSet(parentType, selectionSet);
+        }
+
+        private void CheckSelectionSet(IGraphType? parentType, GraphQLSelectionSet selectionSet)
+        {
+            var entry = GetOrCreateCacheEntry(parentType, selectionSet);
+
+            // Optimization: if only 0 or 1 field per response name, no conflicts possible
+            if (!entry.HasOverlappingFields)
+                return;
+
+            List<Conflict>? conflicts = null;
+            entry.SameResponseShapeByName(_expandCache, _reportedPairs, ref conflicts);
+            entry.SameForCommonParentsByName(_expandCache, _reportedPairs, ref conflicts);
+
+            if (conflicts != null)
+            {
+                foreach (var conflict in conflicts)
+                    _context.ReportError(new OverlappingFieldsCanBeMergedError(_context, conflict));
+            }
+        }
+
+        // ── Field expansion: flatten selection sets by inlining all fragments ──
+
+        internal CacheEntry GetOrCreateCacheEntry(IGraphType? parentType, GraphQLSelectionSet selectionSet)
+        {
+            var key = new ExpandCacheKey(parentType, selectionSet);
+            if (_expandCache.TryGetValue(key, out var entry))
+                return entry;
+
+            var fieldMap = new Dictionary<ROM, List<FieldDefPair>>();
+
+            _visitedFragments.Clear();
+            ExpandSelectionSetCore(parentType, selectionSet, fieldMap);
+
+            entry = new CacheEntry(fieldMap);
+            _expandCache[key] = entry;
+            return entry;
+        }
+
+        private void ExpandSelectionSetCore(
+            IGraphType? parentType,
+            GraphQLSelectionSet selectionSet,
+            Dictionary<ROM, List<FieldDefPair>> result)
+        {
+            for (int i = 0; i < selectionSet.Selections.Count; i++)
+            {
+                var selection = selectionSet.Selections[i];
+
+                if (selection is GraphQLField field)
+                {
+                    var fieldName = field.Name;
+                    FieldType? fieldDef = null;
+                    if (parentType is IComplexGraphType complexType)
+                        fieldDef = complexType.GetField(fieldName);
+
+                    var responseName = field.Alias is null ? fieldName : field.Alias.Name;
+
+                    if (!result.TryGetValue(responseName, out var list))
+                    {
+                        list = new List<FieldDefPair>();
+                        result[responseName] = list;
+                    }
+
+                    list.Add(new FieldDefPair
+                    {
+                        ParentType = parentType,
+                        Field = field,
+                        FieldDef = fieldDef
+                    });
+                }
+                else if (selection is GraphQLFragmentSpread fragmentSpread)
+                {
+                    var fragmentName = fragmentSpread.FragmentName.Name;
+
+                    // Prevent infinite recursion for recursive fragments
+                    if (!_visitedFragments.Add(fragmentName))
+                        continue;
+
+                    var fragment = _context.Document.FindFragmentDefinition(fragmentName);
+                    if (fragment != null)
+                    {
+                        var fragmentType = fragment.TypeCondition.Type.GraphTypeFromType(_context.Schema);
+                        ExpandSelectionSetCore(fragmentType, fragment.SelectionSet, result);
+                    }
+
+                    _visitedFragments.Remove(fragmentName); // Allow re-entry from different paths
+                }
+                else if (selection is GraphQLInlineFragment inlineFragment)
+                {
+                    var typeCondition = inlineFragment.TypeCondition?.Type;
+                    var inlineFragmentType = typeCondition != null
+                        ? typeCondition.GraphTypeFromType(_context.Schema)
+                        : parentType;
+
+                    ExpandSelectionSetCore(inlineFragmentType, inlineFragment.SelectionSet, result);
+                }
             }
         }
     }
@@ -272,7 +261,6 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
         /// Sub-conflicts found in merged sub-selections are wrapped under the parent output name.
         /// </summary>
         public void SameResponseShapeByName(
-            ValidationContext context,
             Dictionary<ExpandCacheKey, CacheEntry> expandCache,
             HashSet<(nint, nint)> reportedPairs,
             ref List<Conflict>? conflicts)
@@ -293,11 +281,11 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
                 RequireSameOutputTypeShape(responseName, fields, reportedPairs, ref conflicts);
 
                 // Merge sub-selections and recurse
-                var merged = GetOrCreateMergedSubSelections(context, expandCache, responseName, fields);
+                var merged = GetOrCreateMergedSubSelections(expandCache, responseName, fields);
                 if (merged != null && merged.HasOverlappingFields)
                 {
                     List<Conflict>? subConflicts = null;
-                    merged.SameResponseShapeByName(context, expandCache, reportedPairs, ref subConflicts);
+                    merged.SameResponseShapeByName(expandCache, reportedPairs, ref subConflicts);
 
                     // Wrap any sub-conflicts under the current response name
                     if (subConflicts != null)
@@ -317,7 +305,6 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
         /// Sub-conflicts found in merged sub-selections are wrapped under the parent output name.
         /// </summary>
         public void SameForCommonParentsByName(
-            ValidationContext context,
             Dictionary<ExpandCacheKey, CacheEntry> expandCache,
             HashSet<(nint, nint)> reportedPairs,
             ref List<Conflict>? conflicts)
@@ -343,11 +330,11 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
                     RequireSameNameAndArguments(responseName, group, reportedPairs, ref conflicts);
 
                     // Merge sub-selections of this parent group and recurse
-                    var merged = MergeSubSelectionsForGroup(context, expandCache, group);
+                    var merged = MergeSubSelectionsForGroup(expandCache, group);
                     if (merged != null && merged.HasOverlappingFields)
                     {
                         List<Conflict>? subConflicts = null;
-                        merged.SameForCommonParentsByName(context, expandCache, reportedPairs, ref subConflicts);
+                        merged.SameForCommonParentsByName(expandCache, reportedPairs, ref subConflicts);
 
                         // Wrap any sub-conflicts under the current response name
                         if (subConflicts != null)
@@ -365,7 +352,6 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
         /// Gets or creates a merged CacheEntry from the sub-selections of all fields with a given response name.
         /// </summary>
         private CacheEntry? GetOrCreateMergedSubSelections(
-            ValidationContext context,
             Dictionary<ExpandCacheKey, CacheEntry> expandCache,
             ROM responseName,
             List<FieldDefPair> fields)
@@ -375,7 +361,7 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
             if (_mergedSubSelectionsCache.TryGetValue(responseName, out var cached))
                 return cached;
 
-            var merged = MergeSubSelectionsForGroup(context, expandCache, fields);
+            var merged = MergeSubSelectionsForGroup(expandCache, fields);
             _mergedSubSelectionsCache[responseName] = merged;
             return merged;
         }
@@ -384,7 +370,6 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
         /// Merge sub-selections of the given fields into a single CacheEntry.
         /// </summary>
         private static CacheEntry? MergeSubSelectionsForGroup(
-            ValidationContext context,
             Dictionary<ExpandCacheKey, CacheEntry> expandCache,
             List<FieldDefPair> fields)
         {
@@ -398,7 +383,9 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
                     continue;
 
                 var subType = field.FieldDef?.ResolvedType?.GetNamedType();
-                var subEntry = GetOrCreateCacheEntry(context, expandCache, subType, subSelectionSet);
+                var key = new ExpandCacheKey(subType, subSelectionSet);
+                if (!expandCache.TryGetValue(key, out var subEntry))
+                    continue;
 
                 if (subEntry.FieldMap.Count == 0)
                     continue;
