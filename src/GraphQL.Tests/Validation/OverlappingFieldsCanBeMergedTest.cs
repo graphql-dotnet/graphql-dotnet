@@ -1,7 +1,11 @@
+using System.Diagnostics;
+using GraphQL.Execution;
 using GraphQL.Types;
+using GraphQL.Validation;
 using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Tests.Validation;
 
@@ -1283,5 +1287,64 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
             config.Schema = schema;
             config.Query = query;
         });
+    }
+
+    /// <summary>
+    /// Regression test for a potential DOS attack via quadratic/exponential blowup in
+    /// OverlappingFieldsCanBeMerged when many inline fragments on the same concrete type
+    /// are nested inside an outer set of inline fragments.
+    ///
+    /// The query shape is:
+    ///   { field { [N x: ... on Node { f { [M x: ... on Node { x }] } }] } }
+    ///
+    /// Without memoization this causes O(N*M^2) or worse comparisons. With correct
+    /// memoization via cachedFieldsAndFragmentNames and comparedFragmentPairs the
+    /// validation must complete in well under one second even for large N and M.
+    /// </summary>
+    [Fact]
+    public async Task Does_not_have_exponential_blowup_with_many_inline_fragments()
+    {
+        var schema = GraphQL.Types.Schema.For("""
+            type Query { field: Node }
+            type Node { f: Node, g: Node, x: String }
+            """);
+
+        static string GenTwoLevel(int n, int m)
+        {
+            var inner = string.Join(" ", Enumerable.Repeat("... on Node { x }", m));
+            var outer = string.Join(" ", Enumerable.Repeat($"... on Node {{ f {{ {inner} }} }}", n));
+            return $"{{ field {{ {outer} }} }}";
+        }
+
+        var docBuilder = new GraphQLDocumentBuilder();
+        var validator = new DocumentValidator();
+
+        // Use a moderately large N and M that would hang for seconds/minutes without
+        // proper memoization but should complete in under 1 second with it.
+        const int n = 250;
+        const int m = 150;
+        const int timeLimitMs = 1_000; // todo: verify this is a reasonable time limit on CI machines
+
+        var query = GenTwoLevel(n, m);
+        var doc = docBuilder.Build(query);
+
+        var sw = Stopwatch.StartNew();
+        var result = await validator.ValidateAsync(new ValidationOptions
+        {
+            Schema = schema,
+            Document = doc,
+            Rules = [OverlappingFieldsCanBeMerged.Instance],
+            Operation = doc.Definitions.OfType<GraphQLOperationDefinition>().First(),
+        });
+        sw.Stop();
+
+        // The query is valid (all inline fragments target the same concrete type Node,
+        // so the mutually-exclusive optimisation applies and no conflicts are reported).
+        result.IsValid.ShouldBeTrue(
+            $"Expected no validation errors but got: {string.Join(", ", result.Errors?.Select(e => e.Message) ?? [])}");
+
+        sw.ElapsedMilliseconds.ShouldBeLessThan(timeLimitMs,
+            $"Validation took {sw.ElapsedMilliseconds}ms for N={n} M={m}, " +
+            $"which exceeds the {timeLimitMs}ms limit — possible quadratic/exponential blowup.");
     }
 }
