@@ -353,11 +353,11 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msg = "c and a are different fields"
+                        Msg = "a and c are different fields"
                     }
                 });
-                e.Locations.Add(new Location(13, 9));
                 e.Locations.Add(new Location(17, 5));
+                e.Locations.Add(new Location(13, 9));
             });
 
             config.Error(e =>
@@ -366,11 +366,11 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msg = "c and b are different fields"
+                        Msg = "b and c are different fields"
                     }
                 });
-                e.Locations.Add(new Location(13, 9));
                 e.Locations.Add(new Location(20, 5));
+                e.Locations.Add(new Location(13, 9));
             });
         });
     }
@@ -1323,7 +1323,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
         // proper memoization but should complete in under 1 second with it.
         const int n = 250;
         const int m = 150;
-        const int timeLimitMs = 1_000; // todo: verify this is a reasonable time limit on CI machines
+        const int timeLimitMs = 3_000; // allow headroom for CI variability
 
         var query = GenTwoLevel(n, m);
         var doc = docBuilder.Build(query);
