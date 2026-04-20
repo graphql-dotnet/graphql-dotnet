@@ -84,6 +84,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// <summary>
     /// Sets the default value of fields on input object graph types.
     /// </summary>
+    [AllowedOn<IInputObjectGraphType>]
     public virtual FieldBuilder<TSourceType, TReturnType> DefaultValue(TReturnType? defaultValue = default)
     {
         FieldType.DefaultValue = defaultValue;
