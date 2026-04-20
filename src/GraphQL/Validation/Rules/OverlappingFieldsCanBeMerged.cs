@@ -403,10 +403,7 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
                 if (subEntry.FieldMap.Count == 0)
                     continue;
 
-                if (mergedMap == null)
-                {
-                    mergedMap = new Dictionary<ROM, List<FieldDefPair>>(subEntry.FieldMap.Count);
-                }
+                mergedMap ??= new Dictionary<ROM, List<FieldDefPair>>(subEntry.FieldMap.Count);
 
                 foreach (var subField in subEntry.FieldMap)
                 {
