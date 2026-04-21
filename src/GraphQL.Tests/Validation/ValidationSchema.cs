@@ -114,6 +114,7 @@ public class Human : ObjectGraphType
     {
         Field<StringGraphType>("name")
             .Argument<BooleanGraphType>("surname");
+        Field<StringGraphType>("dummy");
         Field<ListGraphType<Pet>>("pets");
         Field<ListGraphType<Human>>("relatives");
         Field<IntGraphType>("id");
