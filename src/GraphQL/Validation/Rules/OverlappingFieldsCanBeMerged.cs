@@ -107,7 +107,9 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
                     FieldType? fieldDef = null;
                     if (parentType is IComplexGraphType complexType)
                         fieldDef = complexType.GetField(field.Name);
-                    var fieldReturnType = fieldDef?.ResolvedType;
+                    // Use GetNamedType() to strip List/NonNull wrappers so the cache key
+                    // matches what MergeSubSelectionsForGroup uses when looking up sub-entries.
+                    var fieldReturnType = fieldDef?.ResolvedType?.GetNamedType();
                     PreProcessSelectionSet(fieldReturnType, field.SelectionSet);
                 }
                 else if (selection is GraphQLInlineFragment inlineFragment)

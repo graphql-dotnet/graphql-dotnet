@@ -1335,7 +1335,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                                             Name = "name",
                                             Message = new OverlappingFieldsCanBeMerged.Message
                                             {
-                                                Msg = "id and name are different fields"
+                                                Msg = "they return conflicting types String and Int"
                                             }
                                         }
                                     ]
@@ -1344,14 +1344,15 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         ]
                     }
                 });
-                // FieldsLeft:  human@(3,5) → relatives@(4,13) → name:id@(4,25)
-                // FieldsRight: human@(4,5) → relatives@(7,5) → name@(7,17)
+                // human@(3,5) and human@(4,5) conflict; within that:
+                // relatives@(7,5) and relatives@(4,13) conflict; within that:
+                // name@(7,17) and name:id@(4,25) conflict (type mismatch String vs Int)
                 e.Locations.Add(new Location(3, 5));
-                e.Locations.Add(new Location(4, 13));
-                e.Locations.Add(new Location(4, 25));
-                e.Locations.Add(new Location(4, 5));
                 e.Locations.Add(new Location(7, 5));
                 e.Locations.Add(new Location(7, 17));
+                e.Locations.Add(new Location(4, 5));
+                e.Locations.Add(new Location(4, 13));
+                e.Locations.Add(new Location(4, 25));
             });
         });
     }
@@ -1398,7 +1399,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                                             Name = "name",
                                             Message = new OverlappingFieldsCanBeMerged.Message
                                             {
-                                                Msg = "id and name are different fields"
+                                                Msg = "they return conflicting types String and Int"
                                             }
                                         }
                                     ]
@@ -1407,14 +1408,15 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         ]
                     }
                 });
-                // FieldsLeft:  human@(6,5) → relatives@(7,13) → name:id@(7,25)
-                // FieldsRight: human@(7,5) → relatives@(3,5) → name@(3,17)
+                // human@(6,5) and human@(7,5) conflict; within that:
+                // relatives@(3,5) and relatives@(7,13) conflict; within that:
+                // name@(3,17) and name:id@(7,25) conflict (type mismatch String vs Int)
                 e.Locations.Add(new Location(6, 5));
-                e.Locations.Add(new Location(7, 13));
-                e.Locations.Add(new Location(7, 25));
-                e.Locations.Add(new Location(7, 5));
                 e.Locations.Add(new Location(3, 5));
                 e.Locations.Add(new Location(3, 17));
+                e.Locations.Add(new Location(7, 5));
+                e.Locations.Add(new Location(7, 13));
+                e.Locations.Add(new Location(7, 25));
             });
         });
     }
