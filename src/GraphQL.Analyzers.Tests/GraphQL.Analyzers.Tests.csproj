@@ -5,11 +5,12 @@
     <TargetFrameworks>$(SingleFramework)</TargetFrameworks>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-    <NoWarn>$(NoWarn);RS1036</NoWarn>
+    <NoWarn>$(NoWarn);RS1036;RS1038;RS1041</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.8.0" />
+    <!-- Upgraded to 4.12.0 to support interceptors testing -->
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.13.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="1.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeRefactoring.Testing" Version="1.*" />
@@ -22,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.csproj" />
+    <ProjectReference Include="..\GraphQL.Analyzers.Interceptors\GraphQL.Analyzers.Interceptors.csproj" />
     <ProjectReference Include="..\GraphQL.Analyzers\GraphQL.Analyzers.csproj" />
     <ProjectReference Include="..\GraphQL.Analyzers.SourceGenerators\GraphQL.Analyzers.SourceGenerators.csproj" />
     <ProjectReference Include="..\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj" />

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>GraphQL.Analyzers.Interceptors</RootNamespace>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <Nullable>enable</Nullable>
+    <IncludeSymbols>false</IncludeSymbols>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <LangVersion>latest</LangVersion>
+    <InterceptorsPreviewNamespaces>$(InterceptorsPreviewNamespaces);GraphQL.Analyzers.Interceptors</InterceptorsPreviewNamespaces>
+    <DefineConstants>$(DefineConstants);IMMUTABLE_EQUATABLE_ARRAY_INTERNAL</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\GraphQL.Analyzers.SourceGenerators\SourceBuilder.cs" Link="SourceBuilder.cs" />
+    <Compile Include="..\GraphQL.Analyzers.SourceGenerators\Models\ImmutableEquatableArray.cs" Link="ImmutableEquatableArray.cs" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,6 @@
+<Project>
+  <ItemGroup>
+    <!-- Make the property visible to source generators -->
+    <CompilerVisibleProperty Include="GraphQLEnableFieldInterceptors" />
+  </ItemGroup>
+</Project>
