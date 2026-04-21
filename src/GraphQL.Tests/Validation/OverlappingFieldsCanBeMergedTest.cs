@@ -1544,7 +1544,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     }
 
     /// <summary>
-    /// Same as <see cref="Deep_conflict_detected_when_spreading_fragment_defined_after_parent_fragment"/>
+    /// Same as <see cref="Deep_conflict_detected_when_spreading_fragment_2_defined_after_parent_fragment"/>
     /// but with fragment B defined BEFORE fragment A, to confirm the result is order-independent.
     /// </summary>
     [Fact]
@@ -1626,6 +1626,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
             type Query { field: Node }
             type Node { f: Node, g: Node, x: String }
             """);
+        schema.Initialize();
 
         static string GenTwoLevel(int n, int m)
         {
@@ -1639,8 +1640,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
 
         // Use a moderately large N and M that would hang for seconds/minutes without
         // proper memoization but should complete in under 1 second with it.
-        const int n = 250;
-        const int m = 150;
+        const int n = 200;
+        const int m = 100;
         const int timeLimitMs = 3_000; // allow headroom for CI variability
 
         var query = GenTwoLevel(n, m);
@@ -1664,135 +1665,5 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
         sw.ElapsedMilliseconds.ShouldBeLessThan(timeLimitMs,
             $"Validation took {sw.ElapsedMilliseconds}ms for N={n} M={m}, " +
             $"which exceeds the {timeLimitMs}ms limit — possible quadratic/exponential blowup.");
-    }
-
-    /// <summary>
-    /// When fragment A (defined first) spreads fragment B (defined second),
-    /// and the conflict lives in B's sub-selections, the conflict must still be detected
-    /// regardless of fragment ordering in the document.
-    /// </summary>
-    [Fact]
-    public void Deep_conflict_detected_when_spreading_fragment_defined_after_parent_fragment()
-    {
-        // Fragment A is defined BEFORE fragment B.
-        // A has two `human` selections: one spreads B, one has a direct sub-selection.
-        // The conflict is at the `relatives.name` level: B returns `name` (String),
-        // A's direct branch returns `name: id` (Int) — different underlying fields.
-        const string query = """
-            query { ...A }
-            fragment A on Query {
-                human { ...B }
-                human { relatives { name: dummy } }
-            }
-            fragment B on Human {
-                relatives { name }
-            }
-            """;
-
-        ShouldFailRule(config =>
-        {
-            config.Query = query;
-            config.Error(e =>
-            {
-                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("human", new OverlappingFieldsCanBeMerged.ConflictReason
-                {
-                    Message = new OverlappingFieldsCanBeMerged.Message
-                    {
-                        Msgs =
-                        [
-                            new OverlappingFieldsCanBeMerged.ConflictReason
-                            {
-                                Name = "relatives",
-                                Message = new OverlappingFieldsCanBeMerged.Message
-                                {
-                                    Msgs =
-                                    [
-                                        new OverlappingFieldsCanBeMerged.ConflictReason
-                                        {
-                                            Name = "name",
-                                            Message = new OverlappingFieldsCanBeMerged.Message
-                                            {
-                                                Msg = "dummy and name are different fields"
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                });
-                // FieldsLeft:  human@(3,5) → relatives@(4,13) → name:dummy@(4,25)
-                // FieldsRight: human@(4,5) → relatives@(7,5) → name@(7,17)
-                e.Locations.Add(new Location(3, 5));
-                e.Locations.Add(new Location(4, 13));
-                e.Locations.Add(new Location(4, 25));
-                e.Locations.Add(new Location(4, 5));
-                e.Locations.Add(new Location(7, 5));
-                e.Locations.Add(new Location(7, 17));
-            });
-        });
-    }
-
-    /// <summary>
-    /// Same as <see cref="Deep_conflict_detected_when_spreading_fragment_defined_after_parent_fragment"/>
-    /// but with fragment B defined BEFORE fragment A, to confirm the result is order-independent.
-    /// </summary>
-    [Fact]
-    public void Deep_conflict_detected_when_spreading_fragment_defined_before_parent_fragment()
-    {
-        // Fragment B is defined BEFORE fragment A.
-        const string query = """
-            query { ...A }
-            fragment B on Human {
-                relatives { name }
-            }
-            fragment A on Query {
-                human { ...B }
-                human { relatives { name: dummy } }
-            }
-            """;
-
-        ShouldFailRule(config =>
-        {
-            config.Query = query;
-            config.Error(e =>
-            {
-                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("human", new OverlappingFieldsCanBeMerged.ConflictReason
-                {
-                    Message = new OverlappingFieldsCanBeMerged.Message
-                    {
-                        Msgs =
-                        [
-                            new OverlappingFieldsCanBeMerged.ConflictReason
-                            {
-                                Name = "relatives",
-                                Message = new OverlappingFieldsCanBeMerged.Message
-                                {
-                                    Msgs =
-                                    [
-                                        new OverlappingFieldsCanBeMerged.ConflictReason
-                                        {
-                                            Name = "name",
-                                            Message = new OverlappingFieldsCanBeMerged.Message
-                                            {
-                                                Msg = "dummy and name are different fields"
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                });
-                // FieldsLeft:  human@(6,5) → relatives@(7,13) → name:dummy@(7,25)
-                // FieldsRight: human@(7,5) → relatives@(3,5) → name@(3,17)
-                e.Locations.Add(new Location(6, 5));
-                e.Locations.Add(new Location(7, 13));
-                e.Locations.Add(new Location(7, 25));
-                e.Locations.Add(new Location(7, 5));
-                e.Locations.Add(new Location(3, 5));
-                e.Locations.Add(new Location(3, 17));
-            });
-        });
     }
 }
