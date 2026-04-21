@@ -353,11 +353,11 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msg = "a and c are different fields"
+                        Msg = "c and a are different fields"
                     }
                 });
-                e.Locations.Add(new Location(17, 5));
                 e.Locations.Add(new Location(13, 9));
+                e.Locations.Add(new Location(17, 5));
             });
 
             config.Error(e =>
@@ -366,11 +366,11 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msg = "b and c are different fields"
+                        Msg = "c and b are different fields"
                     }
                 });
-                e.Locations.Add(new Location(20, 5));
                 e.Locations.Add(new Location(13, 9));
+                e.Locations.Add(new Location(20, 5));
             });
         });
     }
@@ -1290,13 +1290,9 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     }
 
     /// <summary>
-    /// Regression test: when fragment A (defined first) spreads fragment B (defined second),
+    /// When fragment A (defined first) spreads fragment B (defined second),
     /// and the conflict lives in B's sub-selections, the conflict must still be detected
     /// regardless of fragment ordering in the document.
-    ///
-    /// During pre-processing of A, B's sub-selection cache entries do not yet exist, so the
-    /// deep merge is incomplete at that phase. The conflict must be caught at the operation
-    /// level in Phase 2, where all cache entries are populated.
     /// </summary>
     [Fact]
     public void Deep_conflict_detected_when_spreading_fragment_defined_after_parent_fragment()
@@ -1339,7 +1335,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                                             Name = "name",
                                             Message = new OverlappingFieldsCanBeMerged.Message
                                             {
-                                                Msg = "name and id are different fields"
+                                                Msg = "id and name are different fields"
                                             }
                                         }
                                     ]
@@ -1348,14 +1344,14 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         ]
                     }
                 });
-                // FieldsLeft:  human@(3,5) → relatives@(7,5) → name@(7,17)
-                // FieldsRight: human@(4,5) → relatives@(4,13) → name:id@(4,25)
+                // FieldsLeft:  human@(3,5) → relatives@(4,13) → name:id@(4,25)
+                // FieldsRight: human@(4,5) → relatives@(7,5) → name@(7,17)
                 e.Locations.Add(new Location(3, 5));
-                e.Locations.Add(new Location(7, 5));
-                e.Locations.Add(new Location(7, 17));
-                e.Locations.Add(new Location(4, 5));
                 e.Locations.Add(new Location(4, 13));
                 e.Locations.Add(new Location(4, 25));
+                e.Locations.Add(new Location(4, 5));
+                e.Locations.Add(new Location(7, 5));
+                e.Locations.Add(new Location(7, 17));
             });
         });
     }
@@ -1402,7 +1398,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                                             Name = "name",
                                             Message = new OverlappingFieldsCanBeMerged.Message
                                             {
-                                                Msg = "name and id are different fields"
+                                                Msg = "id and name are different fields"
                                             }
                                         }
                                     ]
@@ -1411,14 +1407,14 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         ]
                     }
                 });
-                // FieldsLeft:  human@(6,5) → relatives@(3,5) → name@(3,17)
-                // FieldsRight: human@(7,5) → relatives@(7,13) → name:id@(7,25)
+                // FieldsLeft:  human@(6,5) → relatives@(7,13) → name:id@(7,25)
+                // FieldsRight: human@(7,5) → relatives@(3,5) → name@(3,17)
                 e.Locations.Add(new Location(6, 5));
-                e.Locations.Add(new Location(3, 5));
-                e.Locations.Add(new Location(3, 17));
-                e.Locations.Add(new Location(7, 5));
                 e.Locations.Add(new Location(7, 13));
                 e.Locations.Add(new Location(7, 25));
+                e.Locations.Add(new Location(7, 5));
+                e.Locations.Add(new Location(3, 5));
+                e.Locations.Add(new Location(3, 17));
             });
         });
     }
