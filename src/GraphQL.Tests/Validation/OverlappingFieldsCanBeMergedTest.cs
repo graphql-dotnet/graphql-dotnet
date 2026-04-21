@@ -353,11 +353,11 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msg = "c and a are different fields"
+                        Msg = "a and c are different fields"
                     }
                 });
-                e.Locations.Add(new Location(13, 9));
                 e.Locations.Add(new Location(17, 5));
+                e.Locations.Add(new Location(13, 9));
             });
 
             config.Error(e =>
@@ -366,11 +366,11 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msg = "c and b are different fields"
+                        Msg = "b and c are different fields"
                     }
                 });
-                e.Locations.Add(new Location(13, 9));
                 e.Locations.Add(new Location(20, 5));
+                e.Locations.Add(new Location(13, 9));
             });
         });
     }
