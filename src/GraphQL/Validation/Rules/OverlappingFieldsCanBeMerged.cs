@@ -83,7 +83,7 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
 
         ValueTask INodeVisitor.LeaveAsync(ASTNode node, ValidationContext context)
         {
-            if (node is GraphQLSelectionSet selectionSet)
+            if (node is GraphQLSelectionSet selectionSet && context.TypeInfo.GetAncestor(1) is not GraphQLFragmentDefinition)
             {
                 var parentType = context.TypeInfo.GetParentType();
                 CheckSelectionSet(parentType, selectionSet);

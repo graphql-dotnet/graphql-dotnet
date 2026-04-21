@@ -15,6 +15,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Unique_fields_should_pass()
     {
         const string query = """
+            { dog { ...uniqueFields } }
             fragment uniqueFields on Dog {
               name
               nickname
@@ -27,6 +28,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Identical_fields_should_pass()
     {
         const string query = """
+            { dog { ...mergeIdenticalFields } }
             fragment mergeIdenticalFields on Dog {
               name
               name
@@ -39,6 +41,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Identical_fields_with_identical_args_should_pass()
     {
         const string query = """
+            { dog { ...mergeIdenticalFieldsWithIdenticalArgs } }
             fragment mergeIdenticalFieldsWithIdenticalArgs on Dog {
               doesKnowCommand(dogCommand: SIT)
               doesKnowCommand(dogCommand: SIT)
@@ -51,6 +54,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Identical_fields_with_identical_directives_should_pass()
     {
         const string query = """
+            { dog { ...mergeSameFieldsWithSameDirectives } }
             fragment mergeSameFieldsWithSameDirectives on Dog {
               name @include(if: true)
               name @include(if: true)
@@ -63,6 +67,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Different_args_with_different_aliases_should_pass()
     {
         const string query = """
+            { dog { ...differentArgsWithDifferentAliases } }
             fragment differentArgsWithDifferentAliases on Dog {
               knowsSit: doesKnowCommand(dogCommand: SIT)
               knowsDown: doesKnowCommand(dogCommand: DOWN)
@@ -75,6 +80,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Different_directives_with_different_aliases_should_pass()
     {
         const string query = """
+            { dog { ...differentDirectivesWithDifferentAliases } }
             fragment differentDirectivesWithDifferentAliases on Dog {
               nameIfTrue: name @include(if: true)
               nameIfFalse: name @include(if: false)
@@ -87,6 +93,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Different_skip_or_include_directives_accepted_should_pass()
     {
         const string query = """
+            { dog { ...differentDirectivesWithDifferentAliases } }
             fragment differentDirectivesWithDifferentAliases on Dog {
               name @include(if: true)
               name @include(if: false)
@@ -99,6 +106,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Same_aliases_allowed_on_non_overlapping_fields_should_pass()
     {
         const string query = """
+            { catOrDog { ...sameAliasesWithDifferentFieldTargets } }
             fragment sameAliasesWithDifferentFieldTargets on Pet {
                 ... on Dog {
                     name
@@ -115,6 +123,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Same_aliases_with_different_field_targets_should_fail()
     {
         const string query = """
+            { dog { ...sameAliasesWithDifferentFieldTargets } }
             fragment sameAliasesWithDifferentFieldTargets on Dog {
                 fido: name
                 fido: nickname
@@ -132,8 +141,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "name and nickname are different fields"
                     }
                 });
-                e.Locations.Add(new Location(2, 5));
                 e.Locations.Add(new Location(3, 5));
+                e.Locations.Add(new Location(4, 5));
             });
         });
     }
@@ -142,6 +151,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Alias_masking_direct_field_access_should_fail()
     {
         const string query = """
+            { dog { ...aliasMaskingDirectFieldAccess } }
             fragment aliasMaskingDirectFieldAccess on Dog {
                 name: nickname
                 name
@@ -159,8 +169,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "nickname and name are different fields"
                     }
                 });
-                e.Locations.Add(new Location(2, 5));
                 e.Locations.Add(new Location(3, 5));
+                e.Locations.Add(new Location(4, 5));
             });
         });
     }
@@ -169,6 +179,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Different_args_second_adds_an_argument_should_fail()
     {
         const string query = """
+            { dog { ...conflictingArgs } }
             fragment conflictingArgs on Dog {
                 doesKnowCommand
                 doesKnowCommand(dogCommand: HEEL)
@@ -187,8 +198,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "they have differing arguments"
                     }
                 });
-                e.Locations.Add(new Location(2, 5));
                 e.Locations.Add(new Location(3, 5));
+                e.Locations.Add(new Location(4, 5));
             });
         });
     }
@@ -197,6 +208,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Different_args_second_missing_an_argument_should_fail()
     {
         const string query = """
+            { dog { ...conflictingArgs } }
             fragment conflictingArgs on Dog {
                 doesKnowCommand(dogCommand: SIT)
                 doesKnowCommand
@@ -215,8 +227,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "they have differing arguments"
                     }
                 });
-                e.Locations.Add(new Location(2, 5));
                 e.Locations.Add(new Location(3, 5));
+                e.Locations.Add(new Location(4, 5));
             });
         });
     }
@@ -225,6 +237,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Conflicting_args_should_fail()
     {
         const string query = """
+            { dog { ...conflictingArgs } }
             fragment conflictingArgs on Dog {
                 doesKnowCommand(dogCommand: SIT)
                 doesKnowCommand(dogCommand: HEEL)
@@ -243,8 +256,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "they have differing arguments"
                     }
                 });
-                e.Locations.Add(new Location(2, 5));
                 e.Locations.Add(new Location(3, 5));
+                e.Locations.Add(new Location(4, 5));
             });
         });
     }
@@ -257,9 +270,10 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Allows_different_args_where_no_conflict_is_possible_should_pass()
     {
         const string query = """
+            { catOrDog { ...conflictingArgs } }
             fragment conflictingArgs on Pet {
                 ... on Dog {
-                    name(surname: "test")
+                    name(surname: true)
                 }
                 ... on Cat {
                     name
@@ -268,6 +282,44 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
             """;
 
         ShouldPassRule(query);
+    }
+
+    /// <summary>
+    /// Unlike Dog vs Cat (mutually exclusive concrete types), Being and Pet are both interfaces
+    /// that any object can implement simultaneously. Therefore fields with the same response name
+    /// but different arguments on Being and Pet DO conflict and must be reported.
+    /// </summary>
+    [Fact]
+    public void Disallows_different_args_on_overlapping_abstract_types_should_fail()
+    {
+        const string query = """
+            { catOrDog { ...conflictingArgs } }
+            fragment conflictingArgs on Being {
+                ... on Being {
+                    name(surname: true)
+                }
+                ... on Pet {
+                    name
+                }
+            }
+            """;
+
+        ShouldFailRule(config =>
+        {
+            config.Query = query;
+            config.Error(e =>
+            {
+                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("name", new OverlappingFieldsCanBeMerged.ConflictReason
+                {
+                    Message = new OverlappingFieldsCanBeMerged.Message
+                    {
+                        Msg = "they have differing arguments"
+                    }
+                });
+                e.Locations.Add(new Location(4, 9));
+                e.Locations.Add(new Location(7, 9));
+            });
+        });
     }
 
     [Fact]
@@ -735,6 +787,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Does_not_infinite_loop_on_recursive_fragment()
     {
         const string query = """
+            { human { ...fragA } }
             fragment fragA on Human {
                 name,
                 relatives {
@@ -751,6 +804,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Does_not_infinite_loop_on_immediately_recursive_fragment()
     {
         const string query = """
+            { human { ...fragA } }
             fragment fragA on Human {
                 name,
                 ...fragA
@@ -764,6 +818,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Does_not_infinite_loop_on_transitively_recursive_fragment()
     {
         const string query = """
+            { human { ...fragA } }
             fragment fragA on Human { name, ...fragB }
             fragment fragB on Human { name, ...fragC }
             fragment fragC on Human { name, ...fragA }
@@ -776,6 +831,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     public void Finds_invalid_case_even_with_immediately_recursive_fragment()
     {
         const string query = """
+            { dog { ...sameAliasesWithDifferentFieldTargets } }
             fragment sameAliasesWithDifferentFieldTargets on Dog {
                 ...sameAliasesWithDifferentFieldTargets
                 fido: name
@@ -795,8 +851,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "name and nickname are different fields"
                     }
                 });
-                e.Locations.Add(new Location(3, 5));
                 e.Locations.Add(new Location(4, 5));
+                e.Locations.Add(new Location(5, 5));
             });
         });
     }
