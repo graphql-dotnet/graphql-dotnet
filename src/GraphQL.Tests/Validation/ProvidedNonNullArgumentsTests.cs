@@ -219,12 +219,7 @@ public class ProvidedNonNullArgumentsTests : ValidationTestBase<ProvidedNonNullA
     {
         ShouldPassRule("""
             {
-              dog {
-                ...DogFields @defer(label: "r")
-              }
-            }
-            fragment DogFields on Dog {
-              name
+              ... @defer { __typename }
             }
             """);
     }
