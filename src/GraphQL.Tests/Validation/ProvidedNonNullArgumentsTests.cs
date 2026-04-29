@@ -215,6 +215,21 @@ public class ProvidedNonNullArgumentsTests : ValidationTestBase<ProvidedNonNullA
     }
 
     [Fact]
+    public void directive_with_non_null_arg_and_default_value_omitted()
+    {
+        ShouldPassRule("""
+            {
+              dog {
+                ...DogFields @defer(label: "r")
+              }
+            }
+            fragment DogFields on Dog {
+              name
+            }
+            """);
+    }
+
+    [Fact]
     public void directive_with_missing_types()
     {
         ShouldFailRule(_ =>

@@ -291,6 +291,12 @@ public class ValidationSchema : Schema
             new Directive("directiveB", DirectiveLocation.Field),
             new Directive("directive", DirectiveLocation.Field),
             new Directive("rep", DirectiveLocation.Field) { Repeatable = true },
+            new Directive("defer", DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
+            {
+                Arguments = new QueryArguments(
+                    new QueryArgument<NonNullGraphType<BooleanGraphType>> { Name = "if", DefaultValue = true },
+                    new QueryArgument<StringGraphType> { Name = "label" })
+            },
 
             new LengthDirective()
         );
