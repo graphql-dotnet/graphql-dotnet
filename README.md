@@ -403,3 +403,85 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 <a href="https://opencollective.com/graphql-net/sponsor/7/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/7/avatar.svg"></a>
 <a href="https://opencollective.com/graphql-net/sponsor/8/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/graphql-net/sponsor/9/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/9/avatar.svg"></a>
+
+## Custom Validation Rules
+
+GraphQL.NET provides a flexible way to implement custom validation rules to enforce business logic or data constraints during the validation phase of query execution. This guide demonstrates how to create and register a custom validation rule, along with a sample project that showcases its usage.
+
+### Creating a Custom Validation Rule
+
+To create a custom validation rule, you need to implement the `IValidationRule` interface. This interface requires a single method, `Validate`, which takes a `ValidationContext` and returns a collection of `ValidationError` objects.
+
+```csharp
+using GraphQL.Validation;
+using GraphQL.Validation.Errors;
+
+public class MinimumFieldCountRule : IValidationRule
+{
+    private readonly int _minimumFieldCount;
+
+    public MinimumFieldCountRule(int minimumFieldCount)
+    {
+        _minimumFieldCount = minimumFieldCount;
+    }
+
+    public IEnumerable<ValidationError> Validate(ValidationContext context)
+    {
+        if (context.Document.Operations.Any(op => op.SelectionSet.Selections.Count < _minimumFieldCount))
+        {
+            var error = new ValidationError
+            {
+                Message = $"Query must contain at least {_minimumFieldCount} fields.",
+                Locations = context.Locations,
+                Extensions = new Dictionary<string, object>
+                {
+                    ["minimumFieldCount"] = _minimumFieldCount
+                }
+            };
+
+            yield return error;
+        }
+    }
+}
+```
+
+### Registering the Custom Rule
+
+Once you've implemented your custom rule, you can register it with the schema during its configuration. This is done by adding the rule to the `ValidationRules` collection in the schema builder.
+
+```csharp
+var schema = Schema.For(@"
+  type Query {
+    hello: String
+  }
+", builder =>
+{
+    builder.ValidationRules.Add(new MinimumFieldCountRule(2));
+});
+```
+
+### Sample Project
+
+A sample project has been added to the repository that demonstrates the usage of the `MinimumFieldCountRule`. This project includes:
+
+- A simple GraphQL schema with a `Query` type.
+- A custom validation rule that enforces a minimum number of fields in a query.
+- A test that executes a query with fewer than the required fields and verifies that the validation error is returned.
+
+The sample project is located in the `samples/CustomValidationRuleSample` directory and can be built and run using the .NET CLI.
+
+### Documentation Page
+
+A new documentation page has been added to the repository that provides an overview of all sample projects. This page includes:
+
+- A list of all sample projects with brief descriptions.
+- Links to each sample project's GitHub directory.
+- Instructions on how to build and run each sample.
+
+This page is located at `docs/samples.md` and is included in the sitemap.yaml file.
+
+### Sitemap Update
+
+The sitemap.yaml file has been updated to include the new documentation page for samples. This ensures that the page is discoverable by search engines and users navigating the documentation.
+
+By following this guide, you can create and register custom validation rules to enforce specific constraints in your GraphQL API, enhancing the robustness and reliability of your application.
