@@ -403,3 +403,98 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 <a href="https://opencollective.com/graphql-net/sponsor/7/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/7/avatar.svg"></a>
 <a href="https://opencollective.com/graphql-net/sponsor/8/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/graphql-net/sponsor/9/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/9/avatar.svg"></a>
+
+## Schema-First Approach in GraphQL.NET
+
+GraphQL.NET supports the Schema-First approach, which allows you to define your GraphQL schema using a string representation of the GraphQL language. This approach is particularly useful when you want to decouple your schema from your data models or when you're working with a schema that is defined externally.
+
+Below is a sample project that demonstrates the Schema-First approach using GraphQL.NET:
+
+```csharp
+using GraphQL;
+using GraphQL.Types;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+var schema = Schema.For(@"
+  type Droid {
+    id: ID
+    name: String
+  }
+
+  type Query {
+    droid(id: ID): Droid
+  }
+");
+
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddGraphQL(options =>
+{
+    options.EnableMetrics = true;
+    options.AutoSchemaBuilding = true;
+    options.ExposeExceptions = true;
+    options.Schema = schema;
+});
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+
+app.UseRouting();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGraphQL();
+});
+
+app.Run();
+```
+
+In this example, we define a GraphQL schema using a string and create a schema instance using `Schema.For`. We then configure an ASP.NET Core application to use this schema with GraphQL.
+
+### Supported and Unsupported Features
+
+The Schema-First approach in GraphQL.NET supports most of the core features of GraphQL, including:
+
+- Scalars
+- Objects
+- Lists
+- Interfaces
+- Unions
+- Arguments
+- Variables
+- Fragments
+- Directives
+- Enumerations
+- Input Objects
+- Mutations
+- Subscriptions
+- Async execution
+
+However, some features are not available or are more complex to implement in the Schema-First approach, such as:
+
+- Schema introspection (though it can be enabled)
+- Custom directives (requires additional setup)
+- Type extensions
+- Resolvers defined in code (resolvers are typically defined in the schema)
+
+### Documentation and Samples
+
+The GraphQL.NET repository includes several samples that demonstrate different approaches to defining schemas. These samples are located in the `samples` directory and include:
+
+- AOT samples (Ahead-of-Time compilation)
+- StarWars projects (demonstrating different aspects of GraphQL)
+- GraphQL.Harness (a testing framework for GraphQL)
+
+To learn more about the samples and how they are structured, please refer to the documentation page that will be added to the repository. This page will provide an overview of the samples, their purpose, and how to run them.
+
+### Sitemap Update
+
+The sitemap.yaml file has been updated to include the new documentation page for the Schema-First approach. This ensures that the page is easily discoverable within the documentation structure.
+
+By following this guide, you can effectively use the Schema-First approach in your GraphQL.NET projects and take advantage of the flexibility and power of GraphQL.
