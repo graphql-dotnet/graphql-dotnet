@@ -12,6 +12,10 @@ public class DirectiveSchema : Schema
         {
             Arguments = new QueryArguments([new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "value" }])
         });
+        Directives.Register(new Directive("test3", GraphQLParser.AST.DirectiveLocation.Field)
+        {
+            Arguments = new QueryArguments([new QueryArgument<NonNullGraphType<BooleanGraphType>> { Name = "flag", DefaultValue = true }])
+        });
     }
 }
 
@@ -27,6 +31,8 @@ public class DirectiveTestType : ObjectGraphType
             .Resolve(context => context.GetDirective("test1") != null);
         Field<StringGraphType>("d")
             .Resolve(context => context.GetDirective("test2")?.GetArgument<string>("value"));
+        Field<BooleanGraphType>("e")
+            .Resolve(context => context.GetDirective("test3")?.GetArgument<bool>("flag"));
     }
 }
 
@@ -380,6 +386,25 @@ public class DirectiveParsingTests : QueryTestBase<DirectiveSchema>
               "d": "hello"
             }
             """,
+            null, null);
+    }
+}
+
+public class DirectiveDefaultArgumentTests : QueryTestBase<DirectiveSchema>
+{
+    [Theory]
+    [InlineData(null, true)]   // omitted → default value true
+    [InlineData(true, true)]   // explicit true
+    [InlineData(false, false)]   // explicit false
+    public void directive_non_null_arg_with_default_value(bool? providedFlag, bool expectedResult)
+    {
+        string directive = providedFlag.HasValue
+            ? $"@test3(flag: {providedFlag.Value.ToString().ToLower()})"
+            : "@test3";
+
+        AssertQuerySuccess(
+            $"query {{ e {directive} }}",
+            $$$"""{ "e": {{{expectedResult.ToString().ToLower()}}} }""",
             null, null);
     }
 }
