@@ -627,11 +627,11 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
             }
 
             // Step 4: if defaultValue is an unordered map
-            if (defaultValue is GraphQLObjectValue)
+            if (defaultValue is GraphQLObjectValue objectValue)
             {
                 foreach (var field in inputObject.Fields)
                 {
-                    var result = InputFieldDefaultValueHasCycle(field, inputObject, defaultValue, visitedFields);
+                    var result = InputFieldDefaultValueHasCycle(field, inputObject, objectValue, visitedFields);
                     if (result != null)
                         return result;
                 }
@@ -647,24 +647,21 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
         // Returns null if no cycle is detected, or an ordered list of the input object types
         // involved in the cycle (innermost first) for use in error messages.
         //
-        // 1. Assert: defaultValue is an unordered map.
+        // 1. Assert: defaultValue is an unordered map. (implemented at caller)
         // 2. Let fieldType be the type of field; namedFieldType be the underlying named type.
-        // 3. If namedFieldType is not an input object type: return null.
+        // 3. If namedFieldType is not an input object type: return false/null.
         // 4. Let fieldName be the name of field.
         // 5. Let fieldDefaultValue be the value for fieldName in defaultValue.
         // 6. If fieldDefaultValue exists:
         //    a. Return InputObjectDefaultValueHasCycle(namedFieldType, fieldDefaultValue, visitedFields).
         // 7. Otherwise:
         //    a. Let fieldDefaultValue be the default value of field.
-        //    b. If fieldDefaultValue does not exist: return null.
-        //    c. If field is within visitedFields: return the cycle chain (declaring types, innermost first).
+        //    b. If fieldDefaultValue does not exist: return false/null.
+        //    c. If field is within visitedFields: return true/the cycle chain (declaring types, innermost first).
         //    d. Let nextVisitedFields be a new list containing everything from visitedFields plus (field, declaringType).
         //    e. Return InputObjectDefaultValueHasCycle(namedFieldType, fieldDefaultValue, nextVisitedFields).
-        static IReadOnlyList<IInputObjectGraphType>? InputFieldDefaultValueHasCycle(FieldType field, IInputObjectGraphType declaringType, GraphQLValue defaultValue, Stack<(FieldType Field, IInputObjectGraphType DeclaringType)> visitedFields)
+        static IReadOnlyList<IInputObjectGraphType>? InputFieldDefaultValueHasCycle(FieldType field, IInputObjectGraphType declaringType, GraphQLObjectValue defaultValue, Stack<(FieldType Field, IInputObjectGraphType DeclaringType)> visitedFields)
         {
-            // Step 1: assert defaultValue is an unordered map (GraphQLObjectValue)
-            var objectValue = (GraphQLObjectValue)defaultValue;
-
             // Step 2
             var namedFieldType = field.ResolvedType!.GetNamedType();
 
@@ -673,7 +670,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
                 return null;
 
             // Steps 4-5: look up fieldName in defaultValue
-            var objectField = objectValue.Field(field.Name);
+            var objectField = defaultValue.Field(field.Name);
 
             // Step 6: fieldDefaultValue exists in the provided map
             if (objectField != null)
