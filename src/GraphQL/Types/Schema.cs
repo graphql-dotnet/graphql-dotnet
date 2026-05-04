@@ -595,6 +595,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
                     field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, value).Value;
                 }
             }
+
             completed.Add(inputType);
         }
 
