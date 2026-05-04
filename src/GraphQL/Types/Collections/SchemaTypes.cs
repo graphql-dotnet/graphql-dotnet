@@ -1010,7 +1010,7 @@ Make sure that your ServiceProvider is configured correctly.");
                 {
                     throw new InvalidOperationException(
                        $"Union type '{union.Name}' does not provide a 'resolveType' function " +
-                       $"and possible Type '{union.Name}' does not provide a 'isTypeOf' function. " +
+                       $"and possible Type '{unionType.Name}' does not provide a 'isTypeOf' function. " +
                         "There is no way to resolve this possible type during execution.");
                 }
 
