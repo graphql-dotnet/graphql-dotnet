@@ -571,34 +571,34 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
             foreach (var field in inputType.Fields)
             {
-                if (field.DefaultValue is GraphQLValue value)
-                {
-                    var baseType = field.ResolvedType!.GetNamedType();
-                    if (baseType is IInputObjectGraphType inputFieldType)
-                    {
-                        if (inProcess.Contains(field))
-                        {
-                            inputTypesCheckedForCycles ??= new();
-                            if (inputTypesCheckedForCycles.Add(inputType))
-                            {
-                                // We've re-entered a field already on the traversal stack. Use the spec algorithm
-                                // to confirm there is actually a default value cycle (not just a type-graph cycle
-                                // with safe default values). If there is, throw with the cycle chain for diagnostics.
-                                var cycleChain = InputObjectDefaultValueHasCycle(inputType, new GraphQLObjectValue(), new());
-                                if (cycleChain != null)
-                                    throw new InvalidOperationException($"Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: {string.Join(", ", cycleChain.Select(x => $"'{x.Name}'"))}.");
-                            }
-                            continue;
-                        }
+                if (field.DefaultValue is not GraphQLValue defaultValue)
+                    continue;
 
-                        // Push/pop around recursive call to handle nested input objects, which may include cycles.
-                        // If a cycle is detected, the above check will throw with the cycle chain.
-                        inProcess.Push(field);
-                        ExamineType(inputFieldType, completed, inProcess, ref inputTypesCheckedForCycles);
-                        inProcess.Pop();
+                var baseType = field.ResolvedType!.GetNamedType();
+                if (baseType is IInputObjectGraphType inputFieldType)
+                {
+                    if (inProcess.Contains(field))
+                    {
+                        inputTypesCheckedForCycles ??= new();
+                        if (inputTypesCheckedForCycles.Add(inputType))
+                        {
+                            // We've re-entered a field already on the traversal stack. Use the spec algorithm
+                            // to confirm there is actually a default value cycle (not just a type-graph cycle
+                            // with safe default values). If there is, throw with the cycle chain for diagnostics.
+                            var cycleChain = InputObjectDefaultValueHasCycle(inputType, new GraphQLObjectValue(), new());
+                            if (cycleChain != null)
+                                throw new InvalidOperationException($"Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: {string.Join(", ", cycleChain.Select(x => $"'{x.Name}'"))}.");
+                        }
+                        continue;
                     }
-                    field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, value).Value;
+
+                    // Push/pop around recursive call to handle nested input objects, which may include cycles.
+                    // If a cycle is detected, the above check will throw with the cycle chain.
+                    inProcess.Push(field);
+                    ExamineType(inputFieldType, completed, inProcess, ref inputTypesCheckedForCycles);
+                    inProcess.Pop();
                 }
+                field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, defaultValue).Value;
             }
 
             completed.Add(inputType);
