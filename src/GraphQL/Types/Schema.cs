@@ -586,6 +586,8 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
                             continue;
                         }
 
+                        // Push/pop around recursive call to handle nested input objects, which may include cycles.
+                        // If a cycle is detected, the above check will throw with the cycle chain.
                         inProcess.Push(field);
                         ExamineType(inputFieldType, completed, inProcess);
                         inProcess.Pop();
@@ -599,7 +601,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
         // Implements InputObjectDefaultValueHasCycle(inputObject, defaultValue, visitedFields) per spec:
         // https://spec.graphql.org/September2025/#InputObjectDefaultValueHasCycle()
         //
-        // Returns null if no cycle is detected, or an ordered list of the input object types
+        // Returns false/null if no cycle is detected, or an ordered list of the input object types
         // involved in the cycle (innermost first, i.e. in reverse traversal order) for use in
         // error messages.
         //
@@ -607,10 +609,10 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
         // 2. If visitedFields is not provided, initialize it to the empty set. (implemented at caller)
         // 3. If defaultValue is a list:
         //    a. For each itemValue in defaultValue:
-        //       i. If InputObjectDefaultValueHasCycle(inputObject, itemValue, visitedFields) is not null, return it.
+        //       i. If InputObjectDefaultValueHasCycle(inputObject, itemValue, visitedFields) is not false/null, return it.
         // 4. Otherwise, if defaultValue is an unordered map:
         //    a. For each field in inputObject:
-        //       i. If InputFieldDefaultValueHasCycle(field, defaultValue, visitedFields) is not null, return it.
+        //       i. If InputFieldDefaultValueHasCycle(field, defaultValue, visitedFields) is not false/null, return it.
         // 5. Return null.
         static IReadOnlyList<IInputObjectGraphType>? InputObjectDefaultValueHasCycle(IInputObjectGraphType inputObject, GraphQLValue defaultValue, Stack<(FieldType Field, IInputObjectGraphType DeclaringType)> visitedFields)
         {
