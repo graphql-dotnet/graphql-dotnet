@@ -556,20 +556,18 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     protected virtual void CoerceInputTypeDefaultValues()
     {
         var completed = new HashSet<IInputObjectGraphType>();
-        var inProcess = new Stack<IInputObjectGraphType>();
+        var inProcess = new Stack<FieldType>();
         foreach (var type in AllTypes.Dictionary.Values)
         {
             if (type is IInputObjectGraphType inputType)
                 ExamineType(inputType, completed, inProcess);
         }
 
-        static void ExamineType(IInputObjectGraphType inputType, HashSet<IInputObjectGraphType> completed, Stack<IInputObjectGraphType> inProcess)
+        static void ExamineType(IInputObjectGraphType inputType, HashSet<IInputObjectGraphType> completed, Stack<FieldType> inProcess)
         {
             if (completed.Contains(inputType))
                 return;
-            if (inProcess.Contains(inputType))
-                throw new InvalidOperationException($"Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: {string.Join(", ", inProcess.Select(x => $"'{x.Name}'"))}.");
-            inProcess.Push(inputType);
+
             foreach (var field in inputType.Fields)
             {
                 if (field.DefaultValue is GraphQLValue value)
@@ -577,70 +575,135 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
                     var baseType = field.ResolvedType!.GetNamedType();
                     if (baseType is IInputObjectGraphType inputFieldType)
                     {
-                        if (inProcess.Contains(inputFieldType))
-                            // Cycle detected: instead of throwing immediately, verify that the default value
-                            // explicitly provides a value for every field whose type is in the cycle at every
-                            // depth. If any such field is missing, applying its default would use an
-                            // uncoerced GraphQLValue, so we throw. Otherwise coercion can proceed safely.
-                            CheckNoCyclicMissingFields(field.ResolvedType!, value, inProcess);
-                        else
-                            ExamineType(inputFieldType, completed, inProcess);
+                        if (inProcess.Contains(field))
+                        {
+                            // We've re-entered a field already on the traversal stack. Use the spec algorithm
+                            // to confirm there is actually a default value cycle (not just a type-graph cycle
+                            // with safe default values). If there is, throw with the cycle chain for diagnostics.
+                            var cycleChain = InputObjectDefaultValueHasCycle(inputType, new GraphQLObjectValue(), new());
+                            if (cycleChain != null)
+                                throw new InvalidOperationException($"Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: {string.Join(", ", cycleChain.Select(x => $"'{x.Name}'"))}.");
+                            continue;
+                        }
+
+                        inProcess.Push(field);
+                        ExamineType(inputFieldType, completed, inProcess);
+                        inProcess.Pop();
                     }
                     field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, value).Value;
                 }
             }
-            inProcess.Pop();
             completed.Add(inputType);
         }
 
-        // Validates that the given value, which has a type that participates in a dependency cycle
-        // (one or more types in <paramref name="inProcess"/>), does not omit any field whose type
-        // is also in the cycle. A missing cyclic field would require falling back to an uncoerced
-        // default value, which is not yet available at this point in schema initialization.
-        static void CheckNoCyclicMissingFields(IGraphType type, GraphQLValue value, Stack<IInputObjectGraphType> inProcess)
+        // Implements InputObjectDefaultValueHasCycle(inputObject, defaultValue, visitedFields) per spec:
+        // https://spec.graphql.org/September2025/#InputObjectDefaultValueHasCycle()
+        //
+        // Returns null if no cycle is detected, or an ordered list of the input object types
+        // involved in the cycle (innermost first, i.e. in reverse traversal order) for use in
+        // error messages.
+        //
+        // visitedFields is a shared mutable stack pushed/popped as we recurse — no allocation per call.
+        //
+        // 1. If defaultValue is not provided, initialize it to an empty unordered map. (implemented at caller)
+        // 2. If visitedFields is not provided, initialize it to the empty set. (implemented at caller)
+        // 3. If defaultValue is a list:
+        //    a. For each itemValue in defaultValue:
+        //       i. If InputObjectDefaultValueHasCycle(inputObject, itemValue, visitedFields) is not null, return it.
+        // 4. Otherwise, if defaultValue is an unordered map:
+        //    a. For each field in inputObject:
+        //       i. If InputFieldDefaultValueHasCycle(field, defaultValue, visitedFields) is not null, return it.
+        // 5. Return null.
+        static IReadOnlyList<IInputObjectGraphType>? InputObjectDefaultValueHasCycle(IInputObjectGraphType inputObject, GraphQLValue defaultValue, Stack<(FieldType Field, IInputObjectGraphType DeclaringType)> visitedFields)
         {
-            if (type is NonNullGraphType nonNull)
+            // Step 3: if defaultValue is a list
+            if (defaultValue is GraphQLListValue listValue)
             {
-                CheckNoCyclicMissingFields(nonNull.ResolvedType!, value, inProcess);
-                return;
+                foreach (var itemValue in listValue.Values ?? Enumerable.Empty<GraphQLValue>())
+                {
+                    var result = InputObjectDefaultValueHasCycle(inputObject, itemValue, visitedFields);
+                    if (result != null)
+                        return result;
+                }
+                return null;
             }
 
-            if (type is ListGraphType listType)
+            // Step 4: if defaultValue is an unordered map
+            if (defaultValue is GraphQLObjectValue)
             {
-                if (value is GraphQLNullValue)
-                    return;
-                if (value is GraphQLListValue listValue)
+                foreach (var field in inputObject.Fields)
                 {
-                    foreach (var item in listValue.Values ?? Enumerable.Empty<GraphQLValue>())
-                        CheckNoCyclicMissingFields(listType.ResolvedType!, item, inProcess);
+                    var result = InputFieldDefaultValueHasCycle(field, inputObject, defaultValue, visitedFields);
+                    if (result != null)
+                        return result;
                 }
-                else
-                {
-                    CheckNoCyclicMissingFields(listType.ResolvedType!, value, inProcess);
-                }
-                return;
             }
 
-            if (type is not IInputObjectGraphType inputType || !inProcess.Contains(inputType))
-                return;
+            // Step 5
+            return null;
+        }
 
-            if (value is GraphQLNullValue)
-                return;
+        // Implements InputFieldDefaultValueHasCycle(field, defaultValue, visitedFields) per spec:
+        // https://spec.graphql.org/draft/#InputFieldDefaultValueHasCycle()
+        //
+        // Returns null if no cycle is detected, or an ordered list of the input object types
+        // involved in the cycle (innermost first) for use in error messages.
+        //
+        // 1. Assert: defaultValue is an unordered map.
+        // 2. Let fieldType be the type of field; namedFieldType be the underlying named type.
+        // 3. If namedFieldType is not an input object type: return null.
+        // 4. Let fieldName be the name of field.
+        // 5. Let fieldDefaultValue be the value for fieldName in defaultValue.
+        // 6. If fieldDefaultValue exists:
+        //    a. Return InputObjectDefaultValueHasCycle(namedFieldType, fieldDefaultValue, visitedFields).
+        // 7. Otherwise:
+        //    a. Let fieldDefaultValue be the default value of field.
+        //    b. If fieldDefaultValue does not exist: return null.
+        //    c. If field is within visitedFields: return the cycle chain (declaring types, innermost first).
+        //    d. Let nextVisitedFields be a new list containing everything from visitedFields plus (field, declaringType).
+        //    e. Return InputObjectDefaultValueHasCycle(namedFieldType, fieldDefaultValue, nextVisitedFields).
+        static IReadOnlyList<IInputObjectGraphType>? InputFieldDefaultValueHasCycle(FieldType field, IInputObjectGraphType declaringType, GraphQLValue defaultValue, Stack<(FieldType Field, IInputObjectGraphType DeclaringType)> visitedFields)
+        {
+            // Step 1: assert defaultValue is an unordered map (GraphQLObjectValue)
+            var objectValue = (GraphQLObjectValue)defaultValue;
 
-            if (value is not GraphQLObjectValue objectValue)
-                return;
+            // Step 2
+            var namedFieldType = field.ResolvedType!.GetNamedType();
 
-            foreach (var field in inputType.Fields)
+            // Step 3
+            if (namedFieldType is not IInputObjectGraphType namedInputType)
+                return null;
+
+            // Steps 4-5: look up fieldName in defaultValue
+            var objectField = objectValue.Field(field.Name);
+
+            // Step 6: fieldDefaultValue exists in the provided map
+            if (objectField != null)
+                return InputObjectDefaultValueHasCycle(namedInputType, objectField.Value, visitedFields);
+
+            // Step 7: fall back to the field's own default value
+            if (field.DefaultValue is not GraphQLValue fieldDefaultValue)
+                return null;
+
+            // Step 7c: cycle detected — the stack enumerates top-to-bottom (most-recently-pushed
+            // first = innermost first). Collect declaring types up to and including the repeated field.
+            if (visitedFields.Any(e => e.Field == field))
             {
-                var fieldBaseType = field.ResolvedType!.GetNamedType();
-                if (fieldBaseType is IInputObjectGraphType fieldInputType && inProcess.Contains(fieldInputType))
+                var chain = new List<IInputObjectGraphType>(visitedFields.Count);
+                foreach (var entry in visitedFields)
                 {
-                    var objectField = objectValue.Field(field.Name);
-                    if (objectField == null)
-                        throw new InvalidOperationException($"Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: {string.Join(", ", inProcess.Select(x => $"'{x.Name}'"))}.");
-                    CheckNoCyclicMissingFields(field.ResolvedType!, objectField.Value, inProcess);
+                    chain.Add(entry.DeclaringType);
+                    if (entry.Field == field)
+                        break;
                 }
+                return chain;
             }
+
+            // Steps 7d-7e: push, recurse, pop — no new stack allocation.
+            visitedFields.Push((field, declaringType));
+            var result = InputObjectDefaultValueHasCycle(namedInputType, fieldDefaultValue, visitedFields);
+            visitedFields.Pop();
+            return result;
         }
     }
 }

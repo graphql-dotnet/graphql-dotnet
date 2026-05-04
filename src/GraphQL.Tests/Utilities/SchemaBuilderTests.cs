@@ -737,6 +737,32 @@ public class SchemaBuilderTests
     }
 
     [Fact]
+    public void input_types_default_value_loops_pass_three_types()
+    {
+        // SomeInputType1 -> SomeInputType2 -> SomeInputType3 -> SomeInputType1, but the
+        // first type's default value sets the back-reference field to null, breaking the cycle.
+
+        const string definitions = """
+            type Query {
+              dummy: String
+            }
+
+            input SomeInputType1 {
+              test2: SomeInputType2 = { test3: { test1: null } }
+            }
+            input SomeInputType2 {
+              test3: SomeInputType3 = {}
+            }
+            input SomeInputType3 {
+              test1: SomeInputType1 = {}
+            }
+            """;
+
+        var schema = Schema.For(definitions);
+        schema.Initialize();
+    }
+
+    [Fact]
     public void input_types_self_referencing_default_value_passes()
     {
         const string definitions = """
