@@ -603,8 +603,6 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
         // involved in the cycle (innermost first, i.e. in reverse traversal order) for use in
         // error messages.
         //
-        // visitedFields is a shared mutable stack pushed/popped as we recurse — no allocation per call.
-        //
         // 1. If defaultValue is not provided, initialize it to an empty unordered map. (implemented at caller)
         // 2. If visitedFields is not provided, initialize it to the empty set. (implemented at caller)
         // 3. If defaultValue is a list:
