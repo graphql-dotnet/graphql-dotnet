@@ -353,6 +353,412 @@ public class DirectiveFragmentTests : QueryTestBase<DirectiveSchema>
             """,
             null, _data);
     }
+
+    // Combination @skip + @include tests for fragment spreads
+
+    [Fact]
+    public void skip_true_include_true_omits_fragment_spread()
+    {
+        AssertQuerySuccess("""
+            query Q {
+              a
+              ...Frag @skip(if: true) @include(if: true)
+            }
+            fragment Frag on TestType {
+              b
+            }
+            """,
+            """
+            {
+              "a": "a"
+            }
+            """,
+            null, _data);
+    }
+
+    [Fact]
+    public void skip_false_include_false_omits_fragment_spread()
+    {
+        AssertQuerySuccess("""
+            query Q {
+              a
+              ...Frag @skip(if: false) @include(if: false)
+            }
+            fragment Frag on TestType {
+              b
+            }
+            """,
+            """
+            {
+              "a": "a"
+            }
+            """,
+            null, _data);
+    }
+
+    [Fact]
+    public void skip_true_include_false_omits_fragment_spread()
+    {
+        AssertQuerySuccess("""
+            query Q {
+              a
+              ...Frag @skip(if: true) @include(if: false)
+            }
+            fragment Frag on TestType {
+              b
+            }
+            """,
+            """
+            {
+              "a": "a"
+            }
+            """,
+            null, _data);
+    }
+
+    [Fact]
+    public void skip_false_include_true_includes_fragment_spread()
+    {
+        AssertQuerySuccess("""
+            query Q {
+              a
+              ...Frag @skip(if: false) @include(if: true)
+            }
+            fragment Frag on TestType {
+              b
+            }
+            """,
+            """
+            {
+              "a": "a",
+              "b": "b"
+            }
+            """,
+            null, _data);
+    }
+
+    // Combination @skip + @include tests for inline fragments
+
+    [Fact]
+    public void skip_true_include_true_omits_inline_fragment()
+    {
+        AssertQuerySuccess("""
+            query Q {
+              a
+              ... on TestType @skip(if: true) @include(if: true) {
+                b
+              }
+            }
+            """,
+            """
+            {
+              "a": "a"
+            }
+            """,
+            null, _data);
+    }
+
+    [Fact]
+    public void skip_false_include_false_omits_inline_fragment()
+    {
+        AssertQuerySuccess("""
+            query Q {
+              a
+              ... on TestType @skip(if: false) @include(if: false) {
+                b
+              }
+            }
+            """,
+            """
+            {
+              "a": "a"
+            }
+            """,
+            null, _data);
+    }
+
+    [Fact]
+    public void skip_true_include_false_omits_inline_fragment()
+    {
+        AssertQuerySuccess("""
+            query Q {
+              a
+              ... on TestType @skip(if: true) @include(if: false) {
+                b
+              }
+            }
+            """,
+            """
+            {
+              "a": "a"
+            }
+            """,
+            null, _data);
+    }
+
+    [Fact]
+    public void skip_false_include_true_includes_inline_fragment()
+    {
+        AssertQuerySuccess("""
+            query Q {
+              a
+              ... on TestType @skip(if: false) @include(if: true) {
+                b
+              }
+            }
+            """,
+            """
+            {
+              "a": "a",
+              "b": "b"
+            }
+            """,
+            null, _data);
+    }
+
+    // Variable-based tests for fragment spreads
+
+    [Fact]
+    public void include_true_via_variable_includes_fragment_spread()
+    {
+        AssertQuerySuccess("""
+            query Q($var: Boolean!) {
+              a
+              ...Frag @include(if: $var)
+            }
+            fragment Frag on TestType {
+              b
+            }
+            """,
+            """
+            {
+              "a": "a",
+              "b": "b"
+            }
+            """,
+            """{ "var": true }""".ToInputs(), _data);
+    }
+
+    [Fact]
+    public void include_false_via_variable_omits_fragment_spread()
+    {
+        AssertQuerySuccess("""
+            query Q($var: Boolean!) {
+              a
+              ...Frag @include(if: $var)
+            }
+            fragment Frag on TestType {
+              b
+            }
+            """,
+            """
+            {
+              "a": "a"
+            }
+            """,
+            """{ "var": false }""".ToInputs(), _data);
+    }
+
+    [Fact]
+    public void skip_true_via_variable_omits_fragment_spread()
+    {
+        AssertQuerySuccess("""
+            query Q($var: Boolean!) {
+              a
+              ...Frag @skip(if: $var)
+            }
+            fragment Frag on TestType {
+              b
+            }
+            """,
+            """
+            {
+              "a": "a"
+            }
+            """,
+            """{ "var": true }""".ToInputs(), _data);
+    }
+
+    [Fact]
+    public void skip_false_via_variable_includes_fragment_spread()
+    {
+        AssertQuerySuccess("""
+            query Q($var: Boolean!) {
+              a
+              ...Frag @skip(if: $var)
+            }
+            fragment Frag on TestType {
+              b
+            }
+            """,
+            """
+            {
+              "a": "a",
+              "b": "b"
+            }
+            """,
+            """{ "var": false }""".ToInputs(), _data);
+    }
+
+    // Variable-based tests for inline fragments
+
+    [Fact]
+    public void include_true_via_variable_includes_inline_fragment()
+    {
+        AssertQuerySuccess("""
+            query Q($var: Boolean!) {
+              a
+              ... on TestType @include(if: $var) {
+                b
+              }
+            }
+            """,
+            """
+            {
+              "a": "a",
+              "b": "b"
+            }
+            """,
+            """{ "var": true }""".ToInputs(), _data);
+    }
+
+    [Fact]
+    public void include_false_via_variable_omits_inline_fragment()
+    {
+        AssertQuerySuccess("""
+            query Q($var: Boolean!) {
+              a
+              ... on TestType @include(if: $var) {
+                b
+              }
+            }
+            """,
+            """
+            {
+              "a": "a"
+            }
+            """,
+            """{ "var": false }""".ToInputs(), _data);
+    }
+
+    [Fact]
+    public void skip_true_via_variable_omits_inline_fragment()
+    {
+        AssertQuerySuccess("""
+            query Q($var: Boolean!) {
+              a
+              ... on TestType @skip(if: $var) {
+                b
+              }
+            }
+            """,
+            """
+            {
+              "a": "a"
+            }
+            """,
+            """{ "var": true }""".ToInputs(), _data);
+    }
+
+    [Fact]
+    public void skip_false_via_variable_includes_inline_fragment()
+    {
+        AssertQuerySuccess("""
+            query Q($var: Boolean!) {
+              a
+              ... on TestType @skip(if: $var) {
+                b
+              }
+            }
+            """,
+            """
+            {
+              "a": "a",
+              "b": "b"
+            }
+            """,
+            """{ "var": false }""".ToInputs(), _data);
+    }
+
+    // Anonymous inline fragment (no type condition) tests
+
+    [Fact]
+    public void if_false_omits_anonymous_inline_fragment()
+    {
+        AssertQuerySuccess("""
+            query Q {
+              a
+              ... @include(if: false) {
+                b
+              }
+            }
+            """,
+            """
+            {
+              "a": "a"
+            }
+            """,
+            null, _data);
+    }
+
+    [Fact]
+    public void if_true_includes_anonymous_inline_fragment()
+    {
+        AssertQuerySuccess("""
+            query Q {
+              a
+              ... @include(if: true) {
+                b
+              }
+            }
+            """,
+            """
+            {
+              "a": "a",
+              "b": "b"
+            }
+            """,
+            null, _data);
+    }
+
+    [Fact]
+    public void skip_true_omits_anonymous_inline_fragment()
+    {
+        AssertQuerySuccess("""
+            query Q {
+              a
+              ... @skip(if: true) {
+                b
+              }
+            }
+            """,
+            """
+            {
+              "a": "a"
+            }
+            """,
+            null, _data);
+    }
+
+    [Fact]
+    public void skip_false_includes_anonymous_inline_fragment()
+    {
+        AssertQuerySuccess("""
+            query Q {
+              a
+              ... @skip(if: false) {
+                b
+              }
+            }
+            """,
+            """
+            {
+              "a": "a",
+              "b": "b"
+            }
+            """,
+            null, _data);
+    }
 }
 
 public class DirectiveParsingTests : QueryTestBase<DirectiveSchema>
