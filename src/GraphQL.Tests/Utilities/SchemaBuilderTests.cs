@@ -717,12 +717,16 @@ public class SchemaBuilderTests
         Should.Throw<InvalidOperationException>(() => schema.Initialize()).Message.ShouldBe("Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: 'SomeInputType3', 'SomeInputType2', 'SomeInputType1'.");
     }
 
-    [Fact(Skip = "Not yet supported")]
+    [Fact]
     public void input_types_default_value_loops_pass()
     {
         // see: https://github.com/graphql-dotnet/graphql-dotnet/pull/2696#discussion_r764975585
 
         const string definitions = """
+            type Query {
+              dummy: String
+            }
+
             input SomeInputType1 {
               test: SomeInputType1 = { test: null }
             }
@@ -730,6 +734,83 @@ public class SchemaBuilderTests
 
         var schema = Schema.For(definitions);
         schema.Initialize();
+    }
+
+    [Fact]
+    public void input_types_self_referencing_default_value_passes()
+    {
+        const string definitions = """
+            type Query {
+              dummy: String
+            }
+
+            input Input_xsLEb {
+              r0cZU: ID
+              u: Input_xsLEb = {u : {u : {u : null, uf : G4F, r0cZU : null}, uf : G4F, r0cZU : null}, uf : nz5eimt, r0cZU : "^"}
+              uf: Enum_P1MnYWz!
+            }
+
+            enum Enum_P1MnYWz {
+              G4F
+              U_PcE
+              nz5eimt
+            }
+            """;
+
+        var schema = Schema.For(definitions);
+        schema.Initialize();
+    }
+
+    [Fact]
+    public void input_types_self_referencing_default_value_throws_when_missing_nested_self_ref_field()
+    {
+        const string definitions = """
+            type Query {
+              dummy: String
+            }
+
+            input Input_xsLEb {
+              r0cZU: ID
+              u: Input_xsLEb = {u : {u : {uf : G4F, r0cZU : null}, uf : G4F, r0cZU : null}, uf : nz5eimt, r0cZU : "^"}
+              uf: Enum_P1MnYWz!
+            }
+
+            enum Enum_P1MnYWz {
+              G4F
+              U_PcE
+              nz5eimt
+            }
+            """;
+
+        var schema = Schema.For(definitions);
+        Should.Throw<InvalidOperationException>(() => schema.Initialize())
+            .Message.ShouldBe("Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: 'Input_xsLEb'.");
+    }
+
+    [Fact]
+    public void input_types_self_referencing_default_value_throws_when_missing_top_level_self_ref_field()
+    {
+        const string definitions = """
+            type Query {
+              dummy: String
+            }
+
+            input Input_xsLEb {
+              r0cZU: ID
+              u: Input_xsLEb = {uf : nz5eimt, r0cZU : "^"}
+              uf: Enum_P1MnYWz!
+            }
+
+            enum Enum_P1MnYWz {
+              G4F
+              U_PcE
+              nz5eimt
+            }
+            """;
+
+        var schema = Schema.For(definitions);
+        Should.Throw<InvalidOperationException>(() => schema.Initialize())
+            .Message.ShouldBe("Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: 'Input_xsLEb'.");
     }
 
     [Fact]

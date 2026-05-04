@@ -576,12 +576,71 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
                 {
                     var baseType = field.ResolvedType!.GetNamedType();
                     if (baseType is IInputObjectGraphType inputFieldType)
-                        ExamineType(inputFieldType, completed, inProcess);
+                    {
+                        if (inProcess.Contains(inputFieldType))
+                            // Cycle detected: instead of throwing immediately, verify that the default value
+                            // explicitly provides a value for every field whose type is in the cycle at every
+                            // depth. If any such field is missing, applying its default would use an
+                            // uncoerced GraphQLValue, so we throw. Otherwise coercion can proceed safely.
+                            CheckNoCyclicMissingFields(field.ResolvedType!, value, inProcess);
+                        else
+                            ExamineType(inputFieldType, completed, inProcess);
+                    }
                     field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, value).Value;
                 }
             }
             inProcess.Pop();
             completed.Add(inputType);
+        }
+
+        // Validates that the given value, which has a type that participates in a dependency cycle
+        // (one or more types in <paramref name="inProcess"/>), does not omit any field whose type
+        // is also in the cycle. A missing cyclic field would require falling back to an uncoerced
+        // default value, which is not yet available at this point in schema initialization.
+        static void CheckNoCyclicMissingFields(IGraphType type, GraphQLValue value, Stack<IInputObjectGraphType> inProcess)
+        {
+            if (type is NonNullGraphType nonNull)
+            {
+                CheckNoCyclicMissingFields(nonNull.ResolvedType!, value, inProcess);
+                return;
+            }
+
+            if (type is ListGraphType listType)
+            {
+                if (value is GraphQLNullValue)
+                    return;
+                if (value is GraphQLListValue listValue)
+                {
+                    foreach (var item in listValue.Values ?? Enumerable.Empty<GraphQLValue>())
+                        CheckNoCyclicMissingFields(listType.ResolvedType!, item, inProcess);
+                }
+                else
+                {
+                    CheckNoCyclicMissingFields(listType.ResolvedType!, value, inProcess);
+                }
+                return;
+            }
+
+            if (type is not IInputObjectGraphType inputType || !inProcess.Contains(inputType))
+                return;
+
+            if (value is GraphQLNullValue)
+                return;
+
+            if (value is not GraphQLObjectValue objectValue)
+                return;
+
+            foreach (var field in inputType.Fields)
+            {
+                var fieldBaseType = field.ResolvedType!.GetNamedType();
+                if (fieldBaseType is IInputObjectGraphType fieldInputType && inProcess.Contains(fieldInputType))
+                {
+                    var objectField = objectValue.Field(field.Name);
+                    if (objectField == null)
+                        throw new InvalidOperationException($"Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: {string.Join(", ", inProcess.Select(x => $"'{x.Name}'"))}.");
+                    CheckNoCyclicMissingFields(field.ResolvedType!, objectField.Value, inProcess);
+                }
+            }
         }
     }
 }
