@@ -571,9 +571,6 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
             foreach (var field in inputType.Fields)
             {
-                if (field.DefaultValue is not GraphQLValue defaultValue)
-                    continue;
-
                 var baseType = field.ResolvedType!.GetNamedType();
                 if (baseType is IInputObjectGraphType inputFieldType)
                 {
@@ -598,7 +595,9 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
                     ExamineType(inputFieldType, completed, inProcess, ref inputTypesCheckedForCycles);
                     inProcess.Pop();
                 }
-                field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, defaultValue).Value;
+
+                if (field.DefaultValue is GraphQLValue defaultValue)
+                    field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, defaultValue).Value;
             }
 
             completed.Add(inputType);
