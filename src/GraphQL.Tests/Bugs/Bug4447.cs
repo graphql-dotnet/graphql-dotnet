@@ -13,7 +13,7 @@ namespace GraphQL.Tests.Bugs;
 /// InputB.value's default hasn't been coerced yet (still a GraphQLIntValue AST node), causing
 /// schema validation to throw "The default value of Input Object type field 'InputB.a' is invalid."
 /// </summary>
-public class Bug4448
+public class Bug4447
 {
     private const string Sdl = """
         schema {
