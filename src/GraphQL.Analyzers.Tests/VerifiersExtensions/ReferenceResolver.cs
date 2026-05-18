@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using NuGet.Frameworks;

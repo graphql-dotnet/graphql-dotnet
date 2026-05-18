@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;

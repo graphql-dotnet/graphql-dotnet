@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Types.Scalars;
