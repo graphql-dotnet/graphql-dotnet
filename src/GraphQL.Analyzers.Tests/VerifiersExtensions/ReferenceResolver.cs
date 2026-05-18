@@ -9,6 +9,7 @@ public static class ReferenceResolver
 {
     public static ReferenceAssemblies ReferenceAssemblies { get; } = ResolveReferenceAssemblies();
 
+    [MethodImpl(MethodImplOptions.NoInlining)] // inlining would change result of GetCallingAssembly
     private static ReferenceAssemblies ResolveReferenceAssemblies()
     {
         string assemblyLocation = Assembly
