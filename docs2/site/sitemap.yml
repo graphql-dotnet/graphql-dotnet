@@ -85,6 +85,8 @@
             file: complexity-analyzer.md
           - title: Schema Generation
             file: schema-generation.md
+          - title: Samples
+            file: samples.md
           - title: Known Issues & FAQ
             file: known-issues.md
           - title: Links
