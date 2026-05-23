@@ -85,6 +85,7 @@
     <File Path="docs2/site/docs/getting-started/query-organization.md" />
     <File Path="docs2/site/docs/getting-started/query-validation.md" />
     <File Path="docs2/site/docs/getting-started/relay.md" />
+    <File Path="docs2/site/docs/getting-started/samples.md" />
     <File Path="docs2/site/docs/getting-started/schema-types.md" />
     <File Path="docs2/site/docs/getting-started/subscriptions.md" />
     <File Path="docs2/site/docs/getting-started/unions.md" />
@@ -114,6 +115,7 @@
   <Folder Name="/Samples/">
     <Project Path="samples/GraphQL.AotCompilationSample.CodeFirst/GraphQL.AotCompilationSample.CodeFirst.csproj" />
     <Project Path="samples/GraphQL.AotCompilationSample.TypeFirst/GraphQL.AotCompilationSample.TypeFirst.csproj" />
+    <Project Path="samples/GraphQL.CustomValidationRule.Sample/GraphQL.CustomValidationRule.Sample.csproj" />
     <Project Path="samples/GraphQL.DataLoader.Sample.Default/GraphQL.DataLoader.Sample.Default.csproj" />
     <Project Path="samples/GraphQL.DataLoader.Sample.DI/GraphQL.DataLoader.Sample.DI.csproj" />
     <Project Path="samples/GraphQL.Federation.CodeFirst.Sample3/GraphQL.Federation.CodeFirst.Sample3.csproj" />
