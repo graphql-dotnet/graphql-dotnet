@@ -417,6 +417,8 @@ public class StarWarsQuery : ObjectGraphType
 
 Dependency injection scopes behave differently in GraphQL.NET **subscriptions** than in queries and mutations, which can cause scoped services to fail to resolve by default; this section shows how to configure GraphQL.NET to support scoped services in subscription resolvers.
 
+> This documentation assumes the use of [GraphQL.NET Server](https://github.com/graphql-dotnet/server) for handling real-time transport (WebSockets, Server-Sent Events, etc.).
+
 ### Overview
 
 GraphQL.NET integrates with ASP.NET Core dependency injection.
@@ -430,23 +432,26 @@ A GraphQL subscription has two distinct execution phases:
 
 1. **Subscription setup**
    - Triggered when the client sends the subscription request
-   - Runs within the original HTTP request scope
+   - Runs within the original HTTP request scope (typically created by ASP.NET Core middleware)
 
 2. **Event execution**
-   - Triggered each time a subscription event is published
-   - Executes outside the original HTTP request lifecycle
+   - Triggered each time a subscription event is published (e.g. via `IStreamSourceResolver`)
+   - Executes outside the original HTTP request lifecycle — potentially seconds, minutes, or hours later
 
 Because event execution may occur long after the initial request has completed, the original dependency injection scope may already be disposed.
 
-## Why `RequestServices` May Be Disposed
+### Without `AddScopedSubscriptionExecutionStrategy`
 
 By default, GraphQL.NET does **not** create a new dependency injection scope for each subscription event.
 
 As a result:
 
-- `IServiceProvider` stored in `context.RequestServices` may be disposed
-- Attempting to resolve scoped services can throw:
-
+- `IServiceProvider` stored in `context.RequestServices` references the **original request scope**, which is disposed after the HTTP request completes
+- Attempting to resolve scoped services (such as `DbContext`) during event execution will throw `ObjectDisposedException`:
+  ```
+  System.ObjectDisposedException: Cannot access a disposed context instance.
+  ```
+- Singleton and transient services will still resolve correctly
 
 This behavior commonly occurs when subscription resolvers depend on scoped services such as repositories or database contexts.
 
@@ -460,57 +465,134 @@ The root cause was identified as missing DI scope creation during subscription e
 
 ## Solution: Scoped Subscription Execution Strategy
 
-GraphQL.NET provides a scoped execution strategy specifically for subscriptions.
+GraphQL.NET provides a scoped execution strategy specifically for subscriptions, available in the
+[GraphQL.MicrosoftDI NuGet package](https://www.nuget.org/packages/GraphQL.MicrosoftDI).
 
 ### Configuration
 
-Register the scoped execution strategy during GraphQL setup:
+Register the scoped execution strategy during GraphQL setup. When using GraphQL.NET Server,
+configure it alongside your server setup:
 
 ```csharp
+// Program.cs or Startup.cs
 services
     .AddGraphQL()
-    .AddScopedSubscriptionExecutionStrategy();
+    .AddScopedSubscriptionExecutionStrategy()
+    .AddSchema<MySchema>()
+    .AddSystemTextJson();
 ```
 
 ### What This Does
 
-- Creates a new DI scope for each subscription event
+- Creates a **new DI scope** for each subscription event execution
+- Ensures `context.RequestServices` is a valid, non-disposed `IServiceProvider` during resolver execution
+- Enables safe resolution of scoped services (e.g. `DbContext`, repositories)
+- Aligns subscription DI behavior with queries and mutations
 
-- Ensures `context.RequestServices` is valid during resolver execution
+### Why Serial Execution Is the Default
 
-- Enables safe resolution of scoped services
+By default, `AddScopedSubscriptionExecutionStrategy()` uses a **serial** execution strategy
+(`SerialExecutionStrategy`) rather than parallel execution. This is intentional:
 
-- Aligns subscription behavior with queries and mutations
+- **Scoped services are typically not thread-safe.** For example, Entity Framework's `DbContext`
+  is documented as not safe for concurrent access. When multiple subscription fields resolve
+  in parallel sharing the same scope, concurrent database operations can cause data corruption
+  or exceptions.
+- **Serial execution ensures each field resolver completes** before the next one begins, so
+  scoped services accessed within resolvers are used sequentially within their scope.
 
-### Subscription Resolver
+If your subscription resolvers only use thread-safe scoped services (or you manage concurrency
+yourself), you can opt into parallel execution:
 
 ```csharp
-Field<StringGraphType>(
-    "onDataUpdated",
-    resolve: context =>
-    {
-        var service = context.RequestServices.GetRequiredService<IMyService>();
-        return service.GetMessage();
-    }
-);
+services
+    .AddGraphQL()
+    .AddScopedSubscriptionExecutionStrategy(serialExecution: false);
 ```
+
+### Subscription Resolver Example
+
+With the scoped strategy enabled, subscription resolvers can safely use scoped services:
+
+```csharp
+public class Subscription : ObjectGraphType
+{
+    public Subscription()
+    {
+        Field<StringGraphType>("onOrderStatusChanged")
+            .Resolve(context =>
+            {
+                // context.RequestServices is a fresh, valid scope
+                var repo = context.RequestServices.GetRequiredService<IOrderRepository>();
+                var order = repo.GetOrderById(context.Source.OrderId);
+                return $"Order {order.Id} status changed to {order.Status}";
+            });
+    }
+}
+```
+
+### Using `ResolveScopedAsync` with Subscriptions
+
+You can also use the `ResolveScopedAsync` helper from `GraphQL.MicrosoftDI` within subscription
+resolvers, which creates an explicit scope for the resolver. However, with
+`AddScopedSubscriptionExecutionStrategy` enabled, this is typically unnecessary since the
+strategy already provides a valid scope:
+
+```csharp
+Field<OrderType>("onOrderUpdated")
+    .ResolveScopedAsync(async context =>
+    {
+        var db = context.RequestServices.GetRequiredService<AppDbContext>();
+        var orderId = (int)context.Source;
+        return await db.Orders.FindAsync(orderId);
+    });
+```
+
 ### Behavior Comparison
 
-| Execution Strategy | Result
-|-------------------|--------
-| Default strategy  | ❌ Scoped services may fail
-| Scoped strategy   | ✅ Scoped services resolve correctly
+- **Default strategy**: ❌ Scoped services may fail with `ObjectDisposedException`
+- **Scoped strategy (serial)**: ✅ Scoped services resolve correctly, fields execute sequentially
+- **Scoped strategy (parallel)**: ✅ Scoped services resolve correctly, but ensure services are thread-safe
 
 ## When to Use Scoped Subscription Execution
 
 You should enable scoped subscription execution if:
 
 - Your subscription resolvers use:
-  - `DbContext`
+  - `DbContext` (Entity Framework)
   - Repository patterns
-  - Any service registered as **Scoped**
+  - Any service registered as **Scoped** in your DI container
 
 - You expect consistent dependency injection behavior across:
   - Queries
   - Mutations
   - Subscriptions
+
+## Full Example with GraphQL.NET Server
+
+Below is a complete setup showing scoped subscriptions with GraphQL.NET Server:
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services.AddScoped<IOrderService, OrderService>();
+
+builder.Services
+    .AddGraphQL()
+    .AddScopedSubscriptionExecutionStrategy()  // enables scoped DI for subscriptions
+    .AddSchema<AppSchema>()
+    .AddSystemTextJson()
+    .AddGraphTypes();
+
+var app = builder.Build();
+app.UseWebSockets();
+app.UseGraphQL("/graphql");
+app.UseGraphQLPlayground("/ui/playground");
+app.Run();
+```
+
+With this configuration, subscription resolvers can resolve `AppDbContext` and `IOrderService`
+safely, just like query and mutation resolvers.
