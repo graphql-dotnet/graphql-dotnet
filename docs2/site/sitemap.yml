@@ -87,6 +87,10 @@
             file: schema-generation.md
           - title: Known Issues & FAQ
             file: known-issues.md
+          - title: Schema-First Approach
+            file: schema-first.md
+          - title: Samples
+            file: samples.md
           - title: Links
             file: links.md
           - title: Document Caching
