@@ -16,9 +16,6 @@
 | :heart: [Become a backer!](https://opencollective.com/graphql-net#backer) :heart: | [![Backers on Open Collective](https://opencollective.com/graphql-net/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/graphql-net/sponsors/badge.svg)](#sponsors)  |
 |-|-|
 
-| :heavy_dollar_sign: [Get paid for contributing!](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/BOUNTY.md) :heavy_dollar_sign: | [![GitHub issues by-label](https://img.shields.io/github/issues-raw/graphql-dotnet/graphql-dotnet/bounty?color=blue&label=open%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aopen+is%3Aissue+label%3Abounty) [![GitHub closed issues by-label](https://img.shields.io/github/issues-closed-raw/graphql-dotnet/graphql-dotnet/bounty-paid?color=blue&label=paid%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aclosed+is%3Aissue+label%3Abounty-paid)
-|-|-|
-
 This is an implementation of GraphQL, a query language and execution engine originally created
 by Facebook in 2012, in .NET.
 
@@ -383,9 +380,8 @@ If you have a PR with some breaking changes, then please target it to the `devel
 
 Thank you to all our backers! 🙏 [Become a backer](https://opencollective.com/graphql-net#backer).
 
-Contributions are very much appreciated and are used to support the project primarily via [bounties](BOUNTY.md) paid directly to contributors to the project.
+Contributions are very much appreciated and are used to support the maintainers of the project.
 Please help us to express gratitude to those individuals who devote time and energy to contributing to this project by supporting their efforts in a tangible means.
-A list of the outstanding issues to which we are sponsoring via bounties can be found [here](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aopen+is%3Aissue+label%3Abounty).
 
 <a href="https://opencollective.com/graphql-net#backers" target="_blank"><img src="https://opencollective.com/graphql-net/backers.svg?width=890"></a>
 
