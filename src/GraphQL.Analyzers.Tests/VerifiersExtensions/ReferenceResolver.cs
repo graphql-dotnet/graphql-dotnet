@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using NuGet.Frameworks;
@@ -9,6 +10,7 @@ public static class ReferenceResolver
 {
     public static ReferenceAssemblies ReferenceAssemblies { get; } = ResolveReferenceAssemblies();
 
+    [MethodImpl(MethodImplOptions.NoInlining)] // inlining would change result of GetCallingAssembly
     private static ReferenceAssemblies ResolveReferenceAssemblies()
     {
         string assemblyLocation = Assembly

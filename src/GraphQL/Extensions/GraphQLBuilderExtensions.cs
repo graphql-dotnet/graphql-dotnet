@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
@@ -492,6 +493,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <see cref="InputObjectGraphType{TSourceType}"/>, <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/>, and
     /// <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> as generic types.
     /// </summary>
+    [MethodImpl(MethodImplOptions.NoInlining)] // inlining would change result of GetCallingAssembly
     public static IGraphQLBuilder AddGraphTypes(this IGraphQLBuilder builder)
         => builder.AddGraphTypes(Assembly.GetCallingAssembly());
 
@@ -551,6 +553,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// within the schema constructor.
     /// </remarks>
     [RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are not trimmed by the compiler.")]
+    [MethodImpl(MethodImplOptions.NoInlining)] // inlining would change result of GetCallingAssembly
     public static IGraphQLBuilder AddClrTypeMappings(this IGraphQLBuilder builder)
         => builder.AddClrTypeMappings(Assembly.GetCallingAssembly());
 
