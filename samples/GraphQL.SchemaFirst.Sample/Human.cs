@@ -12,13 +12,13 @@ public class Human : Character
     public string? Name { get; set; }
     public List<Episode>? AppearsIn { get; set; }
     public List<string>? Friends { get; set; }
-    
+
     /// <summary>
     /// Home planet of the human.
     /// Maps to SDL field: homePlanet: String
     /// </summary>
     public string? HomePlanet { get; set; }
-    
+
     /// <summary>
     /// Cursor for pagination.
     /// </summary>

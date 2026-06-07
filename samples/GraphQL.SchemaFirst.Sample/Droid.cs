@@ -12,13 +12,13 @@ public class Droid : Character
     public string? Name { get; set; }
     public List<Episode>? AppearsIn { get; set; }
     public List<string>? Friends { get; set; }
-    
+
     /// <summary>
     /// Primary function of the droid.
     /// Maps to SDL field: primaryFunction: String
     /// </summary>
     public string? PrimaryFunction { get; set; }
-    
+
     /// <summary>
     /// Cursor for pagination.
     /// </summary>

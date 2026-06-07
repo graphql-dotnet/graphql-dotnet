@@ -1,5 +1,3 @@
-using GraphQL.Types;
-
 namespace GraphQL.SchemaFirst.Sample;
 
 /// <summary>
