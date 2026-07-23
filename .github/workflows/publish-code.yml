@@ -29,7 +29,7 @@ jobs:
           echo version=$version
           echo "version=$version" >> $GITHUB_ENV
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: npm install docs2
@@ -45,7 +45,7 @@ jobs:
           path: docs2/public/**
           if-no-files-found: error
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
           source-url: https://api.nuget.org/v3/index.json
