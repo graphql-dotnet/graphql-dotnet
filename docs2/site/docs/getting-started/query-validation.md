@@ -27,6 +27,10 @@ await schema.ExecuteAsync(_ =>
 });
 ```
 
+For a runnable custom validation rule sample, see
+[`GraphQL.CustomValidationRule.Sample`](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/samples/GraphQL.CustomValidationRule.Sample).
+The sample demonstrates a rule that reads field metadata and request user context before execution.
+
 ## Setting validation rules on input arguments or input object fields
 
 When defining a schema, you can set validation rules on input arguments or input object fields.
