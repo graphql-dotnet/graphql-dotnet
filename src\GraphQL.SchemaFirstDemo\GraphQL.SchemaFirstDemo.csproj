@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>GraphQL.SchemaFirstDemo</RootNamespace>
+    <AssemblyName>GraphQL.SchemaFirstDemo</AssemblyName>
+    <Description>Sample project demonstrating the Schema-First (SDL-First) approach with GraphQL.NET</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GraphQL.MicrosoftDI" Version="8.*" />
+    <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="8.*" />
+    <PackageReference Include="GraphQL.Server.Ui.Playground" Version="8.*" />
+  </ItemGroup>
+
+</Project>
