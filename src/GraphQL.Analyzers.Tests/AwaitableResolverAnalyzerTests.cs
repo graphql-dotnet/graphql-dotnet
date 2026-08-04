@@ -357,6 +357,273 @@ public class AwaitableResolverAnalyzerTests
     }
 
     [Theory]
+    [InlineData("\"text\"", "Resolve(ctx)", "\"text\"", "Resolve(ctx)", false)]
+    [InlineData("ResolveAsync(ctx)", "\"text\"", "await ResolveAsync(ctx)", "\"text\"", true)]
+    [InlineData("\"text\"", "ResolveAsync(ctx)", "\"text\"", "await ResolveAsync(ctx)", true)]
+    [InlineData("Task.FromResult(\"text\")", "ValueTask.FromResult(\"text\")", "await Task.FromResult(\"text\")", "await ValueTask.FromResult(\"text\")", true)]
+    [InlineData("(ResolveAsync(ctx))", "(\"text\")", "(await ResolveAsync(ctx))", "(\"text\")", true)]
+    public async Task SyncResolve_AwaitableConditionalLambdaResolver_GQL009_Fixed(
+        string whenTrue,
+        string whenFalse,
+        string fixedWhenTrue,
+        string fixedWhenFalse,
+        bool report)
+    {
+        string source =
+            $$"""
+              using System;
+              using System.Threading.Tasks;
+              using GraphQL;
+              using GraphQL.Types;
+
+              namespace Sample.Server;
+
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      Field<StringGraphType>("Test").{|#0:Resolve|}(ctx => ctx.Source == null ? {{whenTrue}} : {{whenFalse}});
+                  }
+
+                  private string Resolve(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                  private Task<string> ResolveAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                  private ValueTask<string> ResolveValueAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+              }
+              """;
+
+        string fix =
+            $$"""
+              using System;
+              using System.Threading.Tasks;
+              using GraphQL;
+              using GraphQL.Types;
+
+              namespace Sample.Server;
+
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      Field<StringGraphType>("Test").ResolveAsync(async ctx => ctx.Source == null ? {{fixedWhenTrue}} : {{fixedWhenFalse}});
+                  }
+
+                  private string Resolve(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                  private Task<string> ResolveAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                  private ValueTask<string> ResolveValueAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+              }
+              """;
+
+        var expected = report
+            ? [VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync)]
+            : DiagnosticResult.EmptyDiagnosticResults;
+
+        string expectedFix = report ? fix : source;
+
+        await VerifyCS.VerifyCodeFixAsync(source, expected, expectedFix);
+    }
+
+    [Fact]
+    public async Task SyncResolve_AwaitableNestedConditionalLambdaResolver_GQL009_Fixed()
+    {
+        const string source =
+            """
+            using System;
+            using System.Threading.Tasks;
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    Field<StringGraphType>("Test").{|#0:Resolve|}(ctx => ctx.Source == null
+                        ? ResolveAsync(ctx)
+                        : ctx.Path == null
+                            ? Resolve(ctx)
+                            : ctx.ParentType == null
+                                ? ResolveValueAsync(ctx)
+                                : "text");
+                }
+
+                private string Resolve(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                private Task<string> ResolveAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                private ValueTask<string> ResolveValueAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+            }
+            """;
+
+        const string fix =
+            """
+            using System;
+            using System.Threading.Tasks;
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    Field<StringGraphType>("Test").ResolveAsync(async ctx => ctx.Source == null
+                        ? await ResolveAsync(ctx)
+                        : ctx.Path == null
+                            ? Resolve(ctx)
+                            : ctx.ParentType == null
+                                ? await ResolveValueAsync(ctx)
+                                : "text");
+                }
+
+                private string Resolve(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                private Task<string> ResolveAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                private ValueTask<string> ResolveValueAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
+    }
+
+    [Fact]
+    public async Task SyncResolve_AwaitableConditionalAmongOtherReturnStatements_GQL009_Fixed()
+    {
+        const string source =
+            """
+            using System;
+            using System.Threading.Tasks;
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    Field<StringGraphType>("Test").{|#0:Resolve|}(ctx =>
+                    {
+                        if (ctx.Source == null)
+                            return "text";
+
+                        if (ctx.Path == null)
+                            return ResolveAsync(ctx);
+
+                        if (ctx.ParentType == null)
+                            return ctx.Source == null ? ResolveValueAsync(ctx) : "text";
+
+                        return Resolve(ctx);
+                    });
+                }
+
+                private string Resolve(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                private Task<string> ResolveAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                private ValueTask<string> ResolveValueAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+            }
+            """;
+
+        const string fix =
+            """
+            using System;
+            using System.Threading.Tasks;
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    Field<StringGraphType>("Test").ResolveAsync(async ctx =>
+                    {
+                        if (ctx.Source == null)
+                            return "text";
+
+                        if (ctx.Path == null)
+                            return await ResolveAsync(ctx);
+
+                        if (ctx.ParentType == null)
+                            return ctx.Source == null ? await ResolveValueAsync(ctx) : "text";
+
+                        return Resolve(ctx);
+                    });
+                }
+
+                private string Resolve(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                private Task<string> ResolveAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                private ValueTask<string> ResolveValueAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
+    }
+
+    [Fact]
+    public async Task SyncResolve_AwaitableConditionalBlockResolver_GQL009_Fixed()
+    {
+        const string source =
+            """
+            using System;
+            using System.Threading.Tasks;
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    Field<StringGraphType>("Test").{|#0:Resolve|}(ctx =>
+                    {
+                        return ctx.Source == null
+                            ? ResolveAsync(ctx)
+                            : ctx.Path == null
+                                ? ResolveValueAsync(ctx)
+                                : "text";
+                    });
+                }
+
+                private Task<string> ResolveAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                private ValueTask<string> ResolveValueAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+            }
+            """;
+
+        const string fix =
+            """
+            using System;
+            using System.Threading.Tasks;
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    Field<StringGraphType>("Test").ResolveAsync(async ctx =>
+                    {
+                        return ctx.Source == null
+                            ? await ResolveAsync(ctx)
+                            : ctx.Path == null
+                                ? await ResolveValueAsync(ctx)
+                                : "text";
+                    });
+                }
+
+                private Task<string> ResolveAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                private ValueTask<string> ResolveValueAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
+    }
+
+    [Theory]
     [InlineData("\"text\"", false)]
     [InlineData("Resolve(ctx)", false)]
     [InlineData("Task.FromResult(\"text\")", true)]
