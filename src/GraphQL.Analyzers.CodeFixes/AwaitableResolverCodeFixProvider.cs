@@ -66,17 +66,19 @@ public class AwaitableResolverCodeFixProvider : CodeFixProvider
         switch (resolver.Expression)
         {
             // Resolve(ctx => AsyncMethod() or statement)
+            // Resolve(ctx => flag ? AsyncMethod() : statement)
             case SimpleLambdaExpressionSyntax { ExpressionBody: not null } lambda:
             {
+                var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+                var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
+
                 // Resolve(async ctx => await AsyncMethod() or statement)
+                // Resolve(async ctx => flag ? await AsyncMethod() : statement)
                 var newLambda = lambda
                     .WithAsyncKeyword(
                         Token(SyntaxKind.AsyncKeyword).WithLeadingTrivia(lambda.GetLeadingTrivia()))
                     .WithExpressionBody(
-                        AwaitExpression(
-                                Token(SyntaxKind.AwaitKeyword),
-                                lambda.ExpressionBody)
-                            .WithLeadingTrivia(lambda.ExpressionBody.GetLeadingTrivia()));
+                        AwaitAwaitableExpressions(lambda.ExpressionBody, semanticModel!, root!.SpanStart));
 
                 docEditor.ReplaceNode(lambda, newLambda);
 
@@ -158,6 +160,38 @@ public class AwaitableResolverCodeFixProvider : CodeFixProvider
         return true;
     }
 
+    /// <summary>
+    /// Wraps the awaitable parts of the <paramref name="expression"/> into the <c>await</c> expression.
+    /// Parentheses are unwrapped and both branches of a conditional expression are rewritten independently,
+    /// so <c>flag ? AsyncMethod() : "text"</c> becomes <c>flag ? await AsyncMethod() : "text"</c>.
+    /// Conditional expressions may be nested within each other.
+    /// </summary>
+    private static ExpressionSyntax AwaitAwaitableExpressions(
+        ExpressionSyntax expression,
+        SemanticModel semanticModel,
+        int position)
+    {
+        switch (expression)
+        {
+            case ParenthesizedExpressionSyntax parenthesized:
+                return parenthesized.WithExpression(
+                    AwaitAwaitableExpressions(parenthesized.Expression, semanticModel, position));
+
+            case ConditionalExpressionSyntax conditional:
+                return conditional
+                    .WithWhenTrue(AwaitAwaitableExpressions(conditional.WhenTrue, semanticModel, position))
+                    .WithWhenFalse(AwaitAwaitableExpressions(conditional.WhenFalse, semanticModel, position));
+
+            default:
+                return expression.IsAwaitableExpression(semanticModel, position)
+                    ? AwaitExpression(
+                            Token(SyntaxKind.AwaitKeyword).WithTrailingTrivia(Space),
+                            expression.WithoutLeadingTrivia())
+                        .WithLeadingTrivia(expression.GetLeadingTrivia())
+                    : expression;
+        }
+    }
+
     private class AwaitableStatementRewriter : CSharpSyntaxRewriter
     {
         private readonly SemanticModel _semanticModel;
@@ -176,14 +210,10 @@ public class AwaitableResolverCodeFixProvider : CodeFixProvider
                 return returnStatement;
             }
 
-            var symbolInfo = _semanticModel.GetSymbolInfo(returnStatement.Expression);
-
-            return !symbolInfo.Symbol.IsAwaitableNonDynamic(_semanticModel, _rootNode.SpanStart)
+            return !returnStatement.Expression.IsAwaitableExpression(_semanticModel, _rootNode.SpanStart)
                 ? returnStatement
                 : returnStatement.WithExpression(
-                    AwaitExpression(
-                        Token(SyntaxKind.AwaitKeyword).WithTrailingTrivia(Space),
-                        returnStatement.Expression));
+                    AwaitAwaitableExpressions(returnStatement.Expression, _semanticModel, _rootNode.SpanStart));
         }
     }
 }
