@@ -14,6 +14,8 @@
             file: introduction.md
           - title: Installation
             file: installation.md
+          - title: Samples
+            file: samples.md
           - title: GraphiQL
             file: graphiql.md
           - title: Altair GraphQL
