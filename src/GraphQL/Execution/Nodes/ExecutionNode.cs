@@ -13,7 +13,20 @@ public abstract class ExecutionNode
     /// <summary>
     /// Returns the parent node, or <see langword="null"/> if this is the root node.
     /// </summary>
+    /// <remarks>
+    /// The node returned is the parent of this node, as conceptualized by the execution graph.
+    /// For the parent as conceptualized by the query graph, see <see cref="QueryParent"/>.
+    /// </remarks>
     public ExecutionNode Parent { get; }
+
+    /// <summary>
+    /// Returns the query-equivalent parent node, or <see langword="null"/> if this is the root node.
+    /// </summary>
+    /// <remarks>
+    /// The node returned is the parent of this node, as conceptualized by the query graph.
+    /// For the parent as conceptualized by the execution graph, see <see cref="Parent"/>.
+    /// </remarks>
+    public ExecutionNode QueryParent { get; }
 
     /// <summary>
     /// Returns the graph type of this node, unwrapped if it is a <see cref="NonNullGraphType"/>.
@@ -65,7 +78,7 @@ public abstract class ExecutionNode
     /// <summary>
     /// Returns the parent node's result.
     /// </summary>
-    public virtual object? Source => Parent?.Result;
+    public virtual object? Source => QueryParent?.Result;
 
     /// <summary>
     /// Initializes an instance of <see cref="ExecutionNode"/> with the specified values
@@ -84,6 +97,14 @@ public abstract class ExecutionNode
         Field = field!;
         FieldDefinition = fieldDefinition!;
         IndexInParentNode = indexInParentNode;
+        QueryParent = GetQueryParent(parent);
+
+        static ExecutionNode GetQueryParent(ExecutionNode p)
+        {
+            while (p is ArrayExecutionNode)
+                p = p.Parent;
+            return p;
+        }
     }
 
     /// <summary>
@@ -101,13 +122,13 @@ public abstract class ExecutionNode
     /// </summary>
     public IObjectGraphType? GetParentType(ISchema schema)
     {
-        IGraphType? parentType = Parent?.GraphType;
+        IGraphType? parentType = QueryParent?.GraphType;
 
         if (parentType is IObjectGraphType objectType)
             return objectType;
 
         if (parentType is IAbstractGraphType abstractType)
-            return abstractType.GetObjectType(Parent!.Result!, schema);
+            return abstractType.GetObjectType(QueryParent!.Result!, schema);
 
         return null;
     }

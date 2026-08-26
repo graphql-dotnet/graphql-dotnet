@@ -55,9 +55,7 @@ public class ReadonlyResolveFieldContext : IResolveFieldContext<object?>
         {
             if (field == null)
             {
-                var parent = _executionNode.Parent;
-                while (parent is ArrayExecutionNode)
-                    parent = parent.Parent;
+                var parent = _executionNode.QueryParent;
 
                 if (parent != null && parent is not RootExecutionNode)
                     field = new ReadonlyResolveFieldContext(parent, _executionContext);
