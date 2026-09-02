@@ -72,7 +72,7 @@ public class VariablesInAllowedPosition : ValidationRuleBase
         if ((variableUsage.Type is NonNullGraphType || variableUsage.IsRequired) && variableType is not NonNullGraphType)
         {
             // >> Let hasNonNullVariableDefaultValue be true if a default value exists for variableDefinition and is not the value null
-            var hasNonNullVariableDefaultValue = variableDefinition.DefaultValue != null;
+            var hasNonNullVariableDefaultValue = variableDefinition.DefaultValue is not null and not GraphQLNullValue;
             // >> Let hasLocationDefaultValue be true if a default value exists for the Argument or ObjectField where variableUsage is located.
             var hasLocationDefaultValue = variableUsage.HasDefault;
             // >> If hasNonNullVariableDefaultValue is NOT true AND hasLocationDefaultValue is NOT true, return false.
