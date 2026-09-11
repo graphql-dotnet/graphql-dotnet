@@ -113,9 +113,12 @@ public class SchemaTypes : IEnumerable<IGraphType>
     // Introspection types https://spec.graphql.org/October2021/#sec-Schema-Introspection
     private Dictionary<Type, IGraphType> _introspectionTypes;
 
-    // Each entry is a factory rather than an instance because every schema needs its own copy —
-    // see CopyOfBuiltInScalar. One prototype is built per factory so the tables can still be
-    // searched by name and keyed by CLR type without constructing anything further.
+    // Each entry is a factory rather than an instance because every schema needs its own copy: a
+    // shared instance would carry every per-schema change to it — a description, an applied
+    // directive — into every other schema in the process. One prototype is built per factory so the
+    // tables can still be searched by name and keyed by CLR type without constructing anything
+    // further. What a factory produces is registered in this schema's own type dictionaries at the
+    // point it is resolved, which is what keeps it to one instance per schema.
     private static Dictionary<Type, (IGraphType Prototype, Func<IGraphType> Create)> ScalarTable(Func<IGraphType>[] factories) =>
         factories.ToDictionary(_ => _().GetType(), _ => (_(), _));
 
@@ -157,29 +160,9 @@ public class SchemaTypes : IEnumerable<IGraphType>
         () => new SByteGraphType(),
     ]);
 
-    // The tables above hold one instance per built-in scalar for the whole process, so handing one
-    // straight to a schema would make every per-schema change to it — a description, an applied
-    // directive, a name converter's work — visible to every other schema in the process. Each
-    // schema takes its own copy instead, cached here so that the three places which fall back to a
-    // built-in all reach the same instance: two of the same scalar under one schema would collide
-    // on registration.
-    private readonly Dictionary<Type, IGraphType> _builtInScalarCopies = [];
-
     private TypeCollectionContext _context;
     private INameConverter _nameConverter;
     private readonly Action<IGraphType>? _onBeforeInitialize;
-
-    /// <summary>This schema's own copy of a built-in scalar, created on first use.</summary>
-    private IGraphType CopyOfBuiltInScalar(Type clrType, Func<IGraphType> create)
-    {
-        if (!_builtInScalarCopies.TryGetValue(clrType, out var copy))
-        {
-            copy = create();
-            _builtInScalarCopies[clrType] = copy;
-        }
-
-        return copy;
-    }
 
     /// <summary>
     /// Initializes a new instance with no types registered.
@@ -271,7 +254,7 @@ public class SchemaTypes : IEnumerable<IGraphType>
                ? graphType
                : (IGraphType?)serviceProvider.GetService(t)
                ?? (_builtInScalars.TryGetValue(t, out var builtIn)
-               ? CopyOfBuiltInScalar(t, builtIn.Create)
+               ? builtIn.Create()
                : throw new Exception($"Invalid introspection type '{t.GetFriendlyName()}'"))),
            (name, type, ctx) =>
            {
@@ -310,9 +293,9 @@ public class SchemaTypes : IEnumerable<IGraphType>
                 // the type is a GraphQL.NET built-in type, create an instance of it
                 return (IGraphType?)serviceProvider.GetService(serviceType)
                     ?? (_builtInScalars.TryGetValue(serviceType, out var builtIn)
-                        ? CopyOfBuiltInScalar(serviceType, builtIn.Create)
+                        ? builtIn.Create()
                         : _builtInCustomScalars.TryGetValue(serviceType, out builtIn)
-                        ? CopyOfBuiltInScalar(serviceType, builtIn.Create)
+                        ? builtIn.Create()
                         : throw new InvalidOperationException($"No service for type '{serviceType.GetFriendlyName()}' has been registered."));
             },
             (name, graphType, context) =>
@@ -1062,21 +1045,20 @@ Make sure that your ServiceProvider is configured correctly.");
             var type2 = this[reference.TypeName];
             if (type2 == null)
             {
-                var builtIn = Find(_builtInScalars) ?? Find(_builtInCustomScalars);
-                if (builtIn != null)
+                var create = Find(_builtInScalars) ?? Find(_builtInCustomScalars);
+                if (create != null)
                 {
-                    type2 = CopyOfBuiltInScalar(builtIn.Value.Key, builtIn.Value.Value.Create);
+                    type2 = create();
                     SetGraphType(type2.Name, type2);
                 }
 
-                KeyValuePair<Type, (IGraphType Prototype, Func<IGraphType> Create)>? Find(
-                    Dictionary<Type, (IGraphType Prototype, Func<IGraphType> Create)> table)
+                Func<IGraphType>? Find(Dictionary<Type, (IGraphType Prototype, Func<IGraphType> Create)> table)
                 {
-                    foreach (var entry in table)
+                    foreach (var entry in table.Values)
                     {
-                        if (entry.Value.Prototype.Name == reference.TypeName)
+                        if (entry.Prototype.Name == reference.TypeName)
                         {
-                            return entry;
+                            return entry.Create;
                         }
                     }
 
