@@ -1,5 +1,4 @@
 using System.Text;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 
 namespace GraphQL.Tests.Execution;
