@@ -736,19 +736,10 @@ to work without changes.
 ### 21. `IResolveFieldContext.Parent` now skips list item nodes
 
 When resolving a field on an object contained in a list, `IResolveFieldContext.Parent` now returns
-the context of the field that resolved the list. Previously, it returned a context backed by a
-synthetic list item execution node, even though that node did not execute a field resolver.
+the context of the field that resolved the list. Previously, traversal retained a synthetic list
+item node and then skipped the actual list field node. As a result, `Parent.Source` returned the
+collection, `Parent.ParentType` was `null`, and `Parent.Path` and `Parent.ResponsePath` included the
+list item index. These properties now describe the actual list field resolver context.
 
-For example, given a `Query.items` field returning a list of `Item` objects, the parent context of
-the `Item.name` resolver now represents `Query.items`. As a result, the following parent-context
-properties have changed:
-
-- `Parent.Source` is now the source object supplied to the list field resolver rather than the
-  collection returned by that resolver.
-- `Parent.ParentType` is now the graph type containing the list field rather than `null`.
-- `Parent.Path` and `Parent.ResponsePath` now identify the list field and do not include the list
-  item index.
-
-Code that relied on the previous synthetic context, such as code that retrieved the list item index
-from `Parent.Path`, should instead inspect the current resolver context's `Path` or `ResponsePath`.
-Parent traversal now consistently represents contexts that were supplied to field resolvers.
+Code that retrieved the list item index from `Parent.Path` should instead inspect the current
+resolver context's `Path` or `ResponsePath`.
