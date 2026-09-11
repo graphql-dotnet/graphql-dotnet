@@ -34,9 +34,7 @@ public class __DirectiveArgument : ObjectGraphType<DirectiveArgument>
                 if (argument.Value == null)
                     return "null";
 
-                var grandParent = context.Parent!.Parent!;
-                int index = (int)grandParent.Path.Last();
-                var appliedDirective = ((IList<AppliedDirective>)grandParent.Source!)[index];
+                var appliedDirective = (AppliedDirective)context.Parent!.Source!;
                 var directiveDefinition = context.Schema.Directives.Find(appliedDirective.Name);
                 var argumentDefinition = directiveDefinition!.Arguments!.Find(argument.Name);
 

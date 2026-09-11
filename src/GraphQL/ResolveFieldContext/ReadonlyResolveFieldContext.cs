@@ -56,7 +56,8 @@ public class ReadonlyResolveFieldContext : IResolveFieldContext<object?>
             if (field == null)
             {
                 var parent = _executionNode.Parent;
-                while (parent is ArrayExecutionNode)
+                // Array item nodes do not execute a field resolver and therefore do not represent a parent context.
+                while (parent?.IndexInParentNode.HasValue == true)
                     parent = parent.Parent;
 
                 if (parent != null && parent is not RootExecutionNode)

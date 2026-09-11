@@ -732,3 +732,14 @@ public class MySchema : Schema
 
 The DI-based override (`services.AddSingleton<BooleanGraphType, MyBooleanGraphType>()`) continues
 to work without changes.
+
+### 21. `IResolveFieldContext.Parent` now skips list item nodes
+
+When resolving a field on an object contained in a list, `IResolveFieldContext.Parent` now returns
+the context of the field that resolved the list. Previously, traversal retained a synthetic list
+item node and then skipped the actual list field node. As a result, `Parent.Source` returned the
+collection, `Parent.ParentType` was `null`, and `Parent.Path` and `Parent.ResponsePath` included the
+list item index. These properties now describe the actual list field resolver context.
+
+Code that retrieved the list item index from `Parent.Path` should instead inspect the current
+resolver context's `Path` or `ResponsePath`.
