@@ -2334,6 +2334,7 @@ namespace GraphQL.Types
         [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(GraphQL.Types.AutoRegisteringInputObjectGraphType<TSourceType?>?))]
         [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(GraphQL.Types.AutoRegisteringInterfaceGraphType<TSourceType?>?))]
         [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(GraphQL.Types.AutoRegisteringObjectGraphType<TSourceType?>?))]
+        [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(GraphQL.Types.AutoRegisteringUnionGraphType<TSourceType?>?))]
         public virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredType) { }
     }
     public static class AutoRegisteringHelper
@@ -2379,6 +2380,11 @@ namespace GraphQL.Types
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.ParameterInfo parameterInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
+    }
+    public class AutoRegisteringUnionGraphType<TSourceType> : GraphQL.Types.UnionGraphType
+    {
+        public AutoRegisteringUnionGraphType() { }
+        protected virtual void ConfigureGraph() { }
     }
     public class AutoSchema<TQueryClrType> : GraphQL.Types.Schema
     {
