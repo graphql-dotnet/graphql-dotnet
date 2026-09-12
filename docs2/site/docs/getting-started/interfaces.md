@@ -146,3 +146,62 @@ public class CharacterInterface : InterfaceGraphType<StarWarsCharacter>
   }
 }
 ```
+
+## C# closed type hierarchies
+
+A type declared with the C# `closed` modifier is implicitly abstract and can only be derived from
+within its own file, so the compiler records the complete list of derived types on it. That is what
+a GraphQL interface describes, and a closed hierarchy is mapped to one automatically:
+
+```csharp
+public closed record PaymentEvent(string PaymentId);
+
+public sealed record PaymentAuthorized(string PaymentId, decimal Amount) : PaymentEvent(PaymentId);
+
+public sealed record PaymentCaptured(string PaymentId, string Reference) : PaymentEvent(PaymentId);
+
+public class Query
+{
+  public static PaymentEvent Event => new PaymentAuthorized("p-123", 42.5m);
+}
+```
+
+```graphql
+interface PaymentEvent {
+  paymentId: String!
+}
+
+type PaymentAuthorized implements PaymentEvent {
+  amount: Decimal!
+  paymentId: String!
+}
+
+type PaymentCaptured implements PaymentEvent {
+  reference: String!
+  paymentId: String!
+}
+```
+
+Neither `ResolveType` nor `IsTypeOf` has to be written: the possible types come from the derived
+types the compiler recorded, and `ObjectGraphType<TSourceType>` already supplies `IsTypeOf` for
+each of them. Without this a closed base registers as an ordinary object graph type and the
+hierarchy collapses to the members the base declares, leaving `amount` and `reference`
+unreachable.
+
+Only terminal types become possible types. A closed type nested within another is mapped to an
+interface implementing an interface, and expansion stops at a derived type that is not itself
+closed, since anything below that is no longer a fixed set:
+
+```csharp
+public closed record Root(string Id);
+
+// not closed, so this is where the hierarchy ends as far as the schema is concerned
+public record OpenBranch(string Id) : Root(Id);
+
+public sealed record OpenLeaf(string Id) : OpenBranch(Id);
+```
+
+Here `OpenBranch` is the possible type of `Root`, and an `OpenLeaf` value is selected as an
+`OpenBranch`.
+
+See [Unions](../unions) for the C# `union` keyword, which maps onto a GraphQL union in the same way.
