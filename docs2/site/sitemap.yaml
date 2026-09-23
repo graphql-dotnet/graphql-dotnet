@@ -1,0 +1,32 @@
+# This file controls the order and nesting of documentation pages.
+# Each entry maps to a markdown file under docs2/site/docs/.
+
+- label: Getting Started
+  items:
+    - introduction
+    - getting-started
+    - migration
+
+- label: Guides
+  items:
+    - guides/schema-types
+    - guides/queries
+    - guides/mutations
+    - guides/subscriptions
+    - guides/authorization
+    - guides/complexity
+    - guides/dataloader
+    - guides/interfaces
+    - guides/unions
+    - guides/relay
+    - guides/directives
+    - guides/error-handling
+    - guides/schema-introspection
+    - guides/dependency-injection
+    - guides/samples
+
+- label: Analyzers
+  items:
+    - analyzers/gql001
+    - analyzers/gql002
+    - analyzers/gql003
