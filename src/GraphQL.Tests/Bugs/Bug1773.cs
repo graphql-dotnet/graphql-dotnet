@@ -41,17 +41,10 @@ public class Bug1773 : QueryTestBase<Bug1773Schema>
     }
 
     [Fact]
-    public void list_treats_string_as_character_enumerable()
+    public void list_throws_when_result_is_string()
     {
-        var result = AssertQueryWithErrors(
-            "{testListString}",
-            "{\"testListString\": [null, null, null]}",
-            expectedErrorCount: 3);
-
-        var errors = result.Errors.ShouldNotBeNull().ToArray();
-        errors[0].Path.ShouldBe(new object[] { "testListString", 0 });
-        errors[1].Path.ShouldBe(new object[] { "testListString", 1 });
-        errors[2].Path.ShouldBe(new object[] { "testListString", 2 });
+        AssertQueryWithError("{testListString}", "{\"testListString\": null}", "Error trying to resolve field 'testListString'.", 1, 2, new[] { "testListString" },
+            new InvalidOperationException("Expected an IEnumerable list though did not find one. Found: String"));
     }
 
     [Fact]
