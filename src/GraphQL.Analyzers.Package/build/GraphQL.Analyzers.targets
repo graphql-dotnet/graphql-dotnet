@@ -1,0 +1,22 @@
+<Project InitialTargets="GraphQL_Analyzers_ConfigureInterceptors">
+
+  <Target Name="GraphQL_Analyzers_ConfigureInterceptors">
+    <PropertyGroup>
+      <!--
+        Enable Field Interceptors when:
+        1. Explicitly set to true by the user, OR
+        2. Not explicitly set and trimming is enabled (PublishTrimmed or EnableTrimAnalyzer)
+      -->
+      <GraphQLEnableFieldInterceptors Condition="'$(GraphQLEnableFieldInterceptors)' == '' AND ('$(PublishTrimmed)' == 'true' OR '$(EnableTrimAnalyzer)' == 'true')">true</GraphQLEnableFieldInterceptors>
+      <GraphQLEnableFieldInterceptors Condition="'$(GraphQLEnableFieldInterceptors)' == ''">false</GraphQLEnableFieldInterceptors>
+    </PropertyGroup>
+
+    <!-- Configure InterceptorsNamespaces when interceptors are enabled -->
+    <PropertyGroup Condition="'$(GraphQLEnableFieldInterceptors)' == 'true'">
+      <!-- Set both InterceptorsNamespaces and InterceptorsPreviewNamespaces for compatibility -->
+      <InterceptorsNamespaces>$(InterceptorsNamespaces);GraphQL.Analyzers.Interceptors</InterceptorsNamespaces>
+      <InterceptorsPreviewNamespaces>$(InterceptorsPreviewNamespaces);GraphQL.Analyzers.Interceptors</InterceptorsPreviewNamespaces>
+    </PropertyGroup>
+  </Target>
+
+</Project>

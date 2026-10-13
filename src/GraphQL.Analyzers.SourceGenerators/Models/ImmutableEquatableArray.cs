@@ -5,7 +5,12 @@ namespace GraphQL.Analyzers.SourceGenerators.Models;
 /// <summary>
 /// Represents an immutable, array-backed value that supports structural equality.
 /// </summary>
-public sealed class ImmutableEquatableArray<T> :
+#if IMMUTABLE_EQUATABLE_ARRAY_INTERNAL
+internal
+#else
+public
+#endif
+sealed class ImmutableEquatableArray<T> :
     IEquatable<ImmutableEquatableArray<T>>,
     IReadOnlyList<T>
     where T : IEquatable<T>
@@ -127,7 +132,12 @@ public sealed class ImmutableEquatableArray<T> :
 /// <summary>
 /// Provides extension methods for creating immutable equatable arrays.
 /// </summary>
-public static class ImmutableEquatableArray
+#if IMMUTABLE_EQUATABLE_ARRAY_INTERNAL
+internal
+#else
+public
+#endif
+static class ImmutableEquatableArray
 {
     /// <summary>
     /// Converts a sequence to an <see cref="ImmutableEquatableArray{T}"/>.
