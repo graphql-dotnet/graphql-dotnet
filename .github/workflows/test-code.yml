@@ -130,7 +130,7 @@ jobs:
         run: dotnet run --no-build --project GraphQL.Federation.TypeFirst.Sample4 &
       - name: Install Apollo Rover CLI
         run: |
-          curl -sSL https://rover.apollo.dev/nix/latest | sh
+          curl -sSL https://rover.apollo.dev/nix/v0.41.0 | sh
           echo "/home/runner/.rover/bin" >> $GITHUB_PATH
           /home/runner/.rover/bin/rover --version
       - name: Install jq
