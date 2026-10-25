@@ -128,7 +128,15 @@ jobs:
       - name: Start Sample4 on port 5604
         working-directory: samples
         run: dotnet run --no-build --project GraphQL.Federation.TypeFirst.Sample4 &
-      - name: Install Apollo Rover CLI
+      - name: Install Apollo Rover CLI for federation 1
+        if: matrix.federationversion == 1
+        # Rover v1.0.0 removed Federation 1 support; v0.41.0 is the last version that supports it
+        run: |
+          curl -sSL https://rover.apollo.dev/nix/v0.41.0 | sh
+          echo "/home/runner/.rover/bin" >> $GITHUB_PATH
+          /home/runner/.rover/bin/rover --version
+      - name: Install Apollo Rover CLI for federation 2
+        if: matrix.federationversion == 2
         run: |
           curl -sSL https://rover.apollo.dev/nix/latest | sh
           echo "/home/runner/.rover/bin" >> $GITHUB_PATH
