@@ -240,6 +240,56 @@ public class SchemaTests
         Should.Throw<InvalidOperationException>(() => schema.Initialize())
             .Message.ShouldBe("Cannot access AllTypes while schema types are being created. AllTypes is not available during OnBeforeInitializeType execution.");
     }
+
+    /// <summary>
+    /// A schema owns its built-in scalars. They used to be process-wide singletons handed to every
+    /// schema, so describing one — or applying a directive to it — reached into every other schema
+    /// in the process.
+    /// </summary>
+    [Fact]
+    public void built_in_scalars_are_not_shared_between_schemas()
+    {
+        var first = BuiltInScalarSchema();
+        var second = BuiltInScalarSchema();
+
+        first.AllTypes["String"].ShouldNotBeSameAs(second.AllTypes["String"]);
+        first.AllTypes["DateTime"].ShouldNotBeSameAs(second.AllTypes["DateTime"]);
+
+        first.AllTypes["String"]!.Description = "only this schema's";
+
+        second.AllTypes["String"]!.Description.ShouldNotBe("only this schema's");
+    }
+
+    /// <summary>
+    /// One copy per schema, not one per lookup: a scalar reached through more than one path within
+    /// a schema has to come back as the same instance, or registering it twice would collide.
+    /// </summary>
+    [Fact]
+    public void a_built_in_scalar_is_one_instance_within_a_schema()
+    {
+        var schema = BuiltInScalarSchema();
+
+        var byName = schema.AllTypes["String"];
+        var throughField = schema.Query!.Fields.Find("name")!.ResolvedType;
+        var throughArgument = schema.Query.Fields.Find("echo")!.Arguments![0].ResolvedType;
+
+        throughField.ShouldBeSameAs(byName);
+        throughArgument.ShouldBeSameAs(byName);
+        schema.AllTypes.Count(_ => _.Name == "String").ShouldBe(1);
+    }
+
+    private static ISchema BuiltInScalarSchema()
+    {
+        var query = new ObjectGraphType { Name = "Query" };
+        query.Field<StringGraphType>("name");
+        query.Field<DateTimeGraphType>("when");
+        query.Field<StringGraphType>("echo")
+            .Argument<StringGraphType>("value");
+
+        var schema = new Schema { Query = query };
+        schema.Initialize();
+        return schema;
+    }
 }
 
 public class SchemaWithOnBeforeInitializeTypeAccessingAllTypes : Schema
