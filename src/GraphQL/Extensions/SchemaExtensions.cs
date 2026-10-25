@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Types.Scalars;
@@ -206,6 +207,7 @@ public static class SchemaExtensions
     /// <see cref="GraphQLBuilderExtensions.AddClrTypeMappings(DI.IGraphQLBuilder)"/> as it will precompute
     /// the mappings prior to execution.
     /// </remarks>
+    [MethodImpl(MethodImplOptions.NoInlining)] // inlining would change result of GetCallingAssembly
     [RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are not trimmed by the compiler.")]
     public static void RegisterTypeMappings(this ISchema schema)
         => schema.RegisterTypeMappings(Assembly.GetCallingAssembly());
