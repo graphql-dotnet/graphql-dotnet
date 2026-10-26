@@ -120,6 +120,7 @@
     <Project Path="samples/GraphQL.Federation.SchemaFirst.Sample1/GraphQL.Federation.SchemaFirst.Sample1.csproj" />
     <Project Path="samples/GraphQL.Federation.SchemaFirst.Sample2/GraphQL.Federation.SchemaFirst.Sample2.csproj" />
     <Project Path="samples/GraphQL.Federation.TypeFirst.Sample4/GraphQL.Federation.TypeFirst.Sample4.csproj" />
+    <Project Path="samples/GraphQL.SchemaFirst.Sample/GraphQL.SchemaFirst.Sample.csproj" />
     <Project Path="samples/GraphQL.Harness/GraphQL.Harness.csproj" />
     <Project Path="samples/GraphQL.Server.Polyfill/GraphQL.Server.Polyfill.csproj" />
     <Project Path="src/GraphQL.StarWars.TypeFirst/GraphQL.StarWars.TypeFirst.csproj" />

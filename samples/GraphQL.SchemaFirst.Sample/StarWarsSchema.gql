@@ -1,0 +1,68 @@
+"""
+GraphQL Star Wars Schema - Schema-First Approach Demo
+This schema demonstrates the Schema-First approach in GraphQL.NET,
+where the schema is defined in SDL (Schema Definition Language) and
+resolvers are configured separately in C#.
+"""
+
+# Episode enum representing Star Wars episodes
+enum Episode {
+  NEWHOPE
+  EMPIRE
+  JEDI
+}
+
+# A human character
+type Human {
+  id: String!
+  name: String
+  appearsIn: [Episode]
+  friends: [Human]
+  homePlanet: String
+}
+
+# A droid character
+type Droid {
+  id: String!
+  name: String
+  appearsIn: [Episode]
+  friends: [Droid]
+  primaryFunction: String
+}
+
+# Input type for creating a review
+input ReviewInput {
+  stars: Int!
+  commentary: String
+}
+
+# A review for a given episode
+type Review {
+  episode: Episode
+  stars: Int
+  commentary: String
+}
+
+# The query type
+type Query {
+  # Get the hero of a specific episode
+  hero(episode: Episode): Human
+  
+  # Get a human by ID
+  human(id: String!): Human
+  
+  # Get all humans
+  humans: [Human]
+  
+  # Get a droid by ID
+  droid(id: String!): Droid
+  
+  # Get all droids
+  droids: [Droid]
+}
+
+# The mutation type
+type Mutation {
+  # Create a review for an episode
+  createReview(episode: Episode!, review: ReviewInput!): Review
+}
