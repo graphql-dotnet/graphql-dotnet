@@ -116,6 +116,7 @@
     <Project Path="samples/GraphQL.AotCompilationSample.TypeFirst/GraphQL.AotCompilationSample.TypeFirst.csproj" />
     <Project Path="samples/GraphQL.DataLoader.Sample.Default/GraphQL.DataLoader.Sample.Default.csproj" />
     <Project Path="samples/GraphQL.DataLoader.Sample.DI/GraphQL.DataLoader.Sample.DI.csproj" />
+    <Project Path="samples/GraphQL.SchemaFirst.Sample/GraphQL.SchemaFirst.Sample.csproj" />
     <Project Path="samples/GraphQL.Federation.CodeFirst.Sample3/GraphQL.Federation.CodeFirst.Sample3.csproj" />
     <Project Path="samples/GraphQL.Federation.SchemaFirst.Sample1/GraphQL.Federation.SchemaFirst.Sample1.csproj" />
     <Project Path="samples/GraphQL.Federation.SchemaFirst.Sample2/GraphQL.Federation.SchemaFirst.Sample2.csproj" />
