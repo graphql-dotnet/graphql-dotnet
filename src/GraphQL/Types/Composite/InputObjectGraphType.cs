@@ -194,6 +194,10 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
         if (value == null)
             return (null, false);
 
+        // When the value is a dictionary (e.g. coerced via SchemaBuilder), use dictionary lookup by field name.
+        if (value is IDictionary<string, object?> dict)
+            return (dict.TryGetValue(field.Name, out var dictValue) ? dictValue : null, false);
+
         // Given Field("FirstName", x => x.FName) and key == "FirstName" returns "FName"
         string propertyName = field.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, field.Name) ?? field.Name;
         if (propertyName == InputObjectGraphType.SKIP_EXPRESSION_VALUE_NAME)

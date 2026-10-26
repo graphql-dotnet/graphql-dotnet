@@ -31,9 +31,9 @@ public sealed class JsonConverterBigInteger : JsonConverter<BigInteger>
     public static bool TryGetBigInteger(ref Utf8JsonReader reader, out BigInteger bi)
     {
         var byteSpan = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
-        Span<char> chars = stackalloc char[byteSpan.Length];
-        Encoding.UTF8.GetChars(reader.ValueSpan, chars);
-        return BigInteger.TryParse(chars, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out bi);
+        Span<char> chars = byteSpan.Length < 512 ? stackalloc char[byteSpan.Length] : new char[byteSpan.Length];
+        var charLength = Encoding.UTF8.GetChars(byteSpan, chars);
+        return BigInteger.TryParse(chars.Slice(0, charLength), NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out bi);
     }
 #endif
 

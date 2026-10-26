@@ -365,6 +365,68 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
         });
     }
 
+    [Fact]
+    public void int_to_nonnull_int_with_null_default()
+    {
+        const string query = """
+            query Query($intArg: Int = null) {
+              complicatedArgs {
+                nonNullIntArgField(nonNullIntArg: $intArg)
+              }
+            }
+            """;
+
+        ShouldFailRule(_ =>
+        {
+            _.Query = query;
+            _.Error(err =>
+            {
+                err.Message = BadVarPosMessage("intArg", "Int", "Int!");
+                err.Loc(1, 13);
+                err.Loc(3, 39);
+            });
+        });
+    }
+
+    [Fact]
+    public void boolean_to_nonnull_boolean_in_directive_with_null_default()
+    {
+        const string query = """
+            query Query($boolVar: Boolean = null) {
+              dog @include(if: $boolVar)
+            }
+            """;
+
+        ShouldFailRule(_ =>
+        {
+            _.Query = query;
+            _.Error(err =>
+            {
+                err.Message = BadVarPosMessage("boolVar", "Boolean", "Boolean!");
+                err.Loc(1, 13);
+                err.Loc(2, 20);
+            });
+        });
+    }
+
+    /// <summary>
+    /// A null default on the variable is no guarantee, but a default on the argument is: leaving the
+    /// variable out falls back to it, so the usage stays allowed. The test schema's 'defer'
+    /// directive declares if as Boolean! with a default of true.
+    /// </summary>
+    [Fact]
+    public void boolean_to_nonnull_boolean_with_null_default_and_location_default()
+    {
+        ShouldPassRule("""
+              query Query($boolVar: Boolean = null)
+              {
+                dog {
+                  ... on Dog @defer(if: $boolVar) { name }
+                }
+              }
+            """);
+    }
+
     private static string BadVarPosMessage(string varName, string varType, string expectedType)
         => VariablesInAllowedPositionError.BadVarPosMessage(varName, varType, expectedType);
 }
