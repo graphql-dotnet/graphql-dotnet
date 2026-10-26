@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Reflection;
+using GraphQL.Reflection;
 
 namespace GraphQL.Types;
 
@@ -15,6 +16,10 @@ internal static class AutoRegisteringInterfaceGraphType
 /// Allows you to automatically register the necessary fields for the specified type.
 /// Supports <see cref="DescriptionAttribute"/>, <see cref="ObsoleteAttribute"/>, <see cref="DefaultValueAttribute"/> and <see cref="RequiredAttribute"/>.
 /// Also it can get descriptions for fields from the XML comments.
+/// <br/><br/>
+/// When <typeparamref name="TSourceType"/> is a type declared with the C# <c>closed</c> modifier, the
+/// possible types of the interface are taken from the derived types the compiler recorded on it, so a
+/// closed hierarchy needs no further configuration to be queried through its leaves.
 /// </summary>
 public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicMethods)][NotAGraphType] TSourceType> : InterfaceGraphType<TSourceType>
 {
@@ -59,6 +64,11 @@ public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(Dynam
             _ = AddField(fieldType);
         }
 
+        // Interfaces is not carried across by the clone constructor, so an instance that implements one
+        // cannot be cached. Types is carried across, so possible types alone do not prevent caching.
+        if (ConfigureClosedHierarchy())
+            cache = false;
+
         // cache the instance if reflection caching is enabled
         if (cache &&
             excludedProperties == null &&
@@ -84,6 +94,31 @@ public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(Dynam
             if (cache)
                 AutoRegisteringInterfaceGraphType.ReflectionCache[typeof(TSourceType)] = new AutoRegisteringInterfaceGraphType<TSourceType>(this, null, false);
         }
+    }
+
+    /// <summary>
+    /// When <typeparamref name="TSourceType"/> is a closed type, registers its terminal derived types as the
+    /// possible types of this interface, and registers any closed type it derives from as an interface that
+    /// this interface implements. Returns whether an implemented interface was registered.
+    /// </summary>
+    private bool ConfigureClosedHierarchy()
+    {
+        if (ClosedTypeInfo.Find(typeof(TSourceType)) is not { } closedInfo)
+            return false;
+
+        foreach (var terminalType in closedInfo.TerminalDerivedTypes)
+        {
+            Type(typeof(GraphQLClrOutputTypeReference<>).MakeGenericType(terminalType));
+        }
+
+        // a closed type nested within another closed hierarchy is an interface implementing an interface
+        var baseTypes = ClosedTypeInfo.GetClosedBaseTypes(typeof(TSourceType));
+        foreach (var baseType in baseTypes)
+        {
+            Interface(typeof(GraphQLClrOutputTypeReference<>).MakeGenericType(baseType));
+        }
+
+        return baseTypes.Count > 0;
     }
 
     /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.ConfigureGraph"/>

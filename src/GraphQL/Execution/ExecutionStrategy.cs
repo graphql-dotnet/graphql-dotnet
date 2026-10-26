@@ -618,6 +618,14 @@ public abstract class ExecutionStrategy : IExecutionStrategy
                 node.Result = valueNode.GraphType.Serialize(node.Result);
             }
 
+            // A C# union is a wrapper around the value of its active case, and it is that value which the
+            // possible types of the GraphQL union describe. Replacing the wrapper here means the object type
+            // selected below, and the source seen by the field resolvers of that type, are the same object.
+            if (node.Result != null && GetClrUnionGraphType(node.ResolvedType) is { } unionGraphType)
+            {
+                node.Result = unionGraphType.GetCaseValue(node.Result);
+            }
+
             ValidateNodeResult(context, node);
 
             // Build child nodes
@@ -685,6 +693,9 @@ public abstract class ExecutionStrategy : IExecutionStrategy
 
         return false;
     }
+
+    private static IClrUnionGraphType? GetClrUnionGraphType(IGraphType? graphType) =>
+        (graphType is NonNullGraphType nonNullType ? nonNullType.ResolvedType : graphType) as IClrUnionGraphType;
 
     /// <summary>
     /// Validates the <see cref="ExecutionNode.Result"/> to ensure that it is valid for the node.
