@@ -1,6 +1,38 @@
 using System.Reflection;
 using BenchmarkDotNet.Running;
 
+// USAGE
+// ─────────────────────────────────────────────────────────────────────────────
+// Full BenchmarkDotNet run (all benchmarks):
+//   dotnet run -c Release
+//
+// Run a specific benchmark class (case-insensitive class name):
+//   dotnet run -c Release -- --filter *ValidationBenchmark*
+//
+// Run a specific benchmark method:
+//   dotnet run -c Release -- --filter *ManyInlineFragments*
+//
+// Run in-process:
+//   dotnet run -c Release -- --inProcess
+//
+// Any other BenchmarkDotNet CLI flags (--job, --exporters, etc.) are forwarded
+// directly to BenchmarkSwitcher.
+//
+// PROFILER MODE  (/p)
+// ─────────────────────────────────────────────────────────────────────────────
+// Runs IBenchmark.RunProfiler() in a tight loop so an external profiler
+// (e.g. dotTrace, PerfView) can attach.  Press Enter between batches.
+//
+//   /p                  Run default benchmark (ExecutionBenchmark), 100 iters/batch
+//   /p <count>          Run default benchmark, <count> iters/batch
+//   /p <benchmarkName>  Run named benchmark class, 100 iters/batch
+//   /p <count> <name>   Run named benchmark class, <count> iters/batch
+//
+// Examples:
+//   dotnet run -c Release -- /p validationbenchmark
+//   dotnet run -c Release -- /p 50 validationbenchmark
+// ─────────────────────────────────────────────────────────────────────────────
+
 namespace GraphQL.Benchmarks;
 
 internal static class Program
@@ -9,73 +41,40 @@ internal static class Program
 
     private static void Main(string[] args)
     {
-        args = args.Select(x => x.ToLower()).ToArray();
-        bool profile = args.FirstOrDefault() == "/p";
-        int skip = 0;
-        int profileCount = 0;
+        var normalizedArgs = args.Select(x => x.ToLower()).ToArray();
+        bool profile = normalizedArgs.FirstOrDefault() == "/p";
+
         if (profile)
         {
-            skip = 1;
-            if (args.Length >= 2 && int.TryParse(args[1], out profileCount))
+            int skip = 1;
+            int profileCount = 100;
+            if (normalizedArgs.Length >= 2 && int.TryParse(normalizedArgs[1], out int parsed))
             {
+                profileCount = parsed;
                 skip = 2;
             }
-            else
+            normalizedArgs = normalizedArgs.Skip(skip).ToArray();
+
+            Type benchmark = _defaultBenchmark;
+            if (normalizedArgs.Length == 1)
             {
-                profileCount = 100;
+                benchmark = BenchmarkTypes().SingleOrDefault(x => x.Name.ToLower() == normalizedArgs[0])
+                    ?? _defaultBenchmark;
             }
-            args = args.Skip(skip).ToArray();
-        }
-        if (args.Length > 1)
-        {
-            Help(args);
-            return;
-        }
-        Type benchmark = _defaultBenchmark; //default benchmark to run
-        if (args.Length == 1)
-        {
-            benchmark = BenchmarkTypes().Where(x => x.Name.ToLower() == args[0]).SingleOrDefault();
-            if (benchmark == null)
-            {
-                Help(args);
-                return;
-            }
-        }
-        if (profile)
-        {
+
             RunProfilerPayload(benchmark, profileCount);
         }
         else
         {
-            Console.WriteLine($"Starting benchmarks for {benchmark.Name}");
-            Console.WriteLine();
-            BenchmarkRunner.Run(benchmark);
+            // Delegate everything to BenchmarkSwitcher so that all BenchmarkDotNet
+            // command-line options work (--filter, --inProcess, --job, etc.).
+            BenchmarkSwitcher.FromAssembly(Assembly.GetExecutingAssembly()).Run(args);
         }
     }
 
     private static IEnumerable<Type> BenchmarkTypes()
     {
         return Assembly.GetExecutingAssembly().GetTypes().Where(x => x.IsClass && typeof(IBenchmark).IsAssignableFrom(x));
-    }
-
-    private static void Help(string[] args)
-    {
-        Console.WriteLine($"Invalid arguments: {string.Join(' ', args)}");
-        Console.WriteLine(@"
-Argument syntax: [/p [count]] [benchmarkTypeName]
-
-        /p                  Runs profiler - if not specified, runs benchmarks
-        count               Number of times to run execution before executing ReadLine
-                               (defaults to 100)
-        benchmarkTypeName   The name of the class to run; the class must inherit from IBenchmark
-                               (defaults to " + _defaultBenchmark.Name + @")
-
-Available benchmarks:
-");
-        foreach (var benchmark in BenchmarkTypes())
-        {
-            Console.WriteLine("        " + benchmark.Name);
-        }
     }
 
     private static void RunProfilerPayload(Type benchmarkType, int count)

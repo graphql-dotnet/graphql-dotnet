@@ -32,16 +32,20 @@ In the example above, a using a DataLoader will allow us to batch together all o
 
 ## Setup
 
-1. Register the DataLoader services
+1. Register GraphQL services and DataLoader support (ASP.NET Core / DI setup):
 
 ``` csharp
 services.AddGraphQL(b => b
+    .AddSchema<MySchema>()
+    .AddSystemTextJson()
     .AddDataLoader()
     // other configurations
 );
 ```
 
-2. Hook up your GraphQL schema to your IoC container.
+`AddDataLoader()` registers the required services and automatically adds `DataLoaderDocumentListener` during execution.
+
+2. If you are not using `AddGraphQL(...)`, hook up your GraphQL schema to your IoC container.
 
 ``` csharp
 public class MySchema : Schema
@@ -56,7 +60,7 @@ public class MySchema : Schema
 services.AddSingleton<MySchema>();
 ```
 
-3. Add the `DataLoaderDocumentListener` to the `DocumentExecuter`.
+3. If you are not using `AddGraphQL(...).AddDataLoader()`, add the `DataLoaderDocumentListener` to the `DocumentExecuter` manually.
 
 ``` csharp
 var listener = Services.GetRequiredService<DataLoaderDocumentListener>();

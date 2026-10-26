@@ -52,7 +52,7 @@ public sealed class ProvidedNonNullArguments : ValidationRuleBase
                     var argAst = node.Arguments?.ValueFor(arg.Name);
                     var type = arg.ResolvedType;
 
-                    if (argAst == null && type is NonNullGraphType)
+                    if (arg.DefaultValue == null && argAst == null && type is NonNullGraphType)
                     {
                         context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
                     }

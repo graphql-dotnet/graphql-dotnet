@@ -32,3 +32,5 @@ bundle.js
 style.css
 
 *.received.txt
+
+BenchmarkDotNet.Artifacts/

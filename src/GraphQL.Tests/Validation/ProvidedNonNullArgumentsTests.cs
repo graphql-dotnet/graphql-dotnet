@@ -215,6 +215,16 @@ public class ProvidedNonNullArgumentsTests : ValidationTestBase<ProvidedNonNullA
     }
 
     [Fact]
+    public void directive_with_non_null_arg_and_default_value_omitted()
+    {
+        ShouldPassRule("""
+            {
+              ... @defer { __typename }
+            }
+            """);
+    }
+
+    [Fact]
     public void directive_with_missing_types()
     {
         ShouldFailRule(_ =>

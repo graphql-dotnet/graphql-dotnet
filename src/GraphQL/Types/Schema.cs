@@ -613,32 +613,169 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     protected virtual void CoerceInputTypeDefaultValues()
     {
         var completed = new HashSet<IInputObjectGraphType>();
-        var inProcess = new Stack<IInputObjectGraphType>();
+        var inProcess = new Stack<FieldType>();
+        HashSet<IInputObjectGraphType>? inputTypesCheckedForCycles = null;
         foreach (var type in AllTypes.Dictionary.Values)
         {
             if (type is IInputObjectGraphType inputType)
-                ExamineType(inputType, completed, inProcess);
+                ExamineType(inputType, completed, inProcess, ref inputTypesCheckedForCycles);
         }
 
-        void ExamineType(IInputObjectGraphType inputType, HashSet<IInputObjectGraphType> completed, Stack<IInputObjectGraphType> inProcess)
+        static IGraphType? GetNamedTypeNoError(IGraphType? graphType)
+        {
+            return graphType switch
+            {
+                NonNullGraphType nonNull => GetNamedTypeNoError(nonNull.ResolvedType),
+                ListGraphType list => GetNamedTypeNoError(list.ResolvedType),
+                _ => graphType
+            };
+        }
+
+        void ExamineType(IInputObjectGraphType inputType, HashSet<IInputObjectGraphType> completed, Stack<FieldType> inProcess, ref HashSet<IInputObjectGraphType>? inputTypesCheckedForCycles)
         {
             if (completed.Contains(inputType))
                 return;
-            if (inProcess.Contains(inputType))
-                throw new InvalidOperationException($"Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: {string.Join(", ", inProcess.Select(x => $"'{x.Name}'"))}.");
-            inProcess.Push(inputType);
+
             foreach (var field in inputType.Fields)
             {
-                if (field.DefaultValue is GraphQLValue value)
+                var baseType = GetNamedTypeNoError(field.ResolvedType);
+                if (baseType == null)
+                    continue; // Schema validation will catch this at a later point
+
+                if (baseType is IInputObjectGraphType inputFieldType)
                 {
-                    var baseType = field.ResolvedType!.GetNamedType();
-                    if (baseType is IInputObjectGraphType inputFieldType)
-                        ExamineType(inputFieldType, completed, inProcess);
-                    field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, value, ValueConverter).Value;
+                    if (inProcess.Contains(field))
+                    {
+                        inputTypesCheckedForCycles ??= new();
+                        if (inputTypesCheckedForCycles.Add(inputType))
+                        {
+                            // We've re-entered a field already on the traversal stack. Use the spec algorithm
+                            // to confirm there is actually a default value cycle (not just a type-graph cycle
+                            // with safe default values). If there is, throw with the cycle chain for diagnostics.
+                            var cycleChain = InputObjectDefaultValueHasCycle(inputType, new GraphQLObjectValue(), new());
+                            if (cycleChain != null)
+                                throw new InvalidOperationException($"Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: {string.Join(", ", cycleChain.Select(x => $"'{x.Name}'"))}.");
+                        }
+                        continue;
+                    }
+
+                    // Push/pop around recursive call to handle nested input objects, which may include cycles.
+                    // If a cycle is detected, the above check will throw with the cycle chain.
+                    inProcess.Push(field);
+                    ExamineType(inputFieldType, completed, inProcess, ref inputTypesCheckedForCycles);
+                    inProcess.Pop();
+                }
+
+                if (field.DefaultValue is GraphQLValue defaultValue)
+                    field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, defaultValue, ValueConverter).Value;
+            }
+
+            completed.Add(inputType);
+        }
+
+        // Implements InputObjectDefaultValueHasCycle(inputObject, defaultValue, visitedFields) per spec:
+        // https://spec.graphql.org/September2025/#InputObjectDefaultValueHasCycle()
+        //
+        // Returns false/null if no cycle is detected, or an ordered list of the input object types
+        // involved in the cycle (innermost first, i.e. in reverse traversal order) for use in
+        // error messages.
+        //
+        // 1. If defaultValue is not provided, initialize it to an empty unordered map. (implemented at caller)
+        // 2. If visitedFields is not provided, initialize it to the empty set. (implemented at caller)
+        // 3. If defaultValue is a list:
+        //    a. For each itemValue in defaultValue:
+        //       i. If InputObjectDefaultValueHasCycle(inputObject, itemValue, visitedFields) is not false/null, return it.
+        // 4. Otherwise, if defaultValue is an unordered map:
+        //    a. For each field in inputObject:
+        //       i. If InputFieldDefaultValueHasCycle(field, defaultValue, visitedFields) is not false/null, return it.
+        // 5. Return null.
+        static IReadOnlyList<IInputObjectGraphType>? InputObjectDefaultValueHasCycle(IInputObjectGraphType inputObject, GraphQLValue defaultValue, Stack<(FieldType Field, IInputObjectGraphType DeclaringType)> visitedFields)
+        {
+            // Step 3: if defaultValue is a list
+            if (defaultValue is GraphQLListValue listValue)
+            {
+                foreach (var itemValue in listValue.Values ?? Enumerable.Empty<GraphQLValue>())
+                {
+                    var result = InputObjectDefaultValueHasCycle(inputObject, itemValue, visitedFields);
+                    if (result != null)
+                        return result;
+                }
+                return null;
+            }
+
+            // Step 4: if defaultValue is an unordered map
+            if (defaultValue is GraphQLObjectValue objectValue)
+            {
+                foreach (var field in inputObject.Fields)
+                {
+                    var result = InputFieldDefaultValueHasCycle(field, inputObject, objectValue, visitedFields);
+                    if (result != null)
+                        return result;
                 }
             }
-            inProcess.Pop();
-            completed.Add(inputType);
+
+            // Step 5
+            return null;
+        }
+
+        // Implements InputFieldDefaultValueHasCycle(field, defaultValue, visitedFields) per spec:
+        // https://spec.graphql.org/draft/#InputFieldDefaultValueHasCycle()
+        //
+        // Returns null if no cycle is detected, or an ordered list of the input object types
+        // involved in the cycle (innermost first) for use in error messages.
+        //
+        // 1. Assert: defaultValue is an unordered map. (implemented at caller)
+        // 2. Let fieldType be the type of field; namedFieldType be the underlying named type.
+        // 3. If namedFieldType is not an input object type: return false/null.
+        // 4. Let fieldName be the name of field.
+        // 5. Let fieldDefaultValue be the value for fieldName in defaultValue.
+        // 6. If fieldDefaultValue exists:
+        //    a. Return InputObjectDefaultValueHasCycle(namedFieldType, fieldDefaultValue, visitedFields).
+        // 7. Otherwise:
+        //    a. Let fieldDefaultValue be the default value of field.
+        //    b. If fieldDefaultValue does not exist: return false/null.
+        //    c. If field is within visitedFields: return true/the cycle chain (declaring types, innermost first).
+        //    d. Let nextVisitedFields be a new list containing everything from visitedFields plus (field, declaringType).
+        //    e. Return InputObjectDefaultValueHasCycle(namedFieldType, fieldDefaultValue, nextVisitedFields).
+        static IReadOnlyList<IInputObjectGraphType>? InputFieldDefaultValueHasCycle(FieldType field, IInputObjectGraphType declaringType, GraphQLObjectValue defaultValue, Stack<(FieldType Field, IInputObjectGraphType DeclaringType)> visitedFields)
+        {
+            // Step 2
+            var namedFieldType = field.ResolvedType!.GetNamedType();
+
+            // Step 3
+            if (namedFieldType is not IInputObjectGraphType namedInputType)
+                return null;
+
+            // Steps 4-5: look up fieldName in defaultValue
+            var objectField = defaultValue.Field(field.Name);
+
+            // Step 6: fieldDefaultValue exists in the provided map
+            if (objectField != null)
+                return InputObjectDefaultValueHasCycle(namedInputType, objectField.Value, visitedFields);
+
+            // Step 7: fall back to the field's own default value
+            if (field.DefaultValue is not GraphQLValue fieldDefaultValue)
+                return null;
+
+            // Step 7c: cycle detected — the stack enumerates top-to-bottom (most-recently-pushed
+            // first = innermost first). Collect declaring types up to and including the repeated field.
+            if (visitedFields.Any(e => e.Field == field))
+            {
+                var chain = new List<IInputObjectGraphType>(visitedFields.Count);
+                foreach (var entry in visitedFields)
+                {
+                    chain.Add(entry.DeclaringType);
+                    if (entry.Field == field)
+                        break;
+                }
+                return chain;
+            }
+
+            // Steps 7d-7e: push, recurse, pop — no new stack allocation.
+            visitedFields.Push((field, declaringType));
+            var result = InputObjectDefaultValueHasCycle(namedInputType, fieldDefaultValue, visitedFields);
+            visitedFields.Pop();
+            return result;
         }
     }
 }

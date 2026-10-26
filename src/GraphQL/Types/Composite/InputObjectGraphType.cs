@@ -83,7 +83,10 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
     internal InputObjectGraphType(InputObjectGraphType<TSourceType>? cloneFrom)
         : base(cloneFrom)
     {
-        // if (cloneFrom == null) { /* initialization logic */ }
+        if (cloneFrom != null)
+        {
+            IsOneOf = cloneFrom.IsOneOf;
+        }
 
         if (typeof(TSourceType) == typeof(object))
         {
@@ -223,6 +226,10 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
     {
         if (value == null)
             return (null, false);
+
+        // When the value is a dictionary (e.g. coerced via SchemaBuilder), use dictionary lookup by field name.
+        if (value is IDictionary<string, object?> dict)
+            return (dict.TryGetValue(field.Name, out var dictValue) ? dictValue : null, false);
 
         // Given Field("FirstName", x => x.FName) and key == "FirstName" returns "FName"
         string propertyName = field.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, field.Name) ?? field.Name;

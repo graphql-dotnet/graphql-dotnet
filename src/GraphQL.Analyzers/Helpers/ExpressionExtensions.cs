@@ -156,6 +156,28 @@ public static class ExpressionExtensions
             TextSpan.FromBounds(methodNameLocation.SourceSpan.Start, argsLocation.SourceSpan.End));
     }
 
+    /// <summary>
+    /// Returns <see langword="true"/> if the <paramref name="expression"/> is "awaitable",
+    /// see <see cref="IsAwaitableNonDynamic"/>.
+    /// Parentheses are unwrapped and both branches of a conditional expression are inspected,
+    /// so <c>flag ? AsyncMethod() : "text"</c> is considered awaitable.
+    /// Conditional expressions may be nested within each other.
+    /// </summary>
+    /// <param name="expression">The <see cref="ExpressionSyntax"/> to inspect.</param>
+    /// <param name="semanticModel">The <see cref="SemanticModel"/>.</param>
+    /// <param name="position">The position within the syntax tree used to look up symbols.</param>
+    public static bool IsAwaitableExpression(this ExpressionSyntax expression, SemanticModel semanticModel, int position) =>
+        expression switch
+        {
+            ParenthesizedExpressionSyntax parenthesized =>
+                parenthesized.Expression.IsAwaitableExpression(semanticModel, position),
+            ConditionalExpressionSyntax conditional =>
+                conditional.WhenTrue.IsAwaitableExpression(semanticModel, position) ||
+                conditional.WhenFalse.IsAwaitableExpression(semanticModel, position),
+            _ => semanticModel.GetSymbolInfo(expression).Symbol
+                .IsAwaitableNonDynamic(semanticModel, position)
+        };
+
 
     /// <summary>
     /// If the <paramref name="symbol"/> is a method symbol, returns <see langword="true"/> if the method's return type is "awaitable",

@@ -80,10 +80,10 @@ public class AwaitableResolverAnalyzer : DiagnosticAnalyzer
         switch (resolver.Expression)
         {
             // Resolve(ctx => AsyncMethod() or statement)
+            // Resolve(ctx => flag ? AsyncMethod() : statement)
             case SimpleLambdaExpressionSyntax { ExpressionBody: not null } lambda:
             {
-                var expressionStatementSymbolInfo = context.SemanticModel.GetSymbolInfo(lambda.ExpressionBody);
-                if (expressionStatementSymbolInfo.Symbol.IsAwaitableNonDynamic(context.SemanticModel, context.Node.SpanStart))
+                if (lambda.ExpressionBody.IsAwaitableExpression(context.SemanticModel, context.Node.SpanStart))
                 {
                     ReportDiagnostic(context, resolveMemberAccessExpression, methodName);
                 }
@@ -101,10 +101,7 @@ public class AwaitableResolverAnalyzer : DiagnosticAnalyzer
                     .OfType<ReturnStatementSyntax>()
                     .Where(returnStatement => returnStatement.Expression != null)
                     .Any(returnStatement =>
-                    {
-                        var symbolInfo = context.SemanticModel.GetSymbolInfo(returnStatement.Expression!);
-                        return symbolInfo.Symbol.IsAwaitableNonDynamic(context.SemanticModel, context.Node.SpanStart);
-                    });
+                        returnStatement.Expression!.IsAwaitableExpression(context.SemanticModel, context.Node.SpanStart));
 
                 if (hasAwaitableStatements)
                 {
