@@ -190,6 +190,128 @@ public class SchemaTypesTests
         schema.Initialize();
     }
 
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public void built_in_scalars_are_isolated_between_schemas(bool useTypeReferences, bool useLegacySchemaTypes)
+    {
+        ScalarGraphType[] expectedScalars =
+        [
+            new StringGraphType(),
+            new BooleanGraphType(),
+            new FloatGraphType(),
+            new IntGraphType(),
+            new IdGraphType(),
+            new DateGraphType(),
+#if NET5_0_OR_GREATER
+            new HalfGraphType(),
+#endif
+#if NET6_0_OR_GREATER
+            new DateOnlyGraphType(),
+            new TimeOnlyGraphType(),
+#endif
+            new DateTimeGraphType(),
+            new DateTimeOffsetGraphType(),
+            new TimeSpanSecondsGraphType(),
+            new TimeSpanMillisecondsGraphType(),
+            new DecimalGraphType(),
+            new UriGraphType(),
+            new GuidGraphType(),
+            new ShortGraphType(),
+            new UShortGraphType(),
+            new UIntGraphType(),
+            new LongGraphType(),
+            new BigIntGraphType(),
+            new ULongGraphType(),
+            new ByteGraphType(),
+            new SByteGraphType(),
+        ];
+
+        using var firstSchema = CreateSchema();
+        using var secondSchema = CreateSchema();
+
+        foreach (var expected in expectedScalars)
+        {
+            var scalar = firstSchema.AllTypes[expected.Name]!;
+            scalar.GetType().ShouldBe(expected.GetType());
+            scalar.ShouldNotBeSameAs(secondSchema.AllTypes[expected.Name]);
+            firstSchema.Query!.Fields.Single(x => x.Name == $"first{expected.Name}").ResolvedType.ShouldBeSameAs(scalar);
+            var secondField = firstSchema.Query.Fields.Single(x => x.Name == $"second{expected.Name}");
+            secondField.ResolvedType.ShouldBeSameAs(scalar);
+            secondField.Arguments![0].ResolvedType.ShouldBeSameAs(scalar);
+        }
+
+        const string metadataKey = "schema-specific-metadata";
+        foreach (var expected in expectedScalars)
+        {
+            var scalar = firstSchema.AllTypes[expected.Name]!;
+            scalar.Description = $"Custom description for {expected.Name}";
+            scalar.Metadata[metadataKey] = expected.Name;
+        }
+
+        // Also initialize a schema after the first schema's scalars have been modified.
+        using var thirdSchema = CreateSchema();
+        foreach (var expected in expectedScalars)
+        {
+            var first = firstSchema.AllTypes[expected.Name]!;
+            var second = secondSchema.AllTypes[expected.Name]!;
+            var third = thirdSchema.AllTypes[expected.Name]!;
+            third.ShouldNotBeSameAs(first);
+            third.ShouldNotBeSameAs(second);
+            second.Description.ShouldBe(expected.Description);
+            third.Description.ShouldBe(expected.Description);
+            second.Metadata.ContainsKey(metadataKey).ShouldBeFalse();
+            third.Metadata.ContainsKey(metadataKey).ShouldBeFalse();
+            first.Description.ShouldBe($"Custom description for {expected.Name}");
+            first.Metadata[metadataKey].ShouldBe(expected.Name);
+        }
+
+        Schema CreateSchema()
+        {
+            // Returning null ensures that built-in scalar fallback resolution is exercised.
+            var serviceProvider = Mock.Of<IServiceProvider>(MockBehavior.Loose);
+            var schema = useLegacySchemaTypes ? new TestSchemaWithLegacySchemaTypes(serviceProvider) : new Schema(serviceProvider);
+            var query = new ObjectGraphType { Name = "Query" };
+            foreach (var expected in expectedScalars)
+            {
+                query.AddField(new FieldType
+                {
+                    Name = $"first{expected.Name}",
+                    Type = useTypeReferences ? null : expected.GetType(),
+                    ResolvedType = useTypeReferences ? new GraphQLTypeReference(expected.Name) : null,
+                });
+                var argument = useTypeReferences
+                    ? new QueryArgument(new GraphQLTypeReference(expected.Name))
+                    : new QueryArgument(expected.GetType());
+                argument.Name = "value";
+                query.AddField(new FieldType
+                {
+                    Name = $"second{expected.Name}",
+                    Type = useTypeReferences ? null : expected.GetType(),
+                    ResolvedType = useTypeReferences ? new GraphQLTypeReference(expected.Name) : null,
+                    Arguments = new QueryArguments(argument),
+                });
+            }
+            schema.Query = query;
+            schema.Initialize();
+            return schema;
+        }
+    }
+
+    private sealed class TestSchemaWithLegacySchemaTypes : Schema
+    {
+        private readonly IServiceProvider _serviceProvider;
+
+        public TestSchemaWithLegacySchemaTypes(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        protected override SchemaTypesBase CreateSchemaTypes() => new LegacySchemaTypes(this, _serviceProvider);
+    }
+
     [Fact]
     public async Task can_override_built_in_types()
     {
