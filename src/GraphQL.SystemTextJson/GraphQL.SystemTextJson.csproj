@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.14" />
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" PackageVersion="[$(Version),$(NextVersion))" />
     <PackageReference Include="System.Text.Json" Version="4.7.2" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'" />
   </ItemGroup>
