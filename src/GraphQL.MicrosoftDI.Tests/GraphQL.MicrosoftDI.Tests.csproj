@@ -3,7 +3,7 @@
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.*" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.*" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.*" />
     <PackageReference Include="System.Reactive" Version="6.*" />
   </ItemGroup>
 
