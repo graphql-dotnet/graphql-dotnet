@@ -1,0 +1,30 @@
+---
+import { getEntry, render } from 'astro:content'
+import Layout from '../../components/Layout.astro'
+import { docsPages, metadata } from '../../utils/site.js'
+
+export function getStaticPaths() {
+  // Match Gatsby: only documents listed in the navigation are published.
+  return docsPages.map((page) => ({
+    params: { slug: page.url.replace(/^\/docs\//, '') },
+    props: { page }
+  }))
+}
+
+const { page } = Astro.props
+const entry = await getEntry('docs', page.id)
+if (!entry) throw new Error(`Missing documentation: ${page.relativePath}`)
+const { Content } = await render(entry)
+const editUrl = `${metadata.githubEditUrl}/${page.relativePath}`
+---
+
+<Layout>
+  <div class="content">
+    <article class="content-body"><Content /></article>
+    <div class="content-toolbar">
+      <a href={editUrl} rel="noopener noreferrer" target="_blank"
+        >Edit this page on GitHub</a
+      >
+    </div>
+  </div>
+</Layout>

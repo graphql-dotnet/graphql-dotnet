@@ -1,0 +1,50 @@
+---
+import './reset.css'
+import 'prismjs/themes/prism-solarizedlight.css'
+import './layout.css'
+import './anchors.css'
+import Header from './Header.astro'
+import SideNav from './SideNav.astro'
+import Announcer from './Announcer.astro'
+import { findMatchingPage } from '../utils/navigation.js'
+import { menu, metadata } from '../utils/site.js'
+
+const rawPathName = Astro.props.pathName || Astro.url.pathname
+const pathName = rawPathName === '/' ? '/' : rawPathName.replace(/\/$/, '')
+const pageConfig = findMatchingPage(menu, pathName)
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="generator" content={Astro.generator} />
+    <title>{metadata.title}</title>
+    <meta name="description" content={metadata.description} />
+    <meta name="keywords" content={metadata.keywords} />
+  </head>
+  <body>
+    <div id="___gatsby">
+      <div style="outline:none" tabindex="-1" id="gatsby-focus-wrapper">
+        <Header
+          links={menu}
+          githubUrl={metadata.githubUrl}
+          pathName={pathName}
+        />
+        <div class="page-body">
+          <slot />
+          {
+            pageConfig?.sidemenu?.length > 0 && (
+              <SideNav activeItem={pageConfig} pathName={pathName} />
+            )
+          }
+        </div>
+      </div>
+      <Announcer />
+    </div>
+  </body>
+</html>

@@ -1,0 +1,14 @@
+---
+import Layout from '../components/Layout.astro'
+import logo from '../../site/pages/logo.svg?raw'
+import '../../site/pages/landing.css'
+
+const logoUrl = `data:image/svg+xml;base64,${Buffer.from(logo).toString('base64')}`
+---
+
+<Layout>
+  <div class="landing">
+    <img src={logoUrl} alt="" />
+    <h1>GraphQL .NET</h1>
+  </div>
+</Layout>

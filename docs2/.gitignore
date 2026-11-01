@@ -1,8 +1,10 @@
-# Project dependencies
+# Project dependencies and caches
 .cache
 node_modules
 yarn-error.log
 
-# Build directory
-/public
+# Astro-generated files and local migration build archives
+/.astro
+/dist
+/.migration-artifacts
 .DS_Store
