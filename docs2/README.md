@@ -38,5 +38,9 @@ write access and GitHub SSH authentication, then run:
 npm run deploy -- 8.0.0
 ```
 
-This builds the site and publishes `dist`, including dotfiles, to the hosting
-repository. The version is used in the deployment commit message.
+`8.0.0` is an example release label; replace it with an appropriate label for
+your deployment. The label appears in console output and the deployment commit
+message. It does not select a release or documentation version.
+
+The script builds the documentation from the current checkout and publishes
+`dist`, including dotfiles, to the hosting repository.
