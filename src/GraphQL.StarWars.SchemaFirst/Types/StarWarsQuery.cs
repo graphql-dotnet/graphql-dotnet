@@ -2,12 +2,15 @@ namespace GraphQL.StarWars.SchemaFirst.Types;
 
 public class StarWarsQuery
 {
-    public async Task<StarWarsCharacter?> Hero([FromServices] StarWarsData data)
+    [GraphQLMetadata("hero")]
+    public async Task<StarWarsCharacter?> HeroAsync([FromServices] StarWarsData data)
         => await data.GetDroidByIdAsync("3").ConfigureAwait(false);
 
-    public Task<Human?> Human([FromServices] StarWarsData data, string id)
+    [GraphQLMetadata("human")]
+    public Task<Human?> HumanAsync([FromServices] StarWarsData data, string id)
         => data.GetHumanByIdAsync(id);
 
-    public Task<Droid?> Droid([FromServices] StarWarsData data, string id)
+    [GraphQLMetadata("droid")]
+    public Task<Droid?> DroidAsync([FromServices] StarWarsData data, string id)
         => data.GetDroidByIdAsync(id);
 }
