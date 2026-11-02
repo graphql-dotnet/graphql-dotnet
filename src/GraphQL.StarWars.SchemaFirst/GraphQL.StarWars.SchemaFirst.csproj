@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
+    <EmbeddedResource Include="StarWars.graphql" />
+  </ItemGroup>
+
+</Project>

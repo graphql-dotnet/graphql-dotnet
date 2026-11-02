@@ -1,0 +1,60 @@
+query AllFields {
+  hero {
+    ...CharacterDetails
+  }
+  human(id: "1") {
+    ...CharacterDetails
+  }
+  droid(id: "4") {
+    ...CharacterDetails
+  }
+}
+
+mutation CreateHuman {
+  createHuman(human: { name: "Leia", homePlanet: "Alderaan" }) {
+    id
+    name
+    homePlanet
+  }
+}
+
+fragment CharacterDetails on Character {
+  ...CharacterFields
+  friends {
+    ...CharacterFields
+  }
+  friendsConnection {
+    ...FriendsConnectionFields
+  }
+}
+
+fragment CharacterFields on Character {
+  id
+  name
+  appearsIn
+  ... on Human {
+    homePlanet
+  }
+  ... on Droid {
+    primaryFunction
+  }
+}
+
+fragment FriendsConnectionFields on IStarWarsCharacterConnection {
+  totalCount
+  edges {
+    cursor
+    node {
+      ...CharacterFields
+    }
+  }
+  items {
+    ...CharacterFields
+  }
+  pageInfo {
+    hasNextPage
+    hasPreviousPage
+    startCursor
+    endCursor
+  }
+}

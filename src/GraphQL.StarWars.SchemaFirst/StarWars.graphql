@@ -1,0 +1,78 @@
+type Query {
+  hero: Character
+  human(id: String!): Human
+  droid(id: String!): Droid
+}
+
+type Mutation {
+  createHuman(human: HumanInput!): Human!
+}
+
+interface Character {
+  "The id of the character."
+  id: String!
+  "The name of the character."
+  name: String!
+  "Which movie they appear in."
+  appearsIn: [Episode!]!
+  friends: [Character!]!
+  friendsConnection: CharacterConnection!
+}
+
+type Human implements Character {
+  "The id of the character."
+  id: String!
+  "The name of the character."
+  name: String!
+  "Which movie they appear in."
+  appearsIn: [Episode!]!
+  friends: [Character!]!
+  friendsConnection: CharacterConnection!
+  homePlanet: String
+}
+
+type Droid implements Character {
+  "The id of the character."
+  id: String!
+  "The name of the character."
+  name: String!
+  "Which movie they appear in."
+  appearsIn: [Episode!]!
+  friends: [Character!]!
+  friendsConnection: CharacterConnection!
+  primaryFunction: String
+}
+
+input HumanInput {
+  name: String!
+  homePlanet: String
+}
+
+"One of the films in the Star Wars Trilogy."
+enum Episode {
+  "Released in 1977."
+  NEWHOPE
+  "Released in 1980."
+  EMPIRE
+  "Released in 1983."
+  JEDI
+}
+
+type CharacterConnection {
+  totalCount: Int
+  edges: [CharacterEdge!]
+  items: [Character]
+  pageInfo: PageInfo
+}
+
+type CharacterEdge {
+  cursor: String
+  node: Character
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
