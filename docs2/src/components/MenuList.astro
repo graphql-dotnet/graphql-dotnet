@@ -1,0 +1,32 @@
+---
+import { pageHref } from '../utils/site.js'
+
+const { items, pathName } = Astro.props
+---
+
+<nav>
+  <ul>
+    {
+      items.map((item) => (
+        <li>
+          {item.file ? (
+            <a
+              href={pageHref(item.url || item.href)}
+              class:list={{ active: pathName === item.url.replace(/\/$/, '') }}
+              aria-current={
+                pathName === item.url.replace(/\/$/, '') ? 'page' : undefined
+              }
+            >
+              {item.title}
+            </a>
+          ) : (
+            <span>{item.title}</span>
+          )}
+          {item.items?.length > 0 && (
+            <Astro.self items={item.items} pathName={pathName} />
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</nav>

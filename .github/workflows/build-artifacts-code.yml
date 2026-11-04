@@ -14,7 +14,6 @@ on:
       - '*'
 
 env:
-  NODE_VERSION: '18.x'   # Node 18 LTS, see https://nodejs.org/en/about/releases/
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
@@ -23,13 +22,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Use Node.js ${{ env.NODE_VERSION }}
+      - name: Use Node.js from docs2/package.json
         uses: actions/setup-node@v7
         with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: npm install docs2
+          node-version-file: docs2/package.json
+      - name: npm ci docs2
         working-directory: docs2
-        run: npm install
+        run: npm ci
       - name: npm run build
         working-directory: docs2
         run: npm run build
@@ -37,8 +36,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: Documentation
-          path: docs2/public/**
+          path: docs2/dist/**
           if-no-files-found: error
+          include-hidden-files: true
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v6
         with:
