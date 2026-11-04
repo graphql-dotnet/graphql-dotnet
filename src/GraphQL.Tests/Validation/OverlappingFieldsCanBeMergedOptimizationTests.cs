@@ -78,8 +78,8 @@ public class OverlappingFieldsCanBeMergedOptimizationTests
     [InlineData("{ node { text(input: {nested: {a: 1}}) text(input: {nested: {a: 2}}) } }", "differing arguments")]
     [InlineData("query($a: Int = 1, $b: Int = 1) { node { text(format: $a) text(format: $b) } }", "differing arguments")]
     [InlineData("{ node { text @skip(if: true) text: other @include(if: false) } }", "different fields")]
-    [InlineData("{ node { child { text } child { text: other } } }", "subfields")]
-    [InlineData("{ node { child { child { text } } child { child { text: other } } } }", "subfields")]
+    [InlineData("{ node { child { text } child { text: other } } }", "different fields")]
+    [InlineData("{ node { child { child { text } } child { child { text: other } } } }", "different fields")]
     [InlineData("{ node { child { same: missing } child { same: otherMissing } } }", "different fields")]
     [InlineData("{ choice { ... on A { value } ... on B { value } } }", "conflicting types")]
     [InlineData("{ choice { ... on Missing { value } ... on A { value } ... on B { value } } }", "conflicting types")]
@@ -88,7 +88,7 @@ public class OverlappingFieldsCanBeMergedOptimizationTests
     [InlineData("{ choice { ... on A { child { same: text } } ... on B { child { same: list } } } }", "conflicting types")]
     [InlineData("{ named { text(format: 1) ... on A { text(format: 2) } } }", "differing arguments")]
     [InlineData("{ named { ... on Named { text(format: 1) } ... on OtherNamed { text(format: 2) } } }", "differing arguments")]
-    [InlineData("{ named { ... on Named { child { text } } ... on OtherNamed { child { text: other } } } }", "subfields")]
+    [InlineData("{ named { ... on Named { child { text } } ... on OtherNamed { child { text: other } } } }", "different fields")]
     [InlineData("{ node { text } } fragment Unused on Node { same: text same: other }", "different fields")]
     [InlineData("query First { node { text } } query Second { node { same: text same: other } }", "different fields")]
     public void Incompatible_selections_are_rejected(string query, string reason)
@@ -110,7 +110,7 @@ public class OverlappingFieldsCanBeMergedOptimizationTests
 
         var result = Validate($"{{ node {{ {spreads} }} }} {definitions}");
 
-        AssertConflict(result, "subfields");
+        AssertConflict(result, "different fields");
         result.Errors.Count.ShouldBe(1);
     }
 
@@ -138,7 +138,7 @@ public class OverlappingFieldsCanBeMergedOptimizationTests
         const string inner = "fragment Inner on Node { child { same: text } }";
         string definitions = reverseDefinitions ? inner + outer : outer + inner;
 
-        AssertConflict(Validate((includeOperation ? "{ node { text } } " : "") + definitions), "subfields");
+        AssertConflict(Validate((includeOperation ? "{ node { text } } " : "") + definitions), "different fields");
     }
 
     [Fact]

@@ -13,7 +13,7 @@ namespace GraphQL.Validation.Rules;
 /// any two field selections which might both be encountered for the same object are only valid
 /// if they are equivalent.
 /// </summary>
-public partial class OverlappingFieldsCanBeMerged : ValidationRuleBase
+public class OverlappingFieldsCanBeMerged : ValidationRuleBase
 {
     /// <summary>
     /// Returns a static instance of this validation rule.
@@ -33,526 +33,541 @@ public partial class OverlappingFieldsCanBeMerged : ValidationRuleBase
     public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
         => new(new MergeVisitor());
 
-    private static List<Conflict>? FindConflictsWithinSelectionSet(
-        ValidationContext context,
-        Dictionary<GraphQLSelectionSet, CachedField> cachedFieldsAndFragmentNames,
-        PairSet comparedFragmentPairs,
-        IGraphType? parentType,
-        GraphQLSelectionSet selectionSet)
+    // Compare response-name groups and report conflicts as they are encountered. The
+    // common path combines the shape and common-parent checks in one pass. Different
+    // concrete parents require a separate shape check: their descendants remain
+    // mutually exclusive for names/arguments, even when their return types coincide.
+    private sealed class MergeVisitor : INodeVisitor
     {
-        List<Conflict>? conflicts = null;
+        private Dictionary<ROM, GraphQLFragmentDefinition>? _fragments;
+        private HashSet<ROM>? _checkedFragments;
+        private HashSet<HashSet<ROM>>? _checkedFragmentGroups;
+        private Dictionary<HashSet<ROM>, FieldMap>? _fragmentLeafSummaries;
+        private HashSet<SelectionGroup>? _checkedGroups;
 
-        var cachedField = GetFieldsAndFragmentNames(
-            context,
-            cachedFieldsAndFragmentNames,
-            parentType,
-            selectionSet);
-
-        var fieldMap = cachedField.NodeAndDef;
-        var fragmentNames = cachedField.Names;
-
-        CollectConflictsWithin(
-            context,
-            ref conflicts,
-            cachedFieldsAndFragmentNames,
-            comparedFragmentPairs,
-            fieldMap);
-
-        if (fragmentNames.Count != 0)
+        public ValueTask EnterAsync(ASTNode node, ValidationContext context)
         {
-            // (B) Then collect conflicts between these fields and those represented by
-            // each spread fragment name found.
-            var comparedFragments = new HashSet<ROM>();
-            for (int i = 0; i < fragmentNames.Count; i++)
-            {
-                CollectConflictsBetweenFieldsAndFragment(
-                  context,
-                  ref conflicts,
-                  cachedFieldsAndFragmentNames,
-                  comparedFragments,
-                  comparedFragmentPairs,
-                  false,
-                  fieldMap,
-                  fragmentNames[i]);
+            if (node is not GraphQLSelectionSet selectionSet)
+                return default;
 
-                // (C) Then compare this fragment with all other fragments found in this
-                // selection set to collect conflicts between fragments spread together.
-                // This compares each item in the list of fragment names to every other
-                // item in that same list (except for itself).
-                for (int j = i + 1; j < fragmentNames.Count; j++)
-                {
-                    CollectConflictsBetweenFragments(
-                      context,
-                      ref conflicts,
-                      cachedFieldsAndFragmentNames,
-                      comparedFragmentPairs,
-                      false,
-                      fragmentNames[i],
-                      fragmentNames[j]);
-                }
-            }
+            // Inline fragments were included in their containing selection set.
+            var ancestor = context.TypeInfo.GetAncestor(1);
+            if (ancestor is GraphQLInlineFragment ||
+                ancestor is GraphQLFragmentDefinition fragment && _checkedFragments?.Contains(fragment.FragmentName.Name) == true ||
+                IsTrivial(selectionSet))
+                return default;
+
+            CheckLocal(context, new SelectionSource(context.TypeInfo.GetParentType(), selectionSet));
+            return default;
         }
-        return conflicts;
-    }
 
-    private static void CollectConflictsWithin(
-        ValidationContext context,
-        ref List<Conflict>? conflicts,
-        Dictionary<GraphQLSelectionSet, CachedField> cachedFieldsAndFragmentNames,
-        PairSet comparedFragmentPairs,
-        Dictionary<ROM, List<FieldDefPair>> fieldMap)
-    {
-        // A field map is a keyed collection, where each key represents a response
-        // name and the value at that key is a list of all fields which provide that
-        // response name. For every response name, if there are multiple fields, they
-        // must be compared to find a potential conflict.
-        foreach (var entry in fieldMap)
+        public ValueTask LeaveAsync(ASTNode node, ValidationContext context) => default;
+
+        private static bool IsTrivial(GraphQLSelectionSet selectionSet)
         {
-            var responseName = entry.Key;
-            var fields = entry.Value;
+            // A single field cannot conflict locally. Its children are visited later.
+            if (selectionSet.Selections.Count == 1 && selectionSet.Selections[0] is GraphQLField)
+                return true;
 
-            // This compares every field in the list to every other field in this list
-            // (except to itself). If the list only has one item, nothing needs to
-            // be compared.
-            if (fields.Count > 1)
+            // Unaliased, argument-free leaves on one parent can only repeat the
+            // exact same field. This scan needs no dictionaries or field records.
+            foreach (var selection in selectionSet.Selections)
             {
-                for (int i = 0; i < fields.Count; i++)
-                {
-                    for (int j = i + 1; j < fields.Count; j++)
-                    {
-                        var conflict = FindConflict(
-                                    context,
-                                    cachedFieldsAndFragmentNames,
-                                    comparedFragmentPairs,
-                                    false, // within one collection is never mutually exclusive
-                                    responseName,
-                                    fields[i],
-                                    fields[j]);
+                if (selection is not GraphQLField { Alias: null, Arguments: null, SelectionSet: null })
+                    return false;
+            }
+            return true;
+        }
 
-                        if (conflict != null)
-                        {
-                            (conflicts ??= []).Add(conflict);
-                        }
-                    }
+        private bool Check(ValidationContext context, SelectionSource source)
+        {
+            var fields = new FieldMap(CheckKind.Both);
+            bool valid = Collect(context, source, ref fields);
+            return CheckChildren(context, ref fields, valid);
+        }
+
+        private bool CheckLocal(ValidationContext context, SelectionSource source)
+        {
+            // Independent aliases often select the same named fragments. Their
+            // local AST selection sets differ, but the fields being checked do not.
+            // Classify before allocating: inline fragments and local composites
+            // need the full merge, while local leaves can use a reusable summary.
+            var selections = source.SelectionSet.Selections;
+            GraphQLFragmentSpread? first = null;
+            bool multipleNames = false;
+            bool hasLeaves = false;
+            bool simpleLeaves = true;
+            foreach (var selection in selections)
+            {
+                if (selection is GraphQLFragmentSpread spread)
+                {
+                    first ??= spread;
+                    multipleNames |= spread.FragmentName.Name != first.FragmentName.Name;
+                }
+                else if (selection is GraphQLField { SelectionSet: null } field)
+                {
+                    hasLeaves = true;
+                    simpleLeaves &= field.Alias == null && field.Arguments == null;
+                }
+                else
+                {
+                    return Check(context, source);
                 }
             }
 
-        }
-    }
+            if (first == null)
+                return Check(context, source);
+            if (!hasLeaves && !multipleNames)
+                return _checkedFragments?.Contains(first.FragmentName.Name) == true || Check(context, source);
 
-    private static Conflict? FindConflict(
-        ValidationContext context,
-        Dictionary<GraphQLSelectionSet, CachedField> cachedFieldsAndFragmentNames,
-        PairSet comparedFragmentPairs,
-        bool parentFieldsAreMutuallyExclusive,
-        ROM responseName,
-        FieldDefPair fieldDefPair1,
-        FieldDefPair fieldDefPair2)
-    {
-        var parentType1 = fieldDefPair1.ParentType;
-        var node1 = fieldDefPair1.Field;
-        var def1 = fieldDefPair1.FieldDef;
-
-        var parentType2 = fieldDefPair2.ParentType;
-        var node2 = fieldDefPair2.Field;
-        var def2 = fieldDefPair2.FieldDef;
-
-        // If it is known that two fields could not possibly apply at the same
-        // time, due to the parent types, then it is safe to permit them to diverge
-        // in aliased field or arguments used as they will not present any ambiguity
-        // by differing.
-        // It is known that two parent types could never overlap if they are
-        // different Object types. Interface or Union types might overlap - if not
-        // in the current state of the schema, then perhaps in some future version,
-        // thus may not safely diverge.
-
-        bool areMutuallyExclusive =
-            parentFieldsAreMutuallyExclusive ||
-            parentType1 != parentType2 && isObjectType(parentType1) && isObjectType(parentType2);
-
-        // return type for each field.
-        var type1 = def1?.ResolvedType;
-        var type2 = def2?.ResolvedType;
-
-        if (!areMutuallyExclusive)
-        {
-            // Two aliases must refer to the same field.
-            var name1 = node1.GetName();
-            var name2 = node2.GetName();
-
-            if (name1 != name2)
+            var names = new HashSet<ROM>();
+            foreach (var selection in selections)
             {
-                return new Conflict
+                if (selection is GraphQLFragmentSpread spread)
+                    names.Add(spread.FragmentName.Name);
+            }
+
+            if (hasLeaves)
+                return CheckMixedLeaves(context, source, names, simpleLeaves);
+
+            if (_checkedFragmentGroups?.Contains(names) == true)
+                return true;
+            if (!Check(context, source))
+                return false;
+
+            // A group is reusable only after both shape and name checks succeed.
+            // An individually valid fragment can still conflict with another one.
+            (_checkedFragmentGroups ??= new(HashSet<ROM>.CreateSetComparer())).Add(names);
+            return true;
+        }
+
+        private bool CheckMixedLeaves(ValidationContext context, SelectionSource source, HashSet<ROM> names, bool simpleLeaves)
+        {
+            bool valid = true;
+            if (_fragmentLeafSummaries == null || !_fragmentLeafSummaries.TryGetValue(names, out var summary))
+            {
+                summary = new FieldMap(CheckKind.Both);
+                foreach (var name in names)
+                    valid &= CollectFragment(context, name, ref summary);
+                valid = CheckChildren(context, ref summary, valid);
+
+                // Only complete, compatible summaries can be reused. Failed fields
+                // are omitted from the merge, but independent selections still run.
+                if (valid)
+                    (_fragmentLeafSummaries ??= new(HashSet<ROM>.CreateSetComparer())).Add(names, summary);
+            }
+
+            var localFields = new FieldMap(CheckKind.Both);
+            foreach (var selection in source.SelectionSet.Selections)
+            {
+                if (selection is GraphQLField field)
                 {
-                    Reason = new ConflictReason
-                    {
-                        Name = (string)responseName, //ISSUE:allocation
-                        Message = new Message
-                        {
-                            Msg = $"{name1} and {name2} are different fields"
-                        }
-                    },
-                    FieldsLeft = [node1],
-                    FieldsRight = [node2]
-                };
-            }
-
-            // Two field calls must have the same arguments.
-            if (!SameArguments(node1.GetArguments(), node2.GetArguments()))
-            {
-                return new Conflict
-                {
-                    Reason = new ConflictReason
-                    {
-                        Name = (string)responseName, //ISSUE:allocation
-                        Message = new Message
-                        {
-                            Msg = "they have differing arguments"
-                        }
-                    },
-                    FieldsLeft = [node1],
-                    FieldsRight = [node2]
-                };
-            }
-        }
-
-        if (type1 != null && type2 != null && DoTypesConflict(type1, type2))
-        {
-            return new Conflict
-            {
-                Reason = new ConflictReason
-                {
-                    Name = (string)responseName, //ISSUE:allocation
-                    Message = new Message
-                    {
-                        Msg = $"they return conflicting types {type1} and {type2}"
-                    }
-                },
-                FieldsLeft = [node1],
-                FieldsRight = [node2]
-            };
-        }
-
-        // Collect and compare sub-fields. Use the same "visited fragment names" list
-        // for both collections so fields in a fragment reference are never
-        // compared to themselves.
-        var selectionSet1 = node1.GetSelectionSet();
-        var selectionSet2 = node2.GetSelectionSet();
-
-        if (selectionSet1 != null && selectionSet2 != null)
-        {
-            var conflicts = FindConflictsBetweenSubSelectionSets(
-                context,
-                cachedFieldsAndFragmentNames,
-                comparedFragmentPairs,
-                areMutuallyExclusive,
-                type1?.GetNamedType(),
-                selectionSet1,
-                type2?.GetNamedType(),
-                selectionSet2);
-
-            return SubfieldConflicts(conflicts, responseName, node1, node2);
-        }
-
-        return null;
-    }
-
-    private static List<Conflict>? FindConflictsBetweenSubSelectionSets(
-        ValidationContext context,
-        Dictionary<GraphQLSelectionSet, CachedField> cachedFieldsAndFragmentNames,
-        PairSet comparedFragmentPairs,
-        bool areMutuallyExclusive,
-        IGraphType? parentType1,
-        GraphQLSelectionSet selectionSet1,
-        IGraphType? parentType2,
-        GraphQLSelectionSet selectionSet2)
-    {
-        List<Conflict>? conflicts = null;
-
-        var cachedField1 = GetFieldsAndFragmentNames(
-            context,
-            cachedFieldsAndFragmentNames,
-            parentType1,
-            selectionSet1);
-
-        var fieldMap1 = cachedField1.NodeAndDef;
-        var fragmentNames1 = cachedField1.Names;
-
-        var cachedField2 = GetFieldsAndFragmentNames(
-            context,
-            cachedFieldsAndFragmentNames,
-            parentType2,
-            selectionSet2);
-
-        var fieldMap2 = cachedField2.NodeAndDef;
-        var fragmentNames2 = cachedField2.Names;
-
-        // (H) First, collect all conflicts between these two collections of field.
-        CollectConflictsBetween(
-            context,
-            ref conflicts,
-            cachedFieldsAndFragmentNames,
-            comparedFragmentPairs,
-            areMutuallyExclusive,
-            fieldMap1,
-            fieldMap2);
-
-        // (I) Then collect conflicts between the first collection of fields and
-        // those referenced by each fragment name associated with the second.
-        if (fragmentNames2.Count != 0)
-        {
-            var comparedFragments = new HashSet<ROM>();
-
-            for (int j = 0; j < fragmentNames2.Count; j++)
-            {
-                CollectConflictsBetweenFieldsAndFragment(
-                  context,
-                  ref conflicts,
-                  cachedFieldsAndFragmentNames,
-                  comparedFragments,
-                  comparedFragmentPairs,
-                  areMutuallyExclusive,
-                  fieldMap1,
-                  fragmentNames2[j]);
-            }
-        }
-
-        // (I) Then collect conflicts between the second collection of fields and
-        // those referenced by each fragment name associated with the first.
-        if (fragmentNames1.Count != 0)
-        {
-            var comparedFragments = new HashSet<ROM>();
-
-            for (int i = 0; i < fragmentNames1.Count; i++)
-            {
-                CollectConflictsBetweenFieldsAndFragment(
-                  context,
-                  ref conflicts,
-                  cachedFieldsAndFragmentNames,
-                  comparedFragments,
-                  comparedFragmentPairs,
-                  areMutuallyExclusive,
-                  fieldMap2,
-                  fragmentNames1[i]);
-            }
-        }
-
-        // (J) Also collect conflicts between any fragment names by the first and
-        // fragment names by the second. This compares each item in the first set of
-        // names to each item in the second set of names.
-        for (int i = 0; i < fragmentNames1.Count; i++)
-        {
-            for (int j = 0; j < fragmentNames2.Count; j++)
-            {
-                CollectConflictsBetweenFragments(
-                  context,
-                  ref conflicts,
-                  cachedFieldsAndFragmentNames,
-                  comparedFragmentPairs,
-                  areMutuallyExclusive,
-                  fragmentNames1[i],
-                  fragmentNames2[j]);
-            }
-        }
-
-        return conflicts;
-    }
-
-    private static void CollectConflictsBetweenFragments(
-        ValidationContext context,
-        ref List<Conflict>? conflicts,
-        Dictionary<GraphQLSelectionSet, CachedField> cachedFieldsAndFragmentNames,
-        PairSet comparedFragmentPairs,
-        bool areMutuallyExclusive,
-        ROM fragmentName1,
-        ROM fragmentName2)
-    {
-        // No need to compare a fragment to itself.
-        if (fragmentName1 == fragmentName2)
-        {
-            return;
-        }
-
-        // Memoize so two fragments are not compared for conflicts more than once.
-        if (comparedFragmentPairs.Has(fragmentName1, fragmentName2, areMutuallyExclusive))
-        {
-            return;
-        }
-
-        comparedFragmentPairs.Add(fragmentName1, fragmentName2, areMutuallyExclusive);
-
-        var fragment1 = context.Document.FindFragmentDefinition(fragmentName1);
-        var fragment2 = context.Document.FindFragmentDefinition(fragmentName2);
-
-        if (fragment1 == null || fragment2 == null)
-        {
-            return;
-        }
-
-        var cachedField1 =
-            GetReferencedFieldsAndFragmentNames(
-                context,
-                cachedFieldsAndFragmentNames,
-                fragment1);
-
-        var fieldMap1 = cachedField1.NodeAndDef;
-        var fragmentNames1 = cachedField1.Names;
-
-        var cachedField2 =
-            GetReferencedFieldsAndFragmentNames(
-                  context,
-                  cachedFieldsAndFragmentNames,
-                  fragment2);
-
-        var fieldMap2 = cachedField2.NodeAndDef;
-        var fragmentNames2 = cachedField2.Names;
-
-        // (F) First, collect all conflicts between these two collections of fields
-        // (not including any nested fragments).
-        CollectConflictsBetween(
-          context,
-          ref conflicts,
-          cachedFieldsAndFragmentNames,
-          comparedFragmentPairs,
-          areMutuallyExclusive,
-          fieldMap1,
-          fieldMap2);
-
-        // (G) Then collect conflicts between the first fragment and any nested
-        // fragments spread in the second fragment.
-        for (int j = 0; j < fragmentNames2.Count; j++)
-        {
-            CollectConflictsBetweenFragments(
-              context,
-              ref conflicts,
-              cachedFieldsAndFragmentNames,
-              comparedFragmentPairs,
-              areMutuallyExclusive,
-              fragmentName1,
-              fragmentNames2[j]);
-        }
-
-        // (G) Then collect conflicts between the second fragment and any nested
-        // fragments spread in the first fragment.
-        for (int i = 0; i < fragmentNames1.Count; i++)
-        {
-            CollectConflictsBetweenFragments(
-              context,
-              ref conflicts,
-              cachedFieldsAndFragmentNames,
-              comparedFragmentPairs,
-              areMutuallyExclusive,
-              fragmentNames1[i],
-              fragmentName2);
-        }
-    }
-
-    private static void CollectConflictsBetweenFieldsAndFragment(
-        ValidationContext context,
-        ref List<Conflict>? conflicts,
-        Dictionary<GraphQLSelectionSet, CachedField> cachedFieldsAndFragmentNames,
-        HashSet<ROM> comparedFragments,
-        PairSet comparedFragmentPairs,
-        bool areMutuallyExclusive,
-        Dictionary<ROM, List<FieldDefPair>> fieldMap,
-        ROM fragmentName)
-    {
-        // Memoize so a fragment is not compared for conflicts more than once.
-        if (!comparedFragments.Add(fragmentName))
-        {
-            return;
-        }
-
-        var fragment = context.Document.FindFragmentDefinition(fragmentName);
-
-        if (fragment == null)
-        {
-            return;
-        }
-
-        var cachedField =
-            GetReferencedFieldsAndFragmentNames(
-                context,
-                cachedFieldsAndFragmentNames,
-                fragment);
-
-        var fieldMap2 = cachedField.NodeAndDef;
-        var fragmentNames2 = cachedField.Names;
-
-        // Do not compare a fragment's fieldMap to itself.
-        if (fieldMap == fieldMap2)
-        {
-            return;
-        }
-
-        // (D) First collect any conflicts between the provided collection of fields
-        // and the collection of fields represented by the given fragment.
-        CollectConflictsBetween(
-            context,
-            ref conflicts,
-            cachedFieldsAndFragmentNames,
-            comparedFragmentPairs,
-            areMutuallyExclusive,
-            fieldMap,
-            fieldMap2);
-
-        // (E) Then collect any conflicts between the provided collection of fields
-        // and any fragment names found in the given fragment.
-        for (int i = 0; i < fragmentNames2.Count; i++)
-        {
-            CollectConflictsBetweenFieldsAndFragment(
-              context,
-              ref conflicts,
-              cachedFieldsAndFragmentNames,
-              comparedFragments,
-              comparedFragmentPairs,
-              areMutuallyExclusive,
-              fieldMap,
-              fragmentNames2[i]);
-        }
-    }
-
-    private static void CollectConflictsBetween(
-        ValidationContext context,
-        ref List<Conflict>? conflicts,
-        Dictionary<GraphQLSelectionSet, CachedField> cachedFieldsAndFragmentNames,
-        PairSet comparedFragmentPairs,
-        bool parentFieldsAreMutuallyExclusive,
-        Dictionary<ROM, List<FieldDefPair>> fieldMap1,
-        Dictionary<ROM, List<FieldDefPair>> fieldMap2)
-    {
-        // A field map is a keyed collection, where each key represents a response
-        // name and the value at that key is a list of all fields which provide that
-        // response name. For any response name which appears in both provided field
-        // maps, each field from the first field map must be compared to every field
-        // in the second field map to find potential conflicts.
-
-        foreach (var responseName in fieldMap1.Keys)
-        {
-            if (fieldMap2.TryGetValue(responseName, out var fields2) && fields2.Count != 0)
-            {
-                var fields1 = fieldMap1[responseName];
-                for (int i = 0; i < fields1.Count; i++)
-                {
-                    for (int j = 0; j < fields2.Count; j++)
-                    {
-                        var conflict = FindConflict(
-                          context,
-                          cachedFieldsAndFragmentNames,
-                          comparedFragmentPairs,
-                          parentFieldsAreMutuallyExclusive,
-                          responseName,
-                          fields1[i],
-                          fields2[j]);
-
-                        if (conflict != null)
-                        {
-                            (conflicts ??= []).Add(conflict);
-                        }
-                    }
+                    var type = (source.ParentType as IComplexGraphType)?.GetField(field.Name)?.ResolvedType;
+                    var reference = new FieldReference(source.ParentType, field, type);
+                    valid &= summary.MatchesLeaf(context, reference);
+                    if (!simpleLeaves)
+                        valid &= localFields.Add(context, reference);
                 }
             }
+            return valid;
         }
+
+        private bool Collect(ValidationContext context, SelectionSource source, ref FieldMap fields)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+            // A conflicting field is not merged, but other selections can still
+            // be checked against their representatives without a pairwise scan.
+            bool valid = true;
+            foreach (var selection in source.SelectionSet.Selections)
+            {
+                if (selection is GraphQLField field)
+                {
+                    var type = (source.ParentType as IComplexGraphType)?.GetField(field.Name)?.ResolvedType;
+                    valid &= fields.Add(context, new FieldReference(source.ParentType, field, type));
+                }
+                else if (selection is GraphQLInlineFragment inline)
+                {
+                    var type = inline.TypeCondition == null
+                        ? source.ParentType
+                        : inline.TypeCondition.Type.GraphTypeFromType(context.Schema);
+                    valid &= Collect(context, new SelectionSource(type, inline.SelectionSet), ref fields);
+                }
+                else if (selection is GraphQLFragmentSpread spread)
+                {
+                    valid &= CollectFragment(context, spread.FragmentName.Name, ref fields);
+                }
+            }
+            return valid;
+        }
+
+        private bool CollectFragment(ValidationContext context, ROM name, ref FieldMap fields)
+        {
+            // Keep this entry for the entire group, including other paths through
+            // a fragment DAG. Removing it on return is exponential.
+            if (!(fields.Fragments ??= new()).Add(name))
+                return true;
+            if (_fragments == null)
+            {
+                _fragments = new();
+                foreach (var definition in context.Document.Definitions)
+                {
+                    if (definition is GraphQLFragmentDefinition fragment && !_fragments.ContainsKey(fragment.FragmentName.Name))
+                        _fragments.Add(fragment.FragmentName.Name, fragment);
+                }
+            }
+            return !_fragments.TryGetValue(name, out var found) ||
+                Collect(context, new SelectionSource(found.TypeCondition.Type.GraphTypeFromType(context.Schema), found.SelectionSet), ref fields);
+        }
+
+        private bool CheckChildren(ValidationContext context, ref FieldMap fields, bool valid)
+        {
+            if (fields.Map != null)
+            {
+                foreach (var group in fields.Map.Values)
+                {
+                    valid &= CheckChildren(context, group.Collision, fields.Kind);
+                }
+            }
+            else if (fields.First.HasValue)
+            {
+                valid &= CheckChildren(context, fields.First.Value.Collision, fields.Kind);
+            }
+
+            if (valid && fields.Kind == CheckKind.Both && fields.Fragments != null)
+                (_checkedFragments ??= new()).UnionWith(fields.Fragments);
+            return valid;
+        }
+
+        private bool CheckChildren(ValidationContext context, FieldGroup? group, CheckKind kind)
+        {
+            if (group?.Children == null)
+                return true;
+
+            // There is no need to partition child selections unless at least two
+            // distinct concrete parents occur. Abstract parents overlap all groups.
+            IGraphType? concreteType = null;
+            bool partition = false;
+            foreach (var child in group.Children)
+            {
+                if (child.ParentType is IObjectGraphType)
+                {
+                    if (concreteType != null && !ReferenceEquals(concreteType, child.ParentType))
+                    {
+                        partition = true;
+                        break;
+                    }
+                    concreteType = child.ParentType;
+                }
+            }
+            if (!partition || kind == CheckKind.Shape)
+                return CheckMerged(context, group.Children, kind);
+
+            bool valid = (kind & CheckKind.Shape) == 0 || CheckMerged(context, group.Children, CheckKind.Shape);
+
+            Dictionary<IGraphType, List<FieldReference>>? concrete = null;
+            List<FieldReference>? abstractFields = null;
+            foreach (var child in group.Children)
+            {
+                if (child.ParentType is IObjectGraphType)
+                {
+                    concrete ??= new();
+                    if (!concrete.TryGetValue(child.ParentType, out var children))
+                        concrete.Add(child.ParentType, children = new());
+                    children.Add(child);
+                }
+                else
+                {
+                    (abstractFields ??= new()).Add(child);
+                }
+            }
+            foreach (var children in concrete!.Values)
+            {
+                if (abstractFields != null)
+                    children.AddRange(abstractFields);
+                valid &= CheckMerged(context, children, CheckKind.Names);
+            }
+            return valid;
+        }
+
+        private bool CheckMerged(ValidationContext context, List<FieldReference> children, CheckKind kind)
+        {
+            if (children.Count <= 1)
+                return true;
+
+            var sources = new HashSet<SelectionSource>();
+            foreach (var child in children)
+                sources.Add(new SelectionSource(child.Type?.GetNamedType(), child.Field.SelectionSet!));
+            // Repeating one AST selection does not introduce a new comparison.
+            if (sources.Count == 1)
+                return true;
+
+            // Cache the actual source set, not object hash codes as identities. Add
+            // before recursion to terminate cycles crossing composite fields.
+            var key = new SelectionGroup(sources, kind);
+            if (!(_checkedGroups ??= new()).Add(key))
+                return true;
+
+            var fields = new FieldMap(kind);
+            bool valid = true;
+            foreach (var source in sources)
+                valid &= Collect(context, source, ref fields);
+            valid = CheckChildren(context, ref fields, valid);
+            if (!valid)
+                _checkedGroups.Remove(key);
+            return valid;
+        }
+    }
+
+    [Flags]
+    private enum CheckKind { Shape = 1, Names = 2, Both = Shape | Names }
+
+    private readonly record struct SelectionSource(IGraphType? ParentType, GraphQLSelectionSet SelectionSet);
+
+    private readonly record struct FieldReference(IGraphType? ParentType, GraphQLField Field, IGraphType? Type);
+
+    private sealed class SelectionGroup(HashSet<SelectionSource> sources, CheckKind kind) : IEquatable<SelectionGroup>
+    {
+        private readonly HashSet<SelectionSource> _sources = sources;
+        private readonly CheckKind _kind = kind;
+
+        public bool Equals(SelectionGroup? other) => other != null && _kind == other._kind && _sources.SetEquals(other._sources);
+
+        public override bool Equals(object? obj) => obj is SelectionGroup other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            int hash = (int)_kind;
+            foreach (var source in _sources)
+                hash = unchecked(hash + source.GetHashCode());
+            return hash;
+        }
+    }
+
+    // One response name is kept inline. The dictionary appears only on the second
+    // name; its values are structs, and repeated leaves never need a list.
+    private struct FieldMap(CheckKind kind)
+    {
+        public readonly CheckKind Kind = kind;
+        public FieldEntry? First;
+        public Dictionary<ROM, FieldEntry>? Map;
+        public HashSet<ROM>? Fragments;
+
+        public bool Add(ValidationContext context, FieldReference field)
+        {
+            var name = field.Field.Alias?.Name ?? field.Field.Name;
+            if (!First.HasValue)
+            {
+                First = new FieldEntry(field);
+                return true;
+            }
+            var first = First.Value;
+            var firstName = first.First.Field.Alias?.Name ?? first.First.Field.Name;
+            if (Map == null)
+            {
+                if (name == firstName)
+                {
+                    bool valid = first.Add(context, field, Kind);
+                    First = first;
+                    return valid;
+                }
+                Map = new() { { firstName, first }, { name, new FieldEntry(field) } };
+                return true;
+            }
+            if (Map.TryGetValue(name, out var group))
+            {
+                bool valid = group.Add(context, field, Kind);
+                Map[name] = group;
+                return valid;
+            }
+            Map.Add(name, new FieldEntry(field));
+            return true;
+        }
+
+        public readonly bool MatchesLeaf(ValidationContext context, FieldReference field)
+        {
+            var name = field.Field.Alias?.Name ?? field.Field.Name;
+            if (Map != null)
+                return !Map.TryGetValue(name, out var entry) || entry.MatchesLeaf(context, field);
+            return First is not FieldEntry first || name != (first.First.Field.Alias?.Name ?? first.First.Field.Name) || first.MatchesLeaf(context, field);
+        }
+    }
+
+    // A unique field occupies only a representative and a nullable collision
+    // state. Large structs in every dictionary slot would penalize unique aliases.
+    private struct FieldEntry(FieldReference first)
+    {
+        public FieldReference First = first;
+        public FieldGroup? Collision;
+
+        public bool Add(ValidationContext context, FieldReference field, CheckKind kind)
+        {
+            if (Collision != null)
+                return Collision.Add(context, field, kind);
+
+            // Repeated leaves on the same parent require no collection or object.
+            if (ReferenceEquals(First.ParentType, field.ParentType) && First.Field.SelectionSet == null && field.Field.SelectionSet == null)
+            {
+                if ((kind & CheckKind.Shape) != 0 && !CheckType(context, First.Field, First.Type, field))
+                    return false;
+                if ((kind & CheckKind.Names) != 0 && !FieldGroup.CheckSameField(context, First.Field, field.Field))
+                    return false;
+                if (First.Type == null && field.Type != null)
+                    First = field;
+                return true;
+            }
+
+            Collision = new FieldGroup(First);
+            return Collision.Add(context, field, kind);
+        }
+
+        public readonly bool MatchesLeaf(ValidationContext context, FieldReference field)
+        {
+            if (Collision != null)
+                return Collision.MatchesLeaf(context, field);
+            if (!CheckType(context, First.Field, First.Type, field))
+                return false;
+            return First.ParentType is IObjectGraphType && field.ParentType is IObjectGraphType && !ReferenceEquals(First.ParentType, field.ParentType) ||
+                FieldGroup.CheckSameField(context, First.Field, field.Field);
+        }
+    }
+
+    private sealed class FieldGroup
+    {
+        public readonly FieldReference First;
+        private IGraphType? _knownType;
+        private GraphQLField _knownTypeField;
+        private FieldReference? _abstract;
+        private Dictionary<IGraphType, FieldReference>? _byParent;
+        private FieldReference? _firstChild;
+        public List<FieldReference>? Children;
+
+        public FieldGroup(FieldReference first)
+        {
+            First = first;
+            _knownType = first.Type;
+            _knownTypeField = first.Field;
+            _abstract = first.ParentType is IObjectGraphType ? null : first;
+            _byParent = null;
+            _firstChild = first.Field.SelectionSet == null ? null : first;
+            Children = null;
+        }
+
+        public bool Add(ValidationContext context, FieldReference field, CheckKind kind)
+        {
+            if ((kind & CheckKind.Shape) != 0 && field.Type != null)
+            {
+                if (!CheckType(context, _knownTypeField, _knownType, field))
+                    return false;
+                // Keep the actual known field for diagnostics when the first field
+                // in the group has no resolved type.
+                if (_knownType == null)
+                {
+                    _knownType = field.Type;
+                    _knownTypeField = field.Field;
+                }
+            }
+            if ((kind & CheckKind.Names) != 0 && !SameForCommonParents(context, field))
+                return false;
+
+            if (field.Field.SelectionSet != null)
+            {
+                if (_firstChild is not FieldReference firstChild)
+                    _firstChild = field;
+                else if (field.Field.SelectionSet != firstChild.Field.SelectionSet || !ReferenceEquals(field.Type, firstChild.Type))
+                    (Children ??= new() { firstChild }).Add(field);
+            }
+            return true;
+        }
+
+        public bool MatchesLeaf(ValidationContext context, FieldReference field)
+        {
+            if (!CheckType(context, _knownTypeField, _knownType, field))
+                return false;
+            if (_abstract is FieldReference abstractField)
+                return CheckSameField(context, abstractField.Field, field.Field);
+
+            if (field.ParentType is IObjectGraphType)
+            {
+                if (ReferenceEquals(First.ParentType, field.ParentType))
+                    return CheckSameField(context, First.Field, field.Field);
+                return _byParent == null || !_byParent.TryGetValue(field.ParentType, out var representative) ||
+                    CheckSameField(context, representative.Field, field.Field);
+            }
+
+            // An abstract (or unknown) local parent overlaps every concrete
+            // representative. This read must not promote or mutate the summary.
+            if (!CheckSameField(context, First.Field, field.Field))
+                return false;
+            if (_byParent != null)
+            {
+                foreach (var representative in _byParent.Values)
+                {
+                    if (!CheckSameField(context, representative.Field, field.Field))
+                        return false;
+                }
+            }
+            return true;
+        }
+
+        private bool SameForCommonParents(ValidationContext context, FieldReference field)
+        {
+            if (_abstract is FieldReference abstractField)
+                return CheckSameField(context, abstractField.Field, field.Field);
+
+            if (field.ParentType is not IObjectGraphType)
+            {
+                if (!CheckSameField(context, First.Field, field.Field))
+                    return false;
+                if (_byParent != null)
+                {
+                    foreach (var representative in _byParent.Values)
+                    {
+                        if (!CheckSameField(context, representative.Field, field.Field))
+                            return false;
+                    }
+                }
+                _abstract = field;
+                _byParent = null;
+                return true;
+            }
+            if (ReferenceEquals(First.ParentType, field.ParentType))
+                return CheckSameField(context, First.Field, field.Field);
+
+            _byParent ??= new() { { First.ParentType!, First } };
+            if (_byParent.TryGetValue(field.ParentType, out var previous))
+                return CheckSameField(context, previous.Field, field.Field);
+            _byParent.Add(field.ParentType, field);
+            return true;
+        }
+
+        public static bool CheckSameField(ValidationContext context, GraphQLField first, GraphQLField second)
+        {
+            if (ReferenceEquals(first, second))
+                return true;
+            if (first.Name != second.Name)
+            {
+                context.ReportError(new OverlappingFieldsCanBeMergedError(context, first, second,
+                    $"{first.Name} and {second.Name} are different fields"));
+                return false;
+            }
+            if (!SameArguments(first.Arguments, second.Arguments))
+            {
+                context.ReportError(new OverlappingFieldsCanBeMergedError(context, first, second, "they have differing arguments"));
+                return false;
+            }
+            return true;
+        }
+    }
+
+    private static bool CheckType(ValidationContext context, GraphQLField first, IGraphType? firstType, FieldReference second)
+    {
+        if (firstType != null && second.Type != null && DoTypesConflict(firstType, second.Type))
+        {
+            context.ReportError(new OverlappingFieldsCanBeMergedError(context, first, second.Field,
+                $"they return conflicting types {firstType} and {second.Type}"));
+            return false;
+        }
+        return true;
     }
 
     private static bool DoTypesConflict(IGraphType type1, IGraphType type2)
@@ -624,156 +639,6 @@ public partial class OverlappingFieldsCanBeMerged : ValidationRuleBase
             arg1.Value is not null && arg2.Value is not null && arg1.Value.Print() == arg2.Value.Print(); //TODO: change
     }
 
-    private static CachedField GetFieldsAndFragmentNames(
-        ValidationContext context,
-        Dictionary<GraphQLSelectionSet, CachedField> cachedFieldsAndFragmentNames,
-        IGraphType? parentType,
-        GraphQLSelectionSet selectionSet)
-    {
-        if (!cachedFieldsAndFragmentNames.TryGetValue(selectionSet, out var cached))
-        {
-            var nodeAndDef = new Dictionary<ROM, List<FieldDefPair>>();
-            var fragmentNames = new HashSet<ROM>();
-
-            CollectFieldsAndFragmentNames(
-                context,
-                parentType,
-                selectionSet,
-                nodeAndDef,
-                fragmentNames);
-
-            cached = new CachedField { NodeAndDef = nodeAndDef, Names = fragmentNames.ToList() };
-            cachedFieldsAndFragmentNames.Add(selectionSet, cached);
-        }
-        return cached;
-    }
-
-    // Given a reference to a fragment, return the represented collection of fields
-    // as well as a list of nested fragment names referenced via fragment spreads.
-    private static CachedField GetReferencedFieldsAndFragmentNames(
-        ValidationContext context,
-        Dictionary<GraphQLSelectionSet, CachedField> cachedFieldsAndFragmentNames,
-        GraphQLFragmentDefinition fragment)
-    {
-        // Short-circuit building a type from the node if possible.
-        if (cachedFieldsAndFragmentNames.TryGetValue(fragment.SelectionSet, out var cached))
-        {
-            return cached;
-        }
-
-        var fragmentType = fragment.TypeCondition.Type.GraphTypeFromType(context.Schema);
-        return GetFieldsAndFragmentNames(
-            context,
-            cachedFieldsAndFragmentNames,
-            fragmentType,
-            fragment.SelectionSet);
-    }
-
-    private static void CollectFieldsAndFragmentNames(
-        ValidationContext context,
-        IGraphType? parentType,
-        GraphQLSelectionSet selectionSet,
-        Dictionary<ROM, List<FieldDefPair>> nodeAndDefs,
-        HashSet<ROM> fragments)
-    {
-        for (int i = 0; i < selectionSet.Selections.Count; i++)
-        {
-            var selection = selectionSet.Selections[i];
-
-            if (selection is GraphQLField field)
-            {
-                var fieldName = field.Name;
-                FieldType? fieldDef = null;
-                if (isObjectType(parentType) || isInterfaceType(parentType))
-                {
-                    fieldDef = (parentType as IComplexGraphType)!.GetField(fieldName);
-                }
-
-                var responseName = field.Alias is null ? fieldName : field.Alias.Name;
-
-                if (!nodeAndDefs.ContainsKey(responseName))
-                {
-                    nodeAndDefs[responseName] = [];
-                }
-
-                nodeAndDefs[responseName].Add(new FieldDefPair
-                {
-                    ParentType = parentType,
-                    Field = field,
-                    FieldDef = fieldDef
-                });
-
-            }
-            else if (selection is GraphQLFragmentSpread fragmentSpread)
-            {
-                fragments.Add(fragmentSpread.FragmentName.Name);
-
-            }
-            else if (selection is GraphQLInlineFragment inlineFragment)
-            {
-                var typeCondition = inlineFragment.TypeCondition?.Type;
-                var inlineFragmentType =
-                    typeCondition != null
-                        ? typeCondition.GraphTypeFromType(context.Schema)
-                        : parentType;
-
-                CollectFieldsAndFragmentNames(
-                    context,
-                    inlineFragmentType,
-                    inlineFragment.SelectionSet,
-                    nodeAndDefs,
-                    fragments);
-            }
-        }
-    }
-
-    private sealed class FieldDefPair
-    {
-        public IGraphType? ParentType { get; set; } = null!;
-        public ISelectionNode Field { get; set; } = null!;
-        public FieldType? FieldDef { get; set; }
-    }
-
-    private static bool isInterfaceType(IGraphType? parentType) => parentType is IInterfaceGraphType;
-
-    private static bool isObjectType(IGraphType? parentType) => parentType is IObjectGraphType;
-
-    // Given a series of Conflicts which occurred between two sub-fields,
-    // generate a single Conflict.
-    private static Conflict? SubfieldConflicts(
-        List<Conflict>? conflicts,
-        ROM responseName,
-        ISelectionNode node1,
-        ISelectionNode node2)
-    {
-        if (conflicts?.Count > 0)
-        {
-            return new Conflict
-            {
-                Reason = new ConflictReason
-                {
-                    Name = (string)responseName, //ISSUE:allocation
-                    Message = new Message
-                    {
-                        Msgs = conflicts.Select(c => c.Reason).ToList()
-                    }
-                },
-                FieldsLeft = conflicts.Aggregate(new List<ISelectionNode> { node1 }, (allfields, conflict) =>
-                {
-                    allfields.AddRange(conflict.FieldsLeft);
-                    return allfields;
-                }),
-                FieldsRight = conflicts.Aggregate(new List<ISelectionNode> { node2 }, (allfields, conflict) =>
-                {
-                    allfields.AddRange(conflict.FieldsRight);
-                    return allfields;
-                })
-            };
-        }
-
-        return null;
-    }
-
     /// <summary>
     /// Describes a conflict between two fields in a document.
     /// </summary>
@@ -826,81 +691,4 @@ public partial class OverlappingFieldsCanBeMerged : ValidationRuleBase
         /// </summary>
         public List<ConflictReason>? Msgs { get; set; }
     }
-
-    private sealed class CachedField
-    {
-        public Dictionary<ROM, List<FieldDefPair>> NodeAndDef { get; set; } = null!;
-        public List<ROM> Names { get; set; } = null!;
-    }
-
-    private sealed class PairSet
-    {
-        private readonly Dictionary<ROM, Dictionary<ROM, bool>> _data;
-
-        public PairSet()
-        {
-            _data = [];
-        }
-
-        public bool Has(ROM a, ROM b, bool areMutuallyExclusive)
-        {
-            _data.TryGetValue(a, out var first);
-
-            if (first == null || !first.TryGetValue(b, out bool result))
-            {
-                return false;
-            }
-
-            if (areMutuallyExclusive == false)
-            {
-                return result == false;
-            }
-
-            return true;
-        }
-
-        public void Add(ROM a, ROM b, bool areMutuallyExclusive)
-        {
-            PairSetAdd(a, b, areMutuallyExclusive);
-            PairSetAdd(b, a, areMutuallyExclusive);
-        }
-
-        private void PairSetAdd(ROM a, ROM b, bool areMutuallyExclusive)
-        {
-            _data.TryGetValue(a, out var map);
-
-            if (map == null)
-            {
-                map = [];
-                _data[a] = map;
-            }
-            map[b] = areMutuallyExclusive;
-        }
-    }
-}
-
-internal static class ISelectionNodeExtensions
-{
-    public static ROM GetName(this ISelectionNode selection)
-         => selection switch
-         {
-             GraphQLField field => field.Name,
-             GraphQLFragmentSpread fragmentSpread => fragmentSpread.FragmentName.Name,
-             _ => default
-         };
-
-    public static GraphQLArguments? GetArguments(this ISelectionNode selection)
-    {
-        return selection is GraphQLField field
-            ? field.Arguments
-            : null;
-    }
-
-    public static GraphQLSelectionSet? GetSelectionSet(this ISelectionNode selection)
-        => selection switch
-        {
-            GraphQLField field => field.SelectionSet,
-            GraphQLInlineFragment inlineFragment => inlineFragment.SelectionSet,
-            _ => null
-        };
 }

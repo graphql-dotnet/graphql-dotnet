@@ -29,6 +29,8 @@ public class OverlappingFieldsBenchmark : IBenchmark
         UnknownFirst100,
         UnknownFirst1000,
         LateConflict100,
+        LateConflict1000,
+        ManyConflicts100,
         InlineFragments10x10,
         InlineFragments100x50,
         FragmentDiamond8,
@@ -94,6 +96,8 @@ public class OverlappingFieldsBenchmark : IBenchmark
                 QueryCase.UnknownFirst100 => "{ field { ... on Missing { x } " + Repeat("x", 100) + " } }",
                 QueryCase.UnknownFirst1000 => "{ field { ... on Missing { x } " + Repeat("x", 1000) + " } }",
                 QueryCase.LateConflict100 => "{ field { " + Repeat("same: x", 100) + " same: g } }",
+                QueryCase.LateConflict1000 => "{ field { " + Repeat("same: x", 1000) + " same: g } }",
+                QueryCase.ManyConflicts100 => "{ field { " + Repeat("same: x same: g", 50) + " } }",
                 QueryCase.InlineFragments10x10 => InlineFragments(10, 10),
                 QueryCase.InlineFragments100x50 => InlineFragments(100, 50),
                 QueryCase.FragmentDiamond8 => FragmentDiamond(8),
@@ -113,9 +117,10 @@ public class OverlappingFieldsBenchmark : IBenchmark
         _operation = _document.Definitions.OfType<GraphQLOperationDefinition>().First();
         _rules = allRules ? DocumentValidator.CoreRules.ToArray() : [OverlappingFieldsCanBeMerged.Instance];
 
-        // Keep the invalid fixture bounded while exercising diagnostic generation.
+        // Keep invalid fixtures bounded while exercising sparse and dense conflicts.
         var result = Validate();
-        if (result.IsValid != (Query != QueryCase.LateConflict100))
+        bool expectedValid = Query is not (QueryCase.LateConflict100 or QueryCase.LateConflict1000 or QueryCase.ManyConflicts100);
+        if (result.IsValid != expectedValid)
             throw new InvalidOperationException($"Unexpected validation result for {Query}: {string.Join("; ", result.Errors.Select(e => e.Message))}");
     }
 
