@@ -57,7 +57,9 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
                 IsTrivial(selectionSet))
                 return default;
 
-            CheckLocal(context, new SelectionSource(context.TypeInfo.GetParentType(), selectionSet));
+            // TypeInfo keeps list/non-null wrappers on selection-set parents.
+            // Field lookup and mutual exclusion require the underlying named type.
+            CheckLocal(context, new SelectionSource(context.TypeInfo.GetParentType()?.GetNamedType(), selectionSet));
             return default;
         }
 
@@ -162,7 +164,7 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
             {
                 if (selection is GraphQLField field)
                 {
-                    var type = (source.ParentType as IComplexGraphType)?.GetField(field.Name)?.ResolvedType;
+                    var type = TypeInfo.GetFieldDef(context.Schema, source.ParentType, field)?.ResolvedType;
                     var reference = new FieldReference(source.ParentType, field, type);
                     valid &= summary.MatchesLeaf(context, reference);
                     if (!simpleLeaves)
@@ -182,7 +184,7 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
             {
                 if (selection is GraphQLField field)
                 {
-                    var type = (source.ParentType as IComplexGraphType)?.GetField(field.Name)?.ResolvedType;
+                    var type = TypeInfo.GetFieldDef(context.Schema, source.ParentType, field)?.ResolvedType;
                     valid &= fields.Add(context, new FieldReference(source.ParentType, field, type));
                 }
                 else if (selection is GraphQLInlineFragment inline)
@@ -606,37 +608,153 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
 
     private static bool SameArguments(GraphQLArguments? arguments1, GraphQLArguments? arguments2)
     {
-        if (arguments1 == null && arguments2 == null)
+        if (ReferenceEquals(arguments1, arguments2))
+            return true;
+        if (arguments1 == null || arguments2 == null || arguments1.Count != arguments2.Count)
+            return false;
+
+        // Aligned names need no lookup buffer, even for large argument sets.
+        int start = 0;
+        while (start < arguments1.Count && arguments1[start].Name == arguments2[start].Name)
+        {
+            if (!SameValue(arguments1[start].Value, arguments2[start].Value))
+                return false;
+            ++start;
+        }
+        if (start == arguments1.Count)
             return true;
 
-        if (arguments1 != null && arguments2 == null)
-            return false;
-
-        if (arguments1 == null && arguments2 != null)
-            return false;
-
-        if (arguments1!.Count != arguments2!.Count)
+        // Keep small reordered suffixes allocation-free without allowing an
+        // unbounded pairwise scan. UniqueArgumentNames handles duplicate names.
+        if (arguments1.Count - start <= 8)
         {
-            return false;
+            for (int i = start; i < arguments1.Count; ++i)
+            {
+                var argument = arguments1[i];
+                bool found = false;
+                for (int j = start; j < arguments2.Count; ++j)
+                {
+                    if (argument.Name != arguments2[j].Name)
+                        continue;
+                    if (!SameValue(argument.Value, arguments2[j].Value))
+                        return false;
+                    found = true;
+                    break;
+                }
+                if (!found)
+                    return false;
+            }
+            return true;
         }
 
-        return arguments1.All(arg1 =>
+        var values = new Dictionary<ROM, GraphQLValue?>(arguments2.Count - start);
+        for (int i = start; i < arguments2.Count; ++i)
+            values[arguments2[i].Name] = arguments2[i].Value;
+        for (int i = start; i < arguments1.Count; ++i)
         {
-            var arg2 = arguments2.FirstOrDefault(x => x.Name == arg1.Name);
-
-            if (arg2 == null)
-            {
+            var argument = arguments1[i];
+            if (!values.TryGetValue(argument.Name, out var other) || !SameValue(argument.Value, other))
                 return false;
-            }
-            return SameValue(arg1, arg2);
-        });
+        }
+        return true;
     }
 
-    private static bool SameValue(GraphQLArgument arg1, GraphQLArgument arg2)
+    private static bool SameValue(GraphQLValue? value1, GraphQLValue? value2)
     {
-        // normalize values prior to comparison by using ASTNode.Print
-        return arg1.Value is null && arg2.Value is null ||
-            arg1.Value is not null && arg2.Value is not null && arg1.Value.Print() == arg2.Value.Print(); //TODO: change
+        if (ReferenceEquals(value1, value2))
+            return true;
+        if (value1 == null || value2 == null || value1.Kind != value2.Kind)
+            return false;
+
+        // Kind ignores parser subclasses carrying locations/comments. String
+        // values are already decoded, while numeric token kinds remain distinct.
+        return value1 switch
+        {
+            GraphQLVariable variable => value2 is GraphQLVariable other && variable.Name == other.Name,
+            GraphQLEnumValue enumValue => value2 is GraphQLEnumValue other && enumValue.Name == other.Name,
+            GraphQLListValue list => value2 is GraphQLListValue other && SameListValues(list, other),
+            GraphQLObjectValue obj => value2 is GraphQLObjectValue other && SameObjectValues(obj, other),
+            IHasValueNode scalar => value2 is IHasValueNode other && scalar.Value == other.Value,
+            _ => false,
+        };
+    }
+
+    private static bool SameListValues(GraphQLListValue value1, GraphQLListValue value2)
+    {
+        var values1 = value1.Values;
+        var values2 = value2.Values;
+        if (ReferenceEquals(values1, values2))
+            return true;
+        if ((values1?.Count ?? 0) != (values2?.Count ?? 0))
+            return false;
+        if (values1 == null || values2 == null)
+            return true;
+
+        // List order is significant, including lists nested in input objects.
+        for (int i = 0; i < values1.Count; ++i)
+        {
+            if (!SameValue(values1[i], values2[i]))
+                return false;
+        }
+        return true;
+    }
+
+    private static bool SameObjectValues(GraphQLObjectValue value1, GraphQLObjectValue value2)
+    {
+        var fields1 = value1.Fields;
+        var fields2 = value2.Fields;
+        if (ReferenceEquals(fields1, fields2))
+            return true;
+        if ((fields1?.Count ?? 0) != (fields2?.Count ?? 0))
+            return false;
+        if (fields1 == null || fields2 == null)
+            return true;
+
+        int start = 0;
+        while (start < fields1.Count && fields1[start].Name == fields2[start].Name)
+        {
+            if (!SameValue(fields1[start].Value, fields2[start].Value))
+                return false;
+            ++start;
+        }
+        if (start == fields1.Count)
+            return true;
+
+        // Input object fields are unordered. As with arguments, only a large
+        // reordered suffix needs a dictionary; the common aligned case does not.
+        if (fields1.Count - start <= 8)
+        {
+            for (int i = start; i < fields1.Count; ++i)
+            {
+                var field = fields1[i];
+                bool found = false;
+                for (int j = start; j < fields2.Count; ++j)
+                {
+                    if (field.Name != fields2[j].Name)
+                        continue;
+                    if (!SameValue(field.Value, fields2[j].Value))
+                        return false;
+                    found = true;
+                    break;
+                }
+                if (!found)
+                    return false;
+            }
+            return true;
+        }
+
+        // Assignment keeps malformed duplicate keys non-throwing; their own
+        // validation rule owns that error.
+        var values = new Dictionary<ROM, GraphQLValue?>(fields2.Count - start);
+        for (int i = start; i < fields2.Count; ++i)
+            values[fields2[i].Name] = fields2[i].Value;
+        for (int i = start; i < fields1.Count; ++i)
+        {
+            var field = fields1[i];
+            if (!values.TryGetValue(field.Name, out var other) || !SameValue(field.Value, other))
+                return false;
+        }
+        return true;
     }
 
     /// <summary>

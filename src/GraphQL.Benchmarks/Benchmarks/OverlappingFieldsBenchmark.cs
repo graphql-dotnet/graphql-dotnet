@@ -41,6 +41,9 @@ public class OverlappingFieldsBenchmark : IBenchmark
         SharedFragments1000,
         SharedMixed100,
         SharedMixed1000,
+        ScalarArguments100,
+        NestedObjectArguments100,
+        ReorderedObjectArguments100,
     }
 
     [ParamsAllValues]
@@ -86,7 +89,11 @@ public class OverlappingFieldsBenchmark : IBenchmark
         {
             _schema = Schema.For("""
                 type Query { field: Node }
-                type Node { f: Node, g: Node, x: String }
+                type Node { f: Node, g: Node, x: String, argument(value: Int, input: ArgumentInput): String }
+                input ArgumentInput {
+                  a: Int b: Int c: Int d: Int e: Int f: Int g: Int h: Int i: Int j: Int
+                  nested: ArgumentInput items: [ArgumentInput]
+                }
                 """);
             query = Query switch
             {
@@ -108,6 +115,9 @@ public class OverlappingFieldsBenchmark : IBenchmark
                 QueryCase.SharedFragments1000 => SharedFragments(1000),
                 QueryCase.SharedMixed100 => SharedFragments(100, true),
                 QueryCase.SharedMixed1000 => SharedFragments(1000, true),
+                QueryCase.ScalarArguments100 => "{ field { " + Repeat("argument(value: 1)", 100) + " } }",
+                QueryCase.NestedObjectArguments100 => "{ field { " + Repeat(ObjectArgument(false), 100) + " } }",
+                QueryCase.ReorderedObjectArguments100 => "{ field { " + Repeat(ObjectArgument(false) + " " + ObjectArgument(true), 50) + " } }",
                 _ => throw new InvalidOperationException(),
             };
         }
@@ -140,6 +150,10 @@ public class OverlappingFieldsBenchmark : IBenchmark
     void IBenchmark.RunProfiler() => _ = Validate();
 
     private static string Repeat(string selection, int count) => string.Join(" ", Enumerable.Repeat(selection, count));
+
+    private static string ObjectArgument(bool reordered) => reordered
+        ? "argument(input: {items: [{b: 2 a: 1} {d: 4 c: 3}] nested: {b: 2 a: 1} j: 10 i: 9 h: 8 g: 7 f: 6 e: 5 d: 4 c: 3 b: 2 a: 1})"
+        : "argument(input: {a: 1 b: 2 c: 3 d: 4 e: 5 f: 6 g: 7 h: 8 i: 9 j: 10 nested: {a: 1 b: 2} items: [{a: 1 b: 2} {c: 3 d: 4}]})";
 
     private static string InlineFragments(int outer, int inner) =>
         "{ field { " + Repeat("... on Node { f { " + Repeat("... on Node { x }", inner) + " } }", outer) + " } }";
