@@ -13,7 +13,7 @@ namespace GraphQL.Validation.Rules;
 /// any two field selections which might both be encountered for the same object are only valid
 /// if they are equivalent.
 /// </summary>
-public class OverlappingFieldsCanBeMerged : ValidationRuleBase
+public partial class OverlappingFieldsCanBeMerged : ValidationRuleBase
 {
     /// <summary>
     /// Returns a static instance of this validation rule.
@@ -31,29 +31,7 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
     /// <inheritdoc/>
     /// <exception cref="OverlappingFieldsCanBeMergedError"/>
     public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
-    {
-        //TODO: make static instance when enabling this rule
-        var comparedFragmentPairs = new PairSet();
-        var cachedFieldsAndFragmentNames = new Dictionary<GraphQLSelectionSet, CachedField>();
-
-        return new ValueTask<INodeVisitor?>(new MatchingNodeVisitor<GraphQLSelectionSet>((selectionSet, context) => //TODO:allocation of Action<GraphQLSelectionSet,ValidationContext>
-        {
-            var conflicts = FindConflictsWithinSelectionSet(
-                    context,
-                    cachedFieldsAndFragmentNames,
-                    comparedFragmentPairs,
-                    context.TypeInfo.GetParentType(),
-                    selectionSet);
-
-            if (conflicts != null)
-            {
-                foreach (var conflict in conflicts)
-                {
-                    context.ReportError(new OverlappingFieldsCanBeMergedError(context, conflict));
-                }
-            }
-        }));
-    }
+        => new(new MergeVisitor());
 
     private static List<Conflict>? FindConflictsWithinSelectionSet(
         ValidationContext context,
