@@ -1,5 +1,4 @@
 using BenchmarkDotNet.Attributes;
-using GraphQL.Benchmarks.Historical;
 using GraphQL.Execution;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
@@ -13,11 +12,11 @@ using Microsoft.Extensions.DependencyInjection;
 namespace GraphQL.Benchmarks;
 
 /// <summary>
-/// Compares pinned historical rules and the working tree on the same initialized
-/// schema and parsed document. Parsing/schema construction are outside measurement.
+/// Measures field-overlap validation for ordinary queries and adversarial selection
+/// patterns. Parsing and schema initialization are outside measurement.
 /// </summary>
 [MemoryDiagnoser]
-public class OverlappingFieldsComparisonBenchmark
+public class OverlappingFieldsBenchmark : IBenchmark
 {
     public enum QueryCase
     {
@@ -48,18 +47,12 @@ public class OverlappingFieldsComparisonBenchmark
     private ISchema _schema;
     private GraphQLDocument _document;
     private GraphQLOperationDefinition _operation;
-    private readonly DocumentValidator _originalValidator = new();
-    private readonly DocumentValidator _prValidator = new();
-    private readonly DocumentValidator _proposedValidator = new();
-    private readonly DocumentValidator _singlePassValidator = new();
-    private IValidationRule[] _originalRules;
-    private IValidationRule[] _prRules;
-    private IValidationRule[] _proposedRules;
-    private IValidationRule[] _singlePassRules;
+    private readonly DocumentValidator _validator = new();
+    private IValidationRule[] _rules;
     private ServiceProvider _provider;
 
     [GlobalSetup]
-    public void Setup()
+    public void GlobalSetup()
     {
         string query;
         bool allRules = Query is QueryCase.Hero or QueryCase.Fragments or QueryCase.Introspection;
@@ -118,46 +111,28 @@ public class OverlappingFieldsComparisonBenchmark
         _schema.Initialize();
         _document = new GraphQLDocumentBuilder().Build(query);
         _operation = _document.Definitions.OfType<GraphQLOperationDefinition>().First();
-        _originalRules = Rules(OriginalOverlappingFields.Instance, allRules);
-        _prRules = Rules(PR4426OverlappingFields.Instance, allRules);
-        _proposedRules = Rules(OverlappingFieldsCanBeMerged.Instance, allRules);
-        _singlePassRules = Rules(SinglePassOverlappingFields.Instance, allRules);
+        _rules = allRules ? DocumentValidator.CoreRules.ToArray() : [OverlappingFieldsCanBeMerged.Instance];
 
-        // A faster algorithm must still do real validation and accept the fixture.
-        foreach (var result in new[] { Original(), PR4426(), SinglePass(), Proposed() })
-        {
-            if (result.IsValid != (Query != QueryCase.LateConflict100))
-                throw new InvalidOperationException($"Unexpected validation result for {Query}: {string.Join("; ", result.Errors.Select(e => e.Message))}");
-        }
+        // Keep the invalid fixture bounded while exercising diagnostic generation.
+        var result = Validate();
+        if (result.IsValid != (Query != QueryCase.LateConflict100))
+            throw new InvalidOperationException($"Unexpected validation result for {Query}: {string.Join("; ", result.Errors.Select(e => e.Message))}");
     }
 
     [GlobalCleanup]
     public void Cleanup() => _provider?.Dispose();
 
-    [Benchmark(Baseline = true)]
-    public IValidationResult Original() => Validate(_originalValidator, _originalRules);
-
     [Benchmark]
-    public IValidationResult PR4426() => Validate(_prValidator, _prRules);
-
-    [Benchmark]
-    public IValidationResult Proposed() => Validate(_proposedValidator, _proposedRules);
-
-    [Benchmark]
-    public IValidationResult SinglePass() => Validate(_singlePassValidator, _singlePassRules);
-
-    private IValidationResult Validate(DocumentValidator validator, IValidationRule[] rules) =>
-        validator.ValidateAsync(new ValidationOptions
+    public IValidationResult Validate() =>
+        _validator.ValidateAsync(new ValidationOptions
         {
             Schema = _schema,
             Document = _document,
             Operation = _operation,
-            Rules = rules,
+            Rules = _rules,
         }).GetAwaiter().GetResult();
 
-    private static IValidationRule[] Rules(IValidationRule overlap, bool allRules) => allRules
-        ? DocumentValidator.CoreRules.Select(rule => rule is OverlappingFieldsCanBeMerged ? overlap : rule).ToArray()
-        : [overlap];
+    void IBenchmark.RunProfiler() => _ = Validate();
 
     private static string Repeat(string selection, int count) => string.Join(" ", Enumerable.Repeat(selection, count));
 

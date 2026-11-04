@@ -1,6 +1,0 @@
-<RunSettings>
-  <!-- Several existing test classes change process-wide GlobalSwitches. -->
-  <xUnit>
-    <ParallelizeTestCollections>false</ParallelizeTestCollections>
-  </xUnit>
-</RunSettings>

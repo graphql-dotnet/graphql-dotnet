@@ -184,10 +184,9 @@ public partial class OverlappingFieldsCanBeMerged
                     if (!Collect(context, new SelectionSource(type, inline.SelectionSet), ref fields))
                         return false;
                 }
-                else if (selection is GraphQLFragmentSpread spread)
+                else if (selection is GraphQLFragmentSpread spread && !CollectFragment(context, spread.FragmentName.Name, ref fields))
                 {
-                    if (!CollectFragment(context, spread.FragmentName.Name, ref fields))
-                        return false;
+                    return false;
                 }
             }
             return true;
@@ -245,7 +244,7 @@ public partial class OverlappingFieldsCanBeMerged
             {
                 if (child.ParentType is IObjectGraphType)
                 {
-                    if (concreteType != null && concreteType != child.ParentType)
+                    if (concreteType != null && !ReferenceEquals(concreteType, child.ParentType))
                     {
                         partition = true;
                         break;
@@ -400,7 +399,7 @@ public partial class OverlappingFieldsCanBeMerged
                 return Collision.Add(field, kind);
 
             // Repeated leaves on the same parent require no collection or object.
-            if (First.ParentType == field.ParentType && First.Field.SelectionSet == null && field.Field.SelectionSet == null)
+            if (ReferenceEquals(First.ParentType, field.ParentType) && First.Field.SelectionSet == null && field.Field.SelectionSet == null)
             {
                 if ((kind & CheckKind.Shape) != 0 && First.Type != null && field.Type != null && DoTypesConflict(First.Type, field.Type))
                     return false;
@@ -421,7 +420,7 @@ public partial class OverlappingFieldsCanBeMerged
                 return Collision.MatchesLeaf(field);
             if (First.Type != null && field.Type != null && DoTypesConflict(First.Type, field.Type))
                 return false;
-            return First.ParentType is IObjectGraphType && field.ParentType is IObjectGraphType && First.ParentType != field.ParentType ||
+            return First.ParentType is IObjectGraphType && field.ParentType is IObjectGraphType && !ReferenceEquals(First.ParentType, field.ParentType) ||
                 FieldGroup.SameField(First.Field, field.Field);
         }
     }
@@ -461,7 +460,7 @@ public partial class OverlappingFieldsCanBeMerged
             {
                 if (_firstChild is not FieldReference firstChild)
                     _firstChild = field;
-                else if (field.Field.SelectionSet != firstChild.Field.SelectionSet || field.Type != firstChild.Type)
+                else if (field.Field.SelectionSet != firstChild.Field.SelectionSet || !ReferenceEquals(field.Type, firstChild.Type))
                     (Children ??= new() { firstChild }).Add(field);
             }
             return true;
@@ -476,7 +475,7 @@ public partial class OverlappingFieldsCanBeMerged
 
             if (field.ParentType is IObjectGraphType)
             {
-                if (First.ParentType == field.ParentType)
+                if (ReferenceEquals(First.ParentType, field.ParentType))
                     return SameField(First.Field, field.Field);
                 return _byParent == null || !_byParent.TryGetValue(field.ParentType, out var representative) ||
                     SameField(representative.Field, field.Field);
@@ -518,7 +517,7 @@ public partial class OverlappingFieldsCanBeMerged
                 _byParent = null;
                 return true;
             }
-            if (First.ParentType == field.ParentType)
+            if (ReferenceEquals(First.ParentType, field.ParentType))
                 return SameField(First.Field, field.Field);
 
             _byParent ??= new() { { First.ParentType!, First } };
