@@ -14,16 +14,16 @@ public sealed partial class SchemaTypes
         private readonly ref struct TypeReferenceReplacementVisitor
         {
             private readonly Dictionary<ROM, IGraphType> _typeDictionary;
-            private readonly ReadOnlyDictionary<string, ScalarGraphType> _builtInTypes;
+            private readonly ReadOnlyDictionary<string, Func<ScalarGraphType>> _builtInTypes;
             private readonly ISchema _schema;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="TypeReferenceReplacementVisitor"/> struct.
             /// </summary>
             /// <param name="typeDictionary">The dictionary containing all registered types in the schema.</param>
-            /// <param name="builtInTypes">The dictionary containing all built-in scalar types.</param>
+            /// <param name="builtInTypes">The dictionary containing factories for all built-in scalar types.</param>
             /// <param name="schema">The schema being processed.</param>
-            public TypeReferenceReplacementVisitor(Dictionary<ROM, IGraphType> typeDictionary, ReadOnlyDictionary<string, ScalarGraphType> builtInTypes, ISchema schema)
+            public TypeReferenceReplacementVisitor(Dictionary<ROM, IGraphType> typeDictionary, ReadOnlyDictionary<string, Func<ScalarGraphType>> builtInTypes, ISchema schema)
             {
                 _typeDictionary = typeDictionary ?? throw new ArgumentNullException(nameof(typeDictionary));
                 _builtInTypes = builtInTypes ?? throw new ArgumentNullException(nameof(builtInTypes));
@@ -147,8 +147,9 @@ public sealed partial class SchemaTypes
                     if (_typeDictionary.TryGetValue(reference.TypeName, out var found))
                         return found;
 
-                    if (_builtInTypes.TryGetValue(reference.TypeName, out var builtIn))
+                    if (_builtInTypes.TryGetValue(reference.TypeName, out var createScalar))
                     {
+                        var builtIn = createScalar();
                         _typeDictionary[reference.TypeName] = builtIn;
                         return builtIn;
                     }

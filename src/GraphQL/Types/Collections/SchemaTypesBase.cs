@@ -13,45 +13,44 @@ namespace GraphQL.Types;
 public abstract class SchemaTypesBase : IReadOnlyCollection<IGraphType>
 {
     /// <summary>
-    /// Built-in scalar instances (preinitialized and shared across all schema instances).
+    /// Factories for built-in scalars, keyed by CLR type. Each schema creates its own instances on first use.
     /// </summary>
-    protected static readonly ReadOnlyDictionary<Type, ScalarGraphType> BuiltInScalars = new(new ScalarGraphType[]
+    protected static readonly ReadOnlyDictionary<Type, Func<ScalarGraphType>> BuiltInScalars = new(new Dictionary<Type, Func<ScalarGraphType>>
     {
-        new StringGraphType(),
-        new BooleanGraphType(),
-        new FloatGraphType(),
-        new IntGraphType(),
-        new IdGraphType(),
-        new DateGraphType(),
+        [typeof(StringGraphType)] = () => new StringGraphType(),
+        [typeof(BooleanGraphType)] = () => new BooleanGraphType(),
+        [typeof(FloatGraphType)] = () => new FloatGraphType(),
+        [typeof(IntGraphType)] = () => new IntGraphType(),
+        [typeof(IdGraphType)] = () => new IdGraphType(),
+        [typeof(DateGraphType)] = () => new DateGraphType(),
 #if NET5_0_OR_GREATER
-        new HalfGraphType(),
+        [typeof(HalfGraphType)] = () => new HalfGraphType(),
 #endif
 #if NET6_0_OR_GREATER
-        new DateOnlyGraphType(),
-        new TimeOnlyGraphType(),
+        [typeof(DateOnlyGraphType)] = () => new DateOnlyGraphType(),
+        [typeof(TimeOnlyGraphType)] = () => new TimeOnlyGraphType(),
 #endif
-        new DateTimeGraphType(),
-        new DateTimeOffsetGraphType(),
-        new TimeSpanSecondsGraphType(),
-        new TimeSpanMillisecondsGraphType(),
-        new DecimalGraphType(),
-        new UriGraphType(),
-        new GuidGraphType(),
-        new ShortGraphType(),
-        new UShortGraphType(),
-        new UIntGraphType(),
-        new LongGraphType(),
-        new BigIntGraphType(),
-        new ULongGraphType(),
-        new ByteGraphType(),
-        new SByteGraphType(),
-    }
-    .ToDictionary(t => t.GetType()));
+        [typeof(DateTimeGraphType)] = () => new DateTimeGraphType(),
+        [typeof(DateTimeOffsetGraphType)] = () => new DateTimeOffsetGraphType(),
+        [typeof(TimeSpanSecondsGraphType)] = () => new TimeSpanSecondsGraphType(),
+        [typeof(TimeSpanMillisecondsGraphType)] = () => new TimeSpanMillisecondsGraphType(),
+        [typeof(DecimalGraphType)] = () => new DecimalGraphType(),
+        [typeof(UriGraphType)] = () => new UriGraphType(),
+        [typeof(GuidGraphType)] = () => new GuidGraphType(),
+        [typeof(ShortGraphType)] = () => new ShortGraphType(),
+        [typeof(UShortGraphType)] = () => new UShortGraphType(),
+        [typeof(UIntGraphType)] = () => new UIntGraphType(),
+        [typeof(LongGraphType)] = () => new LongGraphType(),
+        [typeof(BigIntGraphType)] = () => new BigIntGraphType(),
+        [typeof(ULongGraphType)] = () => new ULongGraphType(),
+        [typeof(ByteGraphType)] = () => new ByteGraphType(),
+        [typeof(SByteGraphType)] = () => new SByteGraphType(),
+    });
 
     /// <summary>
-    /// Built-in scalar instances by name (preinitialized and shared across all schema instances).
+    /// Factories for built-in scalars, keyed by GraphQL type name.
     /// </summary>
-    protected static readonly ReadOnlyDictionary<string, ScalarGraphType> BuiltInScalarsByName = new(BuiltInScalars.Values.ToDictionary(t => t.Name));
+    protected static readonly ReadOnlyDictionary<string, Func<ScalarGraphType>> BuiltInScalarsByName = new(BuiltInScalars.Values.ToDictionary(create => create().Name));
 
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<>))]
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<>))]

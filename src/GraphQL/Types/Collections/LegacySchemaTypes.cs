@@ -119,8 +119,8 @@ public class LegacySchemaTypes : SchemaTypesBase
                t => _introspectionTypes.TryGetValue(t, out var graphType)
                ? graphType
                : (IGraphType?)serviceProvider.GetService(t)
-               ?? (BuiltInScalars.TryGetValue(t, out var scalarType)
-               ? scalarType
+               ?? (BuiltInScalars.TryGetValue(t, out var createScalar)
+               ? createScalar()
                : throw new Exception($"Invalid introspection type '{t.GetFriendlyName()}'"))),
            (name, type, ctx) =>
            {
@@ -161,8 +161,8 @@ public class LegacySchemaTypes : SchemaTypesBase
                 // if the service provider does not provide an instance, and if
                 // the type is a GraphQL.NET built-in type, create an instance of it
                 return (IGraphType?)serviceProvider.GetService(serviceType)
-                    ?? (BuiltInScalars.TryGetValue(serviceType, out var graphType)
-                        ? graphType
+                    ?? (BuiltInScalars.TryGetValue(serviceType, out var createScalar)
+                        ? createScalar()
                         : throw new InvalidOperationException($"No service for type '{serviceType.GetFriendlyName()}' has been registered."));
             },
             (name, graphType, context) =>
@@ -849,7 +849,7 @@ Make sure that your ServiceProvider is configured correctly.");
             var type2 = this[reference.TypeName];
             if (type2 == null)
             {
-                type2 = BuiltInScalarsByName.TryGetValue(reference.TypeName, out var scalar) ? scalar : null;
+                type2 = BuiltInScalarsByName.TryGetValue(reference.TypeName, out var createScalar) ? createScalar() : null;
                 if (type2 != null)
                     SetGraphType(type2.Name, type2);
             }

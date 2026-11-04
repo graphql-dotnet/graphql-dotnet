@@ -149,7 +149,7 @@ namespace GraphQL.Types;
  *      - This allows types to be registered with dependency injection
  *
  *   3. Check BuiltInScalars dictionary
- *      - Falls back to built-in scalar instances if not found in DI
+ *      - Creates a built-in scalar instance for this schema if not found in DI
  *
  *   4. Throw an exception if the type cannot be resolved (includes EnumerationGraphType<T>)
  *
@@ -770,9 +770,9 @@ public sealed partial class SchemaTypes : SchemaTypesBase
                 return instance;
 
             // Unable to resolve from DI; check if it's a built-in scalar
-            if (BuiltInScalars.TryGetValue(type, out var scalar))
+            if (BuiltInScalars.TryGetValue(type, out var createScalar))
             {
-                return scalar;
+                return createScalar();
             }
 
             // Throw if we couldn't resolve to a concrete type
