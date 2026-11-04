@@ -16,6 +16,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Comparisons\**\*.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(CompareOverlappingFields)' == 'true'">
+    <Compile Include="Comparisons\**\*.cs" />
+    <Compile Include="obj\OverlappingFieldsComparison\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
