@@ -415,102 +415,29 @@ public class StarWarsQuery : ObjectGraphType
 
 ## Scoped Services in GraphQL Subscriptions
 
-Dependency injection scopes behave differently in GraphQL.NET **subscriptions** than in queries and mutations, which can cause scoped services to fail to resolve by default; this section shows how to configure GraphQL.NET to support scoped services in subscription resolvers.
+A subscription is set up once, then executes field resolvers for each event from its stream. When using
+GraphQL.NET Server, each initial subscription operation runs in its own DI scope, which is disposed after
+the stream has been created, even while the WebSocket connection remains open. By default, GraphQL.NET
+reuses this provider as `context.RequestServices` for later events, so resolving services from it can throw
+an `ObjectDisposedException`.
 
-### Overview
-
-GraphQL.NET integrates with ASP.NET Core dependency injection.
-For **queries** and **mutations**, each execution runs within a valid request scope, allowing scoped services (such as `DbContext`) to be resolved safely.
-
-**Subscriptions**, however, are executed differently and require special configuration when scoped services are involved.
-
-## Subscription Execution Lifecycle
-
-A GraphQL subscription has two distinct execution phases:
-
-1. **Subscription setup**
-   - Triggered when the client sends the subscription request
-   - Runs within the original HTTP request scope
-
-2. **Event execution**
-   - Triggered each time a subscription event is published
-   - Executes outside the original HTTP request lifecycle
-
-Because event execution may occur long after the initial request has completed, the original dependency injection scope may already be disposed.
-
-## Why `RequestServices` May Be Disposed
-
-By default, GraphQL.NET does **not** create a new dependency injection scope for each subscription event.
-
-As a result:
-
-- `IServiceProvider` stored in `context.RequestServices` may be disposed
-- Attempting to resolve scoped services can throw:
-
-
-This behavior commonly occurs when subscription resolvers depend on scoped services such as repositories or database contexts.
-
-## Related Issue
-
-This behavior was reported and discussed in:
-
-- https://github.com/graphql-dotnet/graphql-dotnet/issues/3812
-
-The root cause was identified as missing DI scope creation during subscription event execution.
-
-## Solution: Scoped Subscription Execution Strategy
-
-GraphQL.NET provides a scoped execution strategy specifically for subscriptions.
-
-### Configuration
-
-Register the scoped execution strategy during GraphQL setup:
+To use scoped services in subscription event resolvers, add `AddScopedSubscriptionExecutionStrategy` from
+the `GraphQL.MicrosoftDI` package to your GraphQL configuration:
 
 ```csharp
-services
-    .AddGraphQL()
-    .AddScopedSubscriptionExecutionStrategy();
+services.AddGraphQL(builder => builder
+    .AddScopedSubscriptionExecutionStrategy());
 ```
 
-### What This Does
+For each event, this strategy creates a new DI scope, makes its provider available through
+`context.RequestServices`, and disposes the scope after execution. Field resolvers and data loaders for
+that event share the scope and execute serially by default. This avoids concurrent access to scoped
+services such as Entity Framework Core's `DbContext`.
 
-- Creates a new DI scope for each subscription event
+Pass `serialExecution: false` to allow parallel field execution within each event. Services shared by
+parallel resolvers must be safe for concurrent use; otherwise, create separate scopes as described
+[above](#thread-safety-with-scoped-services).
 
-- Ensures `context.RequestServices` is valid during resolver execution
-
-- Enables safe resolution of scoped services
-
-- Aligns subscription behavior with queries and mutations
-
-### Subscription Resolver
-
-```csharp
-Field<StringGraphType>(
-    "onDataUpdated",
-    resolve: context =>
-    {
-        var service = context.RequestServices.GetRequiredService<IMyService>();
-        return service.GetMessage();
-    }
-);
-```
-### Behavior Comparison
-
-| Execution Strategy | Result
-|-------------------|--------
-| Default strategy  | ❌ Scoped services may fail
-| Scoped strategy   | ✅ Scoped services resolve correctly
-
-## When to Use Scoped Subscription Execution
-
-You should enable scoped subscription execution if:
-
-- Your subscription resolvers use:
-  - `DbContext`
-  - Repository patterns
-  - Any service registered as **Scoped**
-
-- You expect consistent dependency injection behavior across:
-  - Queries
-  - Mutations
-  - Subscriptions
+These event scopes do not extend the lifetime of services used to create the stream in `ResolveStream`
+or `ResolveStreamAsync`. The event source must remain usable for the lifetime of the subscription,
+typically by belonging to a singleton service.
