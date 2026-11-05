@@ -18,6 +18,7 @@ using ServiceLifetime = GraphQL.DI.ServiceLifetime;
 
 namespace GraphQL.Tests.DI;
 
+[Collection("StaticTests")]
 public class GraphQLBuilderExtensionTests
 {
     public interface IGraphQLBuilderAndServiceRegister : IGraphQLBuilder, IServiceRegister
@@ -310,10 +311,20 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddSchema_Scoped()
     {
-        _builderMock.Setup(b => b.Register(typeof(TestSchema), typeof(TestSchema), ServiceLifetime.Scoped, false)).Returns(_builder).Verifiable();
-        _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Scoped, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
-        _builder.AddSchema<TestSchema>(ServiceLifetime.Scoped);
-        Verify();
+        var originalEnableReflectionCaching = GlobalSwitches.EnableReflectionCaching;
+        var originalDynamicallyCompileToObject = GlobalSwitches.DynamicallyCompileToObject;
+        try
+        {
+            _builderMock.Setup(b => b.Register(typeof(TestSchema), typeof(TestSchema), ServiceLifetime.Scoped, false)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Scoped, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builder.AddSchema<TestSchema>(ServiceLifetime.Scoped);
+            Verify();
+        }
+        finally
+        {
+            GlobalSwitches.EnableReflectionCaching = originalEnableReflectionCaching;
+            GlobalSwitches.DynamicallyCompileToObject = originalDynamicallyCompileToObject;
+        }
     }
 
     [Fact]
