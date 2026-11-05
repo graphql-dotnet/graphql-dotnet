@@ -663,7 +663,7 @@ public class SchemaTypes : IEnumerable<IGraphType>
                     throw new InvalidOperationException($"The GraphQL type '{unionedType.GetFriendlyName()}' for union graph type '{type.Name}' could not be derived implicitly. " + error);
                 var unionedType2 = (Type)typeOrError;
                 if (AddTypeIfNotRegistered(unionedType2, context) is not IObjectGraphType objType)
-                    throw new InvalidOperationException($"The GraphQL type '{unionedType.GetFriendlyName()}' for union graph type '{type.Name}' could not be derived implicitly. The resolved type is not an {nameof(IObjectGraphType)}.");
+                    throw new InvalidOperationException($"The GraphQL type '{unionedType.GetFriendlyName()}' for union graph type '{type.Name}' could not be derived implicitly. The resolved type is not an {nameof(IObjectGraphType)}. A GraphQL union may only contain object types, so a scalar, enumeration or list cannot be one of its possible types.");
 
                 if (union.ResolveType == null && objType != null && objType.IsTypeOf == null)
                 {

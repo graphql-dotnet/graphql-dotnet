@@ -63,6 +63,7 @@ public abstract class GraphQLBuilderBase : IGraphQLBuilder
         Services.TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient);
         Services.TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient);
         Services.TryRegister(typeof(AutoRegisteringInterfaceGraphType<>), typeof(AutoRegisteringInterfaceGraphType<>), ServiceLifetime.Transient);
+        Services.TryRegister(typeof(AutoRegisteringUnionGraphType<>), typeof(AutoRegisteringUnionGraphType<>), ServiceLifetime.Transient);
 
         // configure execution to use the default registered schema if none specified
         this.ConfigureExecutionOptions(options =>
