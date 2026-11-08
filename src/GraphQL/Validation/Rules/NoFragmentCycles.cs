@@ -94,7 +94,7 @@ public class NoFragmentCycles : ValidationRuleBase
                 if (!stack.TryPop(out var parent))
                     break;
 
-                spreadPath.TryPop(out _);
+                spreadPath.Pop();
                 (fragment, spreadNodes, spreadIndex) = parent;
                 continue;
             }
