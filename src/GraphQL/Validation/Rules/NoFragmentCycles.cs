@@ -1,4 +1,3 @@
-using System.Buffers;
 using GraphQL.Validation.Errors;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -83,74 +82,50 @@ public class NoFragmentCycles : ValidationRuleBase
         spreadPathIndexByName[fragmentName] = spreadPath.Count;
 
         // Saved parents let us resume siblings and unwind the active path in depth-first order.
-        (GraphQLFragmentDefinition fragment, List<GraphQLFragmentSpread> spreads, int spreadIndex)[]? stack = null;
-        int stackCount = 0;
+        using var stack = new StackSlim<(GraphQLFragmentDefinition fragment, List<GraphQLFragmentSpread> spreads, int spreadIndex)>();
         int spreadIndex = 0;
 
-        try
+        while (true)
         {
-            while (true)
+            context.CancellationToken.ThrowIfCancellationRequested();
+            if (spreadIndex == spreadNodes.Count)
             {
-                context.CancellationToken.ThrowIfCancellationRequested();
-                if (spreadIndex == spreadNodes.Count)
-                {
-                    spreadPathIndexByName.Remove(fragment.FragmentName.Name);
-                    if (stackCount == 0)
-                        break;
+                spreadPathIndexByName.Remove(fragment.FragmentName.Name);
+                if (!stack.TryPop(out var parent))
+                    break;
 
-                    spreadPath.Pop();
-                    (fragment, spreadNodes, spreadIndex) = stack![--stackCount];
-                    continue;
-                }
-
-                var spreadNode = spreadNodes[spreadIndex++];
-                var spreadName = spreadNode.FragmentName.Name;
-
-                // An active ancestor is a cycle even though it has already been marked visited.
-                if (spreadPathIndexByName.TryGetValue(spreadName, out var cycleIndex))
-                {
-                    var cyclePath = spreadPath.Reverse().Skip(cycleIndex).ToArray();
-                    var nodes = cyclePath.OfType<ASTNode>().Concat(new[] { spreadNode }).ToArray();
-
-                    context.ReportError(new NoFragmentCyclesError(context, spreadName.StringValue, cyclePath.Select(x => x.FragmentName.Name.StringValue).ToArray(), nodes)); //ISSUE:allocation
-                    continue;
-                }
-
-                if (!unvisitedFragments.TryGetValue(spreadName, out var spreadFragment) || spreadFragment == null)
-                    continue;
-
-                unvisitedFragments[spreadName] = null;
-                var childSpreads = context.GetFragmentSpreads(spreadFragment.SelectionSet);
-                if (childSpreads.Count == 0)
-                    continue;
-
-                if (stack == null)
-                {
-                    stack = ArrayPool<(GraphQLFragmentDefinition, List<GraphQLFragmentSpread>, int)>.Shared.Rent(16);
-                }
-                else if (stackCount == stack.Length)
-                {
-                    var larger = ArrayPool<(GraphQLFragmentDefinition, List<GraphQLFragmentSpread>, int)>.Shared.Rent(stack.Length * 2);
-                    Array.Copy(stack, larger, stackCount);
-                    ArrayPool<(GraphQLFragmentDefinition, List<GraphQLFragmentSpread>, int)>.Shared.Return(stack, clearArray: true);
-                    stack = larger;
-                }
-
-                stack[stackCount++] = (fragment, spreadNodes, spreadIndex);
-                spreadPath.Push(spreadNode);
-                spreadPathIndexByName[spreadName] = spreadPath.Count;
-                fragment = spreadFragment;
-                spreadNodes = childSpreads;
-                spreadIndex = 0;
+                spreadPath.TryPop(out _);
+                (fragment, spreadNodes, spreadIndex) = parent;
+                continue;
             }
-        }
-        finally
-        {
-            // Do not retain document references in the pool, including on exceptional exits.
-            if (stack != null)
+
+            var spreadNode = spreadNodes[spreadIndex++];
+            var spreadName = spreadNode.FragmentName.Name;
+
+            // An active ancestor is a cycle even though it has already been marked visited.
+            if (spreadPathIndexByName.TryGetValue(spreadName, out var cycleIndex))
             {
-                ArrayPool<(GraphQLFragmentDefinition, List<GraphQLFragmentSpread>, int)>.Shared.Return(stack, clearArray: true);
+                var cyclePath = spreadPath.Reverse().Skip(cycleIndex).ToArray();
+                var nodes = cyclePath.OfType<ASTNode>().Concat(new[] { spreadNode }).ToArray();
+
+                context.ReportError(new NoFragmentCyclesError(context, spreadName.StringValue, cyclePath.Select(x => x.FragmentName.Name.StringValue).ToArray(), nodes)); //ISSUE:allocation
+                continue;
             }
+
+            if (!unvisitedFragments.TryGetValue(spreadName, out var spreadFragment) || spreadFragment == null)
+                continue;
+
+            unvisitedFragments[spreadName] = null;
+            var childSpreads = context.GetFragmentSpreads(spreadFragment.SelectionSet);
+            if (childSpreads.Count == 0)
+                continue;
+
+            stack.Push((fragment, spreadNodes, spreadIndex));
+            spreadPath.Push(spreadNode);
+            spreadPathIndexByName[spreadName] = spreadPath.Count;
+            fragment = spreadFragment;
+            spreadNodes = childSpreads;
+            spreadIndex = 0;
         }
     }
 }
