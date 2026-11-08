@@ -72,6 +72,8 @@
             file: relay.md
           - title: Global Switches
             file: global-switches.md
+          - title: Samples
+            file: samples.md
       - title: Guides
         dir: guides
         items:
