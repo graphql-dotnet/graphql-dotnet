@@ -13,7 +13,7 @@ public class ReferencedFragmentsBenchmark : IBenchmark
     private GraphQLOperationDefinition _operation;
     private bool _onlyUsed;
 
-    [Params("NoFragments", "UnusedFragment", "Typical", "Chain256", "Nested128", "Wide128", "Repeated256", "Directives")]
+    [Params("NoFragments", "UnusedFragment", "Typical", "Chain256", "Nested128", "Wide128", "Repeated256", "Directives", "DeepBranching257")]
     public string Scenario { get; set; } = "Typical";
 
     [GlobalSetup]
@@ -31,6 +31,7 @@ public class ReferencedFragmentsBenchmark : IBenchmark
                 """,
             "Chain256" => BuildChain(256),
             "Nested128" => "{" + string.Concat(Enumerable.Repeat("child { ... on Character {", 128)) + "...F" + new string('}', 257) + " fragment F on Character { id }",
+            "DeepBranching257" => "{" + string.Concat(Enumerable.Repeat("child {", 257)) + "...F" + string.Concat(Enumerable.Repeat("} id ", 257)) + "} fragment F on Character { id }",
             "Wide128" => "{" + string.Join(" ", Enumerable.Range(0, 128).Select(i => $"...F{i}")) + "}" + string.Join(" ", Enumerable.Range(0, 128).Select(i => $"fragment F{i} on Character {{ id }}")),
             "Repeated256" => "{" + string.Concat(Enumerable.Repeat("hero { ...F ...G }", 256)) + "} fragment F on Character { id ...G } fragment G on Character { name }",
             "Directives" => """
