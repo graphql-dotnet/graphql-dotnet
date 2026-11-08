@@ -155,26 +155,26 @@ public partial class ValidationContext
         // Referenced fragments in discovery order; also used to detect repeated fragments.
         List<GraphQLFragmentDefinition>? fragments = null;
         // Lazily rented stack of parent selections and the next sibling index to resume.
-        (List<ASTNode> selections, int index)[]? stack = null;
-        int count = 0;
+        (List<ASTNode> selections, int selectionIndex)[]? stack = null;
+        int stackCount = 0;
         var selections = selectionSet.Selections;
-        int index = 0;
+        int selectionIndex = 0;
 
         try
         {
             while (true)
             {
-                if (index == selections.Count)
+                if (selectionIndex == selections.Count)
                 {
                     // This selection set is complete; resume the most recent unfinished parent.
-                    if (count == 0)
+                    if (stackCount == 0)
                         break;
 
-                    (selections, index) = stack![--count];
+                    (selections, selectionIndex) = stack![--stackCount];
                     continue;
                 }
 
-                var node = selections[index++];
+                var node = selections[selectionIndex++];
                 if (onlyUsed && !ShouldIncludeNode(node))
                     continue;
 
@@ -211,25 +211,25 @@ public partial class ValidationContext
 
                 // Save only unfinished siblings, preserving depth-first order. A chain of
                 // single selections needs no stack storage, regardless of its depth.
-                if (index < selections.Count)
+                if (selectionIndex < selections.Count)
                 {
                     if (stack == null)
                     {
                         stack = ArrayPool<(List<ASTNode>, int)>.Shared.Rent(16);
                     }
-                    else if (count == stack.Length)
+                    else if (stackCount == stack.Length)
                     {
                         var larger = ArrayPool<(List<ASTNode>, int)>.Shared.Rent(stack.Length * 2);
-                        Array.Copy(stack, larger, count);
+                        Array.Copy(stack, larger, stackCount);
                         ArrayPool<(List<ASTNode>, int)>.Shared.Return(stack, clearArray: true);
                         stack = larger;
                     }
 
-                    stack[count++] = (selections, index);
+                    stack[stackCount++] = (selections, selectionIndex);
                 }
 
                 selections = childSelectionSet.Selections;
-                index = 0;
+                selectionIndex = 0;
             }
 
             return fragments;

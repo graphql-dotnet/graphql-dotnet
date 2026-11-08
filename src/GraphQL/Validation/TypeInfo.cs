@@ -273,8 +273,13 @@ public class TypeInfo : INodeVisitor
         return default;
     }
 
-    private static FieldType? GetFieldDef(ISchema schema, IGraphType parentType, GraphQLField field)
+    // Shared with overlap validation so implicit introspection fields have the
+    // same definitions and response types in every field-collection path.
+    internal static FieldType? GetFieldDef(ISchema schema, IGraphType? parentType, GraphQLField field)
     {
+        if (parentType == null)
+            return null;
+
         var name = field.Name;
 
         if (name == schema.SchemaMetaFieldType.Name && Equals(schema.Query, parentType))
