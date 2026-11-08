@@ -1,3 +1,4 @@
+using System.Text;
 using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 
@@ -5,6 +6,29 @@ namespace GraphQL.Tests.Validation;
 
 public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, ValidationSchema>
 {
+    private const int DeepFragmentCount = 100_000;
+
+    [Fact]
+    public void deep_acyclic_chain_is_valid()
+    {
+        ShouldPassRule(CreateDeepFragmentChain(cycle: false));
+    }
+
+    [Fact]
+    public void deep_chain_reports_terminal_cycle()
+    {
+        ShouldFailRule(_ =>
+        {
+            _.Query = CreateDeepFragmentChain(cycle: true);
+            _.Error(e =>
+            {
+                e.Message = CycleErrorMessage($"frag{DeepFragmentCount - 2}", [$"frag{DeepFragmentCount - 1}"]);
+                e.Loc(DeepFragmentCount - 1, 29);
+                e.Loc(DeepFragmentCount, 29);
+            });
+        });
+    }
+
     [Fact]
     public void single_reference_is_valid()
     {
@@ -55,6 +79,16 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
               fragment nameFragment on Pet {
                 ...UnknownFragment
               }
+            """);
+    }
+
+    [Fact]
+    public void duplicate_names_use_first_fragment_definition()
+    {
+        ShouldPassRule("""
+              fragment fragA on Dog { ...fragB }
+              fragment fragB on Dog { name }
+              fragment fragB on Dog { ...fragA }
             """);
     }
 
@@ -275,6 +309,19 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
                 e.Loc(3, 37);
             });
         });
+    }
+
+    private static string CreateDeepFragmentChain(bool cycle)
+    {
+        // Each definition is shallow; only following references creates a deep traversal.
+        // A fragments-only document isolates this rule from operation validation.
+        var query = new StringBuilder();
+        for (int i = 0; i < DeepFragmentCount - 1; ++i)
+            query.AppendLine($"fragment frag{i} on Dog {{ ...frag{i + 1} }}");
+        query.Append($"fragment frag{DeepFragmentCount - 1} on Dog {{ ")
+            .Append(cycle ? $"...frag{DeepFragmentCount - 2}" : "name")
+            .Append(" }");
+        return query.ToString();
     }
 
     private static string CycleErrorMessage(string fragName, string[] spreadNames)
