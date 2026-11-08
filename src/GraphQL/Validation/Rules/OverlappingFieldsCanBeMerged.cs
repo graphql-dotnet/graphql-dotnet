@@ -52,14 +52,21 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
 
             // Inline fragments were included in their containing selection set.
             var ancestor = context.TypeInfo.GetAncestor(1);
-            if (ancestor is GraphQLInlineFragment ||
-                ancestor is GraphQLFragmentDefinition fragment && _checkedFragments?.Contains(fragment.FragmentName.Name) == true ||
-                IsTrivial(selectionSet))
+            if (ancestor is GraphQLInlineFragment)
+                return default;
+
+            var fragment = ancestor as GraphQLFragmentDefinition;
+            if (fragment != null && _checkedFragments?.Contains(fragment.FragmentName.Name) == true)
                 return default;
 
             // TypeInfo keeps list/non-null wrappers on selection-set parents.
             // Field lookup and mutual exclusion require the underlying named type.
-            CheckLocal(context, new SelectionSource(context.TypeInfo.GetParentType()?.GetNamedType(), selectionSet));
+            bool valid = IsTrivial(selectionSet) ||
+                CheckLocal(context, new SelectionSource(context.TypeInfo.GetParentType()?.GetNamedType(), selectionSet));
+            // A definition can precede its spreads. Reuse its root check just as
+            // when it was collected through a spread; descendants are still visited.
+            if (valid && fragment != null)
+                (_checkedFragments ??= new()).Add(fragment.FragmentName.Name);
             return default;
         }
 
