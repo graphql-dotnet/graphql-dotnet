@@ -28,18 +28,25 @@ public class NoFragmentCycles : ValidationRuleBase
     /// <inheritdoc/>
     /// <exception cref="NoFragmentCyclesError"/>
     public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
-        => new(context.Document.FragmentsCount() > 0 ? _nodeVisitor : null);
-
-    private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLFragmentDefinition>((node, context) =>
     {
-        var unvisitedFragments = context.TypeInfo.NoFragmentCycles_UnvisitedFragments ??= GetFragmentDefinitions(context.Document);
-        var spreadPath = context.TypeInfo.NoFragmentCycles_SpreadPath ??= new();
-        var spreadPathIndexByName = context.TypeInfo.NoFragmentCycles_SpreadPathIndexByName ??= [];
-        if (unvisitedFragments[node.FragmentName.Name] != null)
+        if (context.Document.FragmentsCount() == 0)
+            return default;
+
+        context.CancellationToken.ThrowIfCancellationRequested();
+
+        // Cycle detection needs no TypeInfo, so keep its state local and finish before the AST walk.
+        var unvisitedFragments = GetFragmentDefinitions(context.Document);
+        var spreadPath = new Stack<GraphQLFragmentSpread>();
+        var spreadPathIndexByName = new Dictionary<ROM, int>();
+        foreach (var definition in context.Document.Definitions)
         {
-            DetectCycles(node, spreadPath, unvisitedFragments, spreadPathIndexByName, context);
+            context.CancellationToken.ThrowIfCancellationRequested();
+            if (definition is GraphQLFragmentDefinition fragment && unvisitedFragments[fragment.FragmentName.Name] != null)
+                DetectCycles(fragment, spreadPath, unvisitedFragments, spreadPathIndexByName, context);
         }
-    });
+
+        return default;
+    }
 
     private static Dictionary<ROM, GraphQLFragmentDefinition?> GetFragmentDefinitions(GraphQLDocument document)
     {
@@ -84,6 +91,7 @@ public class NoFragmentCycles : ValidationRuleBase
         {
             while (true)
             {
+                context.CancellationToken.ThrowIfCancellationRequested();
                 if (spreadIndex == spreadNodes.Count)
                 {
                     spreadPathIndexByName.Remove(fragment.FragmentName.Name);

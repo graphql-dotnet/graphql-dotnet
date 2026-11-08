@@ -40,9 +40,6 @@ public class TypeInfo : INodeVisitor
         _directive = null;
         _argument = null;
         // these will not be needed for post-variable-coercion validation rules
-        NoFragmentCycles_UnvisitedFragments = null;
-        NoFragmentCycles_SpreadPath = null;
-        NoFragmentCycles_SpreadPathIndexByName = null;
         NoUndefinedVariables_VariableNameDefined = null;
         NoUnusedFragments_OperationDefs = null;
         NoUnusedFragments_FragmentDefs = null;
@@ -306,20 +303,6 @@ public class TypeInfo : INodeVisitor
 
         return null;
     }
-
-    /// <summary>
-    /// Indexes fragment definitions; null values mark already visited fragments so cycles
-    /// are not redundantly reported and each reference needs only a dictionary lookup.
-    /// </summary>
-    internal Dictionary<ROM, GraphQLFragmentDefinition?>? NoFragmentCycles_UnvisitedFragments;
-    /// <summary>
-    /// Array of AST nodes used to produce meaningful errors
-    /// </summary>
-    internal Stack<GraphQLFragmentSpread>? NoFragmentCycles_SpreadPath;
-    /// <summary>
-    /// Position in the spread path
-    /// </summary>
-    internal Dictionary<ROM, int>? NoFragmentCycles_SpreadPathIndexByName;
 
     internal HashSet<ROM>? NoUndefinedVariables_VariableNameDefined;
 

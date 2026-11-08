@@ -1,12 +1,66 @@
 using System.Text;
+using GraphQL.Validation;
 using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
+using GraphQLParser;
 
 namespace GraphQL.Tests.Validation;
 
 public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, ValidationSchema>
 {
     private const int DeepFragmentCount = 100_000;
+
+    [Fact]
+    public async Task reports_disconnected_cycles_without_returning_a_visitor()
+    {
+        var context = new ValidationContext
+        {
+            Document = Parser.Parse("""
+                fragment unused on Dog { name }
+                fragment fragA on Dog { ...fragB }
+                fragment fragB on Dog { ...fragA }
+                fragment fragC on Dog { ...fragC }
+                """),
+        };
+
+        var visitor = await NoFragmentCycles.Instance.GetPreNodeVisitorAsync(context);
+
+        visitor.ShouldBeNull();
+        var errors = context.Errors.ToArray();
+        errors.Select(x => x.Message).ShouldBe([
+            CycleErrorMessage("fragA", ["fragB"]),
+            CycleErrorMessage("fragC", [])
+        ]);
+        errors[0].Locations!.Select(x => (x.Line, x.Column)).ShouldBe([(2, 25), (3, 25)]);
+        errors[1].Locations!.Select(x => (x.Line, x.Column)).ShouldBe([(4, 25)]);
+    }
+
+    [Fact]
+    public async Task no_fragments_returns_no_visitor_or_errors()
+    {
+        var context = new ValidationContext { Document = Parser.Parse("query { name }") };
+
+        var visitor = await NoFragmentCycles.Instance.GetPreNodeVisitorAsync(context);
+
+        visitor.ShouldBeNull();
+        context.Errors.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task canceled_context_does_not_evaluate_cycles()
+    {
+        var context = new ValidationContext
+        {
+            Document = Parser.Parse("fragment fragA on Dog { ...fragA }"),
+            CancellationToken = new CancellationToken(true),
+        };
+
+        var exception = await Should.ThrowAsync<OperationCanceledException>(
+            () => NoFragmentCycles.Instance.GetPreNodeVisitorAsync(context).AsTask());
+
+        exception.CancellationToken.ShouldBe(context.CancellationToken);
+        context.Errors.ShouldBeEmpty();
+    }
 
     [Fact]
     public void deep_acyclic_chain_is_valid()
