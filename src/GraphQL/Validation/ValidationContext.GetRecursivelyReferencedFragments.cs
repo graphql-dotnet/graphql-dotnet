@@ -144,12 +144,17 @@ public partial class ValidationContext
         }
     }
 
+    /// <summary>
+    /// Uses iterative depth-first traversal to prevent stack overflow exceptions from deeply nested selections or fragment chains.
+    /// </summary>
     private List<GraphQLFragmentDefinition>? CollectReferencedFragments(GraphQLSelectionSet selectionSet, bool onlyUsed)
     {
         if (onlyUsed && !ShouldIncludeNode(selectionSet))
             return null;
 
+        // Referenced fragments in discovery order; also used to detect repeated fragments.
         List<GraphQLFragmentDefinition>? fragments = null;
+        // Lazily rented stack of parent selections and the next sibling index to resume.
         (List<ASTNode> selections, int index)[]? stack = null;
         int count = 0;
         var selections = selectionSet.Selections;
@@ -161,6 +166,7 @@ public partial class ValidationContext
             {
                 if (index == selections.Count)
                 {
+                    // This selection set is complete; resume the most recent unfinished parent.
                     if (count == 0)
                         break;
 
@@ -195,6 +201,7 @@ public partial class ValidationContext
                         _ => null,
                     };
 
+                    // The inclusion hook applies to field/inline selection sets, but not fragment-definition sets.
                     if (childSelectionSet != null && onlyUsed && !ShouldIncludeNode(childSelectionSet))
                         continue;
                 }
@@ -229,6 +236,7 @@ public partial class ValidationContext
         }
         finally
         {
+            // Release storage even if an inclusion hook throws, clearing retained AST references.
             if (stack != null)
                 ArrayPool<(List<ASTNode>, int)>.Shared.Return(stack, clearArray: true);
         }
