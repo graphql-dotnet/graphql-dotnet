@@ -54,13 +54,25 @@ public static class TypeExtensions
     /// <summary>
     /// Returns the name of an AST type after unwrapping any <see cref="GraphQLNonNullType"/> or <see cref="GraphQLListType"/> layers.
     /// </summary>
-    public static string Name(this GraphQLType type) => type switch
+    public static string Name(this GraphQLType type)
     {
-        GraphQLNonNullType nonnull => Name(nonnull.Type),
-        GraphQLListType list => Name(list.Type),
-        GraphQLNamedType named => named.Name.StringValue, //ISSUE:allocation but used only on error paths
-        _ => throw new NotSupportedException($"Unknown type {type}")
-    };
+        while (true)
+        {
+            switch (type)
+            {
+                case GraphQLNonNullType nonnull:
+                    type = nonnull.Type;
+                    break;
+                case GraphQLListType list:
+                    type = list.Type;
+                    break;
+                case GraphQLNamedType named:
+                    return named.Name.StringValue; //ISSUE:allocation but used only on error paths
+                default:
+                    throw new NotSupportedException($"Unknown type {type}");
+            }
+        }
+    }
 
     /// <summary>
     /// Returns the formatted GraphQL type name of the AST type,
