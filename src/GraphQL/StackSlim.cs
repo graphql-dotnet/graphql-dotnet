@@ -8,7 +8,7 @@ namespace GraphQL;
 /// <remarks>
 /// Dispose the stack to return its rented storage. Do not copy a stack that owns rented storage.
 /// </remarks>
-internal ref struct StackSlim<T>
+internal ref struct StackSlim<T> : IDisposable
 {
     private T? _item0;
     private T? _item1;
