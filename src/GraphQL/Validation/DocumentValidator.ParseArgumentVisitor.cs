@@ -1,6 +1,5 @@
 using GraphQL.Execution;
 using GraphQL.Types;
-using GraphQLParser;
 using GraphQLParser.AST;
 using GraphQLParser.Visitors;
 
@@ -43,14 +42,22 @@ public partial class DocumentValidator
             return base.VisitAsync(node, context);
         }
 
-        protected override ValueTask VisitDocumentAsync(GraphQLDocument document, Context context)
+        protected override async ValueTask VisitDocumentAsync(GraphQLDocument document, Context context)
         {
-            // parses the selected operation only
             var selectedOperation = context.ValidationContext.Operation;
-            if (selectedOperation != null)
-                return VisitAsync(selectedOperation, context);
             // if no operation is selected, nothing is parsed
-            return default;
+            if (selectedOperation == null)
+                return;
+
+            await VisitAsync(selectedOperation, context).ConfigureAwait(false);
+
+            // parse each referenced fragment once, including fragments excluded by @skip or @include
+            var fragments = context.ValidationContext.GetRecursivelyReferencedFragments(selectedOperation, onlyUsed: false);
+            if (fragments != null)
+            {
+                foreach (var fragment in fragments)
+                    await VisitAsync(fragment, context).ConfigureAwait(false);
+            }
         }
 
         protected override async ValueTask VisitOperationDefinitionAsync(GraphQLOperationDefinition operationDefinition, Context context)
@@ -99,19 +106,7 @@ public partial class DocumentValidator
 
         protected override ValueTask VisitFragmentSpreadAsync(GraphQLFragmentSpread fragmentSpread, Context context)
         {
-            // visit the fragment that this fragment spread references,
-            // unless we already visited this fragment spread
-            var fragmentName = fragmentSpread.FragmentName.Name.Value;
-            if ((context.VisitedFragments ??= []).Add(fragmentName))
-            {
-                var definition = context.ValidationContext.Document.FindFragmentDefinition(fragmentName);
-                if (definition != null)
-                {
-                    // the fragment name should be one of the definitions in the document, or the
-                    // document would not have passed validation
-                    return VisitAsync(definition, context);
-                }
-            }
+            // spread directives are parsed by VisitAsync; fragment definitions are visited separately
             return default;
         }
 
@@ -187,7 +182,6 @@ public partial class DocumentValidator
             public CancellationToken CancellationToken => ValidationContext.CancellationToken;
             public Dictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
             public Dictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
-            public HashSet<GraphQLParser.ROM>? VisitedFragments { get; set; }
 
             private static Stack<IComplexGraphType?>? _reusableTypes;
 
