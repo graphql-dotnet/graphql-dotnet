@@ -1,6 +1,5 @@
 using GraphQL.Execution;
 using GraphQL.Types;
-using GraphQLParser;
 using GraphQLParser.AST;
 using GraphQLParser.Visitors;
 
