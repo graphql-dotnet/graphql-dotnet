@@ -532,6 +532,67 @@ public class InputObjectGraphTypeTests
         }
     }
 
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task optional_inputs_distinguish_null_and_omission_in_inline_objects(bool compiled, bool nested)
+    {
+        var previous = GlobalSwitches.DynamicallyCompileToObject;
+        GlobalSwitches.DynamicallyCompileToObject = compiled;
+        try
+        {
+            var childType = new InputObjectGraphType<OptionalChildInput>();
+            childType.Field(x => x.Name, type: typeof(StringGraphType));
+            var containerType = new InputObjectGraphType<OptionalContainersInput>();
+            containerType.Field("Child", childType);
+            Optional<string?> actual = default;
+            var queryType = new ObjectGraphType { Name = "Query" };
+            queryType.Field<BooleanGraphType>("test")
+                .Arguments(new QueryArguments(new QueryArgument(nested ? (IGraphType)containerType : childType) { Name = "input" }))
+                .Resolve(context =>
+                {
+                    if (nested)
+                    {
+                        var child = context.GetArgument<OptionalContainersInput>("input").Child;
+                        child.IsSpecified.ShouldBeTrue();
+                        actual = child.Value.ShouldNotBeNull().Name;
+                    }
+                    else
+                    {
+                        actual = context.GetArgument<OptionalChildInput>("input").Name;
+                    }
+                    return actual.IsSpecified;
+                });
+            using var schema = new Schema { Query = queryType };
+
+            foreach (var (operation, input, specified) in new[]
+            {
+                ("", "{ name: null }", true),
+                ("query ($v: String = null)", "{ name: $v }", true),
+                ("query ($v: String)", "{ name: $v }", false),
+                ("", "{}", false),
+            })
+            {
+                var literal = nested ? "{ child: " + input + " }" : input;
+                var result = await schema.ExecuteAsync(options =>
+                {
+                    options.ThrowOnUnhandledException = true;
+                    options.Query = operation + " { test(input: " + literal + ") }";
+                });
+                result.ShouldBeSimilarTo(specified ? """{"data":{"test":true}}""" : """{"data":{"test":false}}""");
+                actual.IsSpecified.ShouldBe(specified);
+                if (specified)
+                    actual.Value.ShouldBeNull();
+            }
+        }
+        finally
+        {
+            GlobalSwitches.DynamicallyCompileToObject = previous;
+        }
+    }
+
     private class OptionalMembersInput
     {
         public OptionalMembersInput(Optional<string?> constructor) => Constructor = constructor;

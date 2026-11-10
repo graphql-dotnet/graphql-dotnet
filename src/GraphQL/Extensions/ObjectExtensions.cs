@@ -283,7 +283,6 @@ public static partial class ObjectExtensions
     /// </param>
     /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, Optional&lt;T&gt;, and Enum.</remarks>
     [RequiresUnreferencedCode("Recursively converts propertyValue to fieldType.")]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(Optional<>))]
     public static object? GetPropertyValue(this object? propertyValue, Type fieldType, IGraphType mappedType)
     {
         if (mappedType == null)
