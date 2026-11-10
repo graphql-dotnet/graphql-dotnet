@@ -173,6 +173,12 @@ public class TypeInformation
     {
         foreach (var type in typeTree)
         {
+            if (isInput && type.Type.IsGenericType && type.Type.GetGenericTypeDefinition() == typeof(Optional<>))
+            {
+                IsNullable |= type.Nullable != NullabilityState.NotNull;
+                continue;
+            }
+
             //detect list types, but not lists of lists
             if (!IsList)
             {

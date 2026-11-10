@@ -197,6 +197,16 @@ public class GetGraphTypeFromTypeTests
     [InlineData(typeof(ListGraphType<IntGraphType>), false, TypeMappingMode.OutputType, null)]
     //input mapping mode
     [InlineData(typeof(int), true, TypeMappingMode.InputType, typeof(GraphQLClrInputTypeReference<int>))]
+    [InlineData(typeof(Optional<int>), false, TypeMappingMode.InputType, typeof(NonNullGraphType<GraphQLClrInputTypeReference<int>>))]
+    [InlineData(typeof(Optional<int?>), true, TypeMappingMode.InputType, typeof(GraphQLClrInputTypeReference<int>))]
+    [InlineData(typeof(Optional<int?>), false, TypeMappingMode.InputType, null)]
+    [InlineData(typeof(Optional<Optional<string>>), true, TypeMappingMode.InputType, typeof(GraphQLClrInputTypeReference<string>))]
+    [InlineData(typeof(Optional<List<int>>), true, TypeMappingMode.InputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<int>>>))]
+    [InlineData(typeof(List<Optional<int?>>), true, TypeMappingMode.InputType, typeof(ListGraphType<GraphQLClrInputTypeReference<int>>))]
+    [InlineData(typeof(Optional<string>[]), true, TypeMappingMode.InputType, typeof(ListGraphType<GraphQLClrInputTypeReference<string>>))]
+    [InlineData(typeof(Optional<int>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<Optional<int>>>))]
+    [InlineData(typeof(List<Optional<string>>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<Optional<string>>>>))]
+    [InlineData(typeof(Optional<int>), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
     //data loader compatibility
     [InlineData(typeof(IDataLoaderResult), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
     [InlineData(typeof(IDataLoaderResult), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<object>))]

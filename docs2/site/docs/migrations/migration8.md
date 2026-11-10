@@ -29,6 +29,7 @@ GraphQL.NET v8 is a major release that includes many new features, including:
 - Allow GraphQL interfaces to implement other GraphQL interfaces (based on spec)
 - Field-specific middleware support (v8.7.0+)
 - `IResolveFieldContextAccessor` opt-in support for accessing current field context (v8.7.0+)
+- `Optional<T>` support for input object members (v8.9.0+)
 
 Some of these features require changes to the infrastructure, which can cause breaking changes during upgrades.
 Most notably, if your server uses any of the following features, you are likely to encounter migration issues:
@@ -1575,6 +1576,21 @@ every field in the schema. Only enable it if you need to access the context from
 code that doesn't have direct access to the resolver's context parameter. To mitigate this overhead,
 the context accessor middleware is not applied to fields that directly access a property or field of
 the source object. Use a resolver function if a property getter needs to access the context.
+
+### 38. `Optional<T>` support for input object members (v8.9.0+)
+
+Input object models can use `Optional<T>` to distinguish an omitted field from an explicitly supplied
+value. When the field is omitted, `IsSpecified` is `false`; when supplied, including an explicit `null`,
+it is `true`. Read `Value` only when `IsSpecified` is `true`, or use `GetValueOrDefault()`.
+
+```csharp
+public class UpdateUserInput
+{
+    public Optional<string?> Name { get; set; }
+}
+```
+
+For this model, `{}` leaves `Name` unspecified, while `{ name: null }` specifies a null value.
 
 ## Breaking Changes
 

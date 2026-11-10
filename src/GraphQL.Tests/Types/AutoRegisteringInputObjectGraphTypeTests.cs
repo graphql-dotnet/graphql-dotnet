@@ -172,6 +172,16 @@ public class AutoRegisteringInputObjectGraphTypeTests
     [InlineData(nameof(FieldTests.NullableIntField), typeof(GraphQLClrInputTypeReference<int>))]
     [InlineData(nameof(FieldTests.NotNullStringField), typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
     [InlineData(nameof(FieldTests.NullableStringField), typeof(GraphQLClrInputTypeReference<string>))]
+    [InlineData(nameof(FieldTests.OptionalIntField), typeof(NonNullGraphType<GraphQLClrInputTypeReference<int>>))]
+    [InlineData(nameof(FieldTests.OptionalNullableIntField), typeof(GraphQLClrInputTypeReference<int>))]
+    [InlineData(nameof(FieldTests.OptionalStringField), typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
+    [InlineData(nameof(FieldTests.OptionalNullableStringField), typeof(GraphQLClrInputTypeReference<string>))]
+    [InlineData(nameof(FieldTests.OptionalListField), typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<string>>>>))]
+    [InlineData(nameof(FieldTests.OptionalNullableListField), typeof(ListGraphType<GraphQLClrInputTypeReference<string>>))]
+    [InlineData(nameof(FieldTests.ListOfOptionalField), typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<int>>>>))]
+    [InlineData(nameof(FieldTests.ArrayOfOptionalField), typeof(NonNullGraphType<ListGraphType<GraphQLClrInputTypeReference<string>>>))]
+    [InlineData(nameof(FieldTests.NestedOptionalField), typeof(GraphQLClrInputTypeReference<string>))]
+    [InlineData(nameof(FieldTests.OptionalInputObjectField), typeof(GraphQLClrInputTypeReference<TestClass>))]
     [InlineData(nameof(FieldTests.NotNullStringWriteOnlyField), typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
     [InlineData(nameof(FieldTests.NullableStringWriteOnlyField), typeof(GraphQLClrInputTypeReference<string>))]
     [InlineData(nameof(FieldTests.NotNullListNullableStringField), typeof(NonNullGraphType<ListGraphType<GraphQLClrInputTypeReference<string>>>))]
@@ -425,6 +435,16 @@ public class AutoRegisteringInputObjectGraphTypeTests
         public int? NullableIntField { get; set; }
         public string NotNullStringField { get; set; } = null!;
         public string? NullableStringField { get; set; }
+        public Optional<int> OptionalIntField { get; set; }
+        public Optional<int?> OptionalNullableIntField { get; set; }
+        public Optional<string> OptionalStringField { get; set; }
+        public Optional<string?> OptionalNullableStringField { get; set; }
+        public Optional<List<string>> OptionalListField { get; set; }
+        public Optional<List<string?>?> OptionalNullableListField { get; set; }
+        public List<Optional<int>> ListOfOptionalField { get; set; } = null!;
+        public Optional<string?>[] ArrayOfOptionalField { get; set; } = null!;
+        public Optional<Optional<string?>> NestedOptionalField { get; set; }
+        public Optional<TestClass?> OptionalInputObjectField { get; set; }
         public string NotNullStringWriteOnlyField { set { } }
         public string? NullableStringWriteOnlyField { set { } }
         public List<string?> NotNullListNullableStringField { get; set; } = null!;

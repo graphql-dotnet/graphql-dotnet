@@ -697,6 +697,16 @@ namespace GraphQL
         public OneOfAttribute() { }
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
     }
+    public readonly struct Optional<T>
+    {
+        public Optional(T value) { }
+        public bool IsSpecified { get; }
+        public T Value { get; }
+        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+        public T GetValueOrDefault() { }
+        public T GetValueOrDefault(T defaultValue) { }
+        public static GraphQL.Optional<T> op_Implicit(T value) { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface)]
     public class OutputNameAttribute : GraphQL.GraphQLAttribute
     {

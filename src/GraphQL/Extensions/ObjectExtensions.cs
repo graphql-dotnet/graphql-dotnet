@@ -66,7 +66,9 @@ public static partial class ObjectExtensions
         {
             var ctorField = reflectionInfo.CtorFields[i];
             ctorArguments[i] = ctorField.Key != null
-                ? GetPropertyValue(source.TryGetValue(ctorField.Key, out var value) ? value : null, ctorField.ParameterInfo.ParameterType, ctorField.GraphType!)
+                ? source.TryGetValue(ctorField.Key, out var value)
+                    ? GetPropertyValue(value, ctorField.ParameterInfo.ParameterType, ctorField.GraphType!)
+                    : null
                 : ctorField.ParameterInfo.DefaultValue;
         }
 
@@ -279,8 +281,9 @@ public static partial class ObjectExtensions
     /// In case of configuring field as Field("FirstName", x => x.FName) source dictionary
     /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
     /// </param>
-    /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
+    /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, Optional&lt;T&gt;, and Enum.</remarks>
     [RequiresUnreferencedCode("Recursively converts propertyValue to fieldType.")]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(Optional<>))]
     public static object? GetPropertyValue(this object? propertyValue, Type fieldType, IGraphType mappedType)
     {
         if (mappedType == null)
@@ -295,10 +298,20 @@ public static partial class ObjectExtensions
         }
 
         // Short-circuit conversion if the property value already of the right type
-        if (propertyValue == null || fieldType == typeof(object) || fieldType.IsInstanceOfType(propertyValue))
+        if (fieldType == typeof(object) || fieldType.IsInstanceOfType(propertyValue))
         {
             return propertyValue;
         }
+
+        // A supplied null is still specified; only a missing dictionary key leaves an optional unset.
+        if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(Optional<>))
+        {
+            var valueType = fieldType.GetGenericArguments()[0];
+            return fieldType.GetConstructor([valueType])!.Invoke([GetPropertyValue(propertyValue, valueType, mappedType)]);
+        }
+
+        if (propertyValue == null)
+            return null;
 
         if (ValueConverter.TryConvertTo(propertyValue, fieldType, out object? result))
             return result;
@@ -319,8 +332,7 @@ public static partial class ObjectExtensions
 
             for (int i = 0; i < objectArray.Length; ++i)
             {
-                var listItem = objectArray[i];
-                objectArray[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType, itemGraphType);
+                objectArray[i] = GetPropertyValue(objectArray[i], underlyingType, itemGraphType);
             }
 
             return listConverter.Convert(objectArray);

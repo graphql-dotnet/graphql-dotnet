@@ -173,20 +173,34 @@ public static partial class ObjectExtensions
             if (type == typeof(object))
                 return expr.Type == typeof(object) ? expr : Expression.Convert(expr, typeof(object));
 
-            // if the expression is already of the requested type, return it as is,
-            // or if the expression is null, return default(T)
             var returnType = asObject ? typeof(object) : type;
             var param = Expression.Parameter(expr.Type, "param");
+            Expression coerced;
+            // Wrap supplied nulls as specified values before the usual null handling.
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Optional<>))
+            {
+                var valueType = type.GetGenericArguments()[0];
+                coerced = Expression.New(
+                    type.GetConstructor([valueType])!,
+                    CoerceExpression(param, valueType, graphType, false, fieldName));
+                if (asObject)
+                    coerced = Expression.Convert(coerced, typeof(object));
+            }
+            else
+            {
+                coerced = Expression.Condition(
+                    Expression.Equal(param, Expression.Constant(null, param.Type)),
+                    Expression.Default(returnType),
+                    CoerceExpressionInternal(param, type, graphType, asObject, fieldName));
+            }
+
             return Expression.Block(
                 [param],
                 Expression.Assign(param, expr),
                 Expression.Condition(
                     Expression.TypeIs(param, type),
                     param.Type == returnType ? param : Expression.Convert(param, returnType),
-                    Expression.Condition(
-                        Expression.Equal(param, Expression.Constant(null, param.Type)),
-                        Expression.Default(returnType),
-                        CoerceExpressionInternal(param, type, graphType, asObject, fieldName))));
+                    coerced));
         }
 
         static Expression CoerceExpressionInternal(Expression expr, Type type, IGraphType graphType, bool asObject, string fieldName)
