@@ -6,7 +6,7 @@ namespace GraphQL;
 internal static class OptionalTypes
 {
     private static readonly ConcurrentDictionary<Type, ConstructorInfo> _types = new();
-    private static readonly ConcurrentDictionary<Assembly, Lazy<bool>> _assemblies = new();
+    private static readonly ConcurrentDictionary<Assembly, byte> _assemblies = new();
 
     static OptionalTypes()
     {
@@ -29,13 +29,12 @@ internal static class OptionalTypes
 
     private static void RegisterAssembly(Assembly assembly)
     {
-        _ = _assemblies.GetOrAdd(assembly, static assembly => new Lazy<bool>(() =>
-        {
-            var attributes = assembly.GetCustomAttributes<OptionalTypeAttribute>()
-                .Concat(assembly.GetModules().SelectMany(module => module.GetCustomAttributes<OptionalTypeAttribute>()));
-            foreach (var attribute in attributes)
-                RegisterType(attribute.OptionalType);
-            return true;
-        })).Value;
+        if (!_assemblies.TryAdd(assembly, 0))
+            return;
+
+        var attributes = assembly.GetCustomAttributes<OptionalTypeAttribute>()
+            .Concat(assembly.GetModules().SelectMany(module => module.GetCustomAttributes<OptionalTypeAttribute>()));
+        foreach (var attribute in attributes)
+            RegisterType(attribute.OptionalType);
     }
 }
