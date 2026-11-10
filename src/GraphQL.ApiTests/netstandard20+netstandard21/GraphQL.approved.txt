@@ -697,6 +697,12 @@ namespace GraphQL
         public OneOfAttribute() { }
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.Module, AllowMultiple=true)]
+    public sealed class OptionalTypeAttribute : System.Attribute
+    {
+        public OptionalTypeAttribute(System.Type optionalType) { }
+        public System.Type OptionalType { get; }
+    }
     public readonly struct Optional<T>
     {
         public Optional(T value) { }

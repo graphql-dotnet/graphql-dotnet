@@ -182,6 +182,13 @@ public class AutoRegisteringInputObjectGraphTypeTests
     [InlineData(nameof(FieldTests.ArrayOfOptionalField), typeof(NonNullGraphType<ListGraphType<GraphQLClrInputTypeReference<string>>>))]
     [InlineData(nameof(FieldTests.NestedOptionalField), typeof(GraphQLClrInputTypeReference<string>))]
     [InlineData(nameof(FieldTests.OptionalInputObjectField), typeof(GraphQLClrInputTypeReference<TestClass>))]
+    [InlineData(nameof(FieldTests.CustomOptionalIntField), typeof(NonNullGraphType<GraphQLClrInputTypeReference<int>>))]
+    [InlineData(nameof(FieldTests.CustomOptionalNullableIntField), typeof(GraphQLClrInputTypeReference<int>))]
+    [InlineData(nameof(FieldTests.CustomOptionalNullableStringField), typeof(GraphQLClrInputTypeReference<string>))]
+    [InlineData(nameof(FieldTests.CustomOptionalClassStringField), typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
+    [InlineData(nameof(FieldTests.CustomOptionalNullableListField), typeof(ListGraphType<GraphQLClrInputTypeReference<string>>))]
+    [InlineData(nameof(FieldTests.ListOfCustomOptionalField), typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<int>>>>))]
+    [InlineData(nameof(FieldTests.NestedCustomOptionalField), typeof(GraphQLClrInputTypeReference<string>))]
     [InlineData(nameof(FieldTests.NotNullStringWriteOnlyField), typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
     [InlineData(nameof(FieldTests.NullableStringWriteOnlyField), typeof(GraphQLClrInputTypeReference<string>))]
     [InlineData(nameof(FieldTests.NotNullListNullableStringField), typeof(NonNullGraphType<ListGraphType<GraphQLClrInputTypeReference<string>>>))]
@@ -445,6 +452,13 @@ public class AutoRegisteringInputObjectGraphTypeTests
         public Optional<string?>[] ArrayOfOptionalField { get; set; } = null!;
         public Optional<Optional<string?>> NestedOptionalField { get; set; }
         public Optional<TestClass?> OptionalInputObjectField { get; set; }
+        public CustomOptional<int> CustomOptionalIntField { get; set; }
+        public CustomOptional<int?> CustomOptionalNullableIntField { get; set; }
+        public CustomOptional<string?> CustomOptionalNullableStringField { get; set; }
+        public CustomOptionalClass<string> CustomOptionalClassStringField { get; set; } = null!;
+        public CustomOptionalClass<List<string?>?> CustomOptionalNullableListField { get; set; } = null!;
+        public List<CustomOptional<int>> ListOfCustomOptionalField { get; set; } = null!;
+        public CustomOptional<CustomOptionalClass<string?>> NestedCustomOptionalField { get; set; }
         public string NotNullStringWriteOnlyField { set { } }
         public string? NullableStringWriteOnlyField { set { } }
         public List<string?> NotNullListNullableStringField { get; set; } = null!;

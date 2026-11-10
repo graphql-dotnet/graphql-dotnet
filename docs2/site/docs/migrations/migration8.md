@@ -1592,6 +1592,28 @@ public class UpdateUserInput
 
 For this model, `{}` leaves `Name` unspecified, while `{ name: null }` specifies a null value.
 
+Register another optional wrapper with an assembly or module `[OptionalType]` attribute. Place it in
+your application or schema assembly, for example in `AssemblyInfo.cs`; the wrapper can come from a
+separate library. The assembly containing the attribute must be loaded before schema construction
+or type inference. Registration applies globally to all schemas.
+
+The wrapper must have one generic parameter, a public parameterless constructor (implicit for
+structs), and a public constructor accepting that parameter's type. Bindings use the parameterless
+constructor for omitted fields and the value constructor for supplied fields, including explicit `null`.
+No `Value` or `IsSpecified` members are required.
+
+```csharp
+[assembly: OptionalType(typeof(MyOptional<>))]
+
+public class MyOptional<T>
+{
+    public bool Supplied { get; }
+    public T Content { get; } = default!;
+    public MyOptional() { }
+    public MyOptional(T value) => (Supplied, Content) = (true, value);
+}
+```
+
 ## Breaking Changes
 
 ### 1. Query type is required

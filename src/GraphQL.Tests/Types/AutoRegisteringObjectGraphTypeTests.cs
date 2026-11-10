@@ -182,6 +182,8 @@ public class AutoRegisteringObjectGraphTypeTests
     [InlineData(nameof(FieldTests.OptionalStringField), typeof(NonNullGraphType<GraphQLClrOutputTypeReference<Optional<string>>>))]
     [InlineData(nameof(FieldTests.OptionalListField), typeof(NonNullGraphType<GraphQLClrOutputTypeReference<Optional<List<string>>>>))]
     [InlineData(nameof(FieldTests.ListOfOptionalField), typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<Optional<string>>>>>))]
+    [InlineData(nameof(FieldTests.CustomOptionalStringField), typeof(NonNullGraphType<GraphQLClrOutputTypeReference<CustomOptional<string>>>))]
+    [InlineData(nameof(FieldTests.CustomOptionalClassField), typeof(NonNullGraphType<GraphQLClrOutputTypeReference<CustomOptionalClass<string>>>))]
     [InlineData(nameof(FieldTests.NotNullListNullableStringField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>))]
     [InlineData(nameof(FieldTests.NotNullListNotNullStringField), typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<string>>>>))]
     [InlineData(nameof(FieldTests.NullableListNullableStringField), typeof(ListGraphType<GraphQLClrOutputTypeReference<string>>))]
@@ -747,6 +749,8 @@ public class AutoRegisteringObjectGraphTypeTests
         public Optional<string?> OptionalStringField { get; set; }
         public Optional<List<string?>?> OptionalListField { get; set; }
         public List<Optional<string?>> ListOfOptionalField { get; set; } = null!;
+        public CustomOptional<string?> CustomOptionalStringField { get; set; }
+        public CustomOptionalClass<string?> CustomOptionalClassField { get; set; } = null!;
         public string NotNullStringGetOnlyField => null!;
         public string? NullableStringGetOnlyField => null!;
         public List<string?> NotNullListNullableStringField { get; set; } = null!;

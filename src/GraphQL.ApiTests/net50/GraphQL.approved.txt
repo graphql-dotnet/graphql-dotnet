@@ -725,6 +725,13 @@ namespace GraphQL
         public OneOfAttribute() { }
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.Module, AllowMultiple=true)]
+    public sealed class OptionalTypeAttribute : System.Attribute
+    {
+        public OptionalTypeAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type optionalType) { }
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
+        public System.Type OptionalType { get; }
+    }
     public readonly struct Optional<T>
     {
         public Optional(T value) { }

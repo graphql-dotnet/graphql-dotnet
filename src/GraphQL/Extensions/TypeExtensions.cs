@@ -247,7 +247,7 @@ public static class TypeExtensions
             }
         }
 
-        if (mode == TypeMappingMode.InputType && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Optional<>))
+        if (mode == TypeMappingMode.InputType && OptionalTypes.IsOptionalType(type))
             return GetGraphTypeFromType(type.GetGenericArguments()[0], isNullable, mode);
 
         Type? graphType = null;
@@ -311,7 +311,7 @@ public static class TypeExtensions
         //TODO: rewrite nullability condition in v5
         bool IsNullableType(Type type)
         {
-            while (mode == TypeMappingMode.InputType && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Optional<>))
+            while (mode == TypeMappingMode.InputType && OptionalTypes.IsOptionalType(type))
                 type = type.GetGenericArguments()[0];
             return !type.IsValueType || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
         }

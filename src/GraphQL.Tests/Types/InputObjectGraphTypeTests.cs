@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -591,6 +592,131 @@ public class InputObjectGraphTypeTests
         {
             GlobalSwitches.DynamicallyCompileToObject = previous;
         }
+    }
+
+    [Theory]
+    [InlineData(false, typeof(CustomOptional<>))]
+    [InlineData(true, typeof(CustomOptional<>))]
+    [InlineData(false, typeof(CustomOptionalClass<>))]
+    [InlineData(true, typeof(CustomOptionalClass<>))]
+    [InlineData(false, typeof(StrongBox<>))]
+    [InlineData(true, typeof(StrongBox<>))]
+    public void ParseDictionary_supports_registered_optional_members(bool compiled, Type optionalType)
+    {
+        if (optionalType == typeof(CustomOptional<>))
+        {
+            Check<CustomOptional<string?>>((optional, specified, value) =>
+            {
+                optional.Present.ShouldBe(specified);
+                optional.Data.ShouldBe(value);
+            });
+        }
+        else if (optionalType == typeof(CustomOptionalClass<>))
+        {
+            Check<CustomOptionalClass<string?>>((optional, specified, value) =>
+            {
+                optional.ShouldNotBeNull().Present.ShouldBe(specified);
+                optional.Data.ShouldBe(value);
+            });
+            Check<CustomOptionalClass<object?>>((optional, specified, value) =>
+            {
+                optional.ShouldNotBeNull().Present.ShouldBe(specified);
+                optional.Data.ShouldBe(value);
+            });
+        }
+        else
+        {
+            Check<StrongBox<string?>>((optional, _, value) => optional.ShouldNotBeNull().Value.ShouldBe(value));
+        }
+
+        void Check<TOptional>(Action<TOptional, bool, string?> assert)
+        {
+            var type = new InputObjectGraphType<RegisteredOptionalMembersInput<TOptional>>();
+            string[] members = ["Constructor", "Property", "Field", "Init", "Required"];
+            foreach (var member in members)
+                type.Field(member, new StringGraphType());
+            if (compiled)
+                type.Initialize(null!);
+
+            foreach (var (specified, value) in new (bool, string?)[] { (false, null), (true, null), (true, "value") })
+            {
+                var data = specified
+                    ? members.ToDictionary(member => member, _ => (object?)value)
+                    : new Dictionary<string, object?>();
+                var result = type.ParseDictionary(data).ShouldBeOfType<RegisteredOptionalMembersInput<TOptional>>();
+                foreach (var member in new[] { result.Constructor, result.Property, result.Field, result.Init, result.Required })
+                    assert(member, specified, value);
+            }
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ParseDictionary_supports_registered_optionals_in_lists_and_nested_optionals(bool compiled)
+    {
+        var type = new InputObjectGraphType<RegisteredOptionalContainersInput>();
+        type.Field("StructItems", new ListGraphType(new StringGraphType()));
+        type.Field("ClassItems", new ListGraphType(new StringGraphType()));
+        type.Field("NestedStruct", new StringGraphType());
+        type.Field("NestedClass", new StringGraphType());
+        type.Field("List", new ListGraphType(new StringGraphType()));
+        if (compiled)
+            type.Initialize(null!);
+
+        var omitted = type.ParseDictionary(new Dictionary<string, object?>()).ShouldBeOfType<RegisteredOptionalContainersInput>();
+        omitted.NestedStruct.Present.ShouldBeFalse();
+        omitted.NestedClass.ShouldNotBeNull().Present.ShouldBeFalse();
+        omitted.List.ShouldNotBeNull().Present.ShouldBeFalse();
+
+        foreach (var value in new[] { null, "value" })
+        {
+            var data = new Dictionary<string, object?>
+            {
+                ["StructItems"] = new object?[] { value },
+                ["ClassItems"] = new object?[] { value },
+                ["NestedStruct"] = value,
+                ["NestedClass"] = value,
+                ["List"] = new object?[] { value },
+            };
+            var result = type.ParseDictionary(data).ShouldBeOfType<RegisteredOptionalContainersInput>();
+            var structItem = result.StructItems.ShouldNotBeNull().Single();
+            structItem.Present.ShouldBeTrue();
+            structItem.Data.ShouldBe(value);
+            var classItem = result.ClassItems.ShouldNotBeNull().Single().ShouldNotBeNull();
+            classItem.Present.ShouldBeTrue();
+            classItem.Data.ShouldBe(value);
+            result.NestedStruct.Present.ShouldBeTrue();
+            result.NestedStruct.Data.ShouldNotBeNull().Present.ShouldBeTrue();
+            result.NestedStruct.Data.Data.ShouldBe(value);
+            result.NestedClass.ShouldNotBeNull().Present.ShouldBeTrue();
+            result.NestedClass.Data.Present.ShouldBeTrue();
+            result.NestedClass.Data.Data.ShouldBe(value);
+            result.List.ShouldNotBeNull().Present.ShouldBeTrue();
+            var listItem = result.List.Data.ShouldNotBeNull().Single();
+            listItem.Present.ShouldBeTrue();
+            listItem.Data.ShouldBe(value);
+        }
+    }
+
+    private class RegisteredOptionalMembersInput<TOptional>
+    {
+        public RegisteredOptionalMembersInput(TOptional constructor) => Constructor = constructor;
+
+        public TOptional Constructor { get; }
+        public TOptional Property { get; set; }
+        public TOptional Field = default!;
+        public TOptional Init { get; init; }
+        public required TOptional Required { get; set; }
+    }
+
+    private class RegisteredOptionalContainersInput
+    {
+        public List<CustomOptional<string?>>? StructItems { get; set; }
+        public List<CustomOptionalClass<string?>>? ClassItems { get; set; }
+        public CustomOptional<CustomOptionalClass<string?>> NestedStruct { get; set; }
+        public CustomOptionalClass<CustomOptional<string?>> NestedClass { get; set; }
+        public CustomOptionalClass<List<CustomOptional<string?>>> List { get; set; }
     }
 
     private class OptionalMembersInput

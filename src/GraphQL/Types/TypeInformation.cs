@@ -173,7 +173,7 @@ public class TypeInformation
     {
         foreach (var type in typeTree)
         {
-            if (isInput && type.Type.IsGenericType && type.Type.GetGenericTypeDefinition() == typeof(Optional<>))
+            if (isInput && OptionalTypes.IsOptionalType(type.Type))
             {
                 IsNullable |= type.Nullable != NullabilityState.NotNull;
                 continue;

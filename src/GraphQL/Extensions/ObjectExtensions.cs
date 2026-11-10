@@ -68,7 +68,7 @@ public static partial class ObjectExtensions
             ctorArguments[i] = ctorField.Key != null
                 ? source.TryGetValue(ctorField.Key, out var value)
                     ? GetPropertyValue(value, ctorField.ParameterInfo.ParameterType, ctorField.GraphType!)
-                    : null
+                    : GetUnspecifiedValue(ctorField.ParameterInfo.ParameterType)
                 : ctorField.ParameterInfo.DefaultValue;
         }
 
@@ -89,6 +89,7 @@ public static partial class ObjectExtensions
         // populate the remaining fields
         foreach (var field in reflectionInfo.MemberFields)
         {
+            var memberType = field.Member is PropertyInfo property ? property.PropertyType : ((FieldInfo)field.Member).FieldType;
             if (source.TryGetValue(field.Key, out var value))
             {
                 if (field.Member is PropertyInfo propertyInfo)
@@ -102,22 +103,25 @@ public static partial class ObjectExtensions
                     fieldInfo.SetValue(obj, coercedValue);
                 }
             }
-            else if (field.IsInitOnly || field.IsRequired)
+            else if (field.IsInitOnly || field.IsRequired || OptionalTypes.IsOptionalType(memberType))
             {
-                // initialize all unspecified init-only or required properties
+                // Initialize unspecified optionals as well as init-only and required members.
                 if (field.Member is PropertyInfo propertyInfo)
                 {
-                    propertyInfo.SetValue(obj, null);
+                    propertyInfo.SetValue(obj, GetUnspecifiedValue(memberType));
                 }
                 else
                 {
-                    ((FieldInfo)field.Member).SetValue(obj, null);
+                    ((FieldInfo)field.Member).SetValue(obj, GetUnspecifiedValue(memberType));
                 }
             }
         }
 
         return obj;
     }
+
+    private static object? GetUnspecifiedValue(Type type)
+        => OptionalTypes.IsOptionalType(type) ? Activator.CreateInstance(type) : null;
 
     private readonly ref struct ReflectionInfo
     {
@@ -281,7 +285,7 @@ public static partial class ObjectExtensions
     /// In case of configuring field as Field("FirstName", x => x.FName) source dictionary
     /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
     /// </param>
-    /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, Optional&lt;T&gt;, and Enum.</remarks>
+    /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, optional wrappers, and Enum.</remarks>
     [RequiresUnreferencedCode("Recursively converts propertyValue to fieldType.")]
     public static object? GetPropertyValue(this object? propertyValue, Type fieldType, IGraphType mappedType)
     {
@@ -303,10 +307,10 @@ public static partial class ObjectExtensions
         }
 
         // A supplied null is still specified; only a missing dictionary key leaves an optional unset.
-        if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(Optional<>))
+        if (OptionalTypes.IsOptionalType(fieldType))
         {
             var valueType = fieldType.GetGenericArguments()[0];
-            return fieldType.GetConstructor([valueType])!.Invoke([GetPropertyValue(propertyValue, valueType, mappedType)]);
+            return OptionalTypes.GetValueConstructor(fieldType).Invoke([GetPropertyValue(propertyValue, valueType, mappedType)]);
         }
 
         if (propertyValue == null)
