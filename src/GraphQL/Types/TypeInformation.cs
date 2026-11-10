@@ -173,6 +173,12 @@ public class TypeInformation
     {
         foreach (var type in typeTree)
         {
+            if (isInput && OptionalTypes.IsOptionalType(type.Type))
+            {
+                IsNullable |= type.Nullable != NullabilityState.NotNull;
+                continue;
+            }
+
             //detect list types, but not lists of lists
             if (!IsList)
             {
