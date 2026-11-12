@@ -11,20 +11,34 @@ public class CollectionBatchDataLoader<TKey, T> : DataLoaderBase<TKey, IEnumerab
     private readonly Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> _loader;
 
     /// <summary>
-    /// Initializes a new instance of CollectionBatchDataLoader with the specified fetch delegate
+    /// Initializes a new instance of CollectionBatchDataLoader with the specified fetch delegate, with caching enabled
     /// </summary>
     /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and cancellation token, which returns an ILookup of keys and values</param>
     /// <param name="keyComparer">An optional equality comparer for the keys</param>
     /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
     public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> fetchDelegate,
            IEqualityComparer<TKey>? keyComparer = null,
-           int maxBatchSize = int.MaxValue) : base(keyComparer, maxBatchSize)
+           int maxBatchSize = int.MaxValue) : this(true, fetchDelegate, keyComparer, maxBatchSize)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of CollectionBatchDataLoader with the specified caching option and fetch delegate
+    /// </summary>
+    /// <param name="caching">Indicates if responses should be cached</param>
+    /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and cancellation token, which returns an ILookup of keys and values</param>
+    /// <param name="keyComparer">An optional equality comparer for the keys</param>
+    /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
+    public CollectionBatchDataLoader(bool caching,
+           Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> fetchDelegate,
+           IEqualityComparer<TKey>? keyComparer = null,
+           int maxBatchSize = int.MaxValue) : base(caching, keyComparer, maxBatchSize)
     {
         _loader = fetchDelegate ?? throw new ArgumentNullException(nameof(fetchDelegate));
     }
 
     /// <summary>
-    /// Initializes a new instance of CollectionBatchDataLoader with the specified fetch delegate and key selector
+    /// Initializes a new instance of CollectionBatchDataLoader with the specified fetch delegate and key selector, with caching enabled
     /// </summary>
     /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and a cancellation token, which returns a list objects</param>
     /// <param name="keySelector">A selector for the key from the returned object</param>
@@ -33,7 +47,23 @@ public class CollectionBatchDataLoader<TKey, T> : DataLoaderBase<TKey, IEnumerab
     public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> fetchDelegate,
         Func<T, TKey> keySelector,
         IEqualityComparer<TKey>? keyComparer = null,
-        int maxBatchSize = int.MaxValue) : base(keyComparer, maxBatchSize)
+        int maxBatchSize = int.MaxValue) : this(true, fetchDelegate, keySelector, keyComparer, maxBatchSize)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of CollectionBatchDataLoader with the specified caching option, fetch delegate and key selector
+    /// </summary>
+    /// <param name="caching">Indicates if responses should be cached</param>
+    /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and a cancellation token, which returns a list objects</param>
+    /// <param name="keySelector">A selector for the key from the returned object</param>
+    /// <param name="keyComparer">An optional equality comparer for the keys</param>
+    /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
+    public CollectionBatchDataLoader(bool caching,
+        Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> fetchDelegate,
+        Func<T, TKey> keySelector,
+        IEqualityComparer<TKey>? keyComparer = null,
+        int maxBatchSize = int.MaxValue) : base(caching, keyComparer, maxBatchSize)
     {
         if (fetchDelegate == null)
             throw new ArgumentNullException(nameof(fetchDelegate));
