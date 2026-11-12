@@ -67,12 +67,13 @@ public static class DataLoaderContextExtensions
     /// <typeparam name="T">The type of data to be loaded</typeparam>
     /// <param name="context">The <seealso cref="DataLoaderContext"/> to get or add a DataLoader to</param>
     /// <param name="loaderKey">A unique key to identify the DataLoader instance</param>
+    /// <param name="caching">Indicates if responses should be cached</param>
     /// <param name="fetchFunc">A cancellable delegate to fetch data for some keys asynchronously</param>
     /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
     /// <param name="defaultValue">The value returned when no match is found in the dictionary, or default(T) if unspecified</param>
     /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
     /// <returns>A new or existing DataLoader instance</returns>
-    public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> fetchFunc,
+    public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, bool caching, Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> fetchFunc,
         IEqualityComparer<TKey>? keyComparer = null, T defaultValue = default!, int maxBatchSize = int.MaxValue)
         where TKey : notnull
     {
@@ -82,7 +83,52 @@ public static class DataLoaderContextExtensions
         if (fetchFunc == null)
             throw new ArgumentNullException(nameof(fetchFunc));
 
-        return context.GetOrAdd(loaderKey, (fetchFunc, keyComparer, defaultValue, maxBatchSize), static x => new BatchDataLoader<TKey, T>(x.fetchFunc, x.keyComparer, x.defaultValue, x.maxBatchSize));
+        return context.GetOrAdd(loaderKey, (caching, fetchFunc, keyComparer, defaultValue, maxBatchSize), static x => new BatchDataLoader<TKey, T>(x.caching, x.fetchFunc, x.keyComparer, x.defaultValue, x.maxBatchSize));
+    }
+
+    /// <summary>
+    /// Get or add a DataLoader instance for batching data fetching operations.
+    /// </summary>
+    /// <typeparam name="TKey">The type of key used to load data</typeparam>
+    /// <typeparam name="T">The type of data to be loaded</typeparam>
+    /// <param name="context">The <seealso cref="DataLoaderContext"/> to get or add a DataLoader to</param>
+    /// <param name="loaderKey">A unique key to identify the DataLoader instance</param>
+    /// <param name="fetchFunc">A cancellable delegate to fetch data for some keys asynchronously</param>
+    /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
+    /// <param name="defaultValue">The value returned when no match is found in the dictionary, or default(T) if unspecified</param>
+    /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
+    /// <returns>A new or existing DataLoader instance</returns>
+    public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> fetchFunc,
+        IEqualityComparer<TKey>? keyComparer = null, T defaultValue = default!, int maxBatchSize = int.MaxValue)
+        where TKey : notnull
+    {
+        return context.GetOrAddBatchLoader(loaderKey, true, fetchFunc, keyComparer, defaultValue, maxBatchSize);
+    }
+
+    /// <summary>
+    /// Get or add a DataLoader instance for batching data fetching operations.
+    /// </summary>
+    /// <typeparam name="TKey">The type of key used to load data</typeparam>
+    /// <typeparam name="T">The type of data to be loaded</typeparam>
+    /// <param name="context">The <seealso cref="DataLoaderContext"/> to get or add a DataLoader to</param>
+    /// <param name="loaderKey">A unique key to identify the DataLoader instance</param>
+    /// <param name="caching">Indicates if responses should be cached</param>
+    /// <param name="fetchFunc">A delegate to fetch data for some keys asynchronously</param>
+    /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
+    /// <param name="defaultValue">The value returned when no match is found in the dictionary, or default(T) if unspecified</param>
+    /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
+    /// <returns>A new or existing DataLoader instance</returns>
+    public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, bool caching, Func<IEnumerable<TKey>, Task<IDictionary<TKey, T>>> fetchFunc,
+        IEqualityComparer<TKey>? keyComparer = null, T defaultValue = default!, int maxBatchSize = int.MaxValue)
+        where TKey : notnull
+    {
+        if (context == null)
+            throw new ArgumentNullException(nameof(context));
+
+        if (fetchFunc == null)
+            throw new ArgumentNullException(nameof(fetchFunc));
+
+        return context.GetOrAdd(loaderKey, (caching, fetchFunc, keyComparer, defaultValue, maxBatchSize), static x => new BatchDataLoader<TKey, T>(x.caching, WrapNonCancellableFunc(x.fetchFunc), x.keyComparer, x.defaultValue, x.maxBatchSize));
     }
 
     /// <summary>
@@ -101,13 +147,37 @@ public static class DataLoaderContextExtensions
         IEqualityComparer<TKey>? keyComparer = null, T defaultValue = default!, int maxBatchSize = int.MaxValue)
         where TKey : notnull
     {
+        return context.GetOrAddBatchLoader(loaderKey, true, fetchFunc, keyComparer, defaultValue, maxBatchSize);
+    }
+
+    /// <summary>
+    /// Get or add a DataLoader instance for batching data fetching operations.
+    /// </summary>
+    /// <typeparam name="TKey">The type of key used to load data</typeparam>
+    /// <typeparam name="T">The type of data to be loaded</typeparam>
+    /// <param name="context">The <seealso cref="DataLoaderContext"/> to get or add a DataLoader to</param>
+    /// <param name="loaderKey">A unique key to identify the DataLoader instance</param>
+    /// <param name="caching">Indicates if responses should be cached</param>
+    /// <param name="fetchFunc"></param>
+    /// <param name="keySelector">A function to extract a key from each element.</param>
+    /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
+    /// <param name="defaultValue">The value returned when no match is found in the list, or default(T) if unspecified</param>
+    /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
+    /// <returns>A new or existing DataLoader instance</returns>
+    public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, bool caching, Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> fetchFunc,
+        Func<T, TKey> keySelector, IEqualityComparer<TKey>? keyComparer = null, T defaultValue = default!, int maxBatchSize = int.MaxValue)
+        where TKey : notnull
+    {
         if (context == null)
             throw new ArgumentNullException(nameof(context));
 
         if (fetchFunc == null)
             throw new ArgumentNullException(nameof(fetchFunc));
 
-        return context.GetOrAdd(loaderKey, (fetchFunc, keyComparer, defaultValue, maxBatchSize), static x => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(x.fetchFunc), x.keyComparer, x.defaultValue, x.maxBatchSize));
+        if (keySelector == null)
+            throw new ArgumentNullException(nameof(keySelector));
+
+        return context.GetOrAdd(loaderKey, (caching, fetchFunc, keySelector, keyComparer, defaultValue, maxBatchSize), static x => new BatchDataLoader<TKey, T>(x.caching, x.fetchFunc, x.keySelector, x.keyComparer, x.defaultValue, x.maxBatchSize));
     }
 
     /// <summary>
@@ -127,6 +197,27 @@ public static class DataLoaderContextExtensions
         Func<T, TKey> keySelector, IEqualityComparer<TKey>? keyComparer = null, T defaultValue = default!, int maxBatchSize = int.MaxValue)
         where TKey : notnull
     {
+        return context.GetOrAddBatchLoader(loaderKey, true, fetchFunc, keySelector, keyComparer, defaultValue, maxBatchSize);
+    }
+
+    /// <summary>
+    /// Get or add a DataLoader instance for batching data fetching operations.
+    /// </summary>
+    /// <typeparam name="TKey">The type of key used to load data</typeparam>
+    /// <typeparam name="T">The type of data to be loaded</typeparam>
+    /// <param name="context">The <seealso cref="DataLoaderContext"/> to get or add a DataLoader to</param>
+    /// <param name="loaderKey">A unique key to identify the DataLoader instance</param>
+    /// <param name="caching">Indicates if responses should be cached</param>
+    /// <param name="fetchFunc">A delegate to fetch data for some keys asynchronously</param>
+    /// <param name="keySelector">A function to extract a key from each element.</param>
+    /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
+    /// <param name="defaultValue">The value returned when no match is found in the list, or default(T) if unspecified</param>
+    /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
+    /// <returns>A new or existing DataLoader instance</returns>
+    public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, bool caching, Func<IEnumerable<TKey>, Task<IEnumerable<T>>> fetchFunc,
+        Func<T, TKey> keySelector, IEqualityComparer<TKey>? keyComparer = null, T defaultValue = default!, int maxBatchSize = int.MaxValue)
+        where TKey : notnull
+    {
         if (context == null)
             throw new ArgumentNullException(nameof(context));
 
@@ -136,7 +227,7 @@ public static class DataLoaderContextExtensions
         if (keySelector == null)
             throw new ArgumentNullException(nameof(keySelector));
 
-        return context.GetOrAdd(loaderKey, (fetchFunc, keySelector, keyComparer, defaultValue, maxBatchSize), static x => new BatchDataLoader<TKey, T>(x.fetchFunc, x.keySelector, x.keyComparer, x.defaultValue, x.maxBatchSize));
+        return context.GetOrAdd(loaderKey, (caching, fetchFunc, keySelector, keyComparer, defaultValue, maxBatchSize), static x => new BatchDataLoader<TKey, T>(x.caching, WrapNonCancellableFunc(x.fetchFunc), x.keySelector, x.keyComparer, x.defaultValue, x.maxBatchSize));
     }
 
     /// <summary>
@@ -156,16 +247,32 @@ public static class DataLoaderContextExtensions
         Func<T, TKey> keySelector, IEqualityComparer<TKey>? keyComparer = null, T defaultValue = default!, int maxBatchSize = int.MaxValue)
         where TKey : notnull
     {
+        return context.GetOrAddBatchLoader(loaderKey, true, fetchFunc, keySelector, keyComparer, defaultValue, maxBatchSize);
+    }
+
+    /// <summary>
+    /// Get or add a DataLoader instance for batching data fetching operations.
+    /// </summary>
+    /// <typeparam name="TKey">The type of key used to load data</typeparam>
+    /// <typeparam name="T">The type of data to be loaded</typeparam>
+    /// <param name="context">The <seealso cref="DataLoaderContext"/> to get or add a DataLoader to</param>
+    /// <param name="loaderKey">A unique key to identify the DataLoader instance</param>
+    /// <param name="caching">Indicates if responses should be cached</param>
+    /// <param name="fetchFunc">A cancellable delegate to fetch data for some keys asynchronously</param>
+    /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
+    /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
+    /// <returns>A new or existing DataLoader instance</returns>
+    public static IDataLoader<TKey, IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, bool caching, Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> fetchFunc,
+        IEqualityComparer<TKey>? keyComparer = null, int maxBatchSize = int.MaxValue)
+        where TKey : notnull
+    {
         if (context == null)
             throw new ArgumentNullException(nameof(context));
 
         if (fetchFunc == null)
             throw new ArgumentNullException(nameof(fetchFunc));
 
-        if (keySelector == null)
-            throw new ArgumentNullException(nameof(keySelector));
-
-        return context.GetOrAdd(loaderKey, (fetchFunc, keySelector, keyComparer, defaultValue, maxBatchSize), static x => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(x.fetchFunc), x.keySelector, x.keyComparer, x.defaultValue, x.maxBatchSize));
+        return context.GetOrAdd(loaderKey, (caching, fetchFunc, keyComparer, maxBatchSize), static x => new CollectionBatchDataLoader<TKey, T>(x.caching, x.fetchFunc, x.keyComparer, x.maxBatchSize));
     }
 
     /// <summary>
@@ -183,13 +290,32 @@ public static class DataLoaderContextExtensions
         IEqualityComparer<TKey>? keyComparer = null, int maxBatchSize = int.MaxValue)
         where TKey : notnull
     {
+        return context.GetOrAddCollectionBatchLoader(loaderKey, true, fetchFunc, keyComparer, maxBatchSize);
+    }
+
+    /// <summary>
+    /// Get or add a DataLoader instance for batching data fetching operations.
+    /// </summary>
+    /// <typeparam name="TKey">The type of key used to load data</typeparam>
+    /// <typeparam name="T">The type of data to be loaded</typeparam>
+    /// <param name="context">The <seealso cref="DataLoaderContext"/> to get or add a DataLoader to</param>
+    /// <param name="loaderKey">A unique key to identify the DataLoader instance</param>
+    /// <param name="caching">Indicates if responses should be cached</param>
+    /// <param name="fetchFunc">A delegate to fetch data for some keys asynchronously</param>
+    /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
+    /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
+    /// <returns>A new or existing DataLoader instance</returns>
+    public static IDataLoader<TKey, IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, bool caching, Func<IEnumerable<TKey>, Task<ILookup<TKey, T>>> fetchFunc,
+        IEqualityComparer<TKey>? keyComparer = null, int maxBatchSize = int.MaxValue)
+        where TKey : notnull
+    {
         if (context == null)
             throw new ArgumentNullException(nameof(context));
 
         if (fetchFunc == null)
             throw new ArgumentNullException(nameof(fetchFunc));
 
-        return context.GetOrAdd(loaderKey, (fetchFunc, keyComparer, maxBatchSize), static x => new CollectionBatchDataLoader<TKey, T>(x.fetchFunc, x.keyComparer, x.maxBatchSize));
+        return context.GetOrAdd(loaderKey, (caching, fetchFunc, keyComparer, maxBatchSize), static x => new CollectionBatchDataLoader<TKey, T>(x.caching, WrapNonCancellableFunc(x.fetchFunc), x.keyComparer, x.maxBatchSize));
     }
 
     /// <summary>
@@ -207,13 +333,36 @@ public static class DataLoaderContextExtensions
         IEqualityComparer<TKey>? keyComparer = null, int maxBatchSize = int.MaxValue)
         where TKey : notnull
     {
+        return context.GetOrAddCollectionBatchLoader(loaderKey, true, fetchFunc, keyComparer, maxBatchSize);
+    }
+
+    /// <summary>
+    /// Get or add a DataLoader instance for batching data fetching operations.
+    /// </summary>
+    /// <typeparam name="TKey">The type of key used to load data</typeparam>
+    /// <typeparam name="T">The type of data to be loaded</typeparam>
+    /// <param name="context">The <seealso cref="DataLoaderContext"/> to get or add a DataLoader to</param>
+    /// <param name="loaderKey">A unique key to identify the DataLoader instance</param>
+    /// <param name="caching">Indicates if responses should be cached</param>
+    /// <param name="fetchFunc">A cancellable delegate to fetch data for some keys asynchronously</param>
+    /// <param name="keySelector">A function to extract a key from each element.</param>
+    /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
+    /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
+    /// <returns>A new or existing DataLoader instance</returns>
+    public static IDataLoader<TKey, IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, bool caching, Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> fetchFunc,
+        Func<T, TKey> keySelector, IEqualityComparer<TKey>? keyComparer = null, int maxBatchSize = int.MaxValue)
+        where TKey : notnull
+    {
         if (context == null)
             throw new ArgumentNullException(nameof(context));
 
         if (fetchFunc == null)
             throw new ArgumentNullException(nameof(fetchFunc));
 
-        return context.GetOrAdd(loaderKey, (fetchFunc, keyComparer, maxBatchSize), static x => new CollectionBatchDataLoader<TKey, T>(WrapNonCancellableFunc(x.fetchFunc), x.keyComparer, x.maxBatchSize));
+        if (keySelector == null)
+            throw new ArgumentNullException(nameof(keySelector));
+
+        return context.GetOrAdd(loaderKey, (caching, fetchFunc, keySelector, keyComparer, maxBatchSize), static x => new CollectionBatchDataLoader<TKey, T>(x.caching, x.fetchFunc, x.keySelector, x.keyComparer, x.maxBatchSize));
     }
 
     /// <summary>
@@ -232,6 +381,26 @@ public static class DataLoaderContextExtensions
         Func<T, TKey> keySelector, IEqualityComparer<TKey>? keyComparer = null, int maxBatchSize = int.MaxValue)
         where TKey : notnull
     {
+        return context.GetOrAddCollectionBatchLoader(loaderKey, true, fetchFunc, keySelector, keyComparer, maxBatchSize);
+    }
+
+    /// <summary>
+    /// Get or add a DataLoader instance for batching data fetching operations.
+    /// </summary>
+    /// <typeparam name="TKey">The type of key used to load data</typeparam>
+    /// <typeparam name="T">The type of data to be loaded</typeparam>
+    /// <param name="context">The <seealso cref="DataLoaderContext"/> to get or add a DataLoader to</param>
+    /// <param name="loaderKey">A unique key to identify the DataLoader instance</param>
+    /// <param name="caching">Indicates if responses should be cached</param>
+    /// <param name="fetchFunc">A delegate to fetch data for some keys asynchronously</param>
+    /// <param name="keySelector">A function to extract a key from each element.</param>
+    /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
+    /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
+    /// <returns>A new or existing DataLoader instance</returns>
+    public static IDataLoader<TKey, IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, bool caching, Func<IEnumerable<TKey>, Task<IEnumerable<T>>> fetchFunc,
+        Func<T, TKey> keySelector, IEqualityComparer<TKey>? keyComparer = null, int maxBatchSize = int.MaxValue)
+        where TKey : notnull
+    {
         if (context == null)
             throw new ArgumentNullException(nameof(context));
 
@@ -241,7 +410,7 @@ public static class DataLoaderContextExtensions
         if (keySelector == null)
             throw new ArgumentNullException(nameof(keySelector));
 
-        return context.GetOrAdd(loaderKey, (fetchFunc, keySelector, keyComparer, maxBatchSize), static x => new CollectionBatchDataLoader<TKey, T>(x.fetchFunc, x.keySelector, x.keyComparer, x.maxBatchSize));
+        return context.GetOrAdd(loaderKey, (caching, fetchFunc, keySelector, keyComparer, maxBatchSize), static x => new CollectionBatchDataLoader<TKey, T>(x.caching, WrapNonCancellableFunc(x.fetchFunc), x.keySelector, x.keyComparer, x.maxBatchSize));
     }
 
     /// <summary>
@@ -260,15 +429,6 @@ public static class DataLoaderContextExtensions
         Func<T, TKey> keySelector, IEqualityComparer<TKey>? keyComparer = null, int maxBatchSize = int.MaxValue)
         where TKey : notnull
     {
-        if (context == null)
-            throw new ArgumentNullException(nameof(context));
-
-        if (fetchFunc == null)
-            throw new ArgumentNullException(nameof(fetchFunc));
-
-        if (keySelector == null)
-            throw new ArgumentNullException(nameof(keySelector));
-
-        return context.GetOrAdd(loaderKey, (fetchFunc, keySelector, keyComparer, maxBatchSize), static x => new CollectionBatchDataLoader<TKey, T>(WrapNonCancellableFunc(x.fetchFunc), x.keySelector, x.keyComparer, x.maxBatchSize));
+        return context.GetOrAddCollectionBatchLoader(loaderKey, true, fetchFunc, keySelector, keyComparer, maxBatchSize);
     }
 }

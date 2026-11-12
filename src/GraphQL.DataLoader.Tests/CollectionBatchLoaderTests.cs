@@ -147,6 +147,55 @@ public class CollectionBatchLoaderTests : DataLoaderTestBase
             "The keys passed to the fetch delegate should be de-duplicated");
     }
 
+    [Fact]
+    public async Task Results_Are_Not_Cached_When_Caching_Is_Disabled()
+    {
+        var mock = new Mock<IOrdersStore>();
+        var orders = Fake.Orders.Generate(2);
+        orders.ForEach(o => o.UserId = 1);
+
+        mock.Setup(store => store.GetOrdersByUserIdAsync(It.IsAny<IEnumerable<int>>(), default))
+            .ReturnsAsync(() => orders.ToLookup(o => o.UserId));
+
+        var loader = new CollectionBatchDataLoader<int, Order>(false, mock.Object.GetOrdersByUserIdAsync);
+
+        var result1 = loader.LoadAsync(1);
+        await loader.DispatchAsync();
+        (await result1.GetResultAsync()).Count().ShouldBe(2);
+
+        var result2 = loader.LoadAsync(1);
+        await loader.DispatchAsync();
+        (await result2.GetResultAsync()).Count().ShouldBe(2);
+
+        mock.Verify(x => x.GetOrdersByUserIdAsync(new[] { 1 }, default), Times.Exactly(2));
+    }
+
+    [Fact]
+    public async Task Results_Are_Not_Cached_When_Caching_Is_Disabled_With_KeySelector()
+    {
+        var mock = new Mock<IOrdersStore>();
+        var orders = Fake.Orders.Generate(2);
+        orders.ForEach(o => o.UserId = 1);
+
+        mock.Setup(store => store.GetOrdersByUserIdAsync(It.IsAny<IEnumerable<int>>(), default))
+            .ReturnsAsync(() => orders.ToLookup(o => o.UserId));
+
+        var loader = new CollectionBatchDataLoader<int, Order>(
+            false,
+            async (keys, token) => (await mock.Object.GetOrdersByUserIdAsync(keys, token)).SelectMany(x => x),
+            order => order.UserId);
+
+        var result1 = loader.LoadAsync(1);
+        await loader.DispatchAsync();
+        (await result1.GetResultAsync()).Count().ShouldBe(2);
+
+        var result2 = loader.LoadAsync(1);
+        await loader.DispatchAsync();
+        (await result2.GetResultAsync()).Count().ShouldBe(2);
+
+        mock.Verify(x => x.GetOrdersByUserIdAsync(new[] { 1 }, default), Times.Exactly(2));
+    }
+
 #nullable disable
     [Fact]
     public async Task Returns_Null_For_Null_Reference_Types()
