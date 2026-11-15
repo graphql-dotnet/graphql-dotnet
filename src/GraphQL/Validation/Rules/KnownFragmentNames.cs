@@ -32,7 +32,7 @@ public class KnownFragmentNames : ValidationRuleBase
     private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLFragmentSpread>((node, context) =>
     {
         var fragmentName = node.FragmentName.Name;
-        var fragment = context.Document.FindFragmentDefinition(fragmentName);
+        var fragment = context.FindFragmentDefinition(fragmentName);
         if (fragment == null)
         {
             context.ReportError(new KnownFragmentNamesError(context, node, fragmentName.StringValue));

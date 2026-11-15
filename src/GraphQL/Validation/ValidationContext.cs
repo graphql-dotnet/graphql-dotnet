@@ -21,6 +21,7 @@ public partial class ValidationContext : IProvideUserContext
         _fragments?.Clear();
         _usedFragments?.Clear();
         _noFragments = null;
+        _fragmentDefinitions = null;
         _variables.Clear();
         Operation = null!;
         Schema = null!;
