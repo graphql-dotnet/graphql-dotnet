@@ -53,8 +53,15 @@ public class NoFragmentCycles : ValidationRuleBase
         foreach (var definition in document.Definitions)
         {
             // Match FindFragmentDefinition's first-definition behavior for duplicate names.
-            if (definition is GraphQLFragmentDefinition fragment && !fragments.ContainsKey(fragment.FragmentName.Name))
-                fragments.Add(fragment.FragmentName.Name, fragment);
+            if (definition is GraphQLFragmentDefinition fragment)
+            {
+#if NETSTANDARD2_0
+                if (!fragments.ContainsKey(fragment.FragmentName.Name))
+                    fragments.Add(fragment.FragmentName.Name, fragment);
+#else
+                fragments.TryAdd(fragment.FragmentName.Name, fragment);
+#endif
+            }
         }
         return fragments;
     }
