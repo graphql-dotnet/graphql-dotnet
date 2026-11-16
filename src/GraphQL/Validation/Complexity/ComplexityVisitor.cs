@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using GraphQL.Types;
 using GraphQL.Validation.Rules.Custom;
-using GraphQLParser;
 using GraphQLParser.AST;
 using GraphQLParser.Visitors;
 

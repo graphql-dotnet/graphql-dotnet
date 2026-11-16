@@ -42,7 +42,7 @@ public class LegacyComplexityValidationRule : ValidationRuleBase, INodeVisitor
             try
             {
                 using (context.Metrics.Subject("document", "Analyzing complexity"))
-                    Validate(context.Document, context.Schema, context);
+                    Validate(context.Document, context.Schema);
             }
             catch (ComplexityError ex)
             {
@@ -55,11 +55,8 @@ public class LegacyComplexityValidationRule : ValidationRuleBase, INodeVisitor
 
     /// <inheritdoc/>
     public void Validate(GraphQLDocument document, ISchema schema)
-        => Validate(document, schema, new ValidationContext { Document = document });
-
-    private void Validate(GraphQLDocument document, ISchema schema, ValidationContext validationContext)
     {
-        var complexityResult = Analyze(document, ComplexityConfiguration.FieldImpact ?? 2.0f, ComplexityConfiguration.MaxRecursionCount, schema, validationContext);
+        var complexityResult = Analyze(document, ComplexityConfiguration.FieldImpact ?? 2.0f, ComplexityConfiguration.MaxRecursionCount, schema);
 
         Analyzed(document, complexityResult);
 
@@ -100,9 +97,6 @@ public class LegacyComplexityValidationRule : ValidationRuleBase, INodeVisitor
     /// Analyzes the complexity of a document.
     /// </summary>
     internal static LegacyComplexityResult Analyze(GraphQLDocument doc, double avgImpact, int maxRecursionCount, ISchema? schema = null)
-        => Analyze(doc, avgImpact, maxRecursionCount, schema, new ValidationContext { Document = doc });
-
-    private static LegacyComplexityResult Analyze(GraphQLDocument doc, double avgImpact, int maxRecursionCount, ISchema? schema, ValidationContext validationContext)
     {
         if (avgImpact <= 1)
             throw new ArgumentOutOfRangeException(nameof(avgImpact));
@@ -117,7 +111,7 @@ public class LegacyComplexityValidationRule : ValidationRuleBase, INodeVisitor
 
         // https://github.com/graphql-dotnet/graphql-dotnet/issues/3030
         // Sort fragment definitions so that independent fragments go in front.
-        var dependencies = BuildDependencies(validationContext);
+        var dependencies = BuildDependencies(doc);
         List<GraphQLFragmentDefinition> orderedFragments = [];
         List<GraphQLFragmentDefinition> fragsToNull = [];
 
@@ -162,12 +156,12 @@ public class LegacyComplexityValidationRule : ValidationRuleBase, INodeVisitor
         throw new InvalidOperationException("Fragments dependency cycle detected!");
     }
 
-    private static Dictionary<GraphQLFragmentDefinition, HashSet<GraphQLFragmentDefinition>?> BuildDependencies(ValidationContext validationContext)
+    private static Dictionary<GraphQLFragmentDefinition, HashSet<GraphQLFragmentDefinition>?> BuildDependencies(GraphQLDocument document)
     {
         Stack<GraphQLSelectionSet> _selectionSetsToVisit = new();
         Dictionary<GraphQLFragmentDefinition, HashSet<GraphQLFragmentDefinition>?> dependencies = [];
 
-        foreach (var fragmentDef in validationContext.Document.Definitions.OfType<GraphQLFragmentDefinition>())
+        foreach (var fragmentDef in document.Definitions.OfType<GraphQLFragmentDefinition>())
         {
             dependencies[fragmentDef] = GetDependencies(fragmentDef);
         }
@@ -191,7 +185,7 @@ public class LegacyComplexityValidationRule : ValidationRuleBase, INodeVisitor
                 {
                     if (selection is GraphQLFragmentSpread spread)
                     {
-                        var frag = validationContext.FindFragmentDefinition(spread.FragmentName.Name.Value);
+                        var frag = document.FindFragmentDefinition(spread.FragmentName.Name.Value);
                         if (frag != null)
                         {
                             (dependencies ??= []).Add(frag);

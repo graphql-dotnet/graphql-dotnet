@@ -11,8 +11,8 @@ public partial class ValidationContext
     // definition for duplicate names, just like Document.FindFragmentDefinition.
     internal GraphQLFragmentDefinition? FindFragmentDefinition(ROM name)
     {
-        // An operation and a single fragment need no lookup dictionary.
-        if (Document.Definitions.Count <= 2)
+        // Avoid a lookup dictionary for documents with only a few definitions.
+        if (Document.Definitions.Count <= 10)
             return Document.FindFragmentDefinition(name);
 
         if (_fragmentDefinitions == null)

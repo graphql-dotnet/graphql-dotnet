@@ -11,10 +11,10 @@ public class ValidationContextFragmentLookupTests
     [InlineData(0, 1)]
     [InlineData(1, 0)]
     [InlineData(1, 1)]
-    [InlineData(2, 0)]
-    [InlineData(2, 1)]
-    [InlineData(3, 1)]
-    [InlineData(0, 3)]
+    [InlineData(9, 1)]
+    [InlineData(10, 0)]
+    [InlineData(10, 1)]
+    [InlineData(0, 11)]
     public void FindsFragmentsByNameAndIgnoresOtherDefinitions(int fragmentCount, int operationCount)
     {
         var document = CreateDocument(fragmentCount, operationCount);
@@ -32,11 +32,12 @@ public class ValidationContextFragmentLookupTests
     }
 
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public void KeepsTheFirstDefinitionForDuplicateNames(bool includeOperation)
+    [InlineData(0)]
+    [InlineData(9)]
+    public void KeepsTheFirstDefinitionForDuplicateNames(int operationCount)
     {
-        var document = Parser.Parse((includeOperation ? "query { ...A }\n" : "") + """
+        var operations = string.Join("\n", Enumerable.Range(0, operationCount).Select(i => $"query Q{i} {{ ...A }}"));
+        var document = Parser.Parse(operations + "\n" + """
             fragment A on Query { first }
             fragment A on Other { second }
             """);
@@ -48,9 +49,9 @@ public class ValidationContextFragmentLookupTests
 
     [Theory]
     [InlineData(1, 1)]
-    [InlineData(1, 3)]
-    [InlineData(3, 1)]
-    [InlineData(3, 3)]
+    [InlineData(1, 11)]
+    [InlineData(11, 1)]
+    [InlineData(11, 11)]
     public void ClearsTheIndexWhenTheContextIsReused(int firstFragmentCount, int secondFragmentCount)
     {
         var context = new ValidationContext { Document = CreateDocument(firstFragmentCount, 0, "Old") };
