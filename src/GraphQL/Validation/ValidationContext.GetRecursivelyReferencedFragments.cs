@@ -8,8 +8,8 @@ public partial class ValidationContext
 {
     private Dictionary<GraphQLOperationDefinition, HashSet<GraphQLFragmentDefinition>?>? _fragments;
     private Dictionary<GraphQLOperationDefinition, HashSet<GraphQLFragmentDefinition>?>? _usedFragments;
-    private Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>>? _fragmentLists;
-    private Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>>? _usedFragmentLists;
+    private Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>?>? _fragmentLists;
+    private Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>?>? _usedFragmentLists;
     private bool? _noFragments;
 
     /// <summary>
@@ -19,14 +19,16 @@ public partial class ValidationContext
     /// </summary>
     public List<GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(GraphQLOperationDefinition operation, bool onlyUsed = false)
     {
-        if ((onlyUsed ? _usedFragmentLists : _fragmentLists)?.TryGetValue(operation, out var results) == true)
+        // if we have already determined that there are fragments in the document and we have already calculated the list for this operation, return it
+        if (_noFragments == false && (onlyUsed ? _usedFragmentLists : _fragmentLists)?.TryGetValue(operation, out var results) == true)
             return results;
 
         var fragments = GetRecursivelyReferencedFragmentsSet(operation, onlyUsed);
-        if (fragments == null)
+
+        if (_noFragments == true)
             return null;
 
-        var list = new List<GraphQLFragmentDefinition>(fragments);
+        var list = fragments == null ? null : new List<GraphQLFragmentDefinition>(fragments);
         (onlyUsed ? _usedFragmentLists ??= [] : _fragmentLists ??= [])[operation] = list;
         return list;
     }
@@ -143,20 +145,16 @@ public partial class ValidationContext
     public List<GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(List<GraphQLOperationDefinition> operations)
     {
         if (operations.Count == 1)
-        {
             return GetRecursivelyReferencedFragments(operations[0]);
-        }
-        else
+
+        List<GraphQLFragmentDefinition>? fragments = null;
+        foreach (var operation in operations)
         {
-            List<GraphQLFragmentDefinition>? fragments = null;
-            foreach (var operation in operations)
-            {
-                var items = GetRecursivelyReferencedFragments(operation);
-                if (items != null)
-                    (fragments ??= []).AddRange(items);
-            }
-            return fragments;
+            var items = GetRecursivelyReferencedFragments(operation);
+            if (items != null)
+                (fragments ??= []).AddRange(items);
         }
+        return fragments;
     }
 
     internal HashSet<GraphQLFragmentDefinition>? GetRecursivelyReferencedFragmentsSet(List<GraphQLOperationDefinition> operations)
@@ -171,7 +169,7 @@ public partial class ValidationContext
             if (items != null)
             {
                 if (fragments == null)
-                    fragments = new HashSet<GraphQLFragmentDefinition>(items);
+                    fragments = new(items);
                 else
                     fragments.UnionWith(items);
             }
