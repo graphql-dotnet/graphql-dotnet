@@ -36,7 +36,7 @@ public partial class ValidationContext
         var context = new GetVariablesVisitorContext(this, new TypeInfo(Schema));
         _getVariablesVisitor.VisitAsync(operation, context).GetAwaiter().GetResult();
 
-        var frags = GetRecursivelyReferencedFragments(operation);
+        var frags = GetRecursivelyReferencedFragmentsSet(operation);
 
         if (frags != null)
         {

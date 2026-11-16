@@ -138,6 +138,156 @@ public class ValidationContextFragmentTests
             .Select(x => x.FragmentName.Name.StringValue).ShouldBe(["first", "nested", "second"]);
     }
 
+    [Fact]
+    public void CachesSeparateSetsAndListsForAllAndUsedFragments()
+    {
+        var document = Parser.Parse("""
+            query { ...included ...skipped @skip(if: true) }
+            fragment included on Query { value }
+            fragment skipped on Query { value }
+            """);
+        var operation = document.Operation();
+        var included = (GraphQLFragmentDefinition)document.Definitions[1];
+        var skipped = (GraphQLFragmentDefinition)document.Definitions[2];
+        var context = Context(document, operation);
+
+        var all = context.GetRecursivelyReferencedFragmentsSet(operation)!;
+        var used = context.GetRecursivelyReferencedFragmentsSet(operation, true)!;
+        all.SetEquals([included, skipped]).ShouldBeTrue();
+        used.SetEquals([included]).ShouldBeTrue();
+        context.GetRecursivelyReferencedFragmentsSet(operation).ShouldBeSameAs(all);
+        context.GetRecursivelyReferencedFragmentsSet(operation, true).ShouldBeSameAs(used);
+
+        var allList = context.GetRecursivelyReferencedFragments(operation)!;
+        var usedList = context.GetRecursivelyReferencedFragments(operation, true)!;
+        allList.ShouldBe([included, skipped]);
+        usedList.ShouldBe([included]);
+        context.GetRecursivelyReferencedFragments(operation).ShouldBeSameAs(allList);
+        context.GetRecursivelyReferencedFragments(operation, true).ShouldBeSameAs(usedList);
+
+        allList.Clear();
+        usedList.Clear();
+        all.SetEquals([included, skipped]).ShouldBeTrue();
+        used.SetEquals([included]).ShouldBeTrue();
+    }
+
+    [Fact]
+    public void UnionsOperationSetsWithoutChangingCachedSets()
+    {
+        var document = Parser.Parse("""
+            query First { ...shared ...first }
+            query Second { ...second ...shared }
+            fragment shared on Query { value }
+            fragment first on Query { value }
+            fragment second on Query { value }
+            """);
+        var firstOperation = (GraphQLOperationDefinition)document.Definitions[0];
+        var secondOperation = (GraphQLOperationDefinition)document.Definitions[1];
+        var shared = (GraphQLFragmentDefinition)document.Definitions[2];
+        var first = (GraphQLFragmentDefinition)document.Definitions[3];
+        var second = (GraphQLFragmentDefinition)document.Definitions[4];
+        var context = Context(document, firstOperation);
+        var firstSet = context.GetRecursivelyReferencedFragmentsSet(firstOperation)!;
+        var secondSet = context.GetRecursivelyReferencedFragmentsSet(secondOperation)!;
+
+        context.GetRecursivelyReferencedFragmentsSet([firstOperation, secondOperation])!
+            .SetEquals([shared, first, second]).ShouldBeTrue();
+
+        firstSet.SetEquals([shared, first]).ShouldBeTrue();
+        secondSet.SetEquals([second, shared]).ShouldBeTrue();
+        context.GetRecursivelyReferencedFragmentsSet(firstOperation).ShouldBeSameAs(firstSet);
+        context.GetRecursivelyReferencedFragmentsSet(secondOperation).ShouldBeSameAs(secondSet);
+        context.GetRecursivelyReferencedFragmentsSet([firstOperation]).ShouldBeSameAs(firstSet);
+    }
+
+    [Fact]
+    public void CachesPublicOperationListsAndDetectsOperationSequenceChanges()
+    {
+        var document = Parser.Parse("""
+            query First { ...shared ...first }
+            query Second { ...second ...shared }
+            fragment shared on Query { value }
+            fragment first on Query { value }
+            fragment second on Query { value }
+            """);
+        var firstOperation = (GraphQLOperationDefinition)document.Definitions[0];
+        var secondOperation = (GraphQLOperationDefinition)document.Definitions[1];
+        var shared = (GraphQLFragmentDefinition)document.Definitions[2];
+        var first = (GraphQLFragmentDefinition)document.Definitions[3];
+        var second = (GraphQLFragmentDefinition)document.Definitions[4];
+        var context = Context(document, firstOperation);
+        var operations = new List<GraphQLOperationDefinition> { firstOperation, secondOperation };
+
+        var fragments = context.GetRecursivelyReferencedFragments(operations)!;
+        fragments.ShouldBe([shared, first, second, shared]);
+        context.GetRecursivelyReferencedFragments(operations).ShouldBeSameAs(fragments);
+        context.GetRecursivelyReferencedFragments([firstOperation])
+            .ShouldBeSameAs(context.GetRecursivelyReferencedFragments(firstOperation));
+
+        operations.Reverse();
+        var reversed = context.GetRecursivelyReferencedFragments(operations)!;
+        reversed.ShouldBe([second, shared, shared, first]);
+        reversed.ShouldNotBeSameAs(fragments);
+        context.GetRecursivelyReferencedFragments(operations).ShouldBeSameAs(reversed);
+
+        operations[0] = firstOperation;
+        context.GetRecursivelyReferencedFragments(operations).ShouldBe([shared, first, shared, first]);
+        operations.Add(secondOperation);
+        context.GetRecursivelyReferencedFragments(operations).ShouldBe([shared, first, shared, first, second, shared]);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ResetClearsFragmentSetsAndPublicLists(bool initiallyHasFragments)
+    {
+        var firstOperation = new GraphQLOperationDefinition(new GraphQLSelectionSet([Spread("fragment")]));
+        var secondOperation = new GraphQLOperationDefinition(new GraphQLSelectionSet([Spread("fragment")]));
+        var operations = new List<GraphQLOperationDefinition> { firstOperation, secondOperation };
+        var oldFragment = Fragment("fragment", new GraphQLSelectionSet([new GraphQLField(new GraphQLName("oldValue"))]));
+        var definitions = new List<ASTNode> { firstOperation, secondOperation };
+        if (initiallyHasFragments)
+            definitions.Add(oldFragment);
+        var context = Context(new GraphQLDocument(definitions), firstOperation);
+        var oldSet = context.GetRecursivelyReferencedFragmentsSet(firstOperation);
+        var oldUsedSet = context.GetRecursivelyReferencedFragmentsSet(firstOperation, true);
+        var oldList = context.GetRecursivelyReferencedFragments(firstOperation);
+        var oldUsedList = context.GetRecursivelyReferencedFragments(firstOperation, true);
+        var oldAggregate = context.GetRecursivelyReferencedFragments(operations);
+        if (initiallyHasFragments)
+        {
+            oldList.ShouldBe([oldFragment]);
+            oldAggregate.ShouldBe([oldFragment, oldFragment]);
+        }
+        else
+        {
+            oldList.ShouldBeNull();
+            oldAggregate.ShouldBeNull();
+        }
+
+        context.Reset();
+        var fragment = Fragment("fragment", new GraphQLSelectionSet([new GraphQLField(new GraphQLName("newValue"))]));
+        context.Document = new GraphQLDocument([firstOperation, secondOperation, fragment]);
+        context.Operation = firstOperation;
+        context.Variables = Inputs.Empty;
+
+        var all = context.GetRecursivelyReferencedFragmentsSet(firstOperation)!;
+        var used = context.GetRecursivelyReferencedFragmentsSet(firstOperation, true)!;
+        all.SetEquals([fragment]).ShouldBeTrue();
+        used.SetEquals([fragment]).ShouldBeTrue();
+        all.ShouldNotBeSameAs(oldSet);
+        used.ShouldNotBeSameAs(oldUsedSet);
+        var allList = context.GetRecursivelyReferencedFragments(firstOperation)!;
+        var usedList = context.GetRecursivelyReferencedFragments(firstOperation, true)!;
+        allList.ShouldBe([fragment]);
+        usedList.ShouldBe([fragment]);
+        allList.ShouldNotBeSameAs(oldList);
+        usedList.ShouldNotBeSameAs(oldUsedList);
+        var aggregate = context.GetRecursivelyReferencedFragments(operations)!;
+        aggregate.ShouldBe([fragment, fragment]);
+        aggregate.ShouldNotBeSameAs(oldAggregate);
+    }
+
     private static ValidationContext Context(GraphQLDocument document, GraphQLOperationDefinition operation)
         => new() { Document = document, Operation = operation, Variables = Inputs.Empty };
 

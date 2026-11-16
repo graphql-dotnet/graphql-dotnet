@@ -43,7 +43,7 @@ public class NoUnusedFragments : ValidationRuleBase
             if (operationDefs == null)
                 return;
 
-            var fragmentsUsed = context.GetRecursivelyReferencedFragments(operationDefs);
+            var fragmentsUsed = context.GetRecursivelyReferencedFragmentsSet(operationDefs);
 
             foreach (var fragmentDef in fragmentDefs)
             {
