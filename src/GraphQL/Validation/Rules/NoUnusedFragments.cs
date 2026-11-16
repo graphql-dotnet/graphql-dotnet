@@ -45,7 +45,7 @@ public class NoUnusedFragments : ValidationRuleBase
                 if (firstOperation == null)
                     firstOperation = operation;
                 else
-                    (operationDefs ??= new(2) { firstOperation }).Add(operation);
+                    (operationDefs ??= new(4) { firstOperation }).Add(operation);
             }
         }
 
