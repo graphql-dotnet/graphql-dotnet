@@ -201,7 +201,7 @@ public class ValidationContextFragmentTests
     }
 
     [Fact]
-    public void CachesPublicOperationListsAndDetectsOperationSequenceChanges()
+    public void PreservesPublicOperationListOrderAndDuplicates()
     {
         var document = Parser.Parse("""
             query First { ...shared ...first }
@@ -220,15 +220,13 @@ public class ValidationContextFragmentTests
 
         var fragments = context.GetRecursivelyReferencedFragments(operations)!;
         fragments.ShouldBe([shared, first, second, shared]);
-        context.GetRecursivelyReferencedFragments(operations).ShouldBeSameAs(fragments);
+        context.GetRecursivelyReferencedFragments(operations).ShouldNotBeSameAs(fragments);
         context.GetRecursivelyReferencedFragments([firstOperation])
             .ShouldBeSameAs(context.GetRecursivelyReferencedFragments(firstOperation));
 
         operations.Reverse();
         var reversed = context.GetRecursivelyReferencedFragments(operations)!;
         reversed.ShouldBe([second, shared, shared, first]);
-        reversed.ShouldNotBeSameAs(fragments);
-        context.GetRecursivelyReferencedFragments(operations).ShouldBeSameAs(reversed);
 
         operations[0] = firstOperation;
         context.GetRecursivelyReferencedFragments(operations).ShouldBe([shared, first, shared, first]);
@@ -253,16 +251,13 @@ public class ValidationContextFragmentTests
         var oldUsedSet = context.GetRecursivelyReferencedFragmentsSet(firstOperation, true);
         var oldList = context.GetRecursivelyReferencedFragments(firstOperation);
         var oldUsedList = context.GetRecursivelyReferencedFragments(firstOperation, true);
-        var oldAggregate = context.GetRecursivelyReferencedFragments(operations);
         if (initiallyHasFragments)
         {
             oldList.ShouldBe([oldFragment]);
-            oldAggregate.ShouldBe([oldFragment, oldFragment]);
         }
         else
         {
             oldList.ShouldBeNull();
-            oldAggregate.ShouldBeNull();
         }
 
         context.Reset();
@@ -283,9 +278,7 @@ public class ValidationContextFragmentTests
         usedList.ShouldBe([fragment]);
         allList.ShouldNotBeSameAs(oldList);
         usedList.ShouldNotBeSameAs(oldUsedList);
-        var aggregate = context.GetRecursivelyReferencedFragments(operations)!;
-        aggregate.ShouldBe([fragment, fragment]);
-        aggregate.ShouldNotBeSameAs(oldAggregate);
+        context.GetRecursivelyReferencedFragments(operations).ShouldBe([fragment, fragment]);
     }
 
     private static ValidationContext Context(GraphQLDocument document, GraphQLOperationDefinition operation)

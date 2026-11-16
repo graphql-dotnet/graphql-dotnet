@@ -10,8 +10,6 @@ public partial class ValidationContext
     private Dictionary<GraphQLOperationDefinition, HashSet<GraphQLFragmentDefinition>?>? _usedFragments;
     private Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>>? _fragmentLists;
     private Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>>? _usedFragmentLists;
-    private GraphQLOperationDefinition[]? _fragmentListOperations;
-    private List<GraphQLFragmentDefinition>? _fragmentList;
     private bool? _noFragments;
 
     /// <summary>
@@ -150,16 +148,6 @@ public partial class ValidationContext
         }
         else
         {
-            // Cache the most recent aggregate, checking the sequence because callers can mutate the input list.
-            if (_fragmentListOperations != null && _fragmentListOperations.Length == operations.Count)
-            {
-                int i = 0;
-                while (i < operations.Count && _fragmentListOperations[i] == operations[i])
-                    ++i;
-                if (i == operations.Count)
-                    return _fragmentList;
-            }
-
             List<GraphQLFragmentDefinition>? fragments = null;
             foreach (var operation in operations)
             {
@@ -167,8 +155,6 @@ public partial class ValidationContext
                 if (items != null)
                     (fragments ??= []).AddRange(items);
             }
-            _fragmentListOperations = operations.ToArray();
-            _fragmentList = fragments;
             return fragments;
         }
     }

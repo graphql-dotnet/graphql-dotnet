@@ -22,8 +22,6 @@ public partial class ValidationContext : IProvideUserContext
         _usedFragments?.Clear();
         _fragmentLists?.Clear();
         _usedFragmentLists?.Clear();
-        _fragmentListOperations = null;
-        _fragmentList = null;
         _noFragments = null;
         _fragmentDefinitions = null;
         _variables.Clear();
