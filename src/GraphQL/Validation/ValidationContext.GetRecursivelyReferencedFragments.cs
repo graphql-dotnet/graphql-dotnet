@@ -1,14 +1,15 @@
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
-using GraphQLParser.Visitors;
 
 namespace GraphQL.Validation;
 
 public partial class ValidationContext
 {
-    private Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>?>? _fragments = [];
-    private Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>?>? _usedFragments = [];
+    private Dictionary<GraphQLOperationDefinition, HashSet<GraphQLFragmentDefinition>?>? _fragments;
+    private Dictionary<GraphQLOperationDefinition, HashSet<GraphQLFragmentDefinition>?>? _usedFragments;
+    private Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>?>? _fragmentLists;
+    private Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>?>? _usedFragmentLists;
     private bool? _noFragments;
 
     /// <summary>
@@ -17,6 +18,22 @@ public partial class ValidationContext
     /// parameter, returns only the fragments that are not skipped by the @skip or @include directive.
     /// </summary>
     public List<GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(GraphQLOperationDefinition operation, bool onlyUsed = false)
+    {
+        // if we have already determined that there are fragments in the document and we have already calculated the list for this operation, return it
+        if (_noFragments == false && (onlyUsed ? _usedFragmentLists : _fragmentLists)?.TryGetValue(operation, out var results) == true)
+            return results;
+
+        var fragments = GetRecursivelyReferencedFragmentsSet(operation, onlyUsed);
+
+        if (_noFragments == true)
+            return null;
+
+        var list = fragments == null ? null : new List<GraphQLFragmentDefinition>(fragments);
+        (onlyUsed ? _usedFragmentLists ??= [] : _fragmentLists ??= [])[operation] = list;
+        return list;
+    }
+
+    internal HashSet<GraphQLFragmentDefinition>? GetRecursivelyReferencedFragmentsSet(GraphQLOperationDefinition operation, bool onlyUsed = false)
     {
         // if we have already determined that there are no fragments in the document, return null
         if (_noFragments == true)
@@ -49,9 +66,7 @@ public partial class ValidationContext
         }
 
         // if we found a fragment, visit the document to find all referenced fragments
-        var context = new GetRecursivelyReferencedFragmentsVisitorContext(this, onlyUsed);
-        GetRecursivelyReferencedFragmentsVisitor.Instance.VisitAsync(operation.SelectionSet, context).GetAwaiter().GetResult();
-        var fragments = context.GetFragments(reset: true);
+        var fragments = CollectReferencedFragments(operation.SelectionSet, onlyUsed);
         (onlyUsed ? _usedFragments ??= [] : _fragments ??= [])[operation] = fragments;
         return fragments;
     }
@@ -130,103 +145,106 @@ public partial class ValidationContext
     public List<GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(List<GraphQLOperationDefinition> operations)
     {
         if (operations.Count == 1)
-        {
             return GetRecursivelyReferencedFragments(operations[0]);
-        }
-        else
+
+        List<GraphQLFragmentDefinition>? fragments = null;
+        foreach (var operation in operations)
         {
-            List<GraphQLFragmentDefinition>? fragments = null;
-            foreach (var operation in operations)
+            var items = GetRecursivelyReferencedFragments(operation);
+            if (items != null)
+                (fragments ??= []).AddRange(items);
+        }
+        return fragments;
+    }
+
+    internal HashSet<GraphQLFragmentDefinition>? GetRecursivelyReferencedFragmentsSet(List<GraphQLOperationDefinition> operations)
+    {
+        if (operations.Count == 1)
+            return GetRecursivelyReferencedFragmentsSet(operations[0]);
+
+        HashSet<GraphQLFragmentDefinition>? fragments = null;
+        foreach (var operation in operations)
+        {
+            var items = GetRecursivelyReferencedFragmentsSet(operation);
+            if (items != null)
             {
-                var items = GetRecursivelyReferencedFragments(operation);
-                if (items != null)
-                    (fragments ??= []).AddRange(items);
+                if (fragments == null)
+                    fragments = new(items);
+                else
+                    fragments.UnionWith(items);
             }
-            return fragments;
         }
+        return fragments;
     }
 
-    // struct intentionally - works only on stack
-    private readonly struct GetRecursivelyReferencedFragmentsVisitorContext : IASTVisitorContext
+    /// <summary>
+    /// Uses iterative depth-first traversal to prevent stack overflow exceptions from deeply nested selections or fragment chains.
+    /// </summary>
+    private HashSet<GraphQLFragmentDefinition>? CollectReferencedFragments(GraphQLSelectionSet selectionSet, bool onlyUsed)
     {
-        public GetRecursivelyReferencedFragmentsVisitorContext(ValidationContext validationContext, bool onlyUsedFragments)
+        if (onlyUsed && !ShouldIncludeNode(selectionSet))
+            return null;
+
+        // The result set also tracks visited fragments, avoiding a separate discovery list.
+        HashSet<GraphQLFragmentDefinition>? fragments = null;
+        // Parent selections and the next sibling index to resume.
+        using var stack = new StackSlim<(List<ASTNode> selections, int selectionIndex)>();
+        var selections = selectionSet.Selections;
+        int selectionIndex = 0;
+
+        while (true)
         {
-            ValidationContext = validationContext;
-            OnlyUsedFragments = onlyUsedFragments;
-        }
-
-        public bool OnlyUsedFragments { get; }
-
-        public ValidationContext ValidationContext { get; }
-
-        public CancellationToken CancellationToken => default;
-
-        public void AddFragment(GraphQLFragmentDefinition fragment)
-            => ValidationContext.AddListItem(nameof(GetRecursivelyReferencedFragmentsVisitorContext), fragment);
-
-        public List<GraphQLFragmentDefinition>? GetFragments(bool reset)
-            => ValidationContext.GetList<GraphQLFragmentDefinition>(nameof(GetRecursivelyReferencedFragmentsVisitorContext), reset);
-    }
-
-    private sealed class GetRecursivelyReferencedFragmentsVisitor : ASTVisitor<GetRecursivelyReferencedFragmentsVisitorContext>
-    {
-        private GetRecursivelyReferencedFragmentsVisitor()
-        {
-        }
-
-        public static GetRecursivelyReferencedFragmentsVisitor Instance { get; } = new();
-
-        public override ValueTask VisitAsync(ASTNode? node, GetRecursivelyReferencedFragmentsVisitorContext context)
-        {
-            // check if this node should be skipped or not (check @skip and @include directives)
-            if (node == null || !context.OnlyUsedFragments || context.ValidationContext.ShouldIncludeNode(node))
-                return base.VisitAsync(node, context);
-
-            return default;
-        }
-
-        protected override ValueTask VisitOperationDefinitionAsync(GraphQLOperationDefinition operationDefinition, GetRecursivelyReferencedFragmentsVisitorContext context)
-            => VisitAsync(operationDefinition.SelectionSet, context);
-
-        protected override ValueTask VisitSelectionSetAsync(GraphQLSelectionSet selectionSet, GetRecursivelyReferencedFragmentsVisitorContext context)
-            => VisitAsync(selectionSet.Selections, context);
-
-        protected override ValueTask VisitFieldAsync(GraphQLField field, GetRecursivelyReferencedFragmentsVisitorContext context)
-            => VisitAsync(field.SelectionSet, context);
-
-        protected override ValueTask VisitInlineFragmentAsync(GraphQLInlineFragment inlineFragment, GetRecursivelyReferencedFragmentsVisitorContext context)
-            => VisitAsync(inlineFragment.SelectionSet, context);
-
-        protected override async ValueTask VisitFragmentSpreadAsync(GraphQLFragmentSpread fragmentSpread, GetRecursivelyReferencedFragmentsVisitorContext context)
-        {
-            // if we have not encountered this fragment before
-            if (!Contains(fragmentSpread, context))
+            if (selectionIndex == selections.Count)
             {
-                // find the fragment definition
-                var fragmentDefinition = context.ValidationContext.Document.FindFragmentDefinition(fragmentSpread.FragmentName.Name);
-                if (fragmentDefinition != null)
+                // This selection set is complete; resume the most recent unfinished parent.
+                if (!stack.TryPop(out var parent))
+                    break;
+
+                (selections, selectionIndex) = parent;
+                continue;
+            }
+
+            var node = selections[selectionIndex++];
+            if (onlyUsed && !ShouldIncludeNode(node))
+                continue;
+
+            GraphQLSelectionSet? childSelectionSet;
+            if (node is GraphQLFragmentSpread spread)
+            {
+                var fragment = FindFragmentDefinition(spread.FragmentName.Name);
+                // Mark before descending so cycles and repeated spreads are visited only once.
+                if (fragment == null || !(fragments ??= []).Add(fragment))
+                    continue;
+
+                childSelectionSet = fragment.SelectionSet;
+            }
+            else
+            {
+                childSelectionSet = node switch
                 {
-                    // add the fragment definition to our known list
-                    context.AddFragment(fragmentDefinition);
-                    // walk the fragment definition
-                    await VisitSelectionSetAsync(fragmentDefinition.SelectionSet, context).ConfigureAwait(false);
-                }
-            }
-        }
+                    GraphQLField field => field.SelectionSet,
+                    GraphQLInlineFragment inlineFragment => inlineFragment.SelectionSet,
+                    _ => null,
+                };
 
-        private static bool Contains(GraphQLFragmentSpread fragmentSpread, GetRecursivelyReferencedFragmentsVisitorContext context)
-        {
-            var fragments = context.GetFragments(reset: false);
-            if (fragments == null)
-                return false;
-
-            foreach (var frag in fragments)
-            {
-                if (frag.FragmentName.Name == fragmentSpread.FragmentName.Name)
-                    return true;
+                // The inclusion hook applies to field/inline selection sets, but not fragment-definition sets.
+                if (childSelectionSet != null && onlyUsed && !ShouldIncludeNode(childSelectionSet))
+                    continue;
             }
 
-            return false;
+            if (childSelectionSet == null)
+                continue;
+
+            // Save only unfinished siblings, preserving depth-first order. A chain of
+            // single selections needs no stack storage, regardless of its depth.
+            if (selectionIndex < selections.Count)
+                stack.Push((selections, selectionIndex));
+
+            selections = childSelectionSet.Selections;
+            selectionIndex = 0;
         }
+
+        return fragments;
+
     }
 }

@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using GraphQL.Types;
 using GraphQL.Validation.Rules.Custom;
-using GraphQLParser;
 using GraphQLParser.AST;
 using GraphQLParser.Visitors;
 
@@ -126,7 +125,7 @@ internal sealed class ComplexityVisitor : ASTVisitor<ComplexityVisitorContext>
 
         // identify the fragment and ensure it is defined within the document
         var fragmentName = fragmentSpread.FragmentName.Name;
-        var fragment = context.Document.FindFragmentDefinition(fragmentName.Value)
+        var fragment = context.ValidationContext.FindFragmentDefinition(fragmentName.Value)
             ?? ThrowInvalidFragment(fragmentName);
 
         // check for circular references

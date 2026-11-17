@@ -39,7 +39,6 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
     // mutually exclusive for names/arguments, even when their return types coincide.
     private sealed class MergeVisitor : INodeVisitor
     {
-        private Dictionary<ROM, GraphQLFragmentDefinition>? _fragments;
         private HashSet<ROM>? _checkedFragments;
         private HashSet<HashSet<ROM>>? _checkedFragmentGroups;
         private Dictionary<HashSet<ROM>, FieldMap>? _fragmentLeafSummaries;
@@ -215,16 +214,8 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
             // a fragment DAG. Removing it on return is exponential.
             if (!(fields.Fragments ??= new()).Add(name))
                 return true;
-            if (_fragments == null)
-            {
-                _fragments = new();
-                foreach (var definition in context.Document.Definitions)
-                {
-                    if (definition is GraphQLFragmentDefinition fragment && !_fragments.ContainsKey(fragment.FragmentName.Name))
-                        _fragments.Add(fragment.FragmentName.Name, fragment);
-                }
-            }
-            return !_fragments.TryGetValue(name, out var found) ||
+            var found = context.FindFragmentDefinition(name);
+            return found == null ||
                 Collect(context, new SelectionSource(found.TypeCondition.Type.GraphTypeFromType(context.Schema), found.SelectionSet), ref fields);
         }
 
