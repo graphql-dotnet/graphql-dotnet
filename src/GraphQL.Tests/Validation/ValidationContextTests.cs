@@ -567,6 +567,6 @@ public class ValidationContextTests
         };
         var actual = context.GetRecursivelyReferencedFragments(context.Operation, !includeSkipped) ?? [];
         var actualNames = actual.Select(x => x.FragmentName.Name.StringValue).ToArray();
-        actualNames.ShouldBe(expectedFragments);
+        actualNames.ShouldBe(expectedFragments, ignoreOrder: true);
     }
 }

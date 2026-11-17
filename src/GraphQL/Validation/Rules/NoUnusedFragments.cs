@@ -44,9 +44,9 @@ public sealed class NoUnusedFragments : ValidationRuleBase
 
         // Get the set of fragments that are used by the collected operations
         var fragmentsUsed = operationDefs != null
-            ? context.GetRecursivelyReferencedFragmentsSet(operationDefs)
+            ? context.GetRecursivelyReferencedFragments(operationDefs)
             : firstOperation != null
-                ? context.GetRecursivelyReferencedFragmentsSet(firstOperation)
+                ? context.GetRecursivelyReferencedFragments(firstOperation)
                 : null;
 
         // Report errors for any fragment definitions that are not used
