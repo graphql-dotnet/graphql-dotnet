@@ -21,7 +21,10 @@ public partial class ValidationContext : IProvideUserContext
         _errors = null;
         _fragments?.Clear();
         _usedFragments?.Clear();
+        _fragmentLists?.Clear();
+        _usedFragmentLists?.Clear();
         _noFragments = null;
+        _fragmentDefinitions = null;
         _variables.Clear();
         Operation = null!;
         Schema = null!;
@@ -127,13 +130,11 @@ public partial class ValidationContext : IProvideUserContext
     {
         var spreads = new List<GraphQLFragmentSpread>();
 
-        var setsToVisit = new Stack<GraphQLSelectionSet>();
+        using var setsToVisit = new StackSlim<GraphQLSelectionSet>();
         setsToVisit.Push(node);
 
-        while (setsToVisit.Count > 0)
+        while (setsToVisit.TryPop(out var set))
         {
-            var set = setsToVisit.Pop();
-
             foreach (var selection in set.Selections)
             {
                 if (selection is GraphQLFragmentSpread spread)

@@ -1,0 +1,9 @@
+---
+import MenuList from './MenuList.astro'
+
+const { activeItem, pathName } = Astro.props
+---
+
+<div class="nav">
+  <MenuList items={activeItem.sidemenu} pathName={pathName} />
+</div>

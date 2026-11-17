@@ -1,7 +1,7 @@
 - title: GraphQL.NET
   dir: ./
   url: /
-  file: pages/landing.js
+  file: ../src/pages/index.astro
 
 - title: Docs
   dir: ./docs

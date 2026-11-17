@@ -18,9 +18,17 @@ public class OverlappingFieldsCanBeMergedError : ValidationError
     {
     }
 
+    internal OverlappingFieldsCanBeMergedError(ValidationContext context, GraphQLField first, GraphQLField second, string reason)
+        : base(context.Document.Source, NUMBER, FieldsConflictMessage((string)(first.Alias?.Name ?? first.Name), reason), first)
+    {
+        AddNode(context.Document.Source, second);
+    }
+
     internal static string FieldsConflictMessage(string responseName, ConflictReason reason) =>
-        $"Fields {responseName} conflicts because {ReasonMessage(reason.Message)}. " +
-        "Use different aliases on the fields to fetch both if this was intentional.";
+        FieldsConflictMessage(responseName, ReasonMessage(reason.Message));
+
+    internal static string FieldsConflictMessage(string responseName, string reason) =>
+        $"Fields '{responseName}' conflict because {reason}.";
 
     private static string ReasonMessage(Message reasonMessage)
     {

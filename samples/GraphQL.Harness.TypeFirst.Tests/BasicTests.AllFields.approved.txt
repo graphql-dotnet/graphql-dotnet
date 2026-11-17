@@ -1,0 +1,219 @@
+{
+  "AllFields": {
+    "data": {
+      "hero": {
+        "id": "3",
+        "name": "R2-D2",
+        "appearsIn": [
+          "NEWHOPE",
+          "EMPIRE",
+          "JEDI"
+        ],
+        "primaryFunction": "Astromech",
+        "friends": [
+          {
+            "id": "1",
+            "name": "Luke",
+            "appearsIn": [
+              "NEWHOPE",
+              "EMPIRE",
+              "JEDI"
+            ],
+            "homePlanet": "Tatooine"
+          },
+          {
+            "id": "4",
+            "name": "C-3PO",
+            "appearsIn": [
+              "NEWHOPE",
+              "EMPIRE",
+              "JEDI"
+            ],
+            "primaryFunction": "Protocol"
+          }
+        ],
+        "friendsConnection": {
+          "totalCount": 2,
+          "edges": [
+            {
+              "cursor": "MQ==",
+              "node": {
+                "id": "1",
+                "name": "Luke",
+                "appearsIn": [
+                  "NEWHOPE",
+                  "EMPIRE",
+                  "JEDI"
+                ],
+                "homePlanet": "Tatooine"
+              }
+            },
+            {
+              "cursor": "NA==",
+              "node": {
+                "id": "4",
+                "name": "C-3PO",
+                "appearsIn": [
+                  "NEWHOPE",
+                  "EMPIRE",
+                  "JEDI"
+                ],
+                "primaryFunction": "Protocol"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "1",
+              "name": "Luke",
+              "appearsIn": [
+                "NEWHOPE",
+                "EMPIRE",
+                "JEDI"
+              ],
+              "homePlanet": "Tatooine"
+            },
+            {
+              "id": "4",
+              "name": "C-3PO",
+              "appearsIn": [
+                "NEWHOPE",
+                "EMPIRE",
+                "JEDI"
+              ],
+              "primaryFunction": "Protocol"
+            }
+          ],
+          "pageInfo": {
+            "hasNextPage": false,
+            "hasPreviousPage": false,
+            "startCursor": "MQ==",
+            "endCursor": "NA=="
+          }
+        }
+      },
+      "human": {
+        "id": "1",
+        "name": "Luke",
+        "appearsIn": [
+          "NEWHOPE",
+          "EMPIRE",
+          "JEDI"
+        ],
+        "homePlanet": "Tatooine",
+        "friends": [
+          {
+            "id": "3",
+            "name": "R2-D2",
+            "appearsIn": [
+              "NEWHOPE",
+              "EMPIRE",
+              "JEDI"
+            ],
+            "primaryFunction": "Astromech"
+          },
+          {
+            "id": "4",
+            "name": "C-3PO",
+            "appearsIn": [
+              "NEWHOPE",
+              "EMPIRE",
+              "JEDI"
+            ],
+            "primaryFunction": "Protocol"
+          }
+        ],
+        "friendsConnection": {
+          "totalCount": 2,
+          "edges": [
+            {
+              "cursor": "Mw==",
+              "node": {
+                "id": "3",
+                "name": "R2-D2",
+                "appearsIn": [
+                  "NEWHOPE",
+                  "EMPIRE",
+                  "JEDI"
+                ],
+                "primaryFunction": "Astromech"
+              }
+            },
+            {
+              "cursor": "NA==",
+              "node": {
+                "id": "4",
+                "name": "C-3PO",
+                "appearsIn": [
+                  "NEWHOPE",
+                  "EMPIRE",
+                  "JEDI"
+                ],
+                "primaryFunction": "Protocol"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "3",
+              "name": "R2-D2",
+              "appearsIn": [
+                "NEWHOPE",
+                "EMPIRE",
+                "JEDI"
+              ],
+              "primaryFunction": "Astromech"
+            },
+            {
+              "id": "4",
+              "name": "C-3PO",
+              "appearsIn": [
+                "NEWHOPE",
+                "EMPIRE",
+                "JEDI"
+              ],
+              "primaryFunction": "Protocol"
+            }
+          ],
+          "pageInfo": {
+            "hasNextPage": false,
+            "hasPreviousPage": false,
+            "startCursor": "Mw==",
+            "endCursor": "NA=="
+          }
+        }
+      },
+      "droid": {
+        "id": "4",
+        "name": "C-3PO",
+        "appearsIn": [
+          "NEWHOPE",
+          "EMPIRE",
+          "JEDI"
+        ],
+        "primaryFunction": "Protocol",
+        "friends": [],
+        "friendsConnection": {
+          "totalCount": 0,
+          "edges": [],
+          "items": [],
+          "pageInfo": {
+            "hasNextPage": false,
+            "hasPreviousPage": false,
+            "startCursor": null,
+            "endCursor": null
+          }
+        }
+      }
+    }
+  },
+  "CreateHuman": {
+    "data": {
+      "createHuman": {
+        "id": "5",
+        "name": "Leia",
+        "homePlanet": "Alderaan"
+      }
+    }
+  }
+}

@@ -55,7 +55,7 @@ public sealed class PossibleFragmentSpreads : ValidationRuleBase
 
     private static IGraphType? getFragmentType(ValidationContext context, ROM name)
     {
-        var frag = context.Document.FindFragmentDefinition(name);
+        var frag = context.FindFragmentDefinition(name);
         return frag?.TypeCondition.Type.GraphTypeFromType(context.Schema);
     }
 }
