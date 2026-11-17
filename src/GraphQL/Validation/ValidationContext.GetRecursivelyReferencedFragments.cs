@@ -151,8 +151,9 @@ public partial class ValidationContext
         if (onlyUsed && !ShouldIncludeNode(selectionSet))
             return null;
 
-        // Referenced fragments in discovery order; also used to detect repeated fragments.
+        // Referenced fragments in discovery order, with constant-time duplicate checks.
         List<GraphQLFragmentDefinition>? fragments = null;
+        HashSet<GraphQLFragmentDefinition>? visited = null;
         // Parent selections and the next sibling index to resume.
         using var stack = new StackSlim<(List<ASTNode> selections, int selectionIndex)>();
         var selections = selectionSet.Selections;
@@ -177,11 +178,8 @@ public partial class ValidationContext
             GraphQLSelectionSet? childSelectionSet;
             if (node is GraphQLFragmentSpread spread)
             {
-                if (Contains(fragments, spread.FragmentName.Name))
-                    continue;
-
-                var fragment = Document.FindFragmentDefinition(spread.FragmentName.Name);
-                if (fragment == null)
+                var fragment = FindFragmentDefinition(spread.FragmentName.Name);
+                if (fragment == null || !(visited ??= []).Add(fragment))
                     continue;
 
                 // Mark before descending so cycles and repeated spreads are visited only once.
@@ -216,18 +214,5 @@ public partial class ValidationContext
 
         return fragments;
 
-        static bool Contains(List<GraphQLFragmentDefinition>? fragments, ROM name)
-        {
-            if (fragments != null)
-            {
-                foreach (var fragment in fragments)
-                {
-                    if (fragment.FragmentName.Name == name)
-                        return true;
-                }
-            }
-
-            return false;
-        }
     }
 }

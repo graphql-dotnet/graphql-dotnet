@@ -1,5 +1,4 @@
 using GraphQL.Validation.Errors;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules;
@@ -46,7 +45,7 @@ public class SingleRootFieldSubscriptions : ValidationRuleBase
 
         if (fragment is GraphQLFragmentSpread fragmentSpread)
         {
-            var fragmentDefinition = context.Document.FindFragmentDefinition(fragmentSpread.FragmentName.Name);
+            var fragmentDefinition = context.FindFragmentDefinition(fragmentSpread.FragmentName.Name);
             if (fragmentDefinition == null)
                 return;
 
