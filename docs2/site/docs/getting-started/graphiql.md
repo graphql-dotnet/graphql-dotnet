@@ -55,7 +55,7 @@ app.UseGraphQLGraphiQL(options: graphiQLOptions);
 ```
 
 ## Additional Resources
-You may find GraphiQL example in [graphql-dotnet](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL.Harness/Startup.cs) repo.
+You may find GraphiQL example in [graphql-dotnet](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/samples/GraphQL.Harness/Startup.cs) repo.
 [This ASP.NET Core sample project](https://github.com/graphql-dotnet/examples/tree/master/src/AspNetCoreCustom) also provides an example of hosting
 the GraphiQL IDE with a little more effort.
 
