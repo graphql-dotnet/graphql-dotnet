@@ -1,5 +1,4 @@
 using GraphQL.Validation.Errors;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules;
@@ -28,30 +27,42 @@ public class NoUnusedFragments : ValidationRuleBase
     /// <inheritdoc/>
     /// <exception cref="NoUnusedFragmentsError"/>
     public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
-        => new(context.Document.FragmentsCount() > 0 ? _nodeVisitor : null);
+    {
+        // If there are no fragment definitions, no need to continue
+        foreach (var definition in context.Document.Definitions)
+            if (definition is GraphQLFragmentDefinition)
+                goto FoundFragment;
+        return default;
+    FoundFragment:
 
-    private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
-        new MatchingNodeVisitor<GraphQLOperationDefinition>((node, context) => (context.TypeInfo.NoUnusedFragments_OperationDefs ??= new(1)).Add(node)),
-        new MatchingNodeVisitor<GraphQLFragmentDefinition>((node, context) => (context.TypeInfo.NoUnusedFragments_FragmentDefs ??= []).Add(node)),
-        new MatchingNodeVisitor<GraphQLDocument>(leave: (document, context) =>
+        // Allocate an operation list only when there is more than one operation.
+        GraphQLOperationDefinition? firstOperation = null;
+        List<GraphQLOperationDefinition>? operationDefs = null;
+        foreach (var definition in context.Document.Definitions)
         {
-            var fragmentDefs = context.TypeInfo.NoUnusedFragments_FragmentDefs;
-            if (fragmentDefs == null)
-                return;
-
-            var operationDefs = context.TypeInfo.NoUnusedFragments_OperationDefs;
-            if (operationDefs == null)
-                return;
-
-            var fragmentsUsed = context.GetRecursivelyReferencedFragments(operationDefs);
-
-            foreach (var fragmentDef in fragmentDefs)
+            if (definition is GraphQLOperationDefinition operation)
             {
-                if (fragmentsUsed == null || !fragmentsUsed.Contains(fragmentDef))
-                {
-                    context.ReportError(new NoUnusedFragmentsError(context, fragmentDef));
-                }
+                if (firstOperation == null)
+                    firstOperation = operation;
+                else
+                    (operationDefs ??= new(4) { firstOperation }).Add(operation);
             }
-        })
-    );
+        }
+
+        // Get the set of fragments that are used by the collected operations
+        var fragmentsUsed = operationDefs != null
+            ? context.GetRecursivelyReferencedFragmentsSet(operationDefs)
+            : firstOperation != null
+                ? context.GetRecursivelyReferencedFragmentsSet(firstOperation)
+                : null;
+
+        // Report errors for any fragment definitions that are not used
+        foreach (var definition in context.Document.Definitions)
+        {
+            if (definition is GraphQLFragmentDefinition fragment && (fragmentsUsed == null || !fragmentsUsed.Contains(fragment)))
+                context.ReportError(new NoUnusedFragmentsError(context, fragment));
+        }
+
+        return default;
+    }
 }

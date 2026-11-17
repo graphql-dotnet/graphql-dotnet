@@ -52,7 +52,7 @@ public partial class DocumentValidator
             await VisitAsync(selectedOperation, context).ConfigureAwait(false);
 
             // parse each referenced fragment once, including fragments excluded by @skip or @include
-            var fragments = context.ValidationContext.GetRecursivelyReferencedFragments(selectedOperation, onlyUsed: false);
+            var fragments = context.ValidationContext.GetRecursivelyReferencedFragmentsSet(selectedOperation, onlyUsed: false);
             if (fragments != null)
             {
                 foreach (var fragment in fragments)

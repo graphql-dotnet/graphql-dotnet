@@ -41,8 +41,6 @@ public class TypeInfo : INodeVisitor
         _argument = null;
         // these will not be needed for post-variable-coercion validation rules
         NoUndefinedVariables_VariableNameDefined = null;
-        NoUnusedFragments_OperationDefs = null;
-        NoUnusedFragments_FragmentDefs = null;
         NoUnusedVariables_VariableDefs = null;
         UniqueArgumentNames_KnownArgs = null;
         UniqueFragmentNames_KnownFragments = null;
@@ -305,9 +303,6 @@ public class TypeInfo : INodeVisitor
     }
 
     internal HashSet<ROM>? NoUndefinedVariables_VariableNameDefined;
-
-    internal List<GraphQLOperationDefinition>? NoUnusedFragments_OperationDefs;
-    internal List<GraphQLFragmentDefinition>? NoUnusedFragments_FragmentDefs;
 
     internal List<GraphQLVariableDefinition>? NoUnusedVariables_VariableDefs;
 
