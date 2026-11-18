@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using GraphQL.Conversion;
 using GraphQL.Introspection;
@@ -114,6 +115,28 @@ public class SchemaIntrospectionTests
         types[1].GetProperty("fields").EnumerateArray().Select(GetName).ShouldBe(new[] { "foo", "bar", "baz" });
         ShouldBe(GetName(types[2]), "Letters");
         types[2].GetProperty("fields").EnumerateArray().Select(GetName).ShouldBe(new[] { "bravo", "charlie", "alfa", "delta" });
+    }
+
+    [Fact]
+    public void alphabetical_schema_comparer_does_not_depend_on_current_culture()
+    {
+        var previous = CultureInfo.CurrentCulture;
+        try
+        {
+            var comparer = new AlphabeticalSchemaComparer().TypeComparer;
+            var ia = new ObjectGraphType { Name = "ia" };
+            var ib = new ObjectGraphType { Name = "Ib" };
+
+            // tr-TR sorts "I" (dotless) before "i", which reverses these two names
+            CultureInfo.CurrentCulture = new CultureInfo("en-US");
+            var expected = Math.Sign(comparer.Compare(ia, ib));
+            CultureInfo.CurrentCulture = new CultureInfo("tr-TR");
+            Math.Sign(comparer.Compare(ia, ib)).ShouldBe(expected);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = previous;
+        }
     }
 
     [Theory]

@@ -75,27 +75,27 @@ public class AlphabeticalSchemaComparer : ISchemaComparer
 
     private sealed class TypeByNameComparer : IComparer<IGraphType>
     {
-        public int Compare(IGraphType? x, IGraphType? y) => (x?.Name ?? "").CompareTo(y?.Name ?? "");
+        public int Compare(IGraphType? x, IGraphType? y) => string.Compare(x?.Name ?? "", y?.Name ?? "", StringComparison.InvariantCulture);
     }
 
     private sealed class DirectiveByNameComparer : IComparer<Directive>
     {
-        public int Compare(Directive? x, Directive? y) => (x?.Name ?? "").CompareTo(y?.Name ?? "");
+        public int Compare(Directive? x, Directive? y) => string.Compare(x?.Name ?? "", y?.Name ?? "", StringComparison.InvariantCulture);
     }
 
     private sealed class ArgumentByNameComparer : IComparer<QueryArgument>
     {
-        public int Compare(QueryArgument? x, QueryArgument? y) => (x?.Name ?? "").CompareTo(y?.Name ?? "");
+        public int Compare(QueryArgument? x, QueryArgument? y) => string.Compare(x?.Name ?? "", y?.Name ?? "", StringComparison.InvariantCulture);
     }
 
     private sealed class EnumValueByNameComparer : IComparer<EnumValueDefinition>
     {
-        public int Compare(EnumValueDefinition? x, EnumValueDefinition? y) => (x?.Name ?? "").CompareTo(y?.Name ?? "");
+        public int Compare(EnumValueDefinition? x, EnumValueDefinition? y) => string.Compare(x?.Name ?? "", y?.Name ?? "", StringComparison.InvariantCulture);
     }
 
     private sealed class FieldByNameComparer : IComparer<IFieldType>
     {
-        public int Compare(IFieldType? x, IFieldType? y) => (x?.Name ?? "").CompareTo(y?.Name ?? "");
+        public int Compare(IFieldType? x, IFieldType? y) => string.Compare(x?.Name ?? "", y?.Name ?? "", StringComparison.InvariantCulture);
     }
 
     /// <inheritdoc/>
