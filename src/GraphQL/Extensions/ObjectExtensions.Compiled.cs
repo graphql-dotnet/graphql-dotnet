@@ -56,7 +56,7 @@ public static partial class ObjectExtensions
                     members.Where(x => x.IsRequired || x.IsInitOnly).Select(GetBindingForMember)))
         };
 
-        // set properties on obj when they exist in the dictionary
+        // Set remaining properties, including empty wrappers for omitted optional fields.
         foreach (var member in members.Where(x => !x.IsRequired && !x.IsInitOnly))
         {
             expressions.Add(ConditionallySetMember(objParam, member));
@@ -108,7 +108,7 @@ public static partial class ObjectExtensions
              * }
              * else
              * {
-             *     ret = default(T);
+             *     ret = optional ? new T() : default(T);
              * }
              * return ret;
              */
@@ -131,13 +131,20 @@ public static partial class ObjectExtensions
                             graphType,
                             false,
                             fieldName)),
-                    Expression.Assign(ret, Expression.Default(type))),
+                    Expression.Assign(ret, OptionalTypes.IsOptionalType(type) ? Expression.New(type) : Expression.Default(type))),
                 ret);
         }
 
         static Expression ConditionallySetMember(ParameterExpression objParam, ReflectionInfo.MemberFieldInfo member)
         {
             var type = member.Member is PropertyInfo propertyInfo ? propertyInfo.PropertyType : ((FieldInfo)member.Member).FieldType;
+
+            if (OptionalTypes.IsOptionalType(type))
+            {
+                return Expression.Assign(
+                    Expression.MakeMemberAccess(objParam, member.Member),
+                    GetCoerceOrDefault(member.Key, type, member.GraphType, member.Member.Name));
+            }
 
             /*
              * ValueTuple<object?, bool> value;
@@ -173,20 +180,34 @@ public static partial class ObjectExtensions
             if (type == typeof(object))
                 return expr.Type == typeof(object) ? expr : Expression.Convert(expr, typeof(object));
 
-            // if the expression is already of the requested type, return it as is,
-            // or if the expression is null, return default(T)
             var returnType = asObject ? typeof(object) : type;
             var param = Expression.Parameter(expr.Type, "param");
+            Expression coerced;
+            // Wrap supplied nulls as specified values before the usual null handling.
+            if (OptionalTypes.IsOptionalType(type))
+            {
+                var valueType = type.GetGenericArguments()[0];
+                coerced = Expression.New(
+                    OptionalTypes.GetValueConstructor(type),
+                    CoerceExpression(param, valueType, graphType, false, fieldName));
+                if (asObject)
+                    coerced = Expression.Convert(coerced, typeof(object));
+            }
+            else
+            {
+                coerced = Expression.Condition(
+                    Expression.Equal(param, Expression.Constant(null, param.Type)),
+                    Expression.Default(returnType),
+                    CoerceExpressionInternal(param, type, graphType, asObject, fieldName));
+            }
+
             return Expression.Block(
                 [param],
                 Expression.Assign(param, expr),
                 Expression.Condition(
                     Expression.TypeIs(param, type),
                     param.Type == returnType ? param : Expression.Convert(param, returnType),
-                    Expression.Condition(
-                        Expression.Equal(param, Expression.Constant(null, param.Type)),
-                        Expression.Default(returnType),
-                        CoerceExpressionInternal(param, type, graphType, asObject, fieldName))));
+                    coerced));
         }
 
         static Expression CoerceExpressionInternal(Expression expr, Type type, IGraphType graphType, bool asObject, string fieldName)

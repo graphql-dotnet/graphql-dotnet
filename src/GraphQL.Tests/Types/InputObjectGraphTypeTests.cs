@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -379,5 +380,371 @@ public class InputObjectGraphTypeTests
         // The field value should be a StringValue with the value "defaultMapped".
         var stringValue = field.Value.ShouldBeOfType<GraphQLStringValue>();
         stringValue.Value.ShouldBe("defaultMapped");
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ParseDictionary_preserves_optional_member_presence(bool compiled)
+    {
+        var type = new InputObjectGraphType<OptionalMembersInput>();
+        type.Field("Constructor", new StringGraphType());
+        type.Field("Property", new IntGraphType());
+        type.Field("Field", new StringGraphType());
+        type.Field("Init", new StringGraphType());
+        type.Field("Required", new IntGraphType());
+        if (compiled)
+            type.Initialize(null!);
+
+        var omitted = type.ParseDictionary(new Dictionary<string, object?>()).ShouldBeOfType<OptionalMembersInput>();
+        omitted.Constructor.IsSpecified.ShouldBeFalse();
+        omitted.Property.IsSpecified.ShouldBeFalse();
+        omitted.Field.IsSpecified.ShouldBeFalse();
+        omitted.Init.IsSpecified.ShouldBeFalse();
+        omitted.Required.IsSpecified.ShouldBeFalse();
+
+        var explicitNull = type.ParseDictionary(new Dictionary<string, object?>
+        {
+            ["Constructor"] = null,
+            ["Property"] = null,
+            ["Field"] = null,
+            ["Init"] = null,
+            ["Required"] = null,
+        }).ShouldBeOfType<OptionalMembersInput>();
+        explicitNull.Constructor.Value.ShouldBeNull();
+        explicitNull.Property.Value.ShouldBeNull();
+        explicitNull.Field.Value.ShouldBeNull();
+        explicitNull.Init.Value.ShouldBeNull();
+        explicitNull.Required.Value.ShouldBeNull();
+
+        var supplied = type.ParseDictionary(new Dictionary<string, object?>
+        {
+            ["Constructor"] = "constructor",
+            ["Property"] = 42L,
+            ["Field"] = "field",
+            ["Init"] = "init",
+            ["Required"] = 0,
+        }).ShouldBeOfType<OptionalMembersInput>();
+        supplied.Constructor.Value.ShouldBe("constructor");
+        supplied.Property.Value.ShouldBe(42);
+        supplied.Field.Value.ShouldBe("field");
+        supplied.Init.Value.ShouldBe("init");
+        supplied.Required.Value.ShouldBe(0);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ParseDictionary_supports_optional_lists_objects_and_nested_optionals(bool compiled)
+    {
+        var childType = new InputObjectGraphType<OptionalChildInput>();
+        childType.Field("Name", new StringGraphType());
+        var type = new InputObjectGraphType<OptionalContainersInput>();
+        type.Field("Items", new ListGraphType(new IntGraphType()));
+        type.Field("List", new ListGraphType(new IntGraphType()));
+        type.Field("Nested", new StringGraphType());
+        type.Field("Child", childType);
+        if (compiled)
+            type.Initialize(null!);
+
+        var omitted = type.ParseDictionary(new Dictionary<string, object?>()).ShouldBeOfType<OptionalContainersInput>();
+        omitted.Items.ShouldBeNull();
+        omitted.List.IsSpecified.ShouldBeFalse();
+        omitted.Nested.IsSpecified.ShouldBeFalse();
+        omitted.Child.IsSpecified.ShouldBeFalse();
+
+        var explicitNull = type.ParseDictionary(new Dictionary<string, object?>
+        {
+            ["List"] = null,
+            ["Nested"] = null,
+            ["Child"] = null,
+        }).ShouldBeOfType<OptionalContainersInput>();
+        explicitNull.List.Value.ShouldBeNull();
+        explicitNull.Nested.Value.Value.ShouldBeNull();
+        explicitNull.Child.Value.ShouldBeNull();
+
+        var supplied = type.ParseDictionary(new Dictionary<string, object?>
+        {
+            ["Items"] = new object?[] { 1L, null, 0 },
+            ["List"] = new object?[] { null, 2L },
+            ["Nested"] = "nested",
+            ["Child"] = new Dictionary<string, object?> { ["Name"] = null },
+        }).ShouldBeOfType<OptionalContainersInput>();
+        supplied.Items.ShouldNotBeNull().Select(x => x.Value).ShouldBe(new int?[] { 1, null, 0 });
+        supplied.List.Value.ShouldNotBeNull().Select(x => x.Value).ShouldBe(new int?[] { null, 2 });
+        supplied.Nested.Value.Value.ShouldBe("nested");
+        supplied.Child.Value.ShouldNotBeNull().Name.Value.ShouldBeNull();
+
+        var empty = type.ParseDictionary(new Dictionary<string, object?>
+        {
+            ["List"] = Array.Empty<object>(),
+            ["Child"] = new Dictionary<string, object?>(),
+        }).ShouldBeOfType<OptionalContainersInput>();
+        empty.List.Value.ShouldNotBeNull().ShouldBeEmpty();
+        empty.Child.Value.ShouldNotBeNull().Name.IsSpecified.ShouldBeFalse();
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task optional_inputs_preserve_presence_during_execution(bool compiled, bool useVariables)
+    {
+        var previous = GlobalSwitches.DynamicallyCompileToObject;
+        GlobalSwitches.DynamicallyCompileToObject = compiled;
+        try
+        {
+            var inputType = new InputObjectGraphType<OptionalExecutionInput> { Name = "OptionalInput" };
+            inputType.Field(x => x.Name, type: typeof(StringGraphType));
+            inputType.Field(x => x.Defaulted, type: typeof(StringGraphType)).Configure(field => field.DefaultValue = "default");
+            var queryType = new ObjectGraphType { Name = "Query" };
+            queryType.Field<StringGraphType>("test")
+                .Arguments(new QueryArguments(new QueryArgument(inputType) { Name = "input" }))
+                .Resolve(context =>
+                {
+                    var input = context.GetArgument<OptionalExecutionInput>("input");
+                    return $"{(input.Name.IsSpecified ? input.Name.Value ?? "null" : "omitted")}/{input.Defaulted.Value}";
+                });
+            using var schema = new Schema { Query = queryType };
+
+            foreach (var (literal, json, expected) in new[]
+            {
+                ("{}", "{}", "omitted"),
+                ("{ name: null }", """{"name":null}""", "null"),
+                ("{ name: \"value\" }", """{"name":"value"}""", "value"),
+            })
+            {
+                var result = await schema.ExecuteAsync(options =>
+                {
+                    options.ThrowOnUnhandledException = true;
+                    options.Query = useVariables
+                        ? "query ($input: OptionalInput!) { test(input: $input) }"
+                        : "{ test(input: " + literal + ") }";
+                    if (useVariables)
+                        options.Variables = new Inputs(new Dictionary<string, object?> { ["input"] = json.ToInputs() });
+                });
+                result.ShouldBeSimilarTo($$$"""{"data":{"test":"{{{expected}}}/default"}}""");
+            }
+        }
+        finally
+        {
+            GlobalSwitches.DynamicallyCompileToObject = previous;
+        }
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task optional_inputs_distinguish_null_and_omission_in_inline_objects(bool compiled, bool nested)
+    {
+        var previous = GlobalSwitches.DynamicallyCompileToObject;
+        GlobalSwitches.DynamicallyCompileToObject = compiled;
+        try
+        {
+            var childType = new InputObjectGraphType<OptionalChildInput>();
+            childType.Field(x => x.Name, type: typeof(StringGraphType));
+            var containerType = new InputObjectGraphType<OptionalContainersInput>();
+            containerType.Field("Child", childType);
+            Optional<string?> actual = default;
+            var queryType = new ObjectGraphType { Name = "Query" };
+            queryType.Field<BooleanGraphType>("test")
+                .Arguments(new QueryArguments(new QueryArgument(nested ? (IGraphType)containerType : childType) { Name = "input" }))
+                .Resolve(context =>
+                {
+                    if (nested)
+                    {
+                        var child = context.GetArgument<OptionalContainersInput>("input").Child;
+                        child.IsSpecified.ShouldBeTrue();
+                        actual = child.Value.ShouldNotBeNull().Name;
+                    }
+                    else
+                    {
+                        actual = context.GetArgument<OptionalChildInput>("input").Name;
+                    }
+                    return actual.IsSpecified;
+                });
+            using var schema = new Schema { Query = queryType };
+
+            foreach (var (operation, input, specified) in new[]
+            {
+                ("", "{ name: null }", true),
+                ("query ($v: String = null)", "{ name: $v }", true),
+                ("query ($v: String)", "{ name: $v }", false),
+                ("", "{}", false),
+            })
+            {
+                var literal = nested ? "{ child: " + input + " }" : input;
+                var result = await schema.ExecuteAsync(options =>
+                {
+                    options.ThrowOnUnhandledException = true;
+                    options.Query = operation + " { test(input: " + literal + ") }";
+                });
+                result.ShouldBeSimilarTo(specified ? """{"data":{"test":true}}""" : """{"data":{"test":false}}""");
+                actual.IsSpecified.ShouldBe(specified);
+                if (specified)
+                    actual.Value.ShouldBeNull();
+            }
+        }
+        finally
+        {
+            GlobalSwitches.DynamicallyCompileToObject = previous;
+        }
+    }
+
+    [Theory]
+    [InlineData(false, typeof(CustomOptional<>))]
+    [InlineData(true, typeof(CustomOptional<>))]
+    [InlineData(false, typeof(CustomOptionalClass<>))]
+    [InlineData(true, typeof(CustomOptionalClass<>))]
+    [InlineData(false, typeof(StrongBox<>))]
+    [InlineData(true, typeof(StrongBox<>))]
+    public void ParseDictionary_supports_registered_optional_members(bool compiled, Type optionalType)
+    {
+        if (optionalType == typeof(CustomOptional<>))
+        {
+            Check<CustomOptional<string?>>((optional, specified, value) =>
+            {
+                optional.Present.ShouldBe(specified);
+                optional.Data.ShouldBe(value);
+            });
+        }
+        else if (optionalType == typeof(CustomOptionalClass<>))
+        {
+            Check<CustomOptionalClass<string?>>((optional, specified, value) =>
+            {
+                optional.ShouldNotBeNull().Present.ShouldBe(specified);
+                optional.Data.ShouldBe(value);
+            });
+            Check<CustomOptionalClass<object?>>((optional, specified, value) =>
+            {
+                optional.ShouldNotBeNull().Present.ShouldBe(specified);
+                optional.Data.ShouldBe(value);
+            });
+        }
+        else
+        {
+            Check<StrongBox<string?>>((optional, _, value) => optional.ShouldNotBeNull().Value.ShouldBe(value));
+        }
+
+        void Check<TOptional>(Action<TOptional, bool, string?> assert)
+        {
+            var type = new InputObjectGraphType<RegisteredOptionalMembersInput<TOptional>>();
+            string[] members = ["Constructor", "Property", "Field", "Init", "Required"];
+            foreach (var member in members)
+                type.Field(member, new StringGraphType());
+            if (compiled)
+                type.Initialize(null!);
+
+            foreach (var (specified, value) in new (bool, string?)[] { (false, null), (true, null), (true, "value") })
+            {
+                var data = specified
+                    ? members.ToDictionary(member => member, _ => (object?)value)
+                    : new Dictionary<string, object?>();
+                var result = type.ParseDictionary(data).ShouldBeOfType<RegisteredOptionalMembersInput<TOptional>>();
+                foreach (var member in new[] { result.Constructor, result.Property, result.Field, result.Init, result.Required })
+                    assert(member, specified, value);
+            }
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ParseDictionary_supports_registered_optionals_in_lists_and_nested_optionals(bool compiled)
+    {
+        var type = new InputObjectGraphType<RegisteredOptionalContainersInput>();
+        type.Field("StructItems", new ListGraphType(new StringGraphType()));
+        type.Field("ClassItems", new ListGraphType(new StringGraphType()));
+        type.Field("NestedStruct", new StringGraphType());
+        type.Field("NestedClass", new StringGraphType());
+        type.Field("List", new ListGraphType(new StringGraphType()));
+        if (compiled)
+            type.Initialize(null!);
+
+        var omitted = type.ParseDictionary(new Dictionary<string, object?>()).ShouldBeOfType<RegisteredOptionalContainersInput>();
+        omitted.NestedStruct.Present.ShouldBeFalse();
+        omitted.NestedClass.ShouldNotBeNull().Present.ShouldBeFalse();
+        omitted.List.ShouldNotBeNull().Present.ShouldBeFalse();
+
+        foreach (var value in new[] { null, "value" })
+        {
+            var data = new Dictionary<string, object?>
+            {
+                ["StructItems"] = new object?[] { value },
+                ["ClassItems"] = new object?[] { value },
+                ["NestedStruct"] = value,
+                ["NestedClass"] = value,
+                ["List"] = new object?[] { value },
+            };
+            var result = type.ParseDictionary(data).ShouldBeOfType<RegisteredOptionalContainersInput>();
+            var structItem = result.StructItems.ShouldNotBeNull().Single();
+            structItem.Present.ShouldBeTrue();
+            structItem.Data.ShouldBe(value);
+            var classItem = result.ClassItems.ShouldNotBeNull().Single().ShouldNotBeNull();
+            classItem.Present.ShouldBeTrue();
+            classItem.Data.ShouldBe(value);
+            result.NestedStruct.Present.ShouldBeTrue();
+            result.NestedStruct.Data.ShouldNotBeNull().Present.ShouldBeTrue();
+            result.NestedStruct.Data.Data.ShouldBe(value);
+            result.NestedClass.ShouldNotBeNull().Present.ShouldBeTrue();
+            result.NestedClass.Data.Present.ShouldBeTrue();
+            result.NestedClass.Data.Data.ShouldBe(value);
+            result.List.ShouldNotBeNull().Present.ShouldBeTrue();
+            var listItem = result.List.Data.ShouldNotBeNull().Single();
+            listItem.Present.ShouldBeTrue();
+            listItem.Data.ShouldBe(value);
+        }
+    }
+
+    private class RegisteredOptionalMembersInput<TOptional>
+    {
+        public RegisteredOptionalMembersInput(TOptional constructor) => Constructor = constructor;
+
+        public TOptional Constructor { get; }
+        public TOptional Property { get; set; }
+        public TOptional Field = default!;
+        public TOptional Init { get; init; }
+        public required TOptional Required { get; set; }
+    }
+
+    private class RegisteredOptionalContainersInput
+    {
+        public List<CustomOptional<string?>>? StructItems { get; set; }
+        public List<CustomOptionalClass<string?>>? ClassItems { get; set; }
+        public CustomOptional<CustomOptionalClass<string?>> NestedStruct { get; set; }
+        public CustomOptionalClass<CustomOptional<string?>> NestedClass { get; set; }
+        public CustomOptionalClass<List<CustomOptional<string?>>> List { get; set; }
+    }
+
+    private class OptionalMembersInput
+    {
+        public OptionalMembersInput(Optional<string?> constructor) => Constructor = constructor;
+
+        public Optional<string?> Constructor { get; }
+        public Optional<int?> Property { get; set; }
+        public Optional<string?> Field = default;
+        public Optional<string?> Init { get; init; }
+        public required Optional<int?> Required { get; set; }
+    }
+
+    private class OptionalContainersInput
+    {
+        public List<Optional<int?>>? Items { get; set; }
+        public Optional<List<Optional<int?>>?> List { get; set; }
+        public Optional<Optional<string?>> Nested { get; set; }
+        public Optional<OptionalChildInput?> Child { get; set; }
+    }
+
+    private class OptionalChildInput
+    {
+        public Optional<string?> Name { get; set; }
+    }
+
+    private class OptionalExecutionInput : OptionalChildInput
+    {
+        public Optional<string> Defaulted { get; set; }
     }
 }

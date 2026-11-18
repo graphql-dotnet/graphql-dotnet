@@ -66,7 +66,9 @@ public static partial class ObjectExtensions
         {
             var ctorField = reflectionInfo.CtorFields[i];
             ctorArguments[i] = ctorField.Key != null
-                ? GetPropertyValue(source.TryGetValue(ctorField.Key, out var value) ? value : null, ctorField.ParameterInfo.ParameterType, ctorField.GraphType!)
+                ? source.TryGetValue(ctorField.Key, out var value)
+                    ? GetPropertyValue(value, ctorField.ParameterInfo.ParameterType, ctorField.GraphType!)
+                    : GetUnspecifiedValue(ctorField.ParameterInfo.ParameterType)
                 : ctorField.ParameterInfo.DefaultValue;
         }
 
@@ -87,6 +89,7 @@ public static partial class ObjectExtensions
         // populate the remaining fields
         foreach (var field in reflectionInfo.MemberFields)
         {
+            var memberType = field.Member is PropertyInfo property ? property.PropertyType : ((FieldInfo)field.Member).FieldType;
             if (source.TryGetValue(field.Key, out var value))
             {
                 if (field.Member is PropertyInfo propertyInfo)
@@ -100,22 +103,25 @@ public static partial class ObjectExtensions
                     fieldInfo.SetValue(obj, coercedValue);
                 }
             }
-            else if (field.IsInitOnly || field.IsRequired)
+            else if (field.IsInitOnly || field.IsRequired || OptionalTypes.IsOptionalType(memberType))
             {
-                // initialize all unspecified init-only or required properties
+                // Initialize unspecified optionals as well as init-only and required members.
                 if (field.Member is PropertyInfo propertyInfo)
                 {
-                    propertyInfo.SetValue(obj, null);
+                    propertyInfo.SetValue(obj, GetUnspecifiedValue(memberType));
                 }
                 else
                 {
-                    ((FieldInfo)field.Member).SetValue(obj, null);
+                    ((FieldInfo)field.Member).SetValue(obj, GetUnspecifiedValue(memberType));
                 }
             }
         }
 
         return obj;
     }
+
+    private static object? GetUnspecifiedValue(Type type)
+        => OptionalTypes.IsOptionalType(type) ? Activator.CreateInstance(type) : null;
 
     private readonly ref struct ReflectionInfo
     {
@@ -279,7 +285,7 @@ public static partial class ObjectExtensions
     /// In case of configuring field as Field("FirstName", x => x.FName) source dictionary
     /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
     /// </param>
-    /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
+    /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, optional wrappers, and Enum.</remarks>
     [RequiresUnreferencedCode("Recursively converts propertyValue to fieldType.")]
     public static object? GetPropertyValue(this object? propertyValue, Type fieldType, IGraphType mappedType)
     {
@@ -295,10 +301,20 @@ public static partial class ObjectExtensions
         }
 
         // Short-circuit conversion if the property value already of the right type
-        if (propertyValue == null || fieldType == typeof(object) || fieldType.IsInstanceOfType(propertyValue))
+        if (fieldType == typeof(object) || fieldType.IsInstanceOfType(propertyValue))
         {
             return propertyValue;
         }
+
+        // A supplied null is still specified; only a missing dictionary key leaves an optional unset.
+        if (OptionalTypes.IsOptionalType(fieldType))
+        {
+            var valueType = fieldType.GetGenericArguments()[0];
+            return OptionalTypes.GetValueConstructor(fieldType).Invoke([GetPropertyValue(propertyValue, valueType, mappedType)]);
+        }
+
+        if (propertyValue == null)
+            return null;
 
         if (ValueConverter.TryConvertTo(propertyValue, fieldType, out object? result))
             return result;
@@ -319,8 +335,7 @@ public static partial class ObjectExtensions
 
             for (int i = 0; i < objectArray.Length; ++i)
             {
-                var listItem = objectArray[i];
-                objectArray[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType, itemGraphType);
+                objectArray[i] = GetPropertyValue(objectArray[i], underlyingType, itemGraphType);
             }
 
             return listConverter.Convert(objectArray);
