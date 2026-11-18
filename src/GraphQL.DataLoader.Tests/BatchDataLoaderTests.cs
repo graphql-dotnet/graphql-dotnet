@@ -372,6 +372,78 @@ public class BatchDataLoaderTests : DataLoaderTestBase
 
 #nullable disable
     [Fact]
+    public async Task Results_Are_Not_Cached_When_Caching_Is_Disabled()
+    {
+        var mock = new Mock<IUsersStore>();
+        var users = Fake.Users.Generate(2);
+
+        mock.Setup(store => store.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
+            .ReturnsAsync(() => users.ToDictionary(x => x.UserId));
+
+        var loader = new BatchDataLoader<int, User>(false, mock.Object.GetUsersByIdAsync);
+
+        var result1 = loader.LoadAsync(1);
+        var result2 = loader.LoadAsync(2);
+        await loader.DispatchAsync();
+        (await result1.GetResultAsync()).ShouldNotBeNull();
+        (await result2.GetResultAsync()).ShouldNotBeNull();
+
+        // the same key is requested again and must be fetched again
+        var result3 = loader.LoadAsync(1);
+        await loader.DispatchAsync();
+        (await result3.GetResultAsync()).UserId.ShouldBe(1);
+
+        mock.Verify(x => x.GetUsersByIdAsync(new[] { 1, 2 }, default), Times.Once);
+        mock.Verify(x => x.GetUsersByIdAsync(new[] { 1 }, default), Times.Once);
+        mock.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task Results_Are_Not_Cached_When_Caching_Is_Disabled_With_KeySelector()
+    {
+        var mock = new Mock<IUsersStore>();
+        var users = Fake.Users.Generate(2);
+
+        mock.Setup(store => store.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
+            .ReturnsAsync(() => users.ToDictionary(x => x.UserId));
+
+        var loader = new BatchDataLoader<int, User>(
+            false,
+            async (keys, token) => (await mock.Object.GetUsersByIdAsync(keys, token)).Values.AsEnumerable(),
+            user => user.UserId);
+
+        var result1 = loader.LoadAsync(1);
+        await loader.DispatchAsync();
+        (await result1.GetResultAsync()).UserId.ShouldBe(1);
+
+        var result2 = loader.LoadAsync(1);
+        await loader.DispatchAsync();
+        (await result2.GetResultAsync()).UserId.ShouldBe(1);
+
+        mock.Verify(x => x.GetUsersByIdAsync(new[] { 1 }, default), Times.Exactly(2));
+    }
+
+    [Fact]
+    public async Task Keys_Are_DeDuped_Within_A_Batch_When_Caching_Is_Disabled()
+    {
+        var mock = new Mock<IUsersStore>();
+        var users = Fake.Users.Generate(1);
+
+        mock.Setup(store => store.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
+            .ReturnsAsync(() => users.ToDictionary(x => x.UserId));
+
+        var loader = new BatchDataLoader<int, User>(false, mock.Object.GetUsersByIdAsync);
+
+        var result1 = loader.LoadAsync(1);
+        var result2 = loader.LoadAsync(1);
+        await loader.DispatchAsync();
+        (await result1.GetResultAsync()).UserId.ShouldBe(1);
+        (await result2.GetResultAsync()).UserId.ShouldBe(1);
+
+        mock.Verify(x => x.GetUsersByIdAsync(new[] { 1 }, default), Times.Once);
+    }
+
+    [Fact]
     public async Task Returns_Null_For_Null_Reference_Types()
     {
         var loader = new BatchDataLoader<object, string>((_, _) => throw new Exception());

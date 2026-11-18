@@ -12,7 +12,7 @@ public class BatchDataLoader<TKey, T> : DataLoaderBase<TKey, T>
     private readonly T _defaultValue;
 
     /// <summary>
-    /// Initializes a new instance of BatchDataLoader with the specified fetch delegate
+    /// Initializes a new instance of BatchDataLoader with the specified fetch delegate, with caching enabled
     /// </summary>
     /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and cancellation token, which returns a dictionary of keys and values</param>
     /// <param name="keyComparer">An optional equality comparer for the keys</param>
@@ -21,14 +21,30 @@ public class BatchDataLoader<TKey, T> : DataLoaderBase<TKey, T>
     public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> fetchDelegate,
            IEqualityComparer<TKey>? keyComparer = null,
            T defaultValue = default!,
-           int maxBatchSize = int.MaxValue) : base(keyComparer, maxBatchSize)
+           int maxBatchSize = int.MaxValue) : this(true, fetchDelegate, keyComparer, defaultValue, maxBatchSize)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of BatchDataLoader with the specified caching option and fetch delegate
+    /// </summary>
+    /// <param name="caching">Indicates if responses should be cached</param>
+    /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and cancellation token, which returns a dictionary of keys and values</param>
+    /// <param name="keyComparer">An optional equality comparer for the keys</param>
+    /// <param name="defaultValue">The value returned when no match is found in the dictionary, or default(T) if unspecified</param>
+    /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
+    public BatchDataLoader(bool caching,
+           Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> fetchDelegate,
+           IEqualityComparer<TKey>? keyComparer = null,
+           T defaultValue = default!,
+           int maxBatchSize = int.MaxValue) : base(caching, keyComparer, maxBatchSize)
     {
         _loader = fetchDelegate ?? throw new ArgumentNullException(nameof(fetchDelegate));
         _defaultValue = defaultValue;
     }
 
     /// <summary>
-    /// Initializes a new instance of BatchDataLoader with the specified fetch delegate and key selector
+    /// Initializes a new instance of BatchDataLoader with the specified fetch delegate and key selector, with caching enabled
     /// </summary>
     /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and a cancellation token, which returns a list objects</param>
     /// <param name="keySelector">A selector for the key from the returned object</param>
@@ -39,7 +55,25 @@ public class BatchDataLoader<TKey, T> : DataLoaderBase<TKey, T>
         Func<T, TKey> keySelector,
         IEqualityComparer<TKey>? keyComparer = null,
         T defaultValue = default!,
-        int maxBatchSize = int.MaxValue) : base(keyComparer, maxBatchSize)
+        int maxBatchSize = int.MaxValue) : this(true, fetchDelegate, keySelector, keyComparer, defaultValue, maxBatchSize)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of BatchDataLoader with the specified caching option, fetch delegate and key selector
+    /// </summary>
+    /// <param name="caching">Indicates if responses should be cached</param>
+    /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and a cancellation token, which returns a list objects</param>
+    /// <param name="keySelector">A selector for the key from the returned object</param>
+    /// <param name="keyComparer">An optional equality comparer for the keys</param>
+    /// <param name="defaultValue">The value returned when no match is found in the list, or default(T) if unspecified</param>
+    /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
+    public BatchDataLoader(bool caching,
+        Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> fetchDelegate,
+        Func<T, TKey> keySelector,
+        IEqualityComparer<TKey>? keyComparer = null,
+        T defaultValue = default!,
+        int maxBatchSize = int.MaxValue) : base(caching, keyComparer, maxBatchSize)
     {
         if (fetchDelegate == null)
             throw new ArgumentNullException(nameof(fetchDelegate));

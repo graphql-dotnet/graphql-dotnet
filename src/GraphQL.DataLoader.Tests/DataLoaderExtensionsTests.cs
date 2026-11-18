@@ -75,7 +75,7 @@ public class DataLoaderExtensionsTests : DataLoaderTestBase
         var result2 = loader.LoadAsync(new int[] { 1, 2, 3 });
 
         // Dispatch loading
-        await loader.DispatchAsync();
+        await ((IDataLoader)loader).DispatchAsync();
         var task1 = result1.GetResultAsync();
         var task2 = result2.GetResultAsync();
 
@@ -101,5 +101,72 @@ public class DataLoaderExtensionsTests : DataLoaderTestBase
 
         // This should have been called only once to load in a single batch
         mock.Verify(x => x.GetUsersByIdAsync(new[] { 1, 2, 3 }, default), Times.Once);
+    }
+
+    [Theory]
+    [InlineData(true, 1)]
+    [InlineData(false, 2)]
+    public async Task GetOrAddBatchLoader_Caching_Option(bool caching, int expectedFetches)
+    {
+        var context = new DataLoaderContext();
+        int fetches = 0;
+        var loader = context.GetOrAddBatchLoader<int, User>("users", caching, keys =>
+        {
+            fetches++;
+            return Task.FromResult<IDictionary<int, User>>(keys.ToDictionary(k => k, k => new User { UserId = k }));
+        });
+
+        for (int i = 0; i < 2; i++)
+        {
+            var result = loader.LoadAsync(1);
+            await ((IDataLoader)loader).DispatchAsync();
+            (await result.GetResultAsync()).UserId.ShouldBe(1);
+        }
+
+        fetches.ShouldBe(expectedFetches);
+    }
+
+    [Fact]
+    public async Task GetOrAddBatchLoader_Caching_Is_Enabled_By_Default()
+    {
+        var context = new DataLoaderContext();
+        int fetches = 0;
+        var loader = context.GetOrAddBatchLoader<int, User>("users", (IEnumerable<int> keys) =>
+        {
+            fetches++;
+            return Task.FromResult<IDictionary<int, User>>(keys.ToDictionary(k => k, k => new User { UserId = k }));
+        });
+
+        for (int i = 0; i < 2; i++)
+        {
+            var result = loader.LoadAsync(1);
+            await ((IDataLoader)loader).DispatchAsync();
+            (await result.GetResultAsync()).UserId.ShouldBe(1);
+        }
+
+        fetches.ShouldBe(1);
+    }
+
+    [Theory]
+    [InlineData(true, 1)]
+    [InlineData(false, 2)]
+    public async Task GetOrAddCollectionBatchLoader_Caching_Option(bool caching, int expectedFetches)
+    {
+        var context = new DataLoaderContext();
+        int fetches = 0;
+        var loader = context.GetOrAddCollectionBatchLoader<int, Order>("orders", caching, (IEnumerable<int> keys) =>
+        {
+            fetches++;
+            return Task.FromResult(keys.ToLookup(k => k, k => new Order { UserId = k }));
+        });
+
+        for (int i = 0; i < 2; i++)
+        {
+            var result = loader.LoadAsync(1);
+            await ((IDataLoader)loader).DispatchAsync();
+            (await result.GetResultAsync()).Count().ShouldBe(1);
+        }
+
+        fetches.ShouldBe(expectedFetches);
     }
 }
