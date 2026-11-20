@@ -247,13 +247,10 @@ public abstract class ValueConverterBase : IValueConverter
     /// The list type may be a generic type definition, such as <see cref="List{T}"/>
     /// or a non-generic collection type such as <see cref="IList"/>. Closed
     /// generic types are also supported, such as <c>List&lt;int&gt;</c>.
-    /// Array types cannot be registered. If the converter is <see langword="null"/>,
-    /// the factory is removed.
+    /// If the converter is <see langword="null"/>, the factory is removed.
     /// </summary>
     public virtual void RegisterListConverterFactory(Type listType, IListConverterFactory? converter)
     {
-        if (listType.IsArray)
-            throw new ArgumentException("Array types cannot be registered.", nameof(listType));
         if (converter == null)
             ListConverterFactories.Remove(listType);
         else
