@@ -75,7 +75,7 @@ public class DataLoaderExtensionsTests : DataLoaderTestBase
         var result2 = loader.LoadAsync(new int[] { 1, 2, 3 });
 
         // Dispatch loading
-        await ((IDataLoader)loader).DispatchAsync();
+        await loader.DispatchAsync();
         var task1 = result1.GetResultAsync();
         var task2 = result2.GetResultAsync();
 
