@@ -247,6 +247,9 @@ public static class TypeExtensions
             }
         }
 
+        if (mode == TypeMappingMode.InputType && OptionalTypes.IsOptionalType(type))
+            return GetGraphTypeFromType(type.GetGenericArguments()[0], isNullable, mode);
+
         Type? graphType = null;
 
         if (type.IsArray)
@@ -306,7 +309,12 @@ public static class TypeExtensions
         return graphType;
 
         //TODO: rewrite nullability condition in v5
-        static bool IsNullableType(Type type) => !type.IsValueType || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+        bool IsNullableType(Type type)
+        {
+            while (mode == TypeMappingMode.InputType && OptionalTypes.IsOptionalType(type))
+                type = type.GetGenericArguments()[0];
+            return !type.IsValueType || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+        }
     }
 
     /// <summary>
