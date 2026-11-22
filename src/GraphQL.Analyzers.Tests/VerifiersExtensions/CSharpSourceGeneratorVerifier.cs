@@ -42,10 +42,14 @@ public static partial class CSharpIncrementalGeneratorVerifier<TIncrementalGener
     /// Runs the incremental source generator and returns a formatted string output suitable for snapshot testing.
     /// Returns SUCCESS with generated files or FAILURE with diagnostics.
     /// </summary>
-    public static async Task<string> GetGeneratorOutputAsync(string source)
+    public static async Task<string> GetGeneratorOutputAsync(string source, bool sort = true)
     {
-        // Parse the source code
-        var syntaxTree = CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.CSharp12));
+        // Create parse options with interceptors enabled
+        var parseOptions = new CSharpParseOptions(LanguageVersion.CSharp12)
+            .WithFeatures(new[] { new KeyValuePair<string, string>("InterceptorsNamespaces", "GraphQL.Analyzers.Interceptors") });
+
+        // Parse the source code with the same parse options
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, parseOptions);
 
         // Get references (similar to how Test class sets them up)
         var references = await ReferenceResolver.ReferenceAssemblies
@@ -64,9 +68,20 @@ public static partial class CSharpIncrementalGeneratorVerifier<TIncrementalGener
             }),
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-        // Create the generator and driver
+        // Create the generator and driver with MSBuild properties to enable interceptors
         var generator = new TIncrementalGenerator();
-        var driver = CSharpGeneratorDriver.Create(generator);
+
+        // Configure analyzer options to enable interceptors
+        var optionsProvider = new TestAnalyzerConfigOptionsProvider(
+            new Dictionary<string, string>
+            {
+                ["build_property.GraphQLEnableFieldInterceptors"] = "true"
+            });
+
+        var driver = CSharpGeneratorDriver.Create(
+            generators: new[] { generator.AsSourceGenerator() },
+            parseOptions: parseOptions,
+            optionsProvider: optionsProvider);
 
         // Run the generator
         driver = (CSharpGeneratorDriver)driver.RunGeneratorsAndUpdateCompilation(
@@ -104,7 +119,7 @@ public static partial class CSharpIncrementalGeneratorVerifier<TIncrementalGener
             if (generatedSources.Count > 0)
             {
                 sb.AppendLine();
-                var orderedSources = generatedSources.OrderBy(s => s.HintName).ToList();
+                var orderedSources = sort ? generatedSources.OrderBy(s => s.HintName).ToList() : generatedSources;
                 for (int i = 0; i < orderedSources.Count; i++)
                 {
                     var generatedSource = orderedSources[i];
@@ -133,7 +148,7 @@ public static partial class CSharpIncrementalGeneratorVerifier<TIncrementalGener
         successBuilder.AppendLine("// SUCCESS:");
         successBuilder.AppendLine();
 
-        var orderedSuccessSources = successSources.OrderBy(s => s.HintName).ToList();
+        var orderedSuccessSources = sort ? successSources.OrderBy(s => s.HintName).ToList() : successSources;
         for (int i = 0; i < orderedSuccessSources.Count; i++)
         {
             var generatedSource = orderedSuccessSources[i];
