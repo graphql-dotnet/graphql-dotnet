@@ -272,7 +272,77 @@ public class NoIntrospectionValidationRule : ValidationRuleBase
 }
 ```
 
-### Example 2: Limiting Connections to Under 1000 Rows
+### Example 2: Requiring an Argument for a Specific Field
+
+This rule demonstrates a field-level document validation rule. It allows normal fields to pass,
+but reports a validation error when the `human` field is selected without an `id` argument.
+
+```csharp
+public class RequireHumanIdValidationRule : ValidationRuleBase
+{
+    public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_visitor);
+
+    private static readonly MatchingNodeVisitor<GraphQLField> _visitor = new((field, context) =>
+    {
+        var fieldDef = context.TypeInfo.GetFieldDef();
+        if (fieldDef?.Name != "human")
+            return;
+
+        var hasIdArgument = field.Arguments?.Any(argument => argument.Name == "id") == true;
+        if (!hasIdArgument)
+        {
+            context.ReportError(new ValidationError(
+                context.Document.Source,
+                number: null,
+                message: "The 'human' field requires an 'id' argument.",
+                field));
+        }
+    });
+}
+```
+
+For the following query:
+
+```graphql
+{
+  human {
+    name
+  }
+}
+```
+
+The rule reports this validation error:
+
+```json
+{
+  "errors": [
+    {
+      "message": "The 'human' field requires an 'id' argument.",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ]
+    }
+  ]
+}
+```
+
+The same rule allows the field when the required argument is present:
+
+```graphql
+{
+  human(id: "1000") {
+    name
+  }
+}
+```
+
+This example mirrors `CustomValidationRuleSamplesTests` in the test suite so the
+documentation sample stays aligned with working code.
+
+### Example 3: Limiting Connections to Under 1000 Rows
 
 This rule limits the number of rows returned in a connection to 1000.
 
