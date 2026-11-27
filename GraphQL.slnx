@@ -120,8 +120,11 @@
     <Project Path="samples/GraphQL.Federation.SchemaFirst.Sample1/GraphQL.Federation.SchemaFirst.Sample1.csproj" />
     <Project Path="samples/GraphQL.Federation.SchemaFirst.Sample2/GraphQL.Federation.SchemaFirst.Sample2.csproj" />
     <Project Path="samples/GraphQL.Federation.TypeFirst.Sample4/GraphQL.Federation.TypeFirst.Sample4.csproj" />
+    <Project Path="samples/GraphQL.Harness.SchemaFirst/GraphQL.Harness.SchemaFirst.csproj" />
+    <Project Path="samples/GraphQL.Harness.TypeFirst/GraphQL.Harness.TypeFirst.csproj" />
     <Project Path="samples/GraphQL.Harness/GraphQL.Harness.csproj" />
     <Project Path="samples/GraphQL.Server.Polyfill/GraphQL.Server.Polyfill.csproj" />
+    <Project Path="src/GraphQL.StarWars.SchemaFirst/GraphQL.StarWars.SchemaFirst.csproj" />
     <Project Path="src/GraphQL.StarWars.TypeFirst/GraphQL.StarWars.TypeFirst.csproj" />
     <Project Path="src/GraphQL.StarWars/GraphQL.StarWars.csproj" />
   </Folder>
@@ -131,7 +134,9 @@
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="samples/GraphQL.Federation.Tests/GraphQL.Federation.Tests.csproj" />
+    <Project Path="samples/GraphQL.Harness.SchemaFirst.Tests/GraphQL.Harness.SchemaFirst.Tests.csproj" />
     <Project Path="samples/GraphQL.Harness.Tests/GraphQL.Harness.Tests.csproj" />
+    <Project Path="samples/GraphQL.Harness.TypeFirst.Tests/GraphQL.Harness.TypeFirst.Tests.csproj" />
     <Project Path="src/GraphQL.Analyzers.Tests/GraphQL.Analyzers.Tests.csproj" />
     <Project Path="src/GraphQL.ApiTests/GraphQL.ApiTests.csproj" />
     <Project Path="src/GraphQL.DataLoader.Tests/GraphQL.DataLoader.Tests.csproj" />

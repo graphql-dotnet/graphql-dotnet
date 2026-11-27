@@ -6,6 +6,16 @@ namespace GraphQL.Tests.Validation;
 public class NoUnusedFragmentsTests : ValidationTestBase<NoUnusedFragments, ValidationSchema>
 {
     [Fact]
+    public void fragments_without_operations_are_unused()
+    {
+        ShouldFailRule(_ =>
+        {
+            _.Query = "fragment HumanFields on Human { name }";
+            unusedFrag(_, "HumanFields", 1, 1);
+        });
+    }
+
+    [Fact]
     public void all_fragment_names_are_used()
     {
         ShouldPassRule("""

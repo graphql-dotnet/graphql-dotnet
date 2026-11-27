@@ -6,7 +6,6 @@ on:
       - published
 
 env:
-  NODE_VERSION: '18.x'   # Node 18 LTS, see https://nodejs.org/en/about/releases/
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
@@ -28,13 +27,13 @@ jobs:
           version="${github_ref:10}"
           echo version=$version
           echo "version=$version" >> $GITHUB_ENV
-      - name: Use Node.js ${{ env.NODE_VERSION }}
+      - name: Use Node.js from docs2/package.json
         uses: actions/setup-node@v7
         with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: npm install docs2
+          node-version-file: docs2/package.json
+      - name: npm ci docs2
         working-directory: docs2
-        run: npm install
+        run: npm ci
       - name: npm run build
         working-directory: docs2
         run: npm run build
@@ -42,8 +41,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: Documentation
-          path: docs2/public/**
+          path: docs2/dist/**
           if-no-files-found: error
+          include-hidden-files: true
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v6
         with:
@@ -70,7 +70,7 @@ jobs:
         working-directory: src
         run: dotnet nuget push "out/*" -k ${{secrets.NUGET_AUTH_TOKEN}}
       - name: Zip documentation
-        working-directory: docs2/public
+        working-directory: docs2/dist
         run: zip -r ../../src/out/Documentation.zip .
       - name: Upload Nuget packages and documentation as release artifacts
         uses: actions/github-script@v9

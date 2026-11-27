@@ -41,6 +41,13 @@ public class Bug1773 : QueryTestBase<Bug1773Schema>
     }
 
     [Fact]
+    public void list_throws_when_result_is_string()
+    {
+        AssertQueryWithError("{testListString}", "{\"testListString\": null}", "Error trying to resolve field 'testListString'.", 1, 2, new[] { "testListString" },
+            new InvalidOperationException("Expected an IEnumerable list though did not find one. Found: String"));
+    }
+
+    [Fact]
     public void nonnull_list_valid()
     {
         AssertQuerySuccess("{testListNullValid}", "{\"testListNullValid\": [123]}");
@@ -105,6 +112,7 @@ public class Bug1773Query : ObjectGraphType
     {
         Field<ListGraphType<IntGraphType>>("testListValid").Resolve(_ => new object[] { 123 });
         Field<ListGraphType<IntGraphType>>("testListInvalid").Resolve(_ => 123);
+        Field<ListGraphType<StringGraphType>>("testListString").Resolve(_ => "abc");
         Field<ListGraphType<IntGraphType>>("testListInvalidType").Resolve(_ => new object[] { "test" });
         Field<ListGraphType<EnumerationGraphType<Bug1773Enum>>>("testListInvalidType2").Resolve(_ => new object[] { "test" });
         Field<ListGraphType<EnumerationGraphType<Bug1773Enum>>>("testListInvalidType3").Resolve(_ => new object[] { "test", Bug1773Enum.Hello });

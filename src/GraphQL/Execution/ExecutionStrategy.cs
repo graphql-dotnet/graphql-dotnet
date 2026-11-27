@@ -437,7 +437,7 @@ public abstract class ExecutionStrategy : IExecutionStrategy
             itemType = nonNullGraphType.ResolvedType!;
         }
 
-        if (parent.Result is not IEnumerable data)
+        if (parent.Result is string || parent.Result is not IEnumerable data)
         {
             throw new InvalidOperationException($"Expected an IEnumerable list though did not find one. Found: {parent.Result?.GetType().GetFriendlyName()}");
         }

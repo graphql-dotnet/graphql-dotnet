@@ -1,7 +1,10 @@
+using GraphQL.Execution;
 using GraphQL.Types;
+using GraphQL.Validation;
 using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Tests.Validation;
 
@@ -301,7 +304,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     }
 
     [Fact]
-    public void Reports_each_conflict_once_should_fail()
+    public void Reports_conflicts_as_they_are_encountered_in_separate_selection_sets()
     {
         const string query = """
             {
@@ -342,31 +345,41 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                 e.Locations.Add(new Location(17, 5));
                 e.Locations.Add(new Location(20, 5));
             });
-
             config.Error(e =>
             {
                 e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msg = "c and a are different fields"
+                        Msg = "b and a are different fields"
                     }
                 });
-                e.Locations.Add(new Location(13, 9));
+                e.Locations.Add(new Location(20, 5));
                 e.Locations.Add(new Location(17, 5));
             });
-
             config.Error(e =>
             {
                 e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msg = "c and b are different fields"
+                        Msg = "a and b are different fields"
                     }
                 });
-                e.Locations.Add(new Location(13, 9));
+                e.Locations.Add(new Location(17, 5));
                 e.Locations.Add(new Location(20, 5));
+            });
+            config.Error(e =>
+            {
+                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
+                {
+                    Message = new OverlappingFieldsCanBeMerged.Message
+                    {
+                        Msg = "a and c are different fields"
+                    }
+                });
+                e.Locations.Add(new Location(17, 5));
+                e.Locations.Add(new Location(13, 9));
             });
         });
     }
@@ -390,26 +403,14 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
             config.Query = query;
             config.Error(e =>
             {
-                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("field", new OverlappingFieldsCanBeMerged.ConflictReason
+                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs =
-                        [
-                            new OverlappingFieldsCanBeMerged.ConflictReason
-                            {
-                                Name = "x",
-                                Message = new OverlappingFieldsCanBeMerged.Message
-                                {
-                                    Msg = "a and b are different fields"
-                                }
-                            }
-                        ]
+                        Msg = "a and b are different fields"
                     }
                 });
-                e.Locations.Add(new Location(2, 5));
                 e.Locations.Add(new Location(3, 9));
-                e.Locations.Add(new Location(5, 5));
                 e.Locations.Add(new Location(6, 9));
             });
         });
@@ -436,36 +437,26 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
             config.Query = query;
             config.Error(e =>
             {
-                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("field", new OverlappingFieldsCanBeMerged.ConflictReason
+                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs =
-                        [
-                            new OverlappingFieldsCanBeMerged.ConflictReason
-                            {
-                                Name = "x",
-                                Message = new OverlappingFieldsCanBeMerged.Message
-                                {
-                                    Msg = "a and b are different fields"
-                                }
-                            },
-                            new OverlappingFieldsCanBeMerged.ConflictReason
-                            {
-                                Name = "y",
-                                Message = new OverlappingFieldsCanBeMerged.Message
-                                {
-                                    Msg = "c and d are different fields"
-                                }
-                            }
-                        ]
+                        Msg = "a and b are different fields"
                     }
                 });
-                e.Locations.Add(new Location(2, 5));
                 e.Locations.Add(new Location(3, 9));
-                e.Locations.Add(new Location(4, 9));
-                e.Locations.Add(new Location(6, 5));
                 e.Locations.Add(new Location(7, 9));
+            });
+            config.Error(e =>
+            {
+                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("y", new OverlappingFieldsCanBeMerged.ConflictReason
+                {
+                    Message = new OverlappingFieldsCanBeMerged.Message
+                    {
+                        Msg = "c and d are different fields"
+                    }
+                });
+                e.Locations.Add(new Location(4, 9));
                 e.Locations.Add(new Location(8, 9));
             });
         });
@@ -494,45 +485,21 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
             config.Query = query;
             config.Error(e =>
             {
-                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("field", new OverlappingFieldsCanBeMerged.ConflictReason
+                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs =
-                        [
-                            new OverlappingFieldsCanBeMerged.ConflictReason
-                            {
-                                Name = "deepField",
-                                Message = new OverlappingFieldsCanBeMerged.Message
-                                {
-                                    Msgs =
-                                    [
-                                        new OverlappingFieldsCanBeMerged.ConflictReason
-                                        {
-                                            Name = "x",
-                                            Message = new OverlappingFieldsCanBeMerged.Message
-                                            {
-                                                Msg = "a and b are different fields"
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
+                        Msg = "a and b are different fields"
                     }
                 });
-                e.Locations.Add(new Location(2, 5));
-                e.Locations.Add(new Location(3, 9));
                 e.Locations.Add(new Location(4, 13));
-                e.Locations.Add(new Location(7, 5));
-                e.Locations.Add(new Location(8, 9));
                 e.Locations.Add(new Location(9, 13));
             });
         });
     }
 
     [Fact]
-    public void Reports_deep_conflict_to_nearest_common_ancestor_should_fail()
+    public void Reports_deep_conflict_at_the_conflicting_fields()
     {
         const string query = """
             {
@@ -552,38 +519,26 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
             }
             """;
 
-        ShouldFailRule(config =>
+        ShouldReportConflictWitnesses(config =>
         {
             config.Query = query;
             config.Error(e =>
             {
-                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("deepField", new OverlappingFieldsCanBeMerged.ConflictReason
+                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs =
-                        [
-                            new OverlappingFieldsCanBeMerged.ConflictReason
-                            {
-                                Name = "x",
-                                Message = new OverlappingFieldsCanBeMerged.Message
-                                {
-                                    Msg = "a and b are different fields"
-                                }
-                            }
-                        ]
+                        Msg = "a and b are different fields"
                     }
                 });
-                e.Locations.Add(new Location(3, 9));
                 e.Locations.Add(new Location(4, 13));
-                e.Locations.Add(new Location(6, 9));
                 e.Locations.Add(new Location(7, 13));
             });
         });
     }
 
     [Fact]
-    public void Reports_deep_conflict_to_nearest_common_ancestor_in_fragments()
+    public void Reports_deep_fragment_conflict_at_the_conflicting_fields()
     {
         const string query = """
             {
@@ -611,31 +566,19 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
             }
             """;
 
-        ShouldFailRule(config =>
+        ShouldReportConflictWitnesses(config =>
         {
             config.Query = query;
             config.Error(e =>
             {
-                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("deeperField", new OverlappingFieldsCanBeMerged.ConflictReason
+                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs =
-                        [
-                            new OverlappingFieldsCanBeMerged.ConflictReason
-                            {
-                                Name = "x",
-                                Message = new OverlappingFieldsCanBeMerged.Message
-                                {
-                                    Msg = "a and b are different fields"
-                                }
-                            }
-                        ]
+                        Msg = "a and b are different fields"
                     }
                 });
-                e.Locations.Add(new Location(11, 9));
                 e.Locations.Add(new Location(12, 13));
-                e.Locations.Add(new Location(14, 9));
                 e.Locations.Add(new Location(15, 13));
             });
         });
@@ -674,37 +617,27 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
             config.Query = query;
             config.Error(e =>
             {
-                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("field", new OverlappingFieldsCanBeMerged.ConflictReason
+                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("y", new OverlappingFieldsCanBeMerged.ConflictReason
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs =
-                        [
-                            new OverlappingFieldsCanBeMerged.ConflictReason
-                            {
-                                Name = "x",
-                                Message = new OverlappingFieldsCanBeMerged.Message
-                                {
-                                    Msg = "a and b are different fields"
-                                }
-                            },
-                            new OverlappingFieldsCanBeMerged.ConflictReason
-                            {
-                                Name = "y",
-                                Message = new OverlappingFieldsCanBeMerged.Message
-                                {
-                                    Msg = "c and d are different fields"
-                                }
-                            }
-                        ]
+                        Msg = "c and d are different fields"
                     }
                 });
-                e.Locations.Add(new Location(2, 5));
-                e.Locations.Add(new Location(10, 5));
                 e.Locations.Add(new Location(14, 5));
-                e.Locations.Add(new Location(5, 5));
-                e.Locations.Add(new Location(21, 5));
                 e.Locations.Add(new Location(17, 5));
+            });
+            config.Error(e =>
+            {
+                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
+                {
+                    Message = new OverlappingFieldsCanBeMerged.Message
+                    {
+                        Msg = "a and b are different fields"
+                    }
+                });
+                e.Locations.Add(new Location(10, 5));
+                e.Locations.Add(new Location(21, 5));
             });
         });
     }
@@ -779,7 +712,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
             }
             """;
 
-        ShouldFailRule(config =>
+        ShouldReportConflictWitnesses(config =>
         {
             config.Query = query;
             config.Error(e =>
@@ -956,26 +889,14 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
             config.Query = query;
             config.Error(e =>
             {
-                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("other", new OverlappingFieldsCanBeMerged.ConflictReason
+                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("scalar", new OverlappingFieldsCanBeMerged.ConflictReason
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs =
-                        [
-                            new OverlappingFieldsCanBeMerged.ConflictReason
-                            {
-                                Name = "scalar",
-                                Message = new OverlappingFieldsCanBeMerged.Message
-                                {
-                                    Msg = "scalar and unrelatedField are different fields"
-                                }
-                            }
-                        ]
+                        Msg = "scalar and unrelatedField are different fields"
                     }
                 });
-                e.Locations.Add(new Location(30, 5));
                 e.Locations.Add(new Location(38, 5));
-                e.Locations.Add(new Location(33, 5));
                 e.Locations.Add(new Location(41, 5));
             });
         });
@@ -1164,26 +1085,14 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
             config.Query = query;
             config.Error(e =>
             {
-                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("box", new OverlappingFieldsCanBeMerged.ConflictReason
+                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("scalar", new OverlappingFieldsCanBeMerged.ConflictReason
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs =
-                        [
-                            new OverlappingFieldsCanBeMerged.ConflictReason
-                            {
-                                Name = "scalar",
-                                Message = new OverlappingFieldsCanBeMerged.Message
-                                {
-                                    Msg = "they return conflicting types String and Int"
-                                }
-                            }
-                        ]
+                        Msg = "they return conflicting types String and Int"
                     }
                 });
-                e.Locations.Add(new Location(4, 13));
                 e.Locations.Add(new Location(5, 17));
-                e.Locations.Add(new Location(9, 13));
                 e.Locations.Add(new Location(10, 17));
             });
         });
@@ -1296,7 +1205,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
         // Fragment A is defined BEFORE fragment B.
         // A has two `human` selections: one spreads B, one has a direct sub-selection.
         // The conflict is at the `relatives.name` level: B returns `name` (String),
-        // A's direct branch returns `name: id` (Int) — different underlying fields.
+        // A's direct branch returns `name: dummy` (String), a different underlying field.
         const string query = """
             query { ...A }
             fragment A on Query {
@@ -1308,46 +1217,20 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
             }
             """;
 
-        ShouldFailRule(config =>
+        ShouldReportConflictWitnesses(config =>
         {
             config.Query = query;
             config.Error(e =>
             {
-                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("human", new OverlappingFieldsCanBeMerged.ConflictReason
+                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("name", new OverlappingFieldsCanBeMerged.ConflictReason
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs =
-                        [
-                            new OverlappingFieldsCanBeMerged.ConflictReason
-                            {
-                                Name = "relatives",
-                                Message = new OverlappingFieldsCanBeMerged.Message
-                                {
-                                    Msgs =
-                                    [
-                                        new OverlappingFieldsCanBeMerged.ConflictReason
-                                        {
-                                            Name = "name",
-                                            Message = new OverlappingFieldsCanBeMerged.Message
-                                            {
-                                                Msg = "dummy and name are different fields"
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
+                        Msg = "name and dummy are different fields"
                     }
                 });
-                // FieldsLeft:  human@(3,5) → relatives@(4,13) → name:dummy@(4,25)
-                // FieldsRight: human@(4,5) → relatives@(7,5) → name@(7,17)
-                e.Locations.Add(new Location(3, 5));
-                e.Locations.Add(new Location(4, 13));
-                e.Locations.Add(new Location(4, 25));
-                e.Locations.Add(new Location(4, 5));
-                e.Locations.Add(new Location(7, 5));
                 e.Locations.Add(new Location(7, 17));
+                e.Locations.Add(new Location(4, 25));
             });
         });
     }
@@ -1371,47 +1254,45 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
             }
             """;
 
-        ShouldFailRule(config =>
+        ShouldReportConflictWitnesses(config =>
         {
             config.Query = query;
             config.Error(e =>
             {
-                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("human", new OverlappingFieldsCanBeMerged.ConflictReason
+                e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("name", new OverlappingFieldsCanBeMerged.ConflictReason
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs =
-                        [
-                            new OverlappingFieldsCanBeMerged.ConflictReason
-                            {
-                                Name = "relatives",
-                                Message = new OverlappingFieldsCanBeMerged.Message
-                                {
-                                    Msgs =
-                                    [
-                                        new OverlappingFieldsCanBeMerged.ConflictReason
-                                        {
-                                            Name = "name",
-                                            Message = new OverlappingFieldsCanBeMerged.Message
-                                            {
-                                                Msg = "dummy and name are different fields"
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
+                        Msg = "name and dummy are different fields"
                     }
                 });
-                // FieldsLeft:  human@(6,5) → relatives@(7,13) → name:dummy@(7,25)
-                // FieldsRight: human@(7,5) → relatives@(3,5) → name@(3,17)
-                e.Locations.Add(new Location(6, 5));
-                e.Locations.Add(new Location(7, 13));
-                e.Locations.Add(new Location(7, 25));
-                e.Locations.Add(new Location(7, 5));
-                e.Locations.Add(new Location(3, 5));
                 e.Locations.Add(new Location(3, 17));
+                e.Locations.Add(new Location(7, 25));
             });
         });
     }
+    private void ShouldReportConflictWitnesses(Action<ValidationTestConfig> configure)
+    {
+        var config = new ValidationTestConfig();
+        configure(config);
+        var document = new GraphQLDocumentBuilder().Build(config.Query);
+        var result = new DocumentValidator().ValidateAsync(new ValidationOptions
+        {
+            Schema = config.Schema ?? Schema,
+            Document = document,
+            Operation = document.Definitions.OfType<GraphQLOperationDefinition>().FirstOrDefault()!,
+            Rules = [Rule],
+            Variables = config.Variables,
+        }).GetAwaiter().GetResult();
+
+        result.IsValid.ShouldBeFalse();
+        // A merged selection and its local AST can encounter the same conflicting
+        // pair. Preserve the concrete diagnostics without requiring global deduplication.
+        var actual = result.Errors.Select(error => error.Message + " " + string.Join(",",
+            error.Locations.ShouldNotBeNull().Select(location => $"{location.Line}:{location.Column}"))).Distinct();
+        var expected = config.Assertions.Select(error => error.Message + " " + string.Join(",",
+            error.Locations.Select(location => $"{location.Line}:{location.Column}")));
+        actual.ShouldBe(expected);
+    }
+
 }

@@ -40,12 +40,7 @@ public class TypeInfo : INodeVisitor
         _directive = null;
         _argument = null;
         // these will not be needed for post-variable-coercion validation rules
-        NoFragmentCycles_VisitedFrags = null;
-        NoFragmentCycles_SpreadPath = null;
-        NoFragmentCycles_SpreadPathIndexByName = null;
         NoUndefinedVariables_VariableNameDefined = null;
-        NoUnusedFragments_OperationDefs = null;
-        NoUnusedFragments_FragmentDefs = null;
         NoUnusedVariables_VariableDefs = null;
         UniqueArgumentNames_KnownArgs = null;
         UniqueFragmentNames_KnownFragments = null;
@@ -273,8 +268,13 @@ public class TypeInfo : INodeVisitor
         return default;
     }
 
-    private static FieldType? GetFieldDef(ISchema schema, IGraphType parentType, GraphQLField field)
+    // Shared with overlap validation so implicit introspection fields have the
+    // same definitions and response types in every field-collection path.
+    internal static FieldType? GetFieldDef(ISchema schema, IGraphType? parentType, GraphQLField field)
     {
+        if (parentType == null)
+            return null;
+
         var name = field.Name;
 
         if (name == schema.SchemaMetaFieldType.Name && Equals(schema.Query, parentType))
@@ -302,24 +302,7 @@ public class TypeInfo : INodeVisitor
         return null;
     }
 
-    /// <summary>
-    /// Tracks already visited fragments to maintain O(N) and to ensure that cycles
-    /// are not redundantly reported.
-    /// </summary>
-    internal HashSet<ROM>? NoFragmentCycles_VisitedFrags;
-    /// <summary>
-    /// Array of AST nodes used to produce meaningful errors
-    /// </summary>
-    internal Stack<GraphQLFragmentSpread>? NoFragmentCycles_SpreadPath;
-    /// <summary>
-    /// Position in the spread path
-    /// </summary>
-    internal Dictionary<ROM, int>? NoFragmentCycles_SpreadPathIndexByName;
-
     internal HashSet<ROM>? NoUndefinedVariables_VariableNameDefined;
-
-    internal List<GraphQLOperationDefinition>? NoUnusedFragments_OperationDefs;
-    internal List<GraphQLFragmentDefinition>? NoUnusedFragments_FragmentDefs;
 
     internal List<GraphQLVariableDefinition>? NoUnusedVariables_VariableDefs;
 

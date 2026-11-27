@@ -1,0 +1,29 @@
+---
+import { pageHref } from '../utils/site.js'
+
+const { links, githubUrl, pathName } = Astro.props
+
+const normalizePath = (path) => (path === '/' ? path : path.replace(/\/$/, ''))
+---
+
+<nav class="header">
+  <ul>
+    {
+      links.map((link) => (
+        <li>
+          <a
+            href={pageHref(link.url)}
+            aria-current={
+              normalizePath(link.url) === pathName ? 'page' : undefined
+            }
+          >
+            {link.title}
+          </a>
+        </li>
+      ))
+    }
+    <li>
+      <a href={githubUrl} rel="noopener noreferrer" target="_blank">GitHub</a>
+    </li>
+  </ul>
+</nav>

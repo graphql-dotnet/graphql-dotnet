@@ -1,0 +1,78 @@
+interface Character {
+  "Which movie they appear in."
+  appearsIn: [Episode!]!
+  friends: [Character!]!
+  friendsConnection: IStarWarsCharacterConnection!
+  "The id of the character."
+  id: String!
+  "The name of the character."
+  name: String!
+}
+
+type Droid implements Character {
+  "Which movie they appear in."
+  appearsIn: [Episode!]!
+  friends: [Character!]!
+  friendsConnection: IStarWarsCharacterConnection!
+  "The id of the character."
+  id: String!
+  "The name of the character."
+  name: String!
+  primaryFunction: String
+}
+
+"One of the films in the Star Wars Trilogy."
+enum Episode {
+  "Released in 1980."
+  EMPIRE
+  "Released in 1983."
+  JEDI
+  "Released in 1977."
+  NEWHOPE
+}
+
+type Human implements Character {
+  "Which movie they appear in."
+  appearsIn: [Episode!]!
+  friends: [Character!]!
+  friendsConnection: IStarWarsCharacterConnection!
+  homePlanet: String
+  "The id of the character."
+  id: String!
+  "The name of the character."
+  name: String!
+}
+
+input HumanInput {
+  homePlanet: String
+  name: String!
+}
+
+type IStarWarsCharacterConnection {
+  edges: [IStarWarsCharacterEdge!]
+  items: [Character]
+  pageInfo: PageInfo
+  totalCount: Int
+}
+
+type IStarWarsCharacterEdge {
+  cursor: String
+  node: Character
+}
+
+type Mutation {
+  createHuman(human: HumanInput!): Human!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
+type Query {
+  droid(id: String!): Droid
+  hero: Character
+  human(id: String!): Human
+}

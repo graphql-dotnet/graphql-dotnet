@@ -8,9 +8,6 @@ on:
       - docs2/**
       - .github/workflows/publish-documentation.yml
 
-env:
-  NODE_VERSION: '18.x'   # Node 18 LTS, see https://nodejs.org/en/about/releases/
-
 jobs:
   build-docs:
     runs-on: ubuntu-latest
@@ -25,13 +22,13 @@ jobs:
           repository: graphql-dotnet/graphql-dotnet.github.io
           token: ${{ secrets.ORG_PAT_TOKEN }}
           path: published
-      - name: Use Node.js ${{ env.NODE_VERSION }}
+      - name: Use Node.js from docs2/package.json
         uses: actions/setup-node@v7
         with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: npm install docs2
+          node-version-file: main/docs2/package.json
+      - name: npm ci docs2
         working-directory: main/docs2
-        run: npm install
+        run: npm ci
       - name: npm run build
         working-directory: main/docs2
         run: npm run build
@@ -39,12 +36,13 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: Documentation
-          path: main/docs2/public/**
+          path: main/docs2/dist/**
           if-no-files-found: error
+          include-hidden-files: true
       - name: Commit docs
         shell: bash
         run: |
-          rsync -a --quiet --delete --exclude ".git" "main/docs2/public/" "published/" || exit 1
+          rsync -a --quiet --delete --exclude ".git" "main/docs2/dist/" "published/" || exit 1
           cd published
           git config user.name github-actions
           git config user.email github-actions@graphql-dotnet.net

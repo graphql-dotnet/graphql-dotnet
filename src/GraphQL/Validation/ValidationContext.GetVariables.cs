@@ -31,25 +31,22 @@ public partial class ValidationContext
             return results;
         }
 
-        var usages = GetVariables(operation);
+        // Complete visits balance TypeInfo's stacks. Share the visitor context and
+        // result list across the operation and its fragments to avoid per-fragment allocations.
+        var context = new GetVariablesVisitorContext(this, new TypeInfo(Schema));
+        _getVariablesVisitor.VisitAsync(operation, context).GetAwaiter().GetResult();
 
-        var frags = GetRecursivelyReferencedFragments(operation);
+        var frags = GetRecursivelyReferencedFragmentsSet(operation);
 
         if (frags != null)
         {
             foreach (var fragment in frags)
             {
-                var usagesFromFragment = GetVariables(fragment);
-                if (usagesFromFragment != null)
-                {
-                    if (usages == null)
-                        usages = usagesFromFragment;
-                    else
-                        usages.AddRange(usagesFromFragment);
-                }
+                _getVariablesVisitor.VisitAsync(fragment, context).GetAwaiter().GetResult();
             }
         }
 
+        var usages = context.GetVariableUsages();
         _variables[operation] = usages;
 
         return usages;

@@ -153,6 +153,8 @@ It supports the popular IDEs for managing GraphQL requests and exploring GraphQL
 - [GraphiQL](https://github.com/graphql/graphiql)
 - [Voyager](https://github.com/APIs-guru/graphql-voyager)
 
+For demo servers targeting .NET 10 with GraphiQL, see [GraphQL.Harness.TypeFirst](samples/GraphQL.Harness.TypeFirst/GraphQL.Harness.TypeFirst.csproj) or [GraphQL.Harness.SchemaFirst](samples/GraphQL.Harness.SchemaFirst/GraphQL.Harness.SchemaFirst.csproj).
+
 ## Ahead-of-time compilation
 
 GraphQL.NET supports ahead-of-time (AOT) compilation for execution of code-first schemas with .NET 7+. This allows
