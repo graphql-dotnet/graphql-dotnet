@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Reflection;
+using GraphQL.Reflection;
 
 namespace GraphQL.Types;
 
@@ -57,6 +58,13 @@ public class AutoRegisteringObjectGraphType<[DynamicallyAccessedMembers(Dynamica
         foreach (var fieldType in ProvideFields())
         {
             _ = AddField(fieldType);
+        }
+
+        // a type within a closed hierarchy implements the GraphQL interface of every closed type it derives
+        // from, which is what lets it be selected through the hierarchy's own graph type
+        foreach (var closedBaseType in ClosedTypeInfo.GetClosedBaseTypes(typeof(TSourceType)))
+        {
+            Interface(typeof(GraphQLClrOutputTypeReference<>).MakeGenericType(closedBaseType));
         }
 
         // cache the instance if reflection caching is enabled
