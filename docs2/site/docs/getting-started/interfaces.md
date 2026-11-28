@@ -150,7 +150,7 @@ public class CharacterInterface : InterfaceGraphType<StarWarsCharacter>
 ## C# closed type hierarchies
 
 A type declared with the C# `closed` modifier is implicitly abstract and can only be derived from
-within its own file, so the compiler records the complete list of derived types on it. That is what
+within its own assembly, so the compiler records the complete list of derived types on it. That is what
 a GraphQL interface describes, and a closed hierarchy is mapped to one automatically:
 
 ```csharp
