@@ -8,32 +8,14 @@ public partial class ValidationContext
 {
     private Dictionary<GraphQLOperationDefinition, HashSet<GraphQLFragmentDefinition>?>? _fragments;
     private Dictionary<GraphQLOperationDefinition, HashSet<GraphQLFragmentDefinition>?>? _usedFragments;
-    private Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>?>? _fragmentLists;
-    private Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>?>? _usedFragmentLists;
     private bool? _noFragments;
 
     /// <summary>
-    /// For a specified operation within a document, returns a list of all fragment definitions referenced by
+    /// For a specified operation within a document, returns a set of all fragment definitions referenced by
     /// the specified operation, or <see langword="null"/> if there are none. When specified by the <paramref name="onlyUsed"/>
     /// parameter, returns only the fragments that are not skipped by the @skip or @include directive.
     /// </summary>
-    public List<GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(GraphQLOperationDefinition operation, bool onlyUsed = false)
-    {
-        // if we have already determined that there are fragments in the document and we have already calculated the list for this operation, return it
-        if (_noFragments == false && (onlyUsed ? _usedFragmentLists : _fragmentLists)?.TryGetValue(operation, out var results) == true)
-            return results;
-
-        var fragments = GetRecursivelyReferencedFragmentsSet(operation, onlyUsed);
-
-        if (_noFragments == true)
-            return null;
-
-        var list = fragments == null ? null : new List<GraphQLFragmentDefinition>(fragments);
-        (onlyUsed ? _usedFragmentLists ??= [] : _fragmentLists ??= [])[operation] = list;
-        return list;
-    }
-
-    internal HashSet<GraphQLFragmentDefinition>? GetRecursivelyReferencedFragmentsSet(GraphQLOperationDefinition operation, bool onlyUsed = false)
+    public HashSet<GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(GraphQLOperationDefinition operation, bool onlyUsed = false)
     {
         // if we have already determined that there are no fragments in the document, return null
         if (_noFragments == true)
@@ -140,32 +122,17 @@ public partial class ValidationContext
     }
 
     /// <summary>
-    /// For a specified operations within a document, returns a list of all fragment definitions in use, or <see langword="null"/> if there are none.
+    /// For the specified operations within a document, returns a set of all fragment definitions in use, or <see langword="null"/> if there are none.
     /// </summary>
-    public List<GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(List<GraphQLOperationDefinition> operations)
+    public HashSet<GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(List<GraphQLOperationDefinition> operations)
     {
         if (operations.Count == 1)
             return GetRecursivelyReferencedFragments(operations[0]);
 
-        List<GraphQLFragmentDefinition>? fragments = null;
-        foreach (var operation in operations)
-        {
-            var items = GetRecursivelyReferencedFragments(operation);
-            if (items != null)
-                (fragments ??= []).AddRange(items);
-        }
-        return fragments;
-    }
-
-    internal HashSet<GraphQLFragmentDefinition>? GetRecursivelyReferencedFragmentsSet(List<GraphQLOperationDefinition> operations)
-    {
-        if (operations.Count == 1)
-            return GetRecursivelyReferencedFragmentsSet(operations[0]);
-
         HashSet<GraphQLFragmentDefinition>? fragments = null;
         foreach (var operation in operations)
         {
-            var items = GetRecursivelyReferencedFragmentsSet(operation);
+            var items = GetRecursivelyReferencedFragments(operation);
             if (items != null)
             {
                 if (fragments == null)

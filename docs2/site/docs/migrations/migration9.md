@@ -743,3 +743,12 @@ list item index. These properties now describe the actual list field resolver co
 
 Code that retrieved the list item index from `Parent.Path` should instead inspect the current
 resolver context's `Path` or `ResponsePath`.
+
+### 22. `ValidationContext.GetRecursivelyReferencedFragments` returns a `HashSet`
+
+Both overloads of `ValidationContext.GetRecursivelyReferencedFragments` now return
+`HashSet<GraphQLFragmentDefinition>?` instead of `List<GraphQLFragmentDefinition>?`.
+Update explicitly typed variables and code that requires list operations accordingly.
+The overload accepting multiple operations now returns each referenced fragment only once,
+even when several operations reference it. Enumeration order is not guaranteed.
+Both overloads still return `null` when no fragments are referenced.
